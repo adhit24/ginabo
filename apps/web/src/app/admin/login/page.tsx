@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type State = { status: "idle" } | { status: "submitting" } | { status: "error"; message: string };
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/admin";
@@ -76,3 +76,10 @@ export default function AdminLoginPage() {
   );
 }
 
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<div className="grid place-items-center py-20 text-sm text-gray-400">Loading...</div>}>
+      <AdminLoginForm />
+    </Suspense>
+  );
+}
