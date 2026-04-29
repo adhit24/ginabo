@@ -89,7 +89,7 @@ export default function HomePage() {
     <div>
 
       {/* ── 1. HERO ── */}
-      <section className="relative overflow-hidden bg-brand-900">
+      <section className="relative overflow-hidden bg-brand-900" style={{minHeight: "420px"}}>
         <div className="absolute inset-0">
           <Image
             src="/hero/hero-woman.jpg"
@@ -99,33 +99,33 @@ export default function HomePage() {
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-900/90 via-brand-900/60 to-brand-700/30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-900/85 via-brand-900/65 to-brand-900/20" />
         </div>
 
-        <div className="relative mx-auto w-full max-w-8xl px-6 py-16 md:min-h-[480px] md:grid md:grid-cols-12 md:items-center md:px-12 md:py-20">
+        <div className="relative flex min-h-[420px] flex-col justify-center px-5 py-14 md:min-h-[500px] md:grid md:grid-cols-12 md:items-center md:px-12 md:py-20 mx-auto w-full max-w-8xl">
           <div className="md:col-span-6">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[11px] font-semibold tracking-[0.18em] text-white/90 backdrop-blur">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-semibold tracking-[0.15em] text-white/90 backdrop-blur">
               BARRIER-FIRST · DAILY · TRUST-BASED
             </div>
-            <h1 className="text-4xl font-extrabold leading-[1.05] text-white md:text-5xl">
+            <h1 className="text-[2rem] font-extrabold leading-[1.1] text-white md:text-5xl">
               Kulit Sehat<br />
               Dimulai dari<br />
               Rutinitas yang<br />
               Tepat
             </h1>
-            <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/80">
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/80 md:max-w-sm">
               Ginabo hadir untuk membantu kamu merawat kulit dengan cara yang sederhana, konsisten, dan aman untuk pemakaian harian.
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-6 flex gap-3">
               <Link
                 href="/shop"
-                className="inline-flex items-center justify-center rounded-xl bg-white px-7 py-3 text-sm font-bold text-brand-800 shadow-sm transition hover:bg-brand-50"
+                className="inline-flex flex-1 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-bold text-brand-800 shadow-sm transition hover:bg-brand-50 md:flex-none md:px-7"
               >
                 Belanja Sekarang
               </Link>
               <Link
                 href="/about"
-                className="inline-flex items-center justify-center rounded-xl border border-white/40 bg-transparent px-7 py-3 text-sm font-bold text-white transition hover:bg-white/10"
+                className="inline-flex flex-1 items-center justify-center rounded-xl border border-white/40 bg-transparent px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10 md:flex-none md:px-7"
               >
                 Tentang Kami
               </Link>
@@ -134,25 +134,25 @@ export default function HomePage() {
         </div>
 
         {/* Dots indicator */}
-        <div className="absolute bottom-5 inset-x-0 flex justify-center gap-2">
+        <div className="absolute bottom-4 inset-x-0 flex justify-center gap-2">
           <span className="h-1.5 w-5 rounded-full bg-white/80" />
           <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
         </div>
       </section>
 
       {/* ── 3. CUSTOMER FAVORITE ── */}
-      <section className="bg-brand-50 py-16 md:py-20">
+      <section className="bg-brand-50 py-10 md:py-20">
         <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
           <div className="mb-1 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">
             Customer Favorite
           </div>
-          <h2 className="mb-2 text-center text-2xl font-bold text-brand-900 md:text-3xl">
+          <h2 className="mb-2 text-center text-xl font-bold text-brand-900 md:text-3xl">
             Produk Terlaris Ginabo
           </h2>
-          <p className="mb-10 text-center text-sm text-brand-500">
+          <p className="mb-7 text-center text-xs text-brand-500 md:text-sm">
             Diformulasi dari riset bertahun-tahun — ringan di kulit, konsisten pada hasil.
           </p>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
             {products.map((p) => (
               <Link key={p.name} href="/shop" className="group flex flex-col overflow-hidden rounded-xl bg-white shadow-brand-sm transition hover:shadow-brand">
                 <div className="relative aspect-[4/5] overflow-hidden">
@@ -185,20 +185,20 @@ export default function HomePage() {
       </section>
 
       {/* ── 4. SHOP BY CATEGORY ── */}
-      <section className="bg-white py-12 md:py-16">
+      <section className="bg-white py-8 md:py-16">
         <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <h2 className="mb-8 text-center text-2xl font-bold text-brand-900 md:text-3xl">
+          <h2 className="mb-5 text-center text-xl font-bold text-brand-900 md:text-3xl">
             Shop By Category
           </h2>
-          <div className="flex gap-4 overflow-x-auto pb-2">
+          <div className="flex gap-3 overflow-x-auto pb-2 px-1 scrollbar-none">
             {shopCategories.map((c) => (
               <Link key={c.label} href={c.href}
-                className="group flex shrink-0 flex-col items-center gap-3 rounded-2xl border border-brand-100 bg-brand-50 p-4 transition hover:border-brand-300 hover:bg-brand-100"
-                style={{ minWidth: 110 }}>
-                <div className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-white shadow-brand-sm">
-                  <Image src={c.img} alt={c.label} fill className="object-cover" sizes="64px" />
+                className="group flex shrink-0 flex-col items-center gap-2 rounded-2xl border border-brand-100 bg-brand-50 p-3 transition hover:border-brand-300 hover:bg-brand-100"
+                style={{ minWidth: 90 }}>
+                <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-white shadow-brand-sm">
+                  <Image src={c.img} alt={c.label} fill className="object-cover" sizes="56px" />
                 </div>
-                <span className="text-[11px] font-bold tracking-[0.12em] text-brand-800">{c.label}</span>
+                <span className="text-[10px] font-bold tracking-[0.1em] text-brand-800 text-center">{c.label}</span>
               </Link>
             ))}
           </div>
@@ -206,12 +206,12 @@ export default function HomePage() {
       </section>
 
       {/* ── 5. SERIES BANNERS ── */}
-      <section className="bg-brand-50 py-14 md:py-20">
+      <section className="bg-brand-50 py-10 md:py-20">
         <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
           <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">
             The Story Behind Our Series
           </div>
-          <h2 className="mb-10 text-center text-2xl font-bold text-brand-900 md:text-3xl">
+          <h2 className="mb-6 text-center text-xl font-bold text-brand-900 md:text-3xl">
             Skincare Series untuk Setiap Kebutuhan
           </h2>
           <div className="grid grid-cols-2 gap-3 md:gap-5 lg:grid-cols-4">
@@ -241,7 +241,7 @@ export default function HomePage() {
         <div className="mx-auto grid w-full max-w-8xl grid-cols-1 divide-y divide-brand-600 md:grid-cols-3 md:divide-x md:divide-y-0">
           {[
             {
-              title: "FREE SHIPPING AROUND INDONESIA",
+              title: "Free Shipping\nseluruh Indonesia",
               icon: (
                 <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2" className="h-12 w-12">
                   <rect x="2" y="20" width="40" height="26" rx="3"/><path d="M42 28h10l8 10v8H42V28z"/><circle cx="16" cy="50" r="5"/><circle cx="50" cy="50" r="5"/><path d="M11 20V14a2 2 0 012-2h26a2 2 0 012 2v6"/>
@@ -249,7 +249,7 @@ export default function HomePage() {
               ),
             },
             {
-              title: "SPECIAL GIFT WITH PURCHASE\n(WEBSITE ONLY)",
+              title: "Special Gift\nWith Purchase",
               icon: (
                 <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2" className="h-12 w-12">
                   <rect x="8" y="24" width="48" height="36" rx="2"/><rect x="4" y="16" width="56" height="10" rx="2"/><path d="M32 16v44M20 16a8 8 0 010-10 8 8 0 0112 0M44 16a8 8 0 000-10 8 8 0 00-12 0"/>
@@ -257,7 +257,7 @@ export default function HomePage() {
               ),
             },
             {
-              title: "CLEARANCE SALE AND DISCOUNT\n(MONDAY AND FRIDAY)",
+              title: "Clearance Sale\n& Discount",
               icon: (
                 <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2" className="h-12 w-12">
                   <circle cx="32" cy="32" r="28"/><circle cx="32" cy="32" r="18"/><path d="M24 40l16-16M24 26a2 2 0 110-4 2 2 0 010 4zM40 42a2 2 0 110-4 2 2 0 010 4z"/>
@@ -265,37 +265,37 @@ export default function HomePage() {
               ),
             },
           ].map((f) => (
-            <div key={f.title} className="flex flex-col items-center gap-5 px-8 py-12 text-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white">
+            <div key={f.title} className="flex flex-row items-center gap-4 px-6 py-8 md:flex-col md:gap-5 md:px-8 md:py-12 md:text-center">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white md:h-20 md:w-20">
                 {f.icon}
               </div>
-              <span className="whitespace-pre-line text-[11px] font-bold tracking-[0.15em] text-white/90">{f.title}</span>
+              <span className="whitespace-pre-line text-sm font-bold text-white/90 md:text-center md:text-[11px] md:tracking-[0.15em]">{f.title}</span>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── 7. PROBLEM SECTION ── */}
-      <section className="bg-white py-16 md:py-24">
+      <section className="bg-white py-10 md:py-24">
         <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mb-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Tantangan Kulit Sehari-hari</div>
-          <h2 className="mb-4 text-center text-2xl font-bold text-brand-900 md:text-3xl">
+          <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Tantangan Kulit Sehari-hari</div>
+          <h2 className="mb-2 text-center text-xl font-bold text-brand-900 md:text-3xl">
             Apakah Kamu Merasakannya?
           </h2>
-          <p className="mb-12 text-center text-sm text-brand-500">
+          <p className="mb-7 text-center text-xs text-brand-500 md:text-sm">
             Kulitmu butuh nutrisi, bukan treatment keras.
           </p>
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
             {[
               { icon: "💧", title: "Kulit Kering", desc: "Terasa ketarik sepanjang hari walau sudah pakai moisturizer" },
               { icon: "🌫️", title: "Kusam & Tidak Merata", desc: "Wajah terlihat lelah meski sudah tidur cukup" },
               { icon: "😫", title: "Kulit Mudah Iritasi", desc: "Produk baru langsung bikin kemerahan atau purging" },
               { icon: "💄", title: "Makeup Tidak Nyaman", desc: "Foundation mudah luntur, pori-pori terlihat jelas" },
             ].map(p => (
-              <div key={p.title} className="flex flex-col items-center gap-4 rounded-2xl border border-brand-100 bg-brand-50 p-6 text-center">
-                <span className="text-4xl">{p.icon}</span>
-                <div className="text-sm font-bold text-brand-900">{p.title}</div>
-                <div className="text-xs leading-relaxed text-brand-500">{p.desc}</div>
+              <div key={p.title} className="flex flex-col items-center gap-2 rounded-2xl border border-brand-100 bg-brand-50 p-4 text-center md:gap-4 md:p-6">
+                <span className="text-3xl md:text-4xl">{p.icon}</span>
+                <div className="text-xs font-bold text-brand-900 md:text-sm">{p.title}</div>
+                <div className="text-[11px] leading-relaxed text-brand-500 md:text-xs">{p.desc}</div>
               </div>
             ))}
           </div>
@@ -303,15 +303,15 @@ export default function HomePage() {
       </section>
 
       {/* ── 8. SOLUTION SECTION ── */}
-      <section className="bg-brand-50 py-16 md:py-24">
+      <section className="bg-brand-50 py-10 md:py-24">
         <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <div className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Pendekatan Kami</div>
-            <h2 className="mb-6 text-2xl font-bold text-brand-900 md:text-3xl">Nutrition Skin Approach</h2>
-            <p className="mb-10 text-sm leading-relaxed text-brand-600">
+            <div className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Pendekatan Kami</div>
+            <h2 className="mb-4 text-xl font-bold text-brand-900 md:text-3xl">Nutrition Skin Approach</h2>
+            <p className="mb-7 text-sm leading-relaxed text-brand-600">
               GINABO tidak mengejar hasil instan. Kami percaya kulit yang sehat dibangun dari rutinitas yang konsisten dan bahan-bahan yang benar-benar bersahabat dengan kulitmu.
             </p>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               {[
                 { num: "01", title: "Gentle", desc: "Formula ringan yang aman dipakai rutin setiap hari tanpa khawatir efek samping" },
                 { num: "02", title: "Barrier-focused", desc: "Prioritas pertama adalah menjaga lapisan pelindung kulit tetap kuat dan sehat" },
@@ -331,7 +331,7 @@ export default function HomePage() {
       {/* ── 9. HERO PRODUCT ── */}
       <section className="overflow-hidden bg-white">
         <div className="mx-auto grid w-full max-w-8xl md:grid-cols-2">
-          <div className="relative min-h-[360px] overflow-hidden md:min-h-[540px]">
+          <div className="relative min-h-[260px] overflow-hidden md:min-h-[540px]">
             <Image
               src="/product-serum-bg.png"
               alt="GlowAge Multi-Active Serum"
@@ -377,11 +377,11 @@ export default function HomePage() {
       </section>
 
       {/* ── 10. HOW IT WORKS ── */}
-      <section className="bg-brand-50 py-16 md:py-24">
+      <section className="bg-brand-50 py-10 md:py-24">
         <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mb-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Cara Kerja</div>
-          <h2 className="mb-12 text-center text-2xl font-bold text-brand-900 md:text-3xl">Semudah 3 Langkah</h2>
-          <div className="relative grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Cara Kerja</div>
+          <h2 className="mb-8 text-center text-xl font-bold text-brand-900 md:text-3xl">Semudah 3 Langkah</h2>
+          <div className="relative grid grid-cols-3 gap-4 md:gap-8">
             {/* connector line */}
             <div className="absolute left-0 right-0 top-8 hidden h-px bg-brand-200 md:block" style={{left:"16%", right:"16%"}} />
             {[
@@ -389,12 +389,12 @@ export default function HomePage() {
               { step: "02", title: "Skin Feels Better", desc: "Minggu pertama kulit mulai terasa lebih lembap, lebih tenang, dan nyaman sepanjang hari." },
               { step: "03", title: "Visible Improvement", desc: "Setelah konsisten 4–8 minggu, warna kulit lebih merata dan cerah terlihat jelas." },
             ].map(s => (
-              <div key={s.step} className="flex flex-col items-center gap-4 text-center">
-                <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-brand-700 text-lg font-extrabold text-white shadow-brand">
+              <div key={s.step} className="flex flex-col items-center gap-3 text-center">
+                <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-brand-700 text-sm font-extrabold text-white shadow-brand md:h-16 md:w-16 md:text-lg">
                   {s.step}
                 </div>
-                <div className="text-base font-bold text-brand-900">{s.title}</div>
-                <div className="max-w-xs text-xs leading-relaxed text-brand-500">{s.desc}</div>
+                <div className="text-xs font-bold text-brand-900 md:text-base">{s.title}</div>
+                <div className="text-[10px] leading-relaxed text-brand-500 md:max-w-xs md:text-xs">{s.desc}</div>
               </div>
             ))}
           </div>
@@ -402,11 +402,11 @@ export default function HomePage() {
       </section>
 
       {/* ── 11. SOCIAL PROOF ── */}
-      <section className="bg-white py-16 md:py-24">
+      <section className="bg-white py-10 md:py-24">
         <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mb-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Testimoni</div>
-          <h2 className="mb-10 text-center text-2xl font-bold text-brand-900 md:text-3xl">Apa Kata Mereka?</h2>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Testimoni</div>
+          <h2 className="mb-6 text-center text-xl font-bold text-brand-900 md:text-3xl">Apa Kata Mereka?</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
               { name: "Rizka A.",    skin: "Kulit kering",    rating: 5, text: "Pakai 2 minggu udah kerasa bedanya. Kulitku yang kering banget akhirnya bisa lembap seharian tanpa re-apply!", img: "/product-serum-1.png" },
               { name: "Diandra S.",  skin: "Kulit berminyak", rating: 5, text: "Skeptis awalnya, tapi sekarang udah jadi holy grail. Minyak berkurang, pori nggak kelihatan melar, dan makeup nempel lama!", img: "/product-cream-bg.png" },
@@ -434,27 +434,27 @@ export default function HomePage() {
       </section>
 
       {/* ── 12. FIRST TRY SECTION ── */}
-      <section className="bg-brand-700 py-16 md:py-24">
-        <div className="mx-auto w-full max-w-8xl px-4 text-center md:px-8">
-          <div className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-brand-200">Khusus Kamu yang Belum Pernah Coba</div>
-          <h2 className="mb-4 text-3xl font-extrabold text-white md:text-4xl">Mulai dari First Try</h2>
-          <p className="mx-auto mb-8 max-w-lg text-sm leading-relaxed text-brand-200">
-            Ukuran kecil, harga terjangkau. Rasakan sendiri manfaatnya sebelum komit ke full size — tanpa risiko, tanpa tekanan.
+      <section className="bg-brand-700 py-12 md:py-24">
+        <div className="mx-auto w-full max-w-8xl px-5 text-center md:px-8">
+          <div className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-200">Khusus Kamu yang Belum Pernah Coba</div>
+          <h2 className="mb-3 text-2xl font-extrabold text-white md:text-4xl">Mulai dari First Try</h2>
+          <p className="mx-auto mb-7 max-w-xs text-sm leading-relaxed text-brand-200 md:max-w-lg">
+            Ukuran kecil, harga terjangkau. Rasakan sendiri manfaatnya sebelum komit ke full size.
           </p>
-          <div className="mb-10 flex flex-wrap items-center justify-center gap-4">
+          <div className="mb-7 grid grid-cols-2 gap-2 md:flex md:flex-wrap md:items-center md:justify-center md:gap-4">
             {[
               { label: "Ukuran 10ml", icon: "🧴" },
-              { label: "Harga mulai Rp 75.000", icon: "💜" },
+              { label: "Mulai Rp 75.000", icon: "💜" },
               { label: "Free shipping", icon: "🚚" },
               { label: "Garansi kepuasan", icon: "✅" },
             ].map(f => (
-              <div key={f.label} className="flex items-center gap-2 rounded-full border border-brand-500 bg-brand-800/50 px-4 py-2 text-sm text-white">
+              <div key={f.label} className="flex items-center justify-center gap-2 rounded-full border border-brand-500 bg-brand-800/50 px-3 py-2 text-xs text-white md:px-4 md:text-sm">
                 <span>{f.icon}</span><span>{f.label}</span>
               </div>
             ))}
           </div>
           <Link href="/shop"
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-10 py-4 text-base font-extrabold text-brand-800 shadow-brand-lg transition hover:bg-brand-50">
+            className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-sm font-extrabold text-brand-800 shadow-brand-lg transition hover:bg-brand-50 md:px-10 md:text-base">
             Coba First Try Sekarang →
           </Link>
         </div>
