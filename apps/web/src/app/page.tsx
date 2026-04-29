@@ -1,25 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SkinTypeSection } from "@/components/SkinTypeSection";
-import { HomeBannerCarousel } from "@/components/HomeBannerCarousel";
-
-const heroSlides = [
-  {
-    href: "/shop",
-    img: "/hero/slide-1.png",
-    imgAlt: "Ginabo promo banner 1",
-  },
-  {
-    href: "/shop",
-    img: "/hero/slide-2.png",
-    imgAlt: "Ginabo promo banner 2",
-  },
-  {
-    href: "/booking",
-    img: "/hero/slide-3.png",
-    imgAlt: "Ginabo promo banner 3",
-  },
-];
 
 const products = [
   {
@@ -107,9 +88,56 @@ export default function HomePage() {
   return (
     <div>
 
-      {/* ── 1. HERO SLIDER ── */}
-      <section className="relative">
-        <HomeBannerCarousel slides={heroSlides.map((s) => ({ src: s.img, alt: s.imgAlt, href: s.href }))} intervalMs={3000} />
+      {/* ── 1. HERO ── */}
+      <section className="relative overflow-hidden bg-brand-900">
+        <div className="absolute inset-0">
+          <Image
+            src="/hero/slide-1.png"
+            alt="Ginabo hero"
+            fill
+            className="object-cover object-center opacity-40"
+            priority
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-900/90 via-brand-900/60 to-brand-700/30" />
+        </div>
+
+        <div className="relative mx-auto w-full max-w-8xl px-6 py-16 md:min-h-[480px] md:grid md:grid-cols-12 md:items-center md:px-12 md:py-20">
+          <div className="md:col-span-6">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[11px] font-semibold tracking-[0.18em] text-white/90 backdrop-blur">
+              BARRIER-FIRST · DAILY · TRUST-BASED
+            </div>
+            <h1 className="text-4xl font-extrabold leading-[1.05] text-white md:text-5xl">
+              Kulit Sehat<br />
+              Dimulai dari<br />
+              Rutinitas yang<br />
+              Tepat
+            </h1>
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/80">
+              Ginabo hadir untuk membantu kamu merawat kulit dengan cara yang sederhana, konsisten, dan aman untuk pemakaian harian.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href="/shop"
+                className="inline-flex items-center justify-center rounded-xl bg-white px-7 py-3 text-sm font-bold text-brand-800 shadow-sm transition hover:bg-brand-50"
+              >
+                Belanja Sekarang
+              </Link>
+              <Link
+                href="/about"
+                className="inline-flex items-center justify-center rounded-xl border border-white/40 bg-transparent px-7 py-3 text-sm font-bold text-white transition hover:bg-white/10"
+              >
+                Tentang Kami
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Dots indicator */}
+        <div className="absolute bottom-5 inset-x-0 flex justify-center gap-2">
+          <span className="h-1.5 w-5 rounded-full bg-white/80" />
+          <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
+        </div>
       </section>
 
       {/* ── 3. CUSTOMER FAVORITE ── */}
