@@ -38,9 +38,9 @@ export function AddToCartButton({
       <button
         type="button"
         onClick={handleClick}
-        className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-brand-700 py-2 text-xs font-semibold text-white transition hover:bg-brand-800"
+        className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-800"
       >
-        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
           <line x1="3" y1="6" x2="21" y2="6" />
           <path d="M16 10a4 4 0 01-8 0" />
@@ -50,4 +50,3 @@ export function AddToCartButton({
     </>
   );
 }
-

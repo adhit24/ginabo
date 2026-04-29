@@ -9,7 +9,7 @@ export function CartMini() {
   return (
     <button
       onClick={openCart}
-      className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-2 text-sm text-gray-800 hover:border-gray-300"
+      className="inline-flex h-10 items-center gap-2 rounded-full border border-gray-200 px-3 text-sm font-semibold text-gray-800 hover:border-gray-300"
     >
       <span className="font-medium">Cart</span>
       <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-semibold text-brand-800">

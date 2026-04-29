@@ -104,7 +104,7 @@ export default function BookingPage() {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-brand-300"
+              className="rounded-2xl border border-gray-200 px-4 py-3 text-[16px] outline-none focus:border-brand-300 md:text-sm"
             />
           </label>
 
@@ -157,7 +157,7 @@ export default function BookingPage() {
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-brand-300"
+                className="rounded-2xl border border-gray-200 px-4 py-3 text-[16px] outline-none focus:border-brand-300 md:text-sm"
                 placeholder="Nama lengkap"
               />
             </label>
@@ -166,7 +166,7 @@ export default function BookingPage() {
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-brand-300"
+                className="rounded-2xl border border-gray-200 px-4 py-3 text-[16px] outline-none focus:border-brand-300 md:text-sm"
                 placeholder="email@contoh.com"
               />
             </label>
@@ -175,7 +175,7 @@ export default function BookingPage() {
               <input
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-brand-300"
+                className="rounded-2xl border border-gray-200 px-4 py-3 text-[16px] outline-none focus:border-brand-300 md:text-sm"
                 placeholder="+62..."
               />
             </label>
@@ -184,7 +184,7 @@ export default function BookingPage() {
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="min-h-24 rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-brand-300"
+                className="min-h-24 rounded-2xl border border-gray-200 px-4 py-3 text-[16px] outline-none focus:border-brand-300 md:text-sm"
                 placeholder="Ceritakan kondisi kulit / tujuan..."
               />
             </label>

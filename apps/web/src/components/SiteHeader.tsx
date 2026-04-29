@@ -87,21 +87,25 @@ export function SiteHeader() {
       </div>
 
       {/* ── Announcement Bar ── */}
-      <div className="bg-gradient-purple py-2">
+      <div className="bg-gradient-purple py-1.5 md:py-2">
         <div className="mx-auto flex max-w-8xl items-center justify-center gap-2 px-4 text-center">
-          <span className="line-clamp-1 text-[11px] font-medium text-white md:text-xs">{ann.text}</span>
+          <span className="line-clamp-1 text-[12px] font-medium text-white md:text-xs">{ann.text}</span>
           <Link href={ann.href}
-            className="shrink-0 rounded-full border border-white/30 px-2.5 py-0.5 text-[10px] font-semibold text-white hover:bg-white/20 transition">
+            className="shrink-0 rounded-full border border-white/30 px-3 py-1 text-[11px] font-semibold text-white transition hover:bg-white/20">
             {ann.cta} →
           </Link>
         </div>
       </div>
 
       {/* ── Main Header Row ── */}
-      <div className="mx-auto flex w-full max-w-8xl items-center justify-between px-4 py-3 md:px-8 md:py-4">
+      <div className="mx-auto flex w-full max-w-8xl items-center justify-between px-4 py-2.5 md:px-8 md:py-4">
 
         {/* Hamburger (mobile) */}
-        <button onClick={() => setDrawerOpen(true)} className="flex flex-col gap-[5px] p-2 md:hidden" aria-label="Menu">
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className="flex h-10 w-10 flex-col items-center justify-center gap-[5px] rounded-xl md:hidden hover:bg-brand-50"
+          aria-label="Menu"
+        >
           <span className="block h-[1.5px] w-5 bg-brand-800" />
           <span className="block h-[1.5px] w-5 bg-brand-800" />
           <span className="block h-[1.5px] w-4 bg-brand-800" />
@@ -163,10 +167,10 @@ export function SiteHeader() {
       </div>
 
       {/* ── Mobile quick-nav strip ── */}
-      <nav className="flex gap-1 overflow-x-auto border-t border-brand-100 bg-brand-50 px-3 py-1.5 md:hidden">
+      <nav className="flex gap-1 overflow-x-auto border-t border-brand-100 bg-brand-50 px-3 py-2 md:hidden">
         {navItems.map(item => (
           <Link key={item.href} href={item.href}
-            className="shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-brand-700 hover:bg-brand-100">
+            className="shrink-0 rounded-full px-3 py-2 text-xs font-medium text-brand-700 hover:bg-brand-100">
             {item.label}
           </Link>
         ))}

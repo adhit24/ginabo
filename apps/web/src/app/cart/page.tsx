@@ -11,14 +11,14 @@ export default function CartPage() {
 
   return (
     <div className="grid gap-6">
-      <div className="flex items-end justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="grid gap-1">
           <h1 className="text-2xl font-semibold tracking-tight text-gray-900 md:text-3xl">Cart</h1>
           <p className="text-sm text-gray-600">Review item sebelum checkout.</p>
         </div>
         <Link
           href="/checkout"
-          className="inline-flex items-center justify-center rounded-full bg-brand-700 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-800"
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-brand-700 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-800 sm:w-auto"
         >
           Checkout
         </Link>
@@ -101,4 +101,3 @@ export default function CartPage() {
     </div>
   );
 }
-

@@ -88,7 +88,7 @@ export default function SignupPage() {
                 placeholder="Nama kamu"
                 value={form.name}
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-[16px] text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 md:text-sm"
               />
             </div>
 
@@ -100,7 +100,7 @@ export default function SignupPage() {
                 placeholder="email@kamu.com"
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-[16px] text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 md:text-sm"
               />
             </div>
 
@@ -111,7 +111,7 @@ export default function SignupPage() {
                 placeholder="08xx-xxxx-xxxx"
                 value={form.phone}
                 onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-[16px] text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 md:text-sm"
               />
             </div>
 
@@ -123,7 +123,7 @@ export default function SignupPage() {
                 placeholder="Min. 8 karakter"
                 value={form.password}
                 onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-[16px] text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 md:text-sm"
               />
             </div>
 
@@ -135,7 +135,7 @@ export default function SignupPage() {
                 placeholder="Ulangi password"
                 value={form.confirm}
                 onChange={e => setForm(f => ({ ...f, confirm: e.target.value }))}
-                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-[16px] text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 md:text-sm"
               />
             </div>
 

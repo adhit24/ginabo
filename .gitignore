@@ -53,6 +53,7 @@ brand_asset/
 node_modules/
 .next/
 .turbo/
+*.tsbuildinfo
 
 # Env
 .env

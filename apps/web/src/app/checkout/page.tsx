@@ -51,14 +51,15 @@ export default function CheckoutPage() {
     }
   }
 
-  const inputCls = "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none placeholder:text-gray-300 focus:border-brand-500 focus:ring-1 focus:ring-brand-200";
+  const inputCls =
+    "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-[16px] text-gray-900 outline-none placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 md:text-sm";
   const labelCls = "mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500";
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="grid gap-6">
       {/* Breadcrumb */}
-      <div className="border-b border-gray-200 bg-white px-4 py-3 md:px-8">
-        <div className="mx-auto flex max-w-5xl items-center gap-2 text-xs text-gray-400">
+      <div className="rounded-2xl border border-gray-100 bg-white px-4 py-3">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
           <Link href="/" className="hover:text-brand-700">Home</Link>
           <span>›</span>
           <Link href="/cart" className="hover:text-brand-700">Keranjang</Link>
@@ -67,8 +68,8 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 py-8 md:px-8">
-        <div className="mb-6">
+      <div className="grid gap-6">
+        <div>
           <h1 className="text-2xl font-extrabold text-gray-900">Checkout</h1>
           <p className="mt-1 text-sm text-gray-500">Lengkapi data pengiriman dan pembayaran untuk menyelesaikan pesanan.</p>
         </div>
@@ -88,7 +89,7 @@ export default function CheckoutPage() {
 
             {/* ── Left: Form ── */}
             <div className="flex-1">
-              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
                 <h2 className="mb-5 text-sm font-bold text-gray-900">Informasi Pengiriman</h2>
                 <div className="flex flex-col gap-4">
                   <div>
@@ -166,10 +167,10 @@ export default function CheckoutPage() {
                         )}
                       </div>
                       <div className="flex-1">
-                        <p className="line-clamp-1 text-xs font-semibold text-gray-800">{i.name}</p>
+                        <p className="line-clamp-1 text-sm font-semibold text-gray-900">{i.name}</p>
                         <p className="text-[11px] text-gray-400">{i.quantity} × {formatMoney(i.priceMinor, i.currency)}</p>
                       </div>
-                      <span className="shrink-0 text-xs font-bold text-gray-900">{formatMoney(i.quantity * i.priceMinor, i.currency)}</span>
+                      <span className="shrink-0 text-sm font-bold text-gray-900">{formatMoney(i.quantity * i.priceMinor, i.currency)}</span>
                     </div>
                   ))}
                 </div>
@@ -206,4 +207,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-

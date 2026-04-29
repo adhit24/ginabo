@@ -20,7 +20,7 @@ export function CartDrawer() {
 
       {/* Drawer */}
       <div
-        className={`fixed right-0 top-0 z-[10000] flex h-full w-[360px] max-w-[100vw] flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 top-0 z-[10000] flex h-full w-full max-w-[100vw] flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out sm:w-[360px] ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -71,7 +71,7 @@ export function CartDrawer() {
 
                     {/* Info */}
                     <div className="flex flex-1 flex-col justify-between gap-1">
-                      <p className="line-clamp-2 text-xs font-semibold leading-snug text-gray-800">{item.name}</p>
+                      <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900">{item.name}</p>
                       <div>
                         <span className="text-sm font-bold text-gray-900">{formatMoney(item.priceMinor, item.currency)}</span>
                         <span className="ml-2 text-[11px] text-gray-400 line-through">{formatMoney(originalMinor, item.currency)}</span>
@@ -89,17 +89,17 @@ export function CartDrawer() {
                           </svg>
                         </button>
 
-                        <div className="flex items-center gap-0 overflow-hidden rounded-lg border border-gray-200">
+                        <div className="flex items-center gap-0 overflow-hidden rounded-xl border border-gray-200">
                           <button
                             onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                            className="flex h-7 w-7 items-center justify-center text-gray-500 transition hover:bg-gray-50"
+                            className="flex h-9 w-9 items-center justify-center text-gray-600 transition hover:bg-gray-50"
                           >
                             <span className="text-sm leading-none">−</span>
                           </button>
-                          <span className="w-7 text-center text-xs font-semibold text-gray-800">{item.quantity}</span>
+                          <span className="w-9 text-center text-sm font-semibold text-gray-900">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                            className="flex h-7 w-7 items-center justify-center text-gray-500 transition hover:bg-gray-50"
+                            className="flex h-9 w-9 items-center justify-center text-gray-600 transition hover:bg-gray-50"
                           >
                             <span className="text-sm leading-none">+</span>
                           </button>
@@ -115,7 +115,7 @@ export function CartDrawer() {
 
         {/* Footer */}
         {state.items.length > 0 && (
-          <div className="border-t border-gray-100 bg-white px-5 pb-6 pt-4">
+          <div className="border-t border-gray-100 bg-white px-5 pb-[calc(1.5rem+var(--safe-bottom))] pt-4">
             <div className="mb-4 flex items-center justify-between">
               <span className="text-sm font-semibold text-gray-600">Subtotal</span>
               <span className="text-base font-bold text-gray-900">{formatMoney(totals.subtotalMinor, "IDR")}</span>

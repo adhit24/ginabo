@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CartProvider>
             <div className="min-h-dvh bg-brand-50">
               <SiteHeader />
-              <main>{children}</main>
+              <main className="mx-auto w-full max-w-6xl px-4 pb-[calc(2.5rem+var(--safe-bottom))] pt-6 md:px-6 md:pb-10 md:pt-10">{children}</main>
               <SiteFooter />
             </div>
           </CartProvider>

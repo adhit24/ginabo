@@ -29,18 +29,18 @@ export default async function ShopPage() {
   const products = await listActiveProducts();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="grid gap-6">
 
       {/* Breadcrumb */}
-      <div className="border-b border-gray-200 bg-white px-4 py-3 md:px-8">
-        <div className="mx-auto flex max-w-7xl items-center gap-2 text-xs text-gray-400">
+      <div className="rounded-2xl border border-gray-100 bg-white px-4 py-3">
+        <div className="flex items-center gap-2 text-xs text-gray-500">
           <Link href="/" className="hover:text-brand-700">Home</Link>
           <span>›</span>
           <span className="font-semibold text-gray-700">Produk</span>
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-7xl gap-6 px-4 py-8 md:px-8">
+      <div className="flex gap-6">
 
         {/* ── Filter Sidebar ── */}
         <FilterSidebar />
@@ -49,27 +49,27 @@ export default async function ShopPage() {
         <div className="flex-1">
 
           {/* Toolbar */}
-          <div className="mb-5 flex flex-wrap items-center gap-3">
-            <select className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600 shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-300">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <select className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 shadow-sm outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-100">
               <option>Show {products.length} Products</option>
               <option>Show 8 Products</option>
               <option>Show 16 Products</option>
               <option>Show 24 Products</option>
             </select>
-            <select className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600 shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-300">
+            <select className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 shadow-sm outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-100">
               <option>Sort by Latest</option>
               <option>Sort by Price: Low to High</option>
               <option>Sort by Price: High to Low</option>
               <option>Sort by Rating</option>
             </select>
-            <div className="ml-auto flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm">
+            <div className="flex w-full items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-sm sm:ml-auto sm:w-auto">
               <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-gray-400">
                 <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
               </svg>
               <input
                 type="text"
                 placeholder="search product"
-                className="w-36 bg-transparent text-xs text-gray-600 outline-none placeholder:text-gray-300"
+                className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400 sm:w-44"
               />
             </div>
           </div>
@@ -121,4 +121,3 @@ export default async function ShopPage() {
     </div>
   );
 }
-
