@@ -92,10 +92,10 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-brand-900">
         <div className="absolute inset-0">
           <Image
-            src="/hero/slide-1.png"
+            src="/hero/hero-woman.jpg"
             alt="Ginabo hero"
             fill
-            className="object-cover object-center opacity-40"
+            className="object-cover object-right"
             priority
             sizes="100vw"
           />
