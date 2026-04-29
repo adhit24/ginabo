@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { CartMini } from "@/components/cart/CartMini";
 
@@ -54,7 +55,7 @@ export function SiteHeader() {
       )}
       <div className={`fixed left-0 top-0 z-50 h-full w-72 bg-white shadow-brand-lg transition-transform duration-300 md:hidden ${drawerOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex items-center justify-between border-b border-brand-100 px-5 py-4">
-          <span className="text-xl font-bold tracking-[0.12em] text-brand-700">GINABO</span>
+          <Image src="/logo.png" alt="Ginabo" width={90} height={36} className="h-9 w-auto object-contain" style={{filter: "invert(29%) sepia(60%) saturate(500%) hue-rotate(240deg) brightness(80%)"}} />
           <button onClick={() => setDrawerOpen(false)} className="rounded-lg p-1.5 text-brand-500 hover:bg-brand-50">
             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
@@ -108,8 +109,7 @@ export function SiteHeader() {
 
         {/* Logo — centered mobile, left desktop */}
         <Link href="/" className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 flex flex-col items-center md:items-start">
-          <span className="text-xl font-extrabold tracking-[0.15em] text-brand-700 md:text-2xl">GINABO</span>
-          <span className="hidden text-[10px] font-medium tracking-[0.2em] text-brand-400 md:block">DAILY SKINCARE</span>
+          <Image src="/logo.png" alt="Ginabo" width={120} height={44} className="h-10 w-auto object-contain md:h-11" style={{filter: "invert(29%) sepia(60%) saturate(500%) hue-rotate(240deg) brightness(80%)"}} />
         </Link>
 
         {/* Desktop Nav */}

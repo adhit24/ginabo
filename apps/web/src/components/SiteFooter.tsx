@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const footerLinks = [
   {
@@ -60,7 +61,9 @@ export function SiteFooter() {
 
           {/* Brand column */}
           <div>
-            <div className="mb-3 text-xl font-extrabold tracking-[0.15em] text-white">GINABO</div>
+            <div className="mb-3">
+              <Image src="/logo.png" alt="Ginabo" width={120} height={44} className="h-10 w-auto object-contain" />
+            </div>
             <p className="mb-5 max-w-xs text-sm leading-relaxed text-brand-300">
               Skincare Friendly Expert — seperti teman yang paling paham kulitmu. Cerah yang tetap nyaman, hari ini dan seterusnya.
             </p>
