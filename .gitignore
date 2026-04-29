@@ -1,0 +1,64 @@
+# AI tool folders
+.adal/
+.agents/
+.aider-desk/
+.augment/
+.bob/
+.claude/
+.codeartsdoer/
+.codebuddy/
+.codemaker/
+.codestudio/
+.commandcode/
+.continue/
+.cortex/
+.crush/
+.devin/
+.factory/
+.forge/
+.goose/
+.iflow/
+.junie/
+.kilocode/
+.kiro/
+.kode/
+.mcpjam/
+.mux/
+.neovate/
+.openhands/
+.pi/
+.pochi/
+.qoder/
+.qwen/
+.roo/
+.rovodev/
+.tabnine/
+.tmp-impeccable/
+.trae/
+.vibe/
+.windsurf/
+.zencoder/
+
+# Skills
+skills/
+skills-lock.json
+
+# Word temp files
+~$*
+
+# Brand assets (large files)
+brand_asset/
+
+# Node
+node_modules/
+.next/
+.turbo/
+
+# Env
+.env
+.env.local
+.env*.local
+
+# OS
+.DS_Store
+Thumbs.db
