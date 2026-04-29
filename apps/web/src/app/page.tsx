@@ -1,34 +1,23 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SkinTypeSection } from "@/components/SkinTypeSection";
+import { HomeBannerCarousel } from "@/components/HomeBannerCarousel";
 
 const heroSlides = [
   {
-    tag: "Barrier-first · Daily · Trust-based",
-    title: "Kulit Sehat Dimulai dari Rutinitas yang Tepat",
-    sub: "Ginabo hadir untuk membantu kamu merawat kulit dengan cara yang sederhana, konsisten, dan aman untuk pemakaian harian.",
-    cta: "Belanja Sekarang",
     href: "/shop",
-    img: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1400&q=80",
-    imgAlt: "Model skincare Ginabo",
+    img: "/hero/slide-1.png",
+    imgAlt: "Ginabo promo banner 1",
   },
   {
-    tag: "New Arrival · GlowAge Series",
-    title: "Brightening yang Menghormati Skin Barrier",
-    sub: "Cerah bertahap tanpa efek purging. Diformulasikan untuk pemakaian AM/PM yang nyaman setiap hari.",
-    cta: "Lihat Produk",
     href: "/shop",
-    img: "/product-serum-bg.png",
-    imgAlt: "Skincare Brightening Series",
+    img: "/hero/slide-2.png",
+    imgAlt: "Ginabo promo banner 2",
   },
   {
-    tag: "Konsultasi Gratis · Skin Expert",
-    title: "Yuk Kenali Kondisi Kulitmu Lebih Dalam",
-    sub: "Booking sesi konsultasi singkat bersama ahli kami — gratis, tanpa paksaan beli.",
-    cta: "Booking Sekarang",
     href: "/booking",
-    img: "/product-dna-bg.png",
-    imgAlt: "Konsultasi skincare",
+    img: "/hero/slide-3.png",
+    imgAlt: "Ginabo promo banner 3",
   },
 ];
 
@@ -119,50 +108,8 @@ export default function HomePage() {
     <div>
 
       {/* ── 1. HERO SLIDER ── */}
-      <section className="relative overflow-hidden">
-        {heroSlides.map((s, i) => (
-          <div key={i} className={i === 0 ? "block" : "hidden"}>
-            <div className="relative min-h-[60vh] w-full overflow-hidden md:min-h-[88vh]">
-              {/* background photo */}
-              <Image
-                src={s.img}
-                alt={s.imgAlt}
-                fill
-                priority={i === 0}
-                className="object-cover object-center"
-                sizes="100vw"
-              />
-              {/* overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-brand-900/70 via-brand-800/40 to-transparent" />
-              {/* content */}
-              <div className="relative mx-auto flex h-full w-full max-w-8xl flex-col items-start justify-center gap-5 px-6 py-20 md:min-h-[88vh] md:gap-7 md:px-12 md:py-0">
-                <span className="rounded-full border border-white/40 bg-white/20 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm">
-                  {s.tag}
-                </span>
-                <h1 className="max-w-xl text-3xl font-extrabold leading-tight text-white drop-shadow-lg md:text-5xl lg:text-6xl">
-                  {s.title}
-                </h1>
-                <p className="max-w-md text-sm leading-relaxed text-white/80 md:text-base">{s.sub}</p>
-                <div className="flex flex-wrap gap-3">
-                  <Link href={s.href}
-                    className="rounded-xl bg-white px-7 py-3 text-sm font-bold text-brand-800 shadow-brand transition hover:bg-brand-50">
-                    {s.cta}
-                  </Link>
-                  <Link href="/about"
-                    className="rounded-xl border border-white/50 px-7 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10">
-                    Tentang Kami
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-        {/* Dots */}
-        <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-2">
-          {heroSlides.map((_, i) => (
-            <span key={i} className={`block h-1.5 rounded-full transition-all ${i === 0 ? "w-6 bg-white" : "w-1.5 bg-white/40"}`} />
-          ))}
-        </div>
+      <section className="relative">
+        <HomeBannerCarousel slides={heroSlides.map((s) => ({ src: s.img, alt: s.imgAlt, href: s.href }))} intervalMs={3000} />
       </section>
 
       {/* ── 3. CUSTOMER FAVORITE ── */}
