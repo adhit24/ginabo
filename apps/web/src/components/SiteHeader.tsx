@@ -108,8 +108,10 @@ export function SiteHeader() {
         </button>
 
         {/* Logo — centered mobile, left desktop */}
-        <Link href="/" className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 flex flex-col items-center md:items-start">
-          <Image src="/logo.png" alt="Ginabo" width={160} height={60} className="w-auto object-contain" style={{height: "56px", filter: "invert(29%) sepia(60%) saturate(500%) hue-rotate(240deg) brightness(80%)"}} />
+        <Link href="/" className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0">
+          <div style={{width: "110px", height: "28px", overflow: "hidden", position: "relative"}}>
+            <Image src="/logo.png" alt="Ginabo" width={400} height={160} style={{position: "absolute", top: "-42%", left: "-2%", width: "104%", height: "auto", filter: "invert(29%) sepia(60%) saturate(500%) hue-rotate(240deg) brightness(80%)"}} />
+          </div>
         </Link>
 
         {/* Desktop Nav */}
