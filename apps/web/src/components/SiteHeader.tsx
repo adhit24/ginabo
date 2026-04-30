@@ -14,8 +14,9 @@ const announcements = [
 const navItems = [
   { href: "/",        label: "Home"       },
   { href: "/shop",    label: "Produk"     },
-  { href: "/about",   label: "About Us"   },
-  { href: "/booking", label: "Konsultasi" },
+  { href: "/about",    label: "About Us"  },
+  { href: "/campaign", label: "Campaign"  },
+  { href: "/booking",  label: "Konsultasi" },
   { href: "/contact", label: "Contact"    },
 ];
 

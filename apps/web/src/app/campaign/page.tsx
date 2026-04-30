@@ -1,0 +1,204 @@
+import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Campaign – Ginabo Beauty",
+  description: "Ikuti program eksklusif Ginabo: Loyalty Program, 21 Days Challenge, dan Reseller Program.",
+};
+
+/* ─── Campaign card data ─── */
+const campaigns = [
+  {
+    id: "loyalty",
+    icon: "⭐",
+    badge: "Member Exclusive",
+    badgeColor: "#665DAC",
+    title: "Loyalty Program",
+    tagline: "Setiap pembelian, ada poinnya.",
+    desc: "Kumpulkan poin dari setiap transaksi dan tukarkan dengan diskon, produk gratis, atau akses early sale eksklusif. Makin sering belanja, makin banyak keuntungannya.",
+    perks: [
+      "1 Poin = Rp 1.000 pembelian",
+      "Tukar poin jadi diskon atau produk",
+      "Akses early sale khusus member",
+      "Birthday reward setiap tahun",
+    ],
+    cta: "Gabung Sekarang",
+    href: "/auth/signup",
+    gradient: "linear-gradient(135deg, #665DAC 0%, #BD6CC9 100%)",
+    accentBg: "#F0EBFA",
+  },
+  {
+    id: "21days",
+    icon: "🔥",
+    badge: "Limited Challenge",
+    badgeColor: "#78257C",
+    title: "21 Days Challenge",
+    tagline: "21 hari. 1 rutinitas. Kulit yang berubah.",
+    desc: "Tantang dirimu untuk konsisten merawat kulit selama 21 hari berturut-turut dengan rangkaian Ginabo. Dokumentasikan perjalananmu dan menangkan hadiah menarik.",
+    perks: [
+      "Panduan rutinitas AM & PM lengkap",
+      "Check-in harian via komunitas",
+      "Hadiah untuk peserta konsisten",
+      "Sertifikat digital eksklusif",
+    ],
+    cta: "Ikut Challenge",
+    href: "/auth/signup",
+    gradient: "linear-gradient(135deg, #78257C 0%, #CF99B4 100%)",
+    accentBg: "#FBF0F8",
+  },
+  {
+    id: "reseller",
+    icon: "🤝",
+    badge: "Bisnis Bersama",
+    badgeColor: "#2a7c78",
+    title: "Reseller Program",
+    tagline: "Jual Ginabo. Untung bareng kami.",
+    desc: "Bergabunglah sebagai reseller resmi Ginabo dan nikmati harga spesial, materi promosi siap pakai, serta dukungan penuh dari tim kami untuk membantu bisnismu berkembang.",
+    perks: [
+      "Harga reseller up to 30% lebih murah",
+      "Materi konten & promosi gratis",
+      "Support tim Ginabo langsung",
+      "Komisi referral untuk member baru",
+    ],
+    cta: "Daftar Reseller",
+    href: "/contact",
+    gradient: "linear-gradient(135deg, #1e6b68 0%, #3cb8b2 100%)",
+    accentBg: "#EDFAF9",
+  },
+];
+
+/* ─── Page ─── */
+export default function CampaignPage() {
+  return (
+    <div className="bg-[#FDFAFF] text-[#2a2a2a]">
+
+      {/* ── HERO ── */}
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #2a1635 0%, #78257C 50%, #BD6CC9 100%)",
+          minHeight: 280,
+        }}
+      >
+        {/* Dot pattern */}
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 25% 55%, white 1px, transparent 1px), radial-gradient(circle at 75% 25%, white 1px, transparent 1px)",
+            backgroundSize: "52px 52px",
+          }}
+        />
+        <div className="relative mx-auto flex min-h-[280px] max-w-5xl flex-col items-center justify-center px-6 py-16 text-center">
+          <span className="mb-4 inline-block rounded-full border border-white/30 bg-white/15 px-5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-white backdrop-blur">
+            Program & Campaign
+          </span>
+          <h1 className="mb-4 text-3xl font-bold leading-tight text-white md:text-5xl">
+            Lebih dari Sekadar{" "}
+            <span className="italic font-light">Skincare.</span>
+          </h1>
+          <p className="max-w-md text-sm leading-relaxed text-white/80 md:text-base">
+            Ikuti program eksklusif Ginabo — raih rewards, buktikan transformasimu,
+            dan tumbuh bersama komunitas kami.
+          </p>
+        </div>
+      </section>
+
+      {/* ── CAMPAIGN CARDS ── */}
+      <section className="py-14 md:py-24">
+        <div className="mx-auto grid max-w-5xl gap-8 px-5 md:px-8 lg:grid-cols-3">
+          {campaigns.map((c) => (
+            <div
+              key={c.id}
+              className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+              style={{ border: "1.5px solid #f0e8f8" }}
+            >
+              {/* Coloured top strip */}
+              <div
+                className="flex items-end justify-between px-6 pb-5 pt-6"
+                style={{ background: c.gradient, minHeight: 120 }}
+              >
+                {/* Icon bubble */}
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 text-3xl shadow backdrop-blur">
+                  {c.icon}
+                </div>
+                {/* Badge */}
+                <span
+                  className="rounded-full border border-white/40 bg-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white backdrop-blur"
+                >
+                  {c.badge}
+                </span>
+              </div>
+
+              {/* Body */}
+              <div className="flex flex-1 flex-col gap-4 p-6">
+                <div>
+                  <h2 className="text-xl font-extrabold" style={{ color: "#2a2a2a" }}>
+                    {c.title}
+                  </h2>
+                  <p className="mt-1 text-xs font-semibold" style={{ color: c.badgeColor }}>
+                    {c.tagline}
+                  </p>
+                </div>
+
+                {/* Divider */}
+                <div className="h-px w-10 rounded-full" style={{ background: c.badgeColor }} />
+
+                <p className="text-sm leading-relaxed" style={{ color: "#555" }}>
+                  {c.desc}
+                </p>
+
+                {/* Perks list */}
+                <ul
+                  className="flex flex-col gap-2 rounded-2xl p-4"
+                  style={{ background: c.accentBg }}
+                >
+                  {c.perks.map((perk) => (
+                    <li key={perk} className="flex items-start gap-2 text-xs" style={{ color: "#444" }}>
+                      <span className="mt-px shrink-0 text-base leading-none" style={{ color: c.badgeColor }}>
+                        ✦
+                      </span>
+                      {perk}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA */}
+                <Link
+                  href={c.href}
+                  className="mt-auto rounded-xl py-3 text-center text-sm font-bold text-white transition hover:opacity-90"
+                  style={{ background: c.gradient }}
+                >
+                  {c.cta} →
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── BOTTOM CTA STRIP ── */}
+      <section
+        className="py-14 text-center"
+        style={{ background: "linear-gradient(135deg, #78257C, #BD6CC9)" }}
+      >
+        <div className="mx-auto max-w-xl px-5">
+          <h2 className="mb-3 text-2xl font-bold text-white md:text-3xl">
+            Ada Pertanyaan Soal Program Kami?
+          </h2>
+          <p className="mb-7 text-sm text-white/80">
+            Tim Ginabo siap membantu kamu memilih program yang paling sesuai.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 text-sm font-extrabold transition hover:bg-purple-50"
+            style={{ color: "#78257C" }}
+          >
+            Hubungi Kami →
+          </Link>
+        </div>
+      </section>
+
+    </div>
+  );
+}

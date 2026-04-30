@@ -1,189 +1,453 @@
-import Image from 'next/image';
+import Link from "next/link";
+import type { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "About Us – Ginabo Beauty",
+  description:
+    "Ginabo hadir buat perempuan aktif yang ingin kulitnya tetap ternutrisi dan sehat di tengah kesibukan. Kenali story, filosofi, dan visi kami.",
+};
+
+/* ─── Data ─── */
+const missions = [
+  "Menghadirkan skincare yang fokus pada nutrisi, kelembapan, kenyamanan, dan perawatan skin barrier.",
+  "Memadukan ingredient modern dengan tekstur yang nyaman buat dipakai rutin tiap hari.",
+  "Bikin skincare jadi lebih gampang dipahami lewat komunikasi yang jujur, hangat, dan relevan.",
+  "Menemani kamu merawat diri dengan cara yang sederhana, konsisten, dan meyakinkan.",
+];
+
+const whatWeCreate = [
+  { icon: "💧", text: "Menjaga kelembapan dan merawat skin barrier." },
+  { icon: "✨", text: "Membantu kulit terasa lebih nyaman, segar, dan sehat." },
+  { icon: "🌸", text: "Membuat kulit tampak cerah dan terawat." },
+];
+
+const beliefs = [
+  { icon: "🧴", title: "Mudah Dipahami", desc: "Skincare nggak harus rumit. Kami bicara jujur dan lugas." },
+  { icon: "🤲", title: "Nyaman Dipakai", desc: "Tekstur yang ringan dan cocok untuk rutinitas harian." },
+  { icon: "📅", title: "Konsisten Itu Kunci", desc: "Perawatan rutin lebih berarti daripada janji instan." },
+  { icon: "🌿", title: "Relevan untuk Hidupmu", desc: "Skincare yang dirancang sesuai kebutuhan nyata perempuan aktif." },
+];
+
+/* ─── Page ─── */
 export default function AboutPage() {
   return (
-    <div className="bg-[#fcfdfa] min-h-screen font-serif text-[#2a3c24]">
-      {/* 1. Hero / Sustainability Values */}
-      <section className="py-16 md:py-24 max-w-6xl mx-auto px-4 text-center">
-        <h1 className="text-3xl md:text-5xl font-medium mb-4 leading-tight">
-          Providing Quality and Innovative Products with Strong Sustainability Value
-        </h1>
-        <p className="text-lg md:text-xl text-[#4a5c44] mb-12">
-          Our Innovative People, Planet, and Profit
-        </p>
+    <div className="bg-[#FDFAFF] text-[#2a2a2a]">
 
-        <div className="grid md:grid-cols-3 gap-6 text-left">
-          {/* Planet */}
-          <div className="bg-[#e9eee4] p-8 rounded-lg shadow-sm border border-[#d9e0d2]">
-            <h3 className="text-xl font-semibold mb-4 text-center border-b border-[#d9e0d2] pb-4">Planet</h3>
-            <ul className="space-y-4 text-sm text-[#3a4c34] mt-4">
-              <li className="flex items-start"><span className="mr-3 text-[#5b7a4c] font-bold">•</span> <span>Menyelamatkan & menghijaukan lingkungan</span></li>
-              <li className="flex items-start"><span className="mr-3 text-[#5b7a4c] font-bold">•</span> <span>Sustainable packaging (100% recyclable)</span></li>
-              <li className="flex items-start"><span className="mr-3 text-[#5b7a4c] font-bold">•</span> <span>Melindungi keanekaragaman hayati</span></li>
-              <li className="flex items-start"><span className="mr-3 text-[#5b7a4c] font-bold">•</span> <span>Mengurangi jejak karbon</span></li>
-            </ul>
-          </div>
-          {/* People */}
-          <div className="bg-[#e9eee4] p-8 rounded-lg shadow-sm border border-[#d9e0d2]">
-            <h3 className="text-xl font-semibold mb-4 text-center border-b border-[#d9e0d2] pb-4">People</h3>
-            <ul className="space-y-4 text-sm text-[#3a4c34] mt-4">
-              <li className="flex items-start"><span className="mr-3 text-[#5b7a4c] font-bold">•</span> <span>Memberdayakan petani & produsen lokal</span></li>
-              <li className="flex items-start"><span className="mr-3 text-[#5b7a4c] font-bold">•</span> <span>Kondisi kerja yang adil dan transparan</span></li>
-              <li className="flex items-start"><span className="mr-3 text-[#5b7a4c] font-bold">•</span> <span>Keterlibatan komunitas dalam pengambilan keputusan</span></li>
-              <li className="flex items-start"><span className="mr-3 text-[#5b7a4c] font-bold">•</span> <span>Mendukung UMKM & usaha lokal</span></li>
-            </ul>
-          </div>
-          {/* Profit */}
-          <div className="bg-[#e9eee4] p-8 rounded-lg shadow-sm border border-[#d9e0d2]">
-            <h3 className="text-xl font-semibold mb-4 text-center border-b border-[#d9e0d2] pb-4">Profit</h3>
-            <ul className="space-y-4 text-sm text-[#3a4c34] mt-4">
-              <li className="flex items-start"><span className="mr-3 text-[#5b7a4c] font-bold">•</span> <span>Bisnis berkelanjutan & ramah lingkungan</span></li>
-              <li className="flex items-start"><span className="mr-3 text-[#5b7a4c] font-bold">•</span> <span>Menginvestasikan kembali keuntungan ke masyarakat dan lingkungan</span></li>
-              <li className="flex items-start"><span className="mr-3 text-[#5b7a4c] font-bold">•</span> <span>Fokus jangka panjang untuk kesejahteraan ekosistem</span></li>
-            </ul>
+      {/* ════════════════════════════════════════
+          HERO — Above the fold
+      ════════════════════════════════════════ */}
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #2a1635 0%, #78257C 55%, #BD6CC9 100%)",
+          minHeight: 380,
+        }}
+      >
+        {/* subtle dot texture */}
+        <div
+          className="absolute inset-0 opacity-[0.08]"
+          style={{
+            backgroundImage: "radial-gradient(white 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+
+        <div className="relative mx-auto flex min-h-[380px] max-w-5xl flex-col items-center justify-center px-6 py-20 text-center">
+          {/* pill */}
+          <span className="mb-5 inline-block rounded-full border border-white/25 bg-white/12 px-5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/90 backdrop-blur">
+            About Us
+          </span>
+
+          {/* headline */}
+          <h1 className="mb-5 text-3xl font-bold leading-[1.15] text-white md:text-[3.2rem]">
+            Healthy skin,{" "}
+            <span className="italic font-light">nourished for real life.</span>
+          </h1>
+
+          {/* sub */}
+          <p className="mx-auto max-w-xl text-sm leading-relaxed text-white/80 md:text-base">
+            Ginabo hadir buat kamu — perempuan aktif yang pengen tetap merawat
+            kulit di tengah padatnya jadwal harian. Fokus kami:{" "}
+            <strong className="text-white font-semibold">
+              Nutrition Skin for Active Woman.
+            </strong>
+          </p>
+
+          {/* value badge */}
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {["Nutrition", "Hydration", "Comfort", "Consistency"].map((v) => (
+              <span
+                key={v}
+                className="rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/85 backdrop-blur"
+              >
+                {v}
+              </span>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* 2. Video Section */}
-      <section className="py-16 max-w-6xl mx-auto px-4">
-        <div className="flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1 md:pr-12">
-            <h2 className="text-4xl md:text-5xl font-medium leading-tight text-[#2a3c24] mb-4">
-              A New Horizon For Skincare.<br/>
-              A New Promise For Every Women
-            </h2>
+      {/* ════════════════════════════════════════
+          OPENING STATEMENT
+      ════════════════════════════════════════ */}
+      <section className="py-16 md:py-24">
+        <div className="mx-auto max-w-3xl px-5 text-center md:px-8">
+          <p className="mb-5 text-base leading-relaxed text-[#444] md:text-lg">
+            Kami percaya kalau kulit yang sehat, nyaman, dan ternutrisi itu bukan
+            cuma soal penampilan aja — tapi soal rasa percaya diri biar kamu bisa
+            menjalani hari dengan lebih tenang.
+          </p>
+          <p className="text-base leading-relaxed text-[#444] md:text-lg">
+            Makanya, kami menghadirkan skincare yang beneran relevan dengan
+            kebutuhan kulit kamu dalam kehidupan nyata.
+          </p>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════
+          OUR STORY
+      ════════════════════════════════════════ */}
+      <section
+        className="py-16 md:py-24"
+        style={{ background: "#F7F3FB" }}
+      >
+        <div className="mx-auto max-w-5xl px-5 md:px-8">
+          {/* section label */}
+          <div className="mb-8 flex items-center gap-3">
+            <div
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white"
+              style={{ background: "#665DAC" }}
+            >
+              01
+            </div>
+            <span
+              className="text-xs font-bold uppercase tracking-[0.2em]"
+              style={{ color: "#665DAC" }}
+            >
+              Our Story
+            </span>
           </div>
-          <div className="flex-1 w-full relative aspect-video rounded-xl overflow-hidden shadow-xl">
-            <img 
-              src="https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?auto=format&fit=crop&q=80&w=800" 
-              alt="Orangutan" 
-              className="object-cover w-full h-full transform hover:scale-105 transition duration-700"
+
+          <div className="grid gap-10 md:grid-cols-2 md:items-start">
+            {/* left — big quote */}
+            <div>
+              <blockquote
+                className="mb-6 border-l-4 pl-6 text-xl font-bold italic leading-snug md:text-2xl"
+                style={{ borderColor: "#BD6CC9", color: "#2a2a2a" }}
+              >
+                "Bukan cuma skincare yang terdengar meyakinkan — tapi yang
+                bener-bener terasa nyaman setiap hari."
+              </blockquote>
+              <div
+                className="h-px w-12 rounded-full"
+                style={{ background: "#BD6CC9" }}
+              />
+            </div>
+
+            {/* right — paragraphs */}
+            <div className="flex flex-col gap-5 text-sm leading-relaxed text-[#555]">
+              <p>
+                Ginabo lahir karena kami ingin menghadirkan skincare yang terasa
+                lebih dekat, gampang dipahami, dan relevan buat perempuan masa
+                kini.
+              </p>
+              <p>
+                Kita nggak bicara soal hasil instan, tapi soal perawatan yang
+                konsisten. Bagi kami, kulit sehat itu dibangun dari rutinitas
+                yang lembut, tepat, dan bisa kamu pertahankan terus.
+              </p>
+              <p>
+                Itulah kenapa Ginabo memilih pendekatan yang menggabungkan
+                ingredient modern, tekstur nyaman, dan manfaat yang jelas — biar
+                momen skincare-an jadi bagian yang menyenangkan di keseharian
+                kamu.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════
+          OUR PHILOSOPHY
+      ════════════════════════════════════════ */}
+      <section className="py-16 md:py-24">
+        <div className="mx-auto max-w-5xl px-5 md:px-8">
+          <div className="mb-8 flex items-center gap-3">
+            <div
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white"
+              style={{ background: "#78257C" }}
+            >
+              02
+            </div>
+            <span
+              className="text-xs font-bold uppercase tracking-[0.2em]"
+              style={{ color: "#78257C" }}
+            >
+              Our Philosophy
+            </span>
+          </div>
+
+          {/* philosophy card */}
+          <div
+            className="relative overflow-hidden rounded-3xl p-8 md:p-12"
+            style={{
+              background: "linear-gradient(135deg, #78257C, #BD6CC9)",
+            }}
+          >
+            {/* decorative circle */}
+            <div
+              className="absolute -right-16 -top-16 h-64 w-64 rounded-full opacity-10"
+              style={{ background: "#fff" }}
             />
-            {/* Overlay Gradient */}
-            <div className="absolute inset-0 bg-black/20"></div>
-            {/* Video Text Overlay */}
-            <div className="absolute top-4 left-4 flex flex-col gap-2">
-               <div className="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm flex items-center">
-                 <span className="w-2 h-2 rounded-full bg-green-400 mr-2"></span> Ginabo Eco Journey
-               </div>
-            </div>
-            {/* Play Button Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center group">
-              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center cursor-pointer group-hover:bg-red-700 group-hover:scale-110 shadow-lg transition-all duration-300">
-                <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"/></svg>
+            <div
+              className="absolute -bottom-20 -left-10 h-48 w-48 rounded-full opacity-10"
+              style={{ background: "#fff" }}
+            />
+
+            <div className="relative max-w-2xl">
+              <p className="mb-2 text-sm font-bold uppercase tracking-[0.15em] text-white/60">
+                Semangat kami
+              </p>
+              <h2 className="mb-6 text-2xl font-bold italic text-white md:text-3xl">
+                "Nutrition Skin for Active Woman"
+              </h2>
+              <div className="flex flex-col gap-4 text-sm leading-relaxed text-white/85">
+                <p>
+                  Kami melihat skincare sebagai nutrisi harian untuk kulitmu.
+                  Kulit yang terus beraktivitas perlu dijaga, dilembapkan, dan
+                  dirawat biar tetap nyaman dan sehat.
+                </p>
+                <p>
+                  Kami percaya kamu nggak butuh skincare yang berlebihan. Yang
+                  paling penting adalah produk yang terasa cocok, mudah dipakai
+                  rutin, dan bisa mendukung kulit kamu tetap dalam kondisi
+                  terbaiknya.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. Timeline / Journey Section */}
-      <section className="py-24 bg-[#4a5c44] text-white my-12 relative overflow-hidden">
-        {/* Background Image Overlay */}
-        <div className="absolute inset-0 opacity-20">
-            <img src="https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&q=80" alt="Nature bg" className="w-full h-full object-cover" />
+      {/* ════════════════════════════════════════
+          VISION & MISSION
+      ════════════════════════════════════════ */}
+      <section
+        className="py-16 md:py-24"
+        style={{ background: "#F7F3FB" }}
+      >
+        <div className="mx-auto max-w-5xl px-5 md:px-8">
+          <div className="mb-10 flex items-center gap-3">
+            <div
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white"
+              style={{ background: "#BD6CC9" }}
+            >
+              03
+            </div>
+            <span
+              className="text-xs font-bold uppercase tracking-[0.2em]"
+              style={{ color: "#BD6CC9" }}
+            >
+              Vision &amp; Mission
+            </span>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2">
+            {/* Vision */}
+            <div
+              className="flex flex-col gap-4 rounded-2xl bg-white p-7"
+              style={{ boxShadow: "0 2px 16px rgba(100,50,120,0.07)", border: "1px solid #f0e8f8" }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🔭</span>
+                <h2 className="text-lg font-extrabold" style={{ color: "#2a2a2a" }}>
+                  Vision
+                </h2>
+              </div>
+              <div className="h-px w-8 rounded-full" style={{ background: "#BD6CC9" }} />
+              <p className="text-sm leading-relaxed" style={{ color: "#555" }}>
+                Menjadi partner kesehatan kulit harian terpercaya bagi perempuan
+                aktif lewat skincare yang membantu kulit tetap ternutrisi, sehat,
+                nyaman, dan terawat di tengah kesibukan.
+              </p>
+            </div>
+
+            {/* Mission */}
+            <div
+              className="flex flex-col gap-4 rounded-2xl bg-white p-7"
+              style={{ boxShadow: "0 2px 16px rgba(100,50,120,0.07)", border: "1px solid #f0e8f8" }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🎯</span>
+                <h2 className="text-lg font-extrabold" style={{ color: "#2a2a2a" }}>
+                  Mission
+                </h2>
+              </div>
+              <div className="h-px w-8 rounded-full" style={{ background: "#BD6CC9" }} />
+              <ul className="flex flex-col gap-3">
+                {missions.map((m, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: "#555" }}>
+                    <span
+                      className="mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                      style={{ background: "#BD6CC9" }}
+                    >
+                      {i + 1}
+                    </span>
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
-        <div className="max-w-6xl mx-auto px-4 relative z-10">
-          <h2 className="text-3xl md:text-4xl font-medium text-center mb-20 text-white">Ginabo Eco-Friendly Journey</h2>
-          
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-16 gap-x-8">
-            {[
-              { year: '2014', title: 'The Beginning', desc: 'Launching of Ginabo with our first natural products.', img: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=200&h=200' },
-              { year: '2015', title: 'Reformulation', desc: 'Reformulating with more natural & safe ingredients.', img: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&q=80&w=200&h=200' },
-              { year: '2016', title: '#GinaboGoesGreen', desc: '1st campaign advocating for greener beauty practices.', img: 'https://images.unsplash.com/photo-1418065460487-3e41a6c8e1e3?auto=format&fit=crop&q=80&w=200&h=200' },
-              { year: '2017', title: 'Paperless', desc: 'Releasing paperless packaging and reducing waste.', img: 'https://images.unsplash.com/photo-1589365278144-c9e705f843ba?auto=format&fit=crop&q=80&w=200&h=200' },
-              { year: '2018', title: 'Love Earth', desc: 'Sustainability campaign "Love Ginabo Love Earth".', img: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=200&h=200' },
-              { year: '2019', title: 'Eco Packaging', desc: 'Launching our 100% eco-friendly packaging lines.', img: 'https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&q=80&w=200&h=200' },
-              { year: '2020', title: 'Protect Wildlife', desc: 'Collaboration to protect endangered wildlife.', img: 'https://images.unsplash.com/photo-1550186980-8700abeb88da?auto=format&fit=crop&q=80&w=200&h=200' },
-              { year: '2021', title: 'Zero Waste', desc: 'Empowering zero waste lifestyle across our community.', img: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=200&h=200' },
-            ].map((item, i) => (
-              <div key={i} className="text-center relative">
-                 <div className="w-28 h-28 mx-auto mb-5 rounded-full overflow-hidden border-4 border-white/40 shadow-lg relative z-10 bg-[#4a5c44]">
-                    <img src={item.img} alt={item.year} className="w-full h-full object-cover" />
-                 </div>
-                 <div className="font-bold text-2xl mb-1 text-white">{item.year}</div>
-                 <div className="font-semibold text-sm mb-2 text-[#d9e0d2]">{item.title}</div>
-                 <p className="text-xs text-white/80 max-w-[200px] mx-auto leading-relaxed">{item.desc}</p>
-                 
-                 {/* Timeline connecting lines (Desktop) */}
-                 {i % 4 !== 3 && (
-                   <div className="hidden lg:block absolute top-14 left-[60%] w-[100%] h-[2px] bg-white/30 -z-0"></div>
-                 )}
+      </section>
+
+      {/* ════════════════════════════════════════
+          WHAT WE CREATE
+      ════════════════════════════════════════ */}
+      <section className="py-16 md:py-24">
+        <div className="mx-auto max-w-5xl px-5 md:px-8">
+          <div className="mb-8 flex items-center gap-3">
+            <div
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white"
+              style={{ background: "#CF99B4" }}
+            >
+              04
+            </div>
+            <span
+              className="text-xs font-bold uppercase tracking-[0.2em]"
+              style={{ color: "#CF99B4" }}
+            >
+              What We Create
+            </span>
+          </div>
+
+          <h2 className="mb-4 text-2xl font-bold md:text-3xl" style={{ color: "#2a2a2a" }}>
+            Produk Ginabo fokus pada{" "}
+            <span style={{ color: "#BD6CC9" }}>kebutuhan kulitmu sehari-hari.</span>
+          </h2>
+          <p className="mb-10 max-w-xl text-sm leading-relaxed" style={{ color: "#666" }}>
+            Setiap produk dirancang dengan lembut tapi tetap ampuh — buat kamu
+            yang ingin kulitnya tetap terasa baik meski harinya super sibuk.
+          </p>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            {whatWeCreate.map((w) => (
+              <div
+                key={w.text}
+                className="flex items-start gap-4 rounded-2xl bg-white p-6 transition hover:shadow-md"
+                style={{ border: "1.5px solid #f0e8f8", boxShadow: "0 1px 8px rgba(100,50,120,0.05)" }}
+              >
+                <span className="shrink-0 text-3xl">{w.icon}</span>
+                <p className="text-sm leading-relaxed" style={{ color: "#444" }}>{w.text}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 4. MulaiDariMejaRias */}
-      <section className="py-20 max-w-6xl mx-auto px-4 border-b border-[#e9eee4]">
-        <div className="flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1 w-full aspect-[4/3] relative rounded-2xl overflow-hidden shadow-lg">
-            <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=800" alt="Skincare routine" className="w-full h-full object-cover" />
+      {/* ════════════════════════════════════════
+          WHAT WE BELIEVE
+      ════════════════════════════════════════ */}
+      <section
+        className="py-16 md:py-24"
+        style={{ background: "#F7F3FB" }}
+      >
+        <div className="mx-auto max-w-5xl px-5 md:px-8">
+          <div className="mb-8 flex items-center gap-3">
+            <div
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white"
+              style={{ background: "#665DAC" }}
+            >
+              05
+            </div>
+            <span
+              className="text-xs font-bold uppercase tracking-[0.2em]"
+              style={{ color: "#665DAC" }}
+            >
+              What We Believe
+            </span>
           </div>
-          <div className="flex-1 space-y-6 md:pl-8">
-            <h2 className="text-3xl md:text-4xl font-medium text-[#2a3c24]">#MulaiDariMejaRias</h2>
-            <div className="w-16 h-1 bg-[#5b7a4c] rounded-full"></div>
-            <p className="text-[#4a5c44] leading-relaxed text-lg">
-              Di tahun 2021, Ginabo meluncurkan awareness campaign, '#MulaiDariMejaRias'. Melalui campaign ini, Ginabo mengajak konsumen untuk mulai melakukan langkah kecil untuk bumi yang lebih baik yang dimulai dari meja rias dengan mengumpulkan kemasan kosong Ginabo.
-            </p>
-            <p className="text-[#4a5c44] leading-relaxed text-lg">
-              Inisiatif ini tidak hanya mendukung gaya hidup zero waste, tapi juga membangun komitmen untuk melindungi lingkungan secara berkelanjutan demi masa depan yang lebih baik.
-            </p>
-          </div>
-        </div>
-      </section>
 
-      {/* 5. GlowingMilikSemua */}
-      <section className="py-20 max-w-6xl mx-auto px-4">
-        <div className="flex flex-col-reverse md:flex-row items-center gap-12">
-          <div className="flex-1 space-y-6 md:pr-8">
-            <h2 className="text-3xl md:text-4xl font-medium text-[#2a3c24]">#GlowingMilikSemua</h2>
-            <div className="w-16 h-1 bg-[#5b7a4c] rounded-full"></div>
-            <p className="text-[#4a5c44] leading-relaxed text-lg">
-              Kami percaya bahwa kecantikan adalah milik semua orang, tidak peduli dari mana mereka berasal atau apa warna kulitnya. Karena itu, kami merayakan keberagaman dan inklusivitas dalam setiap langkah.
-            </p>
-            <p className="text-[#4a5c44] leading-relaxed text-lg">
-              Bagi kami, ini bukan cuma sekedar komitmen pada alam, tetapi juga dedikasi untuk merawat semua orang. Kami bangga dapat menjadi bagian dari perjalanan skincare Anda dan berkomitmen untuk terus menghadirkan inovasi yang inklusif dan berkelanjutan.
-            </p>
-          </div>
-          <div className="flex-1 w-full aspect-[4/3] relative rounded-2xl overflow-hidden shadow-lg">
-            <img src="https://images.unsplash.com/photo-1512496015851-a1c848cb6fc1?auto=format&fit=crop&q=80&w=800" alt="Diverse beauty" className="w-full h-full object-cover" />
-          </div>
-        </div>
-      </section>
+          <p className="mb-10 max-w-2xl text-sm leading-relaxed md:text-base" style={{ color: "#555" }}>
+            Skincare itu harus gampang dipahami, nyaman dipakai, dan relevan.
+            Kulit sehat jauh lebih penting daripada klaim yang berlebihan, dan
+            perawatan yang konsisten jauh lebih berarti daripada sekadar janji
+            hasil instan.
+          </p>
 
-      {/* 6. Artikel Section */}
-      <section className="py-20 bg-[#fcfdfa]">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-medium text-center text-[#2a3c24] mb-4">Artikel</h2>
-          <div className="w-24 h-1 bg-[#5b7a4c] rounded-full mx-auto mb-12"></div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { title: "Ginabo x Waste4Change: Bersama Merawat Bumi", img: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=400&h=250" },
-              { title: "Kolaborasi Ginabo x Rekosistem: Pengelolaan Sampah", img: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=400&h=250" },
-              { title: "Ginabo Dukung Komunitas Perempuan Mandiri", img: "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=400&h=250" },
-              { title: "Langkah Hijau Ginabo Untuk Ekosistem", img: "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&q=80&w=400&h=250" },
-              { title: "Inovasi Packaging Ramah Lingkungan", img: "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&q=80&w=400&h=250" },
-              { title: "Zero Waste Living: Mulai Dari Rumah", img: "https://images.unsplash.com/photo-1589365278144-c9e705f843ba?auto=format&fit=crop&q=80&w=400&h=250" },
-              { title: "Program Adopsi Orangutan Ginabo", img: "https://images.unsplash.com/photo-1550186980-8700abeb88da?auto=format&fit=crop&q=80&w=400&h=250" },
-              { title: "Membersihkan Pantai Bersama Relawan", img: "https://images.unsplash.com/photo-1618477461853-cf6ed80f04c0?auto=format&fit=crop&q=80&w=400&h=250" },
-            ].map((article, i) => (
-              <div key={i} className="group cursor-pointer">
-                <div className="relative aspect-video rounded-xl overflow-hidden mb-4 shadow-sm border border-[#e9eee4]">
-                  <img src={article.img} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                  <div className="absolute top-3 left-3 bg-white/95 px-2.5 py-1 text-[10px] font-bold text-[#4a5c44] rounded uppercase tracking-wider shadow-sm">
-                    Environment
-                  </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {beliefs.map((b) => (
+              <div
+                key={b.title}
+                className="flex flex-col gap-3 rounded-2xl bg-white p-6 transition hover:-translate-y-1 hover:shadow-lg"
+                style={{ boxShadow: "0 2px 10px rgba(100,50,120,0.06)", border: "1px solid #f0e8f8" }}
+              >
+                <span className="text-3xl">{b.icon}</span>
+                <div>
+                  <div className="mb-1 font-bold" style={{ color: "#2a2a2a" }}>{b.title}</div>
+                  <div className="h-px w-6 rounded-full" style={{ background: "#BD6CC9" }} />
                 </div>
-                <h3 className="text-base font-semibold text-[#2a3c24] leading-snug group-hover:text-[#5b7a4c] transition">{article.title}</h3>
+                <p className="text-xs leading-relaxed" style={{ color: "#666" }}>{b.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      {/* ════════════════════════════════════════
+          OUR PROMISE — Final CTA
+      ════════════════════════════════════════ */}
+      <section
+        className="relative overflow-hidden py-20 text-center"
+        style={{
+          background: "linear-gradient(135deg, #2a1635 0%, #78257C 50%, #BD6CC9 100%)",
+        }}
+      >
+        {/* texture */}
+        <div
+          className="absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage: "radial-gradient(white 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
+          }}
+        />
+
+        <div className="relative mx-auto max-w-2xl px-5">
+          <span className="mb-5 inline-block rounded-full border border-white/25 bg-white/12 px-5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80 backdrop-blur">
+            Our Promise
+          </span>
+
+          <h2 className="mb-6 text-2xl font-bold leading-snug text-white md:text-3xl">
+            Menghadirkan skincare yang membantu kulit kamu<br className="hidden md:block" />
+            terasa lebih{" "}
+            <span className="italic font-light">ternutrisi dan sehat</span>{" "}
+            setiap hari.
+          </h2>
+
+          <p className="mb-8 text-sm leading-relaxed text-white/80 md:text-base">
+            Karena merawat kulit itu bukan tentang menjadi orang lain. Merawat
+            kulit adalah tentang menjaga diri kamu sendiri — setiap hari.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/shop"
+              className="rounded-xl bg-white px-8 py-3.5 text-sm font-extrabold transition hover:bg-purple-50"
+              style={{ color: "#78257C" }}
+            >
+              Mulai Rawat Kulitmu →
+            </Link>
+            <Link
+              href="/booking"
+              className="rounded-xl border-2 border-white/40 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Konsultasi Gratis
+            </Link>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }
