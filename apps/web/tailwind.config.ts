@@ -28,9 +28,11 @@ export default {
         },
       },
       fontFamily: {
-        sans:  ["Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
-        serif: ["Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
-        mono:  ["ui-monospace", "monospace"],
+        sans:        ["var(--font-poppins)", "Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        serif:       ["Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        mono:        ["ui-monospace", "monospace"],
+        poppins:     ["var(--font-poppins)", "sans-serif"],
+        staatliches: ["var(--font-staatliches)", "sans-serif"],
       },
       borderRadius: {
         DEFAULT: "10px",

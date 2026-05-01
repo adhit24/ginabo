@@ -31,7 +31,7 @@ const products = [
     img: "/product-dna-bg.png",
   },
   {
-    name: "Daily Barrier Routine Set",
+    name: "Daily Skin Nutrition Set",
     type: "Bundling AM/PM",
     badge: "BUNDLING",
     price: "Rp 380.000",
@@ -468,9 +468,9 @@ export default function HomePage() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {[
               {
-                name: "Starter Kit",
-                desc: "Cocok untuk yang baru mau mulai skincare",
-                items: ["Bright & Care Moisture Cream", "DNA Salmon Essence"],
+                name: "Comfort Starter Duo",
+                desc: "Mulai rutinitas nutrisi harian yang simpel, fokus pada hidrasi dan kenyamanan kulit",
+                items: ["Bright & Care Moisture Cream", "Hydra Moist Gel Ultimate"],
                 price: "Rp 360.000",
                 original: "Rp 410.000",
                 save: "Hemat 12%",
@@ -478,9 +478,9 @@ export default function HomePage() {
                 highlight: false,
               },
               {
-                name: "Daily Barrier Set",
-                desc: "Rutinitas AM/PM lengkap untuk kulit sehat konsisten",
-                items: ["GlowAge Serum", "Bright & Care Cream", "DNA Salmon Essence"],
+                name: "Daily Skin Nutrition Set",
+                desc: "Paket lengkap untuk perempuan aktif, nutrisi, hidrasi, dan soothing yang nyaman dipakai konsisten",
+                items: ["GlowAge Multi-Active Serum", "Bright & Care Moisture Cream", "Hydra Moist Gel Ultimate"],
                 price: "Rp 620.000",
                 original: "Rp 695.000",
                 save: "Hemat 20%",
@@ -488,9 +488,9 @@ export default function HomePage() {
                 highlight: true,
               },
               {
-                name: "Brightening Set",
-                desc: "Fokus cerahkan kulit bertahap dan merata",
-                items: ["GlowAge Serum", "Bright & Care Cream"],
+                name: "Bright + Comfort Duo",
+                desc: "Bantu kulit tampak lebih cerah alami dengan feel yang tetap ringan dan nyaman sebelum makeup",
+                items: ["GlowAge Multi-Active Serum", "Bright & Care Moisture Cream"],
                 price: "Rp 435.000",
                 original: "Rp 480.000",
                 save: "Hemat 9%",
