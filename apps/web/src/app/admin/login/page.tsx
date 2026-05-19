@@ -1,29 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ADMIN_CREDS, store } from "@/lib/adminStore";
-
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
-    setTimeout(() => {
-      if (username === ADMIN_CREDS.username && password === ADMIN_CREDS.password) {
-        store.setAdminSession(true);
-        router.replace("/admin");
+    try {
+      const res = await fetch("/api/admin/auth/simple-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      if (res.ok) {
+        window.location.href = "/admin";
       } else {
-        setError("Username atau password salah.");
+        const data = await res.json().catch(() => ({}));
+        setError((data as { error?: string }).error ?? "Username atau password salah.");
         setLoading(false);
       }
-    }, 500);
+    } catch {
+      setError("Terjadi kesalahan. Coba lagi.");
+      setLoading(false);
+    }
   }
 
   return (

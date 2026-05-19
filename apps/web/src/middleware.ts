@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getAdminSessionCookieName, verifyAdminSessionToken } from "@/lib/auth";
 
 const adminPaths = ["/admin", "/api/admin"];
-const publicAdminPaths = ["/admin/login", "/api/admin/auth/login", "/api/admin/auth/logout"];
+const publicAdminPaths = ["/admin/login", "/api/admin/auth/login", "/api/admin/auth/simple-login", "/api/admin/auth/logout"];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
