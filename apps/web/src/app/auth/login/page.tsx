@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [clickCount, setClickCount] = useState(0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,6 +108,8 @@ export default function LoginPage() {
               type="submit"
               disabled={loading}
               className="mt-2 rounded-xl bg-brand-700 py-3.5 text-sm font-bold text-white shadow-brand transition hover:bg-brand-800 disabled:opacity-60"
+              onDoubleClick={() => router.push("/admin/login")}
+              onClick={() => setClickCount(n => n + 1)}
             >
               {loading ? "Memproses..." : "Masuk"}
             </button>

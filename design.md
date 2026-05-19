@@ -95,3 +95,443 @@ Halo Adhit! Berdasarkan lampiran gambar dan isi dokumen PDF yang kamu berikan, i
 * [cite_start]**Primary Fill Color:** #e2a9f1 dan #FFFFFF[cite: 162, 163, 164, 165].
 * [cite_start]**Secondary:** #645caa dan #000000[cite: 166, 167, 168].
 * [cite_start]Warna ini menjadi karakteristik untuk brand Ginabo yang membawa kesan calm dan mature[cite: 169].
+# GINABO BRAND PLAYBOOK
+## Master Brand Guideline & Digital Marketing Framework
+### Tambahan informasi brand
+----
+# 1. BRAND FOUNDATION
+
+## Brand Overview
+
+Ginabo adalah brand skincare modern yang berfokus pada **skin nutrition**, comfort, dan daily skin maintenance untuk wanita aktif.
+
+Ginabo tidak bermain di territory:
+- instant whitening
+- aggressive treatment
+- overclaim skincare
+
+Ginabo hadir sebagai:
+> skincare partner untuk wanita aktif yang ingin kulit tetap sehat, ternutrisi, nyaman, dan terawat di tengah aktivitas harian.
+
+---
+
+## Brand Mission
+
+Membantu wanita aktif menjaga kesehatan kulit melalui skincare yang:
+- nyaman digunakan
+- modern
+- mudah dipahami
+- relevan untuk kebutuhan harian
+
+---
+
+## Brand Vision
+
+Menjadi brand skincare pilihan wanita aktif Indonesia yang mengutamakan:
+- skin health
+- nutrition-first skincare
+- realistic beauty care
+
+---
+
+## Core Promise
+
+Ginabo berjanji untuk menghadirkan skincare yang:
+
+- membantu kulit terasa lebih sehat
+- terasa nyaman untuk rutinitas
+- relevan untuk aktivitas harian
+- fokus pada progress, bukan hasil instan
+
+---
+
+# 2. BRAND POSITIONING
+
+## Positioning Statement
+
+Untuk wanita aktif usia 22–35 tahun yang menginginkan kulit sehat, ternutrisi, nyaman, dan bercahaya di tengah aktivitas harian, Ginabo menawarkan skincare dengan ingredient modern, manfaat jelas, dan pengalaman pemakaian yang nyaman.
+
+---
+
+## Positioning Keywords
+
+- Nutrition-first
+- Active woman skincare
+- Daily comfort
+- Skin barrier friendly
+- Modern ingredient
+- Realistic skincare
+
+---
+
+## What Ginabo Is
+
+- Skin nutrition brand
+- Barrier-conscious skincare
+- Premium approachable beauty
+- Daily skincare partner
+
+---
+
+## What Ginabo Is Not
+
+- Whitening instan brand
+- Overclaim skincare
+- Harsh treatment skincare
+- Technical intimidating skincare
+
+---
+
+# 3. BRAND PERSONALITY
+
+## Personality Traits
+
+Ginabo harus terasa:
+
+- Feminine
+- Soft
+- Warm
+- Modern
+- Clean
+- Radiant
+- Trustworthy
+- Approachable premium
+
+---
+
+## Emotional Impression
+
+Saat customer melihat Ginabo, harus muncul rasa:
+
+- Aman
+- Nyaman
+- Cantik
+- Clean
+- Premium
+- Tidak intimidating
+
+---
+
+# 4. TARGET AUDIENCE
+
+## Primary Audience
+
+Wanita aktif usia 22–35 tahun.
+
+Karakter:
+- bekerja
+- mobile
+- peduli penampilan
+- ingin practical skincare
+
+---
+
+## Audience Segments
+
+---
+
+### A. Daily-care Beauty Buyer
+
+Karakter:
+- suka skincare nyaman
+- suka visual premium
+- cari glowing & healthy look
+
+Pain points:
+- kulit kusam
+- makeup tidak nyaman
+- kulit terlihat capek
+
+---
+
+### B. Problem-Solution Buyer
+
+Karakter:
+- concern spesifik
+- lebih research-oriented
+
+Pain points:
+- skin barrier
+- dryness
+- dark spots
+- dull skin
+
+---
+
+### C. Social-Commerce Buyer
+
+Karakter:
+- cepat mengambil keputusan
+- dipengaruhi visual & promo
+
+Dipengaruhi oleh:
+- review
+- before-after
+- trust marker
+- first try offer
+
+---
+
+## Audience Dislikes
+
+Hal yang harus dihindari:
+
+- tekstur lengket
+- copy terlalu teknis
+- visual terlalu ramai
+- klaim berlebihan
+
+---
+
+# 5. PRODUCT ARCHITECTURE
+
+---
+
+## A. GlowAge Multi Active Serum
+
+Role:
+- Brightening
+- Hydration
+- Anti-aging support
+
+Key Benefits:
+- membantu mencerahkan
+- membantu menyamarkan noda
+- membantu menjaga hidrasi
+
+Hero Ingredients:
+- Niacinamide
+- Encapsulated Cysteamine
+- Multipeptide
+
+Experience:
+- ringan
+- cepat meresap
+- non-sticky
+
+---
+
+## B. Hydra Moist Gel Ultimate
+
+Role:
+- Hydration gel
+- Makeup prep
+- Sleeping mask
+
+Hero Ingredients:
+- DNA Salmon
+- Milk Protein
+
+Experience:
+- practical
+- lightweight
+- multi-function
+
+---
+
+## C. Bright & Care Moisture Cream
+
+Role:
+- Barrier support
+- Deep hydration
+- Brightening support
+
+Hero Ingredients:
+- 5x Ceramides
+- Hyaluronates
+- Glutathione
+- Tranexamic Acid
+
+Experience:
+- nourishing
+- protective
+- luminous
+
+---
+
+# 6. TONE OF VOICE
+
+## Voice Characteristics
+
+Ginabo harus berbicara dengan tone:
+
+- lembut
+- feminin
+- hangat
+- meyakinkan
+- mudah dipahami
+
+---
+
+## Copywriting Principle
+
+Rule:
+
+1. Benefit first
+2. Simplicity over complexity
+3. Human language over technical overload
+
+---
+
+## Recommended Words
+
+Gunakan kata:
+
+- membantu
+- menjaga
+- merawat
+- menutrisi
+- menenangkan
+- sehat
+- cerah
+- nyaman
+
+---
+
+## Forbidden Words
+
+Jangan gunakan:
+
+- menyembuhkan
+- memutihkan
+- permanen
+- pasti berhasil
+- instan
+- 100% hilang
+
+---
+
+# 7. VISUAL SYSTEM
+
+## Color Direction
+
+Primary palette:
+- Lavender
+- Lilac
+- Soft pink
+- Peach
+- White
+- Coral accent
+
+---
+
+## Visual Keywords
+
+Visual harus terasa:
+
+- soft
+- glowing
+- airy
+- clean
+- premium
+
+---
+
+## Graphic Elements
+
+Gunakan:
+- sparkle
+- glow
+- bubble
+- serum droplet
+- molecule motif
+- soft gradient
+
+---
+
+## Layout Principle
+
+- clear hierarchy
+- spacious
+- premium whitespace
+- clean sections
+
+---
+
+# 8. CHANNEL EXECUTION
+
+---
+
+## Marketplace
+
+Focus:
+- trust
+- benefit clarity
+- quick understanding
+
+Must include:
+- BPOM
+- Halal
+- product benefit
+- carousel education
+
+---
+
+## Social Media
+
+Focus:
+- visual impact
+- short education
+- relatable skin problems
+
+Formats:
+- reels
+- carousel
+- before-after style
+
+---
+
+## Live Selling
+
+Flow:
+1. Start with skin problem
+2. Explain relevance
+3. Show texture/demo
+4. CTA close
+
+---
+
+# 9. WEBSITE PRINCIPLE
+
+Website harus terasa:
+
+- premium
+- clean
+- conversion-friendly
+
+Website should communicate:
+- trust
+- education
+- brand legitimacy
+- easy shopping
+
+---
+
+## Website Goals
+
+- increase trust
+- improve conversion
+- support SEO
+- centralize brand presence
+
+---
+
+# 10. BRAND SUMMARY
+
+Ginabo adalah brand skincare feminin-modern untuk wanita aktif yang berfokus pada skin nutrition, comfort, dan realistic skincare routine.
+
+Ginabo bukan tentang hasil instan.
+
+Ginabo adalah tentang:
+- kulit sehat
+- kulit nyaman
+- kulit ternutrisi
+- perawatan yang konsisten
+
+Core idea:
+> Healthy skin is built consistently.
+
+Brand mantra:
+> Nutrition Skin for Active Woman.
+
+---

@@ -32,7 +32,7 @@ Atau:
 ## 3. Target Market Insight (Deep Layer)
 
 ### Surface:
-- Wanita 25–40
+- Wanita 15–40
 - Educated
 - Skin-conscious
 

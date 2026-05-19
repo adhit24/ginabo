@@ -1,734 +1,691 @@
+"use client";
+
+import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { SkinTypeSection } from "@/components/SkinTypeSection";
+import { motion } from "framer-motion";
+import { FlashSaleSection } from "@/components/FlashSaleSection";
+import { HeroBanner } from "@/components/HeroBanner";
+import { Reveal } from "@/components/ui/Reveal";
+import { Marquee } from "@/components/ui/Marquee";
+import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
+import { useCart } from "@/components/cart/CartProvider";
+import { store, type GProduct } from "@/lib/adminStore";
 
-const products = [
+// ── Figma Assets ──────────────────────────────────────────────────────────────
+const IMG_TEXTURE   = "https://www.figma.com/api/mcp/asset/28c8f53f-937f-4a2b-930b-d14c3e2fd172"; // purple texture (badge bg)
+const IMG_STORE     = "/store_ginabo.png";
+const IMG_PERSON    = "https://www.figma.com/api/mcp/asset/3b32a890-5932-43ff-a576-41fc59926f60"; // model photo
+const IMG_SPRITE    = "https://www.figma.com/api/mcp/asset/71dedf14-7a07-4680-8fde-41aadfebedf7"; // 3-product sprite
+const IMG_CREAM     = "https://www.figma.com/api/mcp/asset/4db5c30d-969e-4093-aa64-026dd52a7f47"; // bright & care
+const IMG_HYDRA     = "https://www.figma.com/api/mcp/asset/691267df-2c74-42aa-9b09-e48cddcf41de"; // hydra moist gel
+const IMG_SERUM     = "https://www.figma.com/api/mcp/asset/42847e4c-7e8e-4690-a5d1-19adaf062ceb"; // glowage serum
+const IMG_G0        = "https://www.figma.com/api/mcp/asset/2dee09d9-e461-4704-a34f-f5cb85651358"; // pillar icon 0
+const IMG_G1        = "https://www.figma.com/api/mcp/asset/8824f9cf-5804-4ec0-9df4-5eab487a0c30"; // pillar icon 1
+const IMG_G2        = "https://www.figma.com/api/mcp/asset/f628e868-9c20-47c2-be27-9a5a2693c0e2"; // pillar icon 2
+const IMG_G3        = "https://www.figma.com/api/mcp/asset/129c7c57-ba52-4194-ab8e-b83458818851"; // pillar icon 3
+const IMG_CART1     = "https://www.figma.com/api/mcp/asset/4fa1de69-1da2-4be4-ae0d-59309b68e713"; // shopping cart (product card)
+const IMG_STAR      = "https://www.figma.com/api/mcp/asset/dd951a0c-532e-4daf-bd8f-5c5956a5da93"; // star
+const IMG_PROFILE   = "https://www.figma.com/api/mcp/asset/0df780a8-167c-4ae1-aca9-410075054133"; // profile/user icon
+const IMG_BOTTLE    = "https://www.figma.com/api/mcp/asset/be1d4cf7-e0dc-4442-b74b-959148b85f0f"; // squeeze bottle icon
+const IMG_ELLIPSE1  = "https://www.figma.com/api/mcp/asset/e909b8de-84fb-41af-aac4-3b99dada1ce6"; // decorative ellipse 1
+const IMG_ELLIPSE2  = "https://www.figma.com/api/mcp/asset/d999a210-ed98-4e40-8aef-f0297bdb4c26"; // decorative ellipse 2
+
+// ── Static Data ───────────────────────────────────────────────────────────────
+const marqueeItems = [
+  "BPOM ✓", "Halal ✓", "Dermatologist Tested", "No Parabens",
+  "Barrier-First", "Gentle Formula", "AM & PM Routine", "2 Years Research",
+];
+
+const singleProducts = [
+  { name: "Hydra Moist\nGel Ultimate",       rating: "5.0", reviews: "127", priceLabel: "IDR", priceVal: " 120K", img: "/gel.png"         },
+  { name: "Bright & Care\nMoisture Cream",   rating: "5.0", reviews: "127", priceLabel: "IDR", priceVal: " 75K",  img: "/bright_care.png" },
+  { name: "GlowAge Multi-\nActive Serum",    rating: "5.0", reviews: "127", priceLabel: "IDR", priceVal: " 90K",  img: "/serum.png"       },
+];
+
+const bundleProducts = [
+  { name: "Ginabo Complete\nSkin Nutrition Set", rating: "5.0", reviews: "127", originalPrice: "Rp 575.999", priceVal: "Rp 287.999", img: "/ginabo_bundling_3.png"          },
+  { name: "Repair &\nGlow Set",                 rating: "5.0", reviews: "127", originalPrice: "Rp 415.999", priceVal: "Rp 207.999", img: "/bundling_repair_and_glow.png"   },
+  { name: "Daily Skin\nBarrier Set",            rating: "5.0", reviews: "127", originalPrice: "Rp 395.999", priceVal: "Rp 197.999", img: "/bundling_daily_skin_barrier.png" },
+  { name: "Bright\nRenewal Set",               rating: "5.0", reviews: "127", originalPrice: "Rp 339.999", priceVal: "Rp 169.999", img: "/bundling_bright_renewal.png"    },
+];
+
+const pillars: { title: string; desc: string; icon: ReactNode }[] = [
   {
-    name: "GlowAge Multi-Active Serum",
-    type: "Serum · 30ml",
-    badge: "BESTSELLER",
-    price: "Rp 285.000",
-    rating: "4.9",
-    reviews: "2.1k",
-    img: "/product-serum-1.png",
+    title: "Brightening while respecting the skin barrier",
+    desc: "Mencerahkan kulit tanpa mengorbankan lapisan pelindungnya. Hasil bertahap, aman dipakai rutin.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+        <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7L12 2z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    ),
   },
   {
-    name: "Bright & Care Moisture Cream",
-    type: "Moisturizer · 10g",
-    badge: "FAVORITE",
-    price: "Rp 195.000",
-    rating: "4.8",
-    reviews: "1.8k",
-    img: "/product-cream-bg.png",
+    title: "Hydration as the foundation",
+    desc: "Hidrasi bukan sekedar step rutinitas, ini merupakan standar dari semua langkah skincare kamu.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+        <path d="M12 2C12 2 5 10 5 15a7 7 0 0 0 14 0c0-5-7-13-7-13z"/>
+      </svg>
+    ),
   },
   {
-    name: "Hydra Moist Gel Ultimate",
-    type: "DNA Salmon · 30ml",
-    badge: "BESTSELLER",
-    price: "Rp 215.000",
-    rating: "4.9",
-    reviews: "890",
-    img: "/product-dna-bg.png",
+    title: "Soothing for daily comfort",
+    desc: "Kulit yang tenang adalah kulit yang sehat. Setiap produk Ginabo diformulasikan untuk memberikan rasa nyaman sejak pemakaian pertama.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+        <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+        <line x1="9" y1="9" x2="9.01" y2="9"/>
+        <line x1="15" y1="9" x2="15.01" y2="9"/>
+      </svg>
+    ),
   },
   {
-    name: "Daily Barrier Routine Set",
-    type: "Bundling AM/PM",
-    badge: "BUNDLING",
-    price: "Rp 380.000",
-    rating: "5.0",
-    reviews: "3.2k",
-    img: "/product-bundle.png",
+    title: "Anti-aging support",
+    desc: "Menjaga kualitas kulit jangka panjang. Bukan anti-aging yang agresif, tapi yang bekerja bersama kulitmu setiap hari.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+        <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/>
+      </svg>
+    ),
   },
 ];
 
-const seriesBanners = [
-  {
-    title: "GlowAge Series",
-    sub: "Brightening + Anti-aging",
-    href: "/shop",
-    img: "/product-serum-2.png",
-  },
-  {
-    title: "Hydration Series",
-    sub: "Deep moisture daily",
-    href: "/shop",
-    img: "/product-cream-1.png",
-  },
-  {
-    title: "Barrier Series",
-    sub: "Soothing & repair",
-    href: "/shop",
-    img: "/product-dna-1.png",
-  },
-  {
-    title: "DNA Salmon Series",
-    sub: "Calming + recovery",
-    href: "/shop",
-    img: "/product-dna-2.png",
-  },
+const characters = [
+  { title: "Warm",        desc: "Terasa hangat dan mudah didekati, bukan brand yang menghakimi kondisi kulitmu." },
+  { title: "Reliable",    desc: "Riset bertahun-tahun untuk formula yang seimbang antara performa dan kenyamanan." },
+  { title: "Trustworthy", desc: "Kami serius di kualitas, karena kulit kamu bukan tempat coba-coba." },
+  { title: "Clear",       desc: "Komunikasi jujur & realistis. Tidak ada klaim berlebihan seperti \"putih instan\" atau \"1 malam langsung\"." },
 ];
 
 const blogPosts = [
-  { title: "Kenali Tanda-tanda Skin Barrier Kamu Rusak", date: "12 Apr 2024", tag: "Skin Barrier", read: "4 min", img: "/product-serum-3.png" },
-  { title: "Urutan Skincare yang Benar untuk Pemula",    date: "5 Apr 2024",  tag: "Beginner",     read: "6 min", img: "/product-cream-2.png" },
-  { title: "Serum vs Essence: Mana yang Kamu Butuhkan?", date: "28 Mar 2024", tag: "Tips",         read: "5 min", img: "/product-serum-4.png" },
-  { title: "Cara Pakai Sunscreen yang Efektif Setiap Hari", date: "20 Mar 2024", tag: "Sunscreen", read: "3 min", img: "/product-dna-3.png" },
+  { title: "Kenali Tanda-tanda Skin Barrier Kamu Rusak",     date: "12 Apr 2024", tag: "Skin Barrier", read: "4 min", img: "/product-serum-3.png" },
+  { title: "Urutan Skincare yang Benar untuk Pemula",        date: "5 Apr 2024",  tag: "Beginner",     read: "6 min", img: "/product-cream-2.png" },
+  { title: "Serum vs Essence: Mana yang Kamu Butuhkan?",    date: "28 Mar 2024", tag: "Tips",         read: "5 min", img: "/product-serum-4.png" },
+  { title: "Cara Pakai Sunscreen yang Efektif Setiap Hari", date: "20 Mar 2024", tag: "Sunscreen",    read: "3 min", img: "/product-dna-3.png" },
 ];
 
-const shopCategories = [
-  { label: "SERUM",       href: "/shop", img: "/product-serum-bg.png" },
-  { label: "MOISTURIZER", href: "/shop", img: "/product-cream-bg.png" },
-  { label: "DNA SALMON",  href: "/shop", img: "/product-dna-bg.png" },
-  { label: "BUNDLING",    href: "/shop", img: "/product-bundle.png" },
-  { label: "SERUM SET",   href: "/shop", img: "/product-serum-1.png" },
-  { label: "CREAM SET",   href: "/shop", img: "/product-cream-1.png" },
-];
+// ── Animation Variants ────────────────────────────────────────────────────────
+const EASE = [0.25, 1, 0.5, 1] as const;
 
-export default function HomePage() {
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.13, delayChildren: 0.1 } },
+};
+
+const cardSlideUp = {
+  hidden: { opacity: 0, y: 44 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.58, ease: EASE } },
+};
+
+const fadeInLeft = {
+  hidden: { opacity: 0, x: -48 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.65, ease: EASE } },
+};
+
+const fadeInRight = {
+  hidden: { opacity: 0, x: 48 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.65, ease: EASE } },
+};
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function Badge({ children, center }: { children: ReactNode; center?: boolean }) {
   return (
-    <div>
+    <div className={`badge-bg ${center ? "self-center" : "self-start"} rounded-[10px] px-4 sm:px-8 py-2 mb-6`}>
+      <span className="font-bold text-white text-[13px] tracking-wider whitespace-nowrap">{children}</span>
+    </div>
+  );
+}
 
-      {/* ── 1. HERO ── */}
-      <section className="relative overflow-hidden bg-brand-900" style={{minHeight: "420px"}}>
-        <div className="absolute inset-0">
-          <Image
-            src="/hero/hero-woman.jpg"
-            alt="Ginabo hero"
-            fill
-            className="object-cover object-right"
-            priority
-            sizes="100vw"
+function SectionLabel({ children, center }: { children: ReactNode; center?: boolean }) {
+  return (
+    <div className={`mb-1 text-xs font-bold uppercase tracking-[0.2em] ${center ? "text-center" : ""}`} style={{ color: "#CF99B4" }}>
+      {children}
+    </div>
+  );
+}
+
+function ProductCard({
+  name, rating, reviews, priceLabel, priceVal, originalPrice,
+  imgLeft, imgTop, img, priceMinor, productId,
+}: {
+  name: string; rating: string; reviews: string; priceLabel?: string; priceVal: string;
+  originalPrice?: string; imgLeft?: string; imgTop?: string; img?: string;
+  priceMinor?: number; productId?: string;
+}) {
+  const { addItem } = useCart();
+  function handleAddToCart() {
+    addItem({
+      productId: productId ?? name,
+      slug:      productId ?? name,
+      name:      name.replace(/\n/g, " "),
+      priceMinor: priceMinor ?? 0,
+      currency:  "IDR",
+      imageUrl:  img ?? null,
+    });
+  }
+  return (
+    <motion.div
+      variants={cardSlideUp}
+      whileHover={{ y: -10, boxShadow: "0 28px 56px rgba(42,35,86,0.18)" }}
+      className="w-full overflow-hidden rounded-[20px] bg-white flex flex-col cursor-pointer"
+      style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.10)" }}
+    >
+      {/* Product image */}
+      <div className="relative overflow-hidden aspect-[4/5]">
+        {img ? (
+          <img src={img} alt={name} className="w-full h-full object-cover" />
+        ) : (
+          <img
+            src={IMG_SPRITE}
+            alt={name}
+            className="absolute max-w-none pointer-events-none"
+            style={{ width: "303.75%", height: "113.33%", top: imgTop, left: imgLeft }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-900/85 via-brand-900/65 to-brand-900/20" />
-        </div>
+        )}
+      </div>
 
-        <div className="relative flex min-h-[420px] flex-col justify-center px-5 py-14 md:min-h-[500px] md:grid md:grid-cols-12 md:items-center md:px-12 md:py-20 mx-auto w-full max-w-8xl">
-          <div className="md:col-span-6">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-semibold tracking-[0.15em] text-white/90 backdrop-blur">
-              BARRIER-FIRST · DAILY · TRUST-BASED
-            </div>
-            <h1 className="text-[2rem] font-extrabold leading-[1.1] text-white md:text-5xl">
-              Kulit Sehat<br />
-              Dimulai dari<br />
-              Rutinitas yang<br />
-              Tepat
-            </h1>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/80 md:max-w-sm">
-              Ginabo hadir untuk membantu kamu merawat kulit dengan cara yang sederhana, konsisten, dan aman untuk pemakaian harian.
+      {/* Info row */}
+      <div className="flex flex-col gap-1 px-4 py-3 bg-white flex-1">
+        <p className="text-[#aaa] font-semibold text-[12px] md:text-[14px]">Ginabo</p>
+        <p className="font-semibold text-[#2a2356] text-[13px] md:text-[16px] leading-snug whitespace-pre-line">{name}</p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="#F59E0B">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          <span className="text-[#737373] font-semibold text-[12px]">{rating}</span>
+          <span className="text-[#656565] text-base font-light">|</span>
+          <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+          <span className="text-[#737373] font-semibold text-[12px]">{reviews}</span>
+        </div>
+        <div className="flex items-center justify-between mt-auto pt-1">
+          <div className="flex flex-col">
+            {originalPrice && (
+              <p className="text-[11px] md:text-[13px] font-medium line-through" style={{ color: "#bbb" }}>
+                {originalPrice}
+              </p>
+            )}
+            <p className="font-bold text-[13px] md:text-[16px]" style={{ color: "#be3ab4" }}>
+              {priceLabel && <span style={{ color: "#be3ab4" }}>{priceLabel} </span>}
+              {priceVal}
             </p>
-            <div className="mt-6 flex gap-3">
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.12 }}
+            whileTap={{ scale: 0.92 }}
+            onClick={handleAddToCart}
+            className="flex items-center justify-center rounded-[14px] overflow-hidden flex-shrink-0"
+            style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", width: 44, height: 44 }}
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </motion.button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+export default function HomePage() {
+  const [products, setProducts] = useState<GProduct[]>([]);
+  const [bundles,  setBundles]  = useState<GProduct[]>([]);
+
+  useEffect(() => {
+    setProducts(store.getProducts());
+    setBundles(store.getBundles());
+  }, []);
+
+  return (
+    <div className="bg-[#fffafa] overflow-x-hidden">
+
+      {/* ════════════════════════════════════════════
+          1. HERO BANNER
+      ════════════════════════════════════════════ */}
+      <HeroBanner />
+
+      {/* ════════════════════════════════════════════
+          2. MARQUEE (KEEP)
+      ════════════════════════════════════════════ */}
+      <div className="border-y border-[#f0d8eb] bg-white py-3.5">
+        <Marquee
+          items={marqueeItems}
+          speed={28}
+          itemClassName="font-bold text-[13px] tracking-wide text-[#78257C]"
+          separator="✦"
+        />
+      </div>
+
+      {/* ════════════════════════════════════════════
+          3. FLASH SALE (KEEP)
+      ════════════════════════════════════════════ */}
+      <FlashSaleSection />
+
+      {/* ════════════════════════════════════════════
+          4. BRAND ESSENCE
+      ════════════════════════════════════════════ */}
+      <section className="overflow-hidden" style={{ background: "#2a2356", minHeight: 580 }}>
+        <div className="flex w-full flex-col md:flex-row" style={{ minHeight: 580 }}>
+
+          <motion.div
+            variants={fadeInLeft}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="flex-shrink-0 md:w-[46%] lg:w-[44%]"
+            style={{ minHeight: 280 }}
+          >
+            <div className="relative h-full" style={{ minHeight: 280 }}>
+              <img src={IMG_STORE} alt="Ginabo Store" className="h-full w-full object-cover" style={{ minHeight: 280 }} />
+            </div>
+          </motion.div>
+
+          <motion.div
+            variants={fadeInRight}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="flex flex-1 flex-col justify-center px-8 py-14 md:px-14 md:py-20 lg:px-20"
+          >
+            <Badge>Brand Essence</Badge>
+
+            <h2 className="mb-6 font-bold leading-tight" style={{ color: "#ffa8f8", fontSize: "clamp(1.8rem,4vw,3rem)" }}>
+              &quot;Cerah yang tetap nyaman.&quot;
+            </h2>
+            <p className="mb-10 text-[14px] leading-[22px] text-justify text-white opacity-90" style={{ maxWidth: 620 }}>
+              GINABO membantu kulitmu tampak lebih cerah dan terawat melalui rutinitas yang nyaman dan konsisten.
+              Bukan skincare instan, tapi perawatan yang bikin kulit terasa nyaman, terawat, dan hasilnya makin konsisten dari waktu ke waktu.
+            </p>
+
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="flex flex-wrap gap-10"
+            >
+              {[
+                { label: "Riset Per Produk",     val: null,  counter: null,                  fallback: "~2 Tahun" },
+                { label: "Usia Mulai Pemakaian", val: null,  counter: { to: 15, suffix: "+" }, fallback: null },
+                { label: "Rutinitas Simpel",     val: "AM/PM", counter: null,                 fallback: null },
+              ].map((s) => (
+                <motion.div key={s.label} variants={cardSlideUp}>
+                  <p className="font-bold leading-[30px]" style={{ color: "#ffa8f8", fontSize: "2rem" }}>
+                    {s.counter
+                      ? <AnimatedCounter to={s.counter.to} suffix={s.counter.suffix} />
+                      : (s.val ?? s.fallback)}
+                  </p>
+                  <p className="font-semibold text-white text-[15px] leading-[20px]">{s.label}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════
+          5. PRODUK KAMI
+      ════════════════════════════════════════════ */}
+      <section className="bg-[#fffafa] pt-14 pb-4 md:pt-20 md:pb-4">
+        <div className="mx-auto w-full max-w-5xl px-5 md:px-10">
+          <Reveal>
+            <SectionLabel center>Katalog</SectionLabel>
+            <h2 className="text-center font-staatliches leading-[1] text-[clamp(2.5rem,6vw,64px)] mb-8" style={{ color: "#5245b2" }}>
+              Produk Kami
+            </h2>
+          </Reveal>
+
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {products.map((p) => (
+              <ProductCard
+                key={p.id}
+                productId={p.id}
+                name={p.name}
+                rating={p.rating}
+                reviews={p.reviews}
+                priceLabel={p.priceLabel}
+                priceVal={p.priceVal}
+                priceMinor={p.priceMinor}
+                img={p.img}
+              />
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════
+          6. PAKET BUNDLING
+      ════════════════════════════════════════════ */}
+      
+      <section className="bg-[#FDFAFF] pt-4 pb-14 md:pt-6 md:pb-20">
+        <div className="mx-auto w-full max-w-5xl px-5 md:px-10">
+          <Reveal>
+            <SectionLabel center>Katalog</SectionLabel>
+            <h2 className="text-center font-staatliches leading-[1] text-[clamp(2.5rem,6vw,64px)] mb-8" style={{ color: "#5245b2" }}>
+              Paket Bundling
+            </h2>
+          </Reveal>
+
+
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {bundles.map((p) => (
+              <ProductCard
+                key={p.id}
+                productId={p.id}
+                name={p.name}
+                rating={p.rating}
+                reviews={p.reviews}
+                originalPrice={p.originalPrice}
+                priceVal={p.priceVal}
+                priceMinor={p.priceMinor}
+                img={p.img}
+              />
+            ))}
+          </motion.div>
+
+          <Reveal delay={0.3}>
+            <div className="mt-8 text-center">
               <Link
                 href="/shop"
-                className="inline-flex flex-1 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-bold text-brand-800 shadow-sm transition hover:bg-brand-50 md:flex-none md:px-7"
+                className="inline-flex items-center gap-2 rounded-[10px] badge-bg px-8 py-3 text-sm font-bold text-white transition hover:opacity-90"
               >
-                Belanja Sekarang
+                Lihat Semua Produk →
               </Link>
-              <Link
-                href="/about"
-                className="inline-flex flex-1 items-center justify-center rounded-xl border border-white/40 bg-transparent px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10 md:flex-none md:px-7"
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════
+          7. BRAND PILLARS — 4 Pilar Fondasi Ginabo
+      ════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden py-20 md:py-28" style={{ background: "linear-gradient(135deg,#0f0a1e 0%,#1e0a38 50%,#2a1040 100%)" }}>
+        {/* Glow blobs */}
+        <div className="pointer-events-none absolute top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle,#8b5cf6,transparent 70%)" }} />
+        <div className="pointer-events-none absolute bottom-0 right-1/4 h-[400px] w-[400px] translate-x-1/2 translate-y-1/2 rounded-full opacity-15"
+          style={{ background: "radial-gradient(circle,#e879f9,transparent 70%)" }} />
+        <div className="pointer-events-none absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-10"
+          style={{ background: "radial-gradient(circle,#c026d3,transparent 70%)" }} />
+
+        <div className="relative mx-auto w-full max-w-5xl px-5 md:px-10">
+
+          {/* Header */}
+          <Reveal>
+            <div className="mb-14 text-center">
+              <span className="mb-4 inline-block rounded-full px-4 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
+                style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}>
+                Brand Pillars
+              </span>
+              <h2 className="font-staatliches text-[clamp(2.4rem,5vw,4rem)] leading-none text-white mt-3">
+                4 Pilar Fondasi{" "}
+                <span style={{ background: "linear-gradient(135deg,#c084fc,#e879f9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                  Ginabo
+                </span>
+              </h2>
+              <p className="mx-auto mt-4 max-w-lg text-[14px] leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+                Setiap produk Ginabo dibangun di atas empat prinsip utama yang menjadi standar kualitas kami.
+              </p>
+            </div>
+          </Reveal>
+
+          {/* 4-card grid */}
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+          >
+            {pillars.map((p, i) => (
+              <motion.div
+                key={p.title}
+                variants={cardSlideUp}
+                whileHover={{ y: -6, boxShadow: "0 24px 64px rgba(139,92,246,0.25)" }}
+                className="relative overflow-hidden rounded-2xl p-7 flex flex-col gap-5"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  backdropFilter: "blur(20px)",
+                }}
               >
-                Tentang Kami
-              </Link>
+                {/* Top row: number + icon */}
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: "#c084fc" }}>
+                    0{i + 1}
+                  </span>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl"
+                    style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}>
+                    {p.icon}
+                  </div>
+                </div>
+
+                {/* Title */}
+                <h3 className="font-staatliches text-white leading-tight text-[clamp(1.5rem,2.8vw,2rem)]">
+                  {p.title}
+                </h3>
+
+                {/* Desc */}
+                <p className="text-[13px] leading-relaxed flex-1" style={{ color: "rgba(255,255,255,0.60)" }}>
+                  {p.desc}
+                </p>
+
+                {/* Bottom accent line */}
+                <div className="absolute bottom-0 left-0 right-0 h-[2px]"
+                  style={{ background: "linear-gradient(90deg,#8b5cf6,#e879f9,transparent)" }} />
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════
+          8. BRAND CHARACTER — Jika Ginabo Adalah Seseorang
+      ════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden py-20 md:py-28" style={{ background: "linear-gradient(160deg,#fdf4ff 0%,#f5f0ff 50%,#fdf4ff 100%)" }}>
+        {/* Subtle bg blobs */}
+        <div className="pointer-events-none absolute -top-32 -right-32 h-[500px] w-[500px] rounded-full opacity-30"
+          style={{ background: "radial-gradient(circle,#e879f9,transparent 70%)" }} />
+        <div className="pointer-events-none absolute -bottom-24 -left-24 h-[400px] w-[400px] rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle,#8b5cf6,transparent 70%)" }} />
+
+        <div className="relative mx-auto w-full max-w-5xl px-5 md:px-10">
+
+          {/* Header */}
+          <Reveal>
+            <div className="mb-14 text-center">
+              <span className="mb-4 inline-block rounded-full px-4 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
+                style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}>
+                Brand Character
+              </span>
+              <h2 className="font-staatliches mt-3 text-[clamp(2.4rem,5vw,4rem)] leading-none" style={{ color: "#2a1a4e" }}>
+                Jika Ginabo Adalah{" "}
+                <span style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                  Seseorang
+                </span>
+              </h2>
+              <p className="mx-auto mt-4 max-w-md text-[14px] leading-relaxed" style={{ color: "#888" }}>
+                Empat sifat yang mencerminkan kepribadian brand Ginabo dalam setiap produk dan komunikasinya.
+              </p>
             </div>
-          </div>
-        </div>
+          </Reveal>
 
-        {/* Dots indicator */}
-        <div className="absolute bottom-4 inset-x-0 flex justify-center gap-2">
-          <span className="h-1.5 w-5 rounded-full bg-white/80" />
-          <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
-        </div>
-      </section>
-
-      {/* ── 3. CUSTOMER FAVORITE ── */}
-      <section className="bg-brand-50 py-10 md:py-20">
-        <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mb-1 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">
-            Customer Favorite
-          </div>
-          <h2 className="mb-2 text-center text-xl font-bold text-brand-900 md:text-3xl">
-            Produk Terlaris Ginabo
-          </h2>
-          <p className="mb-7 text-center text-xs text-brand-500 md:text-sm">
-            Diformulasi dari riset bertahun-tahun — ringan di kulit, konsisten pada hasil.
-          </p>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
-            {products.map((p) => (
-              <Link key={p.name} href="/shop" className="group flex flex-col overflow-hidden rounded-xl bg-white shadow-brand-sm transition hover:shadow-brand">
-                <div className="relative aspect-[4/5] overflow-hidden">
-                  <Image src={p.img} alt={p.name} fill className="object-cover transition duration-500 group-hover:scale-105" sizes="(max-width:768px) 50vw, 25vw" />
-                  <span className={`absolute left-3 top-3 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white ${
-                    p.badge === "NEW" ? "bg-accent" : p.badge === "BUNDLING" ? "bg-brand-500" : "bg-brand-700"
-                  }`}>{p.badge}</span>
-                  <div className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-center bg-brand-700/90 py-3 text-xs font-semibold text-white transition-transform duration-200 group-hover:translate-y-0">
-                    + Tambah ke Keranjang
-                  </div>
-                </div>
-                <div className="flex flex-1 flex-col gap-1 p-3 md:p-4">
-                  <div className="text-[11px] text-brand-400">{p.type}</div>
-                  <div className="text-sm font-semibold leading-snug text-brand-900 md:text-base">{p.name}</div>
-                  <div className="mt-1 flex items-center gap-1">
-                    <span className="text-xs text-amber-400">★ {p.rating}</span>
-                    <span className="text-[11px] text-brand-400">({p.reviews})</span>
-                  </div>
-                  <div className="mt-2 font-bold text-brand-700">{p.price}</div>
-                </div>
-              </Link>
-            ))}
-          </div>
-          <div className="mt-10 text-center">
-            <Link href="/shop" className="inline-flex items-center gap-2 rounded-xl border-2 border-brand-700 px-8 py-3 text-sm font-bold text-brand-700 transition hover:bg-brand-700 hover:text-white">
-              Lihat Semua Produk →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 4. SHOP BY CATEGORY ── */}
-      <section className="bg-white py-8 md:py-16">
-        <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <h2 className="mb-5 text-center text-xl font-bold text-brand-900 md:text-3xl">
-            Shop By Category
-          </h2>
-          <div className="flex gap-3 overflow-x-auto pb-2 px-1 scrollbar-none">
-            {shopCategories.map((c) => (
-              <Link key={c.label} href={c.href}
-                className="group flex shrink-0 flex-col items-center gap-2 rounded-2xl border border-brand-100 bg-brand-50 p-3 transition hover:border-brand-300 hover:bg-brand-100"
-                style={{ minWidth: 90 }}>
-                <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-white shadow-brand-sm">
-                  <Image src={c.img} alt={c.label} fill className="object-cover" sizes="56px" />
-                </div>
-                <span className="text-[10px] font-bold tracking-[0.1em] text-brand-800 text-center">{c.label}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 5. SERIES BANNERS ── */}
-      <section className="bg-brand-50 py-10 md:py-20">
-        <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">
-            The Story Behind Our Series
-          </div>
-          <h2 className="mb-6 text-center text-xl font-bold text-brand-900 md:text-3xl">
-            Skincare Series untuk Setiap Kebutuhan
-          </h2>
-          <div className="grid grid-cols-2 gap-3 md:gap-5 lg:grid-cols-4">
-            {seriesBanners.map((s) => (
-              <Link key={s.title} href={s.href}
-                className="group relative flex aspect-[3/4] flex-col justify-end overflow-hidden rounded-2xl">
-                <Image src={s.img} alt={s.title} fill className="object-cover transition duration-500 group-hover:scale-105" sizes="(max-width:768px) 50vw, 25vw" />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-900/80 via-brand-900/20 to-transparent" />
-                <div className="relative p-5">
-                  <div className="font-bold text-white">{s.title}</div>
-                  <div className="mt-1 text-xs text-white/70">{s.sub}</div>
-                  <div className="mt-3 text-xs font-bold text-brand-200 opacity-0 transition-opacity group-hover:opacity-100">
-                    Lihat Series →
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 6. PRODUCT RECOMMENDATIONS ── */}
-      <SkinTypeSection />
-
-      {/* ── 6b. FEATURE STRIP ── */}
-      <section className="bg-brand-700">
-        <div className="mx-auto grid w-full max-w-8xl grid-cols-1 divide-y divide-brand-600 md:grid-cols-3 md:divide-x md:divide-y-0">
-          {[
-            {
-              title: "Free Shipping\nseluruh Indonesia",
-              icon: (
-                <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2" className="h-12 w-12">
-                  <rect x="2" y="20" width="40" height="26" rx="3"/><path d="M42 28h10l8 10v8H42V28z"/><circle cx="16" cy="50" r="5"/><circle cx="50" cy="50" r="5"/><path d="M11 20V14a2 2 0 012-2h26a2 2 0 012 2v6"/>
+          {/* Character cards */}
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+          >
+            {[
+              { title: "Warm",        desc: "Terasa hangat dan mudah didekati, bukan brand yang menghakimi kondisi kulitmu.", color: "#f97316", icon: (
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                 </svg>
-              ),
-            },
-            {
-              title: "Special Gift\nWith Purchase",
-              icon: (
-                <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2" className="h-12 w-12">
-                  <rect x="8" y="24" width="48" height="36" rx="2"/><rect x="4" y="16" width="56" height="10" rx="2"/><path d="M32 16v44M20 16a8 8 0 010-10 8 8 0 0112 0M44 16a8 8 0 000-10 8 8 0 00-12 0"/>
+              )},
+              { title: "Reliable",    desc: "Riset bertahun-tahun untuk formula yang seimbang antara performa dan kenyamanan.", color: "#8b5cf6", icon: (
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                  <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7L12 2z"/>
+                  <path d="M9 12l2 2 4-4"/>
                 </svg>
-              ),
-            },
-            {
-              title: "Clearance Sale\n& Discount",
-              icon: (
-                <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2" className="h-12 w-12">
-                  <circle cx="32" cy="32" r="28"/><circle cx="32" cy="32" r="18"/><path d="M24 40l16-16M24 26a2 2 0 110-4 2 2 0 010 4zM40 42a2 2 0 110-4 2 2 0 010 4z"/>
+              )},
+              { title: "Trustworthy", desc: "Kami serius di kualitas, karena kulit kamu bukan tempat coba-coba.", color: "#06b6d4", icon: (
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 8v4l3 3"/>
                 </svg>
-              ),
-            },
-          ].map((f) => (
-            <div key={f.title} className="flex flex-row items-center gap-4 px-6 py-8 md:flex-col md:gap-5 md:px-8 md:py-12 md:text-center">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white md:h-20 md:w-20">
-                {f.icon}
-              </div>
-              <span className="whitespace-pre-line text-sm font-bold text-white/90 md:text-center md:text-[11px] md:tracking-[0.15em]">{f.title}</span>
+              )},
+              { title: "Clear",       desc: "Komunikasi jujur & realistis. Tidak ada klaim berlebihan seperti \"putih instan\" atau \"1 malam langsung\".", color: "#e879f9", icon: (
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+              )},
+            ].map((c, i) => (
+              <motion.div
+                key={c.title}
+                variants={cardSlideUp}
+                whileHover={{ y: -6, boxShadow: `0 24px 64px ${c.color}44` }}
+                className="relative overflow-hidden rounded-2xl p-7 flex flex-col gap-3"
+                style={{ background: c.color, boxShadow: `0 4px 20px ${c.color}33` }}
+              >
+                {/* Number */}
+                <span className="text-[11px] font-bold uppercase tracking-widest text-white/60">
+                  0{i + 1}
+                </span>
+
+                {/* Title */}
+                <h3 className="font-staatliches text-white text-[clamp(1.6rem,3vw,2rem)] leading-none">
+                  {c.title}
+                </h3>
+
+                {/* Desc */}
+                <p className="text-[13px] leading-relaxed text-white/80">
+                  {c.desc}
+                </p>
+
+                {/* Decorative circle */}
+                <div className="pointer-events-none absolute -bottom-8 -right-8 h-28 w-28 rounded-full bg-white/10" />
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════
+          9. POSITIONING — "Friendly Expert"
+      ════════════════════════════════════════════ */}
+      <section className="overflow-hidden py-16 md:py-24 text-center" style={{ background: "#1e1840" }}>
+        <div className="mx-auto w-full max-w-[1340px] px-5 md:px-10">
+          <Reveal>
+            <div className="flex justify-center mb-8">
+              <Badge>Positioning</Badge>
             </div>
-          ))}
-        </div>
-      </section>
+          </Reveal>
 
-      {/* ── 7. PROBLEM SECTION ── */}
-      <section className="bg-white py-10 md:py-24">
-        <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Tantangan Kulit Sehari-hari</div>
-          <h2 className="mb-2 text-center text-xl font-bold text-brand-900 md:text-3xl">
-            Apakah Kamu Merasakannya?
-          </h2>
-          <p className="mb-7 text-center text-xs text-brand-500 md:text-sm">
-            Kulitmu butuh nutrisi, bukan treatment keras.
-          </p>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
-            {[
-              { icon: "💧", title: "Kulit Kering", desc: "Terasa ketarik sepanjang hari walau sudah pakai moisturizer" },
-              { icon: "🌫️", title: "Kusam & Tidak Merata", desc: "Wajah terlihat lelah meski sudah tidur cukup" },
-              { icon: "😫", title: "Kulit Mudah Iritasi", desc: "Produk baru langsung bikin kemerahan atau purging" },
-              { icon: "💄", title: "Makeup Tidak Nyaman", desc: "Foundation mudah luntur, pori-pori terlihat jelas" },
-            ].map(p => (
-              <div key={p.title} className="flex flex-col items-center gap-2 rounded-2xl border border-brand-100 bg-brand-50 p-4 text-center md:gap-4 md:p-6">
-                <span className="text-3xl md:text-4xl">{p.icon}</span>
-                <div className="text-xs font-bold text-brand-900 md:text-sm">{p.title}</div>
-                <div className="text-[11px] leading-relaxed text-brand-500 md:text-xs">{p.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 8. SOLUTION SECTION ── */}
-      <section className="bg-brand-50 py-10 md:py-24">
-        <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Pendekatan Kami</div>
-            <h2 className="mb-4 text-xl font-bold text-brand-900 md:text-3xl">Nutrition Skin Approach</h2>
-            <p className="mb-7 text-sm leading-relaxed text-brand-600">
-              GINABO tidak mengejar hasil instan. Kami percaya kulit yang sehat dibangun dari rutinitas yang konsisten dan bahan-bahan yang benar-benar bersahabat dengan kulitmu.
-            </p>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              {[
-                { num: "01", title: "Gentle", desc: "Formula ringan yang aman dipakai rutin setiap hari tanpa khawatir efek samping" },
-                { num: "02", title: "Barrier-focused", desc: "Prioritas pertama adalah menjaga lapisan pelindung kulit tetap kuat dan sehat" },
-                { num: "03", title: "Daily Use", desc: "Dirancang untuk AM & PM — simpel, nyaman, dan hasilnya kelihatan konsisten" },
-              ].map(s => (
-                <div key={s.num} className="flex flex-col gap-3 rounded-2xl bg-white p-6 shadow-brand-sm">
-                  <div className="text-3xl font-extrabold text-brand-200">{s.num}</div>
-                  <div className="text-base font-bold text-brand-800">{s.title}</div>
-                  <div className="text-xs leading-relaxed text-brand-500">{s.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 9. HERO PRODUCT ── */}
-      <section className="overflow-hidden bg-white">
-        <div className="mx-auto grid w-full max-w-8xl md:grid-cols-2">
-          <div className="relative min-h-[260px] overflow-hidden md:min-h-[540px]">
-            <Image
-              src="/product-serum-bg.png"
-              alt="GlowAge Multi-Active Serum"
-              fill
-              className="object-cover object-center"
-              sizes="(max-width:768px) 100vw, 50vw"
-            />
-          </div>
-          <div className="flex flex-col justify-center gap-5 px-6 py-12 md:px-12 md:py-16">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Hero Product</div>
-            <h2 className="text-2xl font-bold text-brand-900 md:text-3xl">GlowAge Multi-Active Serum</h2>
-            <p className="text-sm leading-relaxed text-brand-600">
-              Diformulasi hampir 2 tahun untuk membantu meratakan warna kulit, menjaga kelembapan & skin barrier, dan menenangkan kemerahan — dalam satu langkah simpel.
-            </p>
-            <ul className="flex flex-col gap-2">
-              {[
-                "✦ Brightening bertahap — rata merata tanpa iritasi",
-                "✦ Barrier support — kulit tetap kuat & terlindungi",
-                "✦ Anti-aging ringan — cocok mulai usia 18+",
-              ].map(b => (
-                <li key={b} className="text-sm font-medium text-brand-700">{b}</li>
-              ))}
-            </ul>
-            <div className="flex flex-wrap gap-2">
-              {["BPOM RI", "Cruelty Free", "Dermat. Tested", "Daily Safe"].map(badge => (
-                <span key={badge} className="rounded-full bg-brand-100 px-3 py-1 text-[11px] font-bold text-brand-700">{badge}</span>
-              ))}
-            </div>
-            <div className="flex items-center gap-3 pt-1">
-              <span className="text-xl font-extrabold text-brand-700">Rp 285.000</span>
-              <span className="text-xs text-brand-400 line-through">Rp 320.000</span>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/shop" className="rounded-xl bg-brand-700 px-7 py-3 text-sm font-bold text-white shadow-brand transition hover:bg-brand-800">
-                Coba First Try
-              </Link>
-              <Link href="/shop" className="rounded-xl border border-brand-300 px-7 py-3 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
-                Lihat Detail →
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 10. HOW IT WORKS ── */}
-      <section className="bg-brand-50 py-10 md:py-24">
-        <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Cara Kerja</div>
-          <h2 className="mb-8 text-center text-xl font-bold text-brand-900 md:text-3xl">Semudah 3 Langkah</h2>
-          <div className="relative grid grid-cols-3 gap-4 md:gap-8">
-            {/* connector line */}
-            <div className="absolute left-0 right-0 top-8 hidden h-px bg-brand-200 md:block" style={{left:"16%", right:"16%"}} />
-            {[
-              { step: "01", title: "Apply Daily", desc: "Pakai serum & moisturizer pagi dan malam setelah cuci muka. Cukup 2–3 menit." },
-              { step: "02", title: "Skin Feels Better", desc: "Minggu pertama kulit mulai terasa lebih lembap, lebih tenang, dan nyaman sepanjang hari." },
-              { step: "03", title: "Visible Improvement", desc: "Setelah konsisten 4–8 minggu, warna kulit lebih merata dan cerah terlihat jelas." },
-            ].map(s => (
-              <div key={s.step} className="flex flex-col items-center gap-3 text-center">
-                <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-brand-700 text-sm font-extrabold text-white shadow-brand md:h-16 md:w-16 md:text-lg">
-                  {s.step}
-                </div>
-                <div className="text-xs font-bold text-brand-900 md:text-base">{s.title}</div>
-                <div className="text-[10px] leading-relaxed text-brand-500 md:max-w-xs md:text-xs">{s.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 11. SOCIAL PROOF ── */}
-      <section className="bg-white py-10 md:py-24">
-        <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Testimoni</div>
-          <h2 className="mb-6 text-center text-xl font-bold text-brand-900 md:text-3xl">Apa Kata Mereka?</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              { name: "Rizka A.",    skin: "Kulit kering",    rating: 5, text: "Pakai 2 minggu udah kerasa bedanya. Kulitku yang kering banget akhirnya bisa lembap seharian tanpa re-apply!", img: "/product-serum-1.png" },
-              { name: "Diandra S.",  skin: "Kulit berminyak", rating: 5, text: "Skeptis awalnya, tapi sekarang udah jadi holy grail. Minyak berkurang, pori nggak kelihatan melar, dan makeup nempel lama!", img: "/product-cream-bg.png" },
-              { name: "Marshanda P.",skin: "Kulit sensitif",  rating: 5, text: "Kulit sensitifku nggak kena iritasi sama sekali. Teksturnya ringan banget dan wanginya segar nggak bikin migrain.", img: "/product-dna-bg.png" },
-              { name: "Tiara W.",    skin: "Kombinasi",       rating: 5, text: "T-zone tetap terkontrol, pipi nggak kering. Akhirnya nemu yang bisa handle kombinasi skin!",                         img: "/product-serum-2.png" },
-              { name: "Felicia N.",  skin: "Kulit normal",    rating: 5, text: "Udah 3 bulan konsisten dan kulit glowing banget. Banyak yang nanya skincare apa yang aku pakai!",                     img: "/product-cream-1.png" },
-              { name: "Amira K.",    skin: "Kulit kering",    rating: 5, text: "Serum-nya ringan banget, nggak lengket, cepet meresap. Bahkan bisa dipake sebelum makeup dan nggak bikin blobor.",     img: "/product-dna-1.png" },
-            ].map(r => (
-              <div key={r.name} className="flex flex-col gap-4 rounded-2xl border border-brand-100 bg-brand-50 p-6">
-                <div className="flex items-center gap-3">
-                  <div className="relative h-11 w-11 overflow-hidden rounded-full border-2 border-brand-200">
-                    <Image src={r.img} alt={r.name} fill className="object-cover" sizes="44px" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-brand-900">{r.name}</div>
-                    <div className="text-[11px] text-brand-400">{r.skin}</div>
-                  </div>
-                  <div className="ml-auto text-xs font-bold text-amber-400">{"★".repeat(r.rating)}</div>
-                </div>
-                <p className="text-xs leading-relaxed text-brand-600">"{r.text}"</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 12. FIRST TRY SECTION ── */}
-      <section className="bg-brand-700 py-12 md:py-24">
-        <div className="mx-auto w-full max-w-8xl px-5 text-center md:px-8">
-          <div className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-200">Khusus Kamu yang Belum Pernah Coba</div>
-          <h2 className="mb-3 text-2xl font-extrabold text-white md:text-4xl">Mulai dari First Try</h2>
-          <p className="mx-auto mb-7 max-w-xs text-sm leading-relaxed text-brand-200 md:max-w-lg">
-            Ukuran kecil, harga terjangkau. Rasakan sendiri manfaatnya sebelum komit ke full size.
-          </p>
-          <div className="mb-7 grid grid-cols-2 gap-2 md:flex md:flex-wrap md:items-center md:justify-center md:gap-4">
-            {[
-              { label: "Ukuran 10ml", icon: "🧴" },
-              { label: "Mulai Rp 75.000", icon: "💜" },
-              { label: "Free shipping", icon: "🚚" },
-              { label: "Garansi kepuasan", icon: "✅" },
-            ].map(f => (
-              <div key={f.label} className="flex items-center justify-center gap-2 rounded-full border border-brand-500 bg-brand-800/50 px-3 py-2 text-xs text-white md:px-4 md:text-sm">
-                <span>{f.icon}</span><span>{f.label}</span>
-              </div>
-            ))}
-          </div>
-          <Link href="/shop"
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-sm font-extrabold text-brand-800 shadow-brand-lg transition hover:bg-brand-50 md:px-10 md:text-base">
-            Coba First Try Sekarang →
-          </Link>
-        </div>
-      </section>
-
-      {/* ── 13. BUNDLE SECTION ── */}
-      <section className="bg-white py-16 md:py-24">
-        <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mb-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Hemat Lebih Banyak</div>
-          <h2 className="mb-10 text-center text-2xl font-bold text-brand-900 md:text-3xl">Paket Bundling Terbaik</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {[
-              {
-                name: "Starter Kit",
-                desc: "Cocok untuk yang baru mau mulai skincare",
-                items: ["Bright & Care Moisture Cream", "DNA Salmon Essence"],
-                price: "Rp 360.000",
-                original: "Rp 410.000",
-                save: "Hemat 12%",
-                img: "/product-cream-bg.png",
-                highlight: false,
-              },
-              {
-                name: "Daily Barrier Set",
-                desc: "Rutinitas AM/PM lengkap untuk kulit sehat konsisten",
-                items: ["GlowAge Serum", "Bright & Care Cream", "DNA Salmon Essence"],
-                price: "Rp 620.000",
-                original: "Rp 695.000",
-                save: "Hemat 20%",
-                img: "/product-bundle.png",
-                highlight: true,
-              },
-              {
-                name: "Brightening Set",
-                desc: "Fokus cerahkan kulit bertahap dan merata",
-                items: ["GlowAge Serum", "Bright & Care Cream"],
-                price: "Rp 435.000",
-                original: "Rp 480.000",
-                save: "Hemat 9%",
-                img: "/product-serum-bg.png",
-                highlight: false,
-              },
-            ].map(b => (
-              <div key={b.name} className={`flex flex-col overflow-hidden rounded-2xl border transition hover:shadow-brand ${b.highlight ? "border-brand-500 shadow-brand" : "border-brand-100"}`}>
-                <div className="relative aspect-[16/9] overflow-hidden">
-                  <Image src={b.img} alt={b.name} fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
-                  {b.highlight && (
-                    <span className="absolute right-3 top-3 rounded-full bg-brand-700 px-3 py-1 text-[11px] font-bold text-white">TERLARIS</span>
-                  )}
-                </div>
-                <div className="flex flex-1 flex-col gap-3 p-6">
-                  <div className="text-base font-bold text-brand-900">{b.name}</div>
-                  <div className="text-xs text-brand-500">{b.desc}</div>
-                  <ul className="flex flex-col gap-1">
-                    {b.items.map(i => <li key={i} className="text-xs text-brand-600">· {i}</li>)}
-                  </ul>
-                  <div className="mt-auto flex items-center justify-between pt-3">
-                    <div>
-                      <div className="text-lg font-extrabold text-brand-700">{b.price}</div>
-                      <div className="text-[11px] text-brand-400 line-through">{b.original}</div>
-                    </div>
-                    <span className="rounded-full bg-green-50 px-3 py-1 text-[11px] font-bold text-green-700">{b.save}</span>
-                  </div>
-                  <Link href="/shop" className={`mt-2 rounded-xl py-2.5 text-center text-sm font-bold transition ${b.highlight ? "bg-brand-700 text-white hover:bg-brand-800" : "border border-brand-700 text-brand-700 hover:bg-brand-700 hover:text-white"}`}>
-                    Pilih Paket Ini
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 14. ROUTINE SECTION ── */}
-      <section className="bg-brand-50 py-16 md:py-24">
-        <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mb-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Rutinitas Simpel</div>
-          <h2 className="mb-4 text-center text-2xl font-bold text-brand-900 md:text-3xl">AM & PM Dalam 3 Langkah</h2>
-          <p className="mb-12 text-center text-sm text-brand-500">Ringan tapi nutrisi lengkap — selesai dalam 5 menit.</p>
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-            {[
-              { step: "Step 1", name: "Cleanser", desc: "Bersihkan wajah dengan lembut. Cukup sekali — jangan over-cleanse.", time: "1 menit", img: "/product-serum-1.png" },
-              { step: "Step 2", name: "Serum", desc: "Aplikasikan GlowAge Serum. Tunggu 15–30 menit agar menyerap sempurna.", time: "15–30 menit", img: "/product-serum-2.png" },
-              { step: "Step 3", name: "Moisturizer", desc: "Tutup dengan Bright & Care Cream. Lock in semua nutrisi dan hidrasi.", time: "1 menit", img: "/product-cream-1.png" },
-            ].map(r => (
-              <div key={r.step} className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-brand-sm">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <Image src={r.img} alt={r.name} fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
-                  <span className="absolute left-4 top-4 rounded-full bg-brand-700 px-3 py-1 text-[11px] font-bold text-white">{r.step}</span>
-                </div>
-                <div className="flex flex-col gap-2 p-5">
-                  <div className="text-base font-bold text-brand-900">{r.name}</div>
-                  <div className="text-xs leading-relaxed text-brand-500">{r.desc}</div>
-                  <div className="mt-2 text-[11px] font-semibold text-brand-400">⏱ {r.time}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 15. PRESS LOGOS ── */}
-      <section className="bg-white py-14 md:py-16">
-        <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-brand-400">
-            Dipercaya & Diliput
-          </div>
-          <p className="mb-10 text-center text-base font-medium text-brand-700 md:text-lg">
-            "Produk Ginabo menggunakan bahan-bahan yang aman dan teruji untuk pemakaian harian."
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
-            {[
-              { name: "Kompas TV",     style: "border border-brand-200 px-4 py-2 rounded-lg text-sm font-bold text-red-600 bg-white" },
-              { name: "Female Daily", style: "border-2 border-pink-400 px-4 py-2 rounded-full text-sm font-bold text-pink-500 bg-white" },
-              { name: "Forbes",       style: "text-xl font-black text-brand-900 tracking-tight" },
-              { name: "Beauty Journal", style: "text-sm font-bold tracking-widest text-brand-800 uppercase" },
-              { name: "CNN Indonesia", style: "text-sm font-black text-red-700 tracking-tight" },
-              { name: "Detik Health", style: "text-sm font-bold text-brand-700" },
-            ].map((p) => (
-              <div key={p.name} className={p.style}>{p.name}</div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 8. SPLIT ABOUT BANNER ── */}
-      <section className="overflow-hidden bg-brand-50">
-        <div className="mx-auto grid w-full max-w-8xl md:grid-cols-2">
-          <div className="relative min-h-[320px] overflow-hidden md:min-h-[500px]">
-            <Image
-              src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&q=80"
-              alt="Model Ginabo"
-              fill
-              className="object-cover object-center"
-              sizes="(max-width:768px) 100vw, 50vw"
-            />
-            <div className="absolute inset-0 bg-brand-900/20" />
-          </div>
-          <div className="flex flex-col justify-center gap-5 bg-white px-6 py-12 md:px-12 md:py-16">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Tentang Kami</div>
-            <h2 className="text-2xl font-bold leading-snug text-brand-900 md:text-3xl">
-              Skincare yang Terasa Seperti Teman yang Paling Paham Kulitmu
+          <Reveal direction="up" delay={0.1}>
+            <h2 className="font-bold mb-6" style={{ color: "#ffa8f8", fontSize: "clamp(2rem,5vw,3rem)" }}>
+              &quot;Friendly expert.&quot;
             </h2>
-            <p className="text-sm leading-relaxed text-brand-600">
-              GINABO hadir sebagai Friendly Expert — hangat, jelas, dan berbasis alasan. Bukan sekadar jualan, tapi benar-benar membantu kamu membangun rutinitas yang konsisten dan aman.
+          </Reveal>
+
+          <Reveal direction="up" delay={0.2}>
+            <p className="mx-auto mb-10 font-semibold text-white text-[clamp(14px,2vw,20px)] leading-[1.7] opacity-90" style={{ maxWidth: 900 }}>
+              Ginabo berbicara seperti teman yang memahami perawatan kulit, bukan seperti sales yang mengejar penjualan.
+              Informatif, not judging. Jujur dan memberikan rasa aman.
             </p>
-            <div className="grid grid-cols-3 gap-4 border-t border-brand-100 pt-5">
-              {[
-                { val: "~2 Thn", desc: "Riset per produk" },
-                { val: "15+",    desc: "Usia mulai pakai" },
-                { val: "AM/PM",  desc: "Rutinitas simpel" },
-              ].map(s => (
-                <div key={s.desc}>
-                  <div className="text-lg font-extrabold text-brand-700 md:text-xl">{s.val}</div>
-                  <div className="text-xs text-brand-400">{s.desc}</div>
-                </div>
+          </Reveal>
+
+          {/* Trait pills */}
+          <Reveal direction="up" delay={0.3}>
+            <div className="flex flex-wrap gap-3 justify-center mb-12">
+              {["Calm & Mature", "Informative", "Not Judging", "Honest"].map((tag) => (
+                <motion.span
+                  key={tag}
+                  whileHover={{ scale: 1.06, backgroundColor: "#6958c0" }}
+                  className="rounded-[10px] px-6 py-2.5 font-semibold text-white text-[15px] cursor-default select-none"
+                  style={{ background: "#4a3662" }}
+                >
+                  {tag}
+                </motion.span>
               ))}
             </div>
-            <div className="flex flex-wrap gap-3 pt-1">
-              <Link href="/about" className="rounded-xl bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white shadow-brand-sm transition hover:bg-brand-800">
-                Tentang Kami
-              </Link>
-              <Link href="/booking" className="rounded-xl border border-brand-300 px-6 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-100">
-                Booking Konsultasi
-              </Link>
+          </Reveal>
+
+          {/* CTA */}
+          <Reveal direction="up" delay={0.4}>
+            <div className="flex justify-center">
+              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+                <Link
+                  href="/shop"
+                  className="inline-flex items-center gap-3 rounded-[10px] badge-bg px-8 py-4 font-semibold text-white text-[17px] shadow-lg"
+                >
+                  <img src={IMG_BOTTLE} alt="" className="w-7 h-7 flex-shrink-0" />
+                  Rawat Sekarang
+                </Link>
+              </motion.div>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* ── 9. CERTIFICATIONS ── */}
-      <section className="bg-white py-12 md:py-16">
-        <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <p className="mb-8 text-center text-sm font-semibold text-brand-600 md:text-base">
-            Inspired by Nature, Created for You
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
-            {[
-              { label: "PETA",            bg: "bg-yellow-50",  text: "text-yellow-800",  border: "border-yellow-200" },
-              { label: "HALAL",           bg: "bg-green-50",   text: "text-green-800",   border: "border-green-300" },
-              { label: "Cruelty Free",    bg: "bg-brand-50",   text: "text-brand-700",   border: "border-brand-200" },
-              { label: "Vegan",           bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200" },
-              { label: "BPOM RI",         bg: "bg-blue-50",    text: "text-blue-800",    border: "border-blue-200" },
-              { label: "Dermat. Tested",  bg: "bg-violet-50",  text: "text-violet-800",  border: "border-violet-200" },
-            ].map(c => (
-              <div key={c.label}
-                className={`flex h-20 w-20 flex-col items-center justify-center rounded-full border-2 ${c.bg} ${c.border} p-2 text-center`}>
-                <span className={`text-[11px] font-bold leading-tight ${c.text}`}>{c.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── BRAND STORY ── */}
-      <section className="bg-brand-50 py-16 md:py-20">
-        <div className="mx-auto w-full max-w-3xl px-4 text-center md:px-8">
-          <div className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Brand Story</div>
-          <blockquote className="mb-6 text-xl font-bold leading-relaxed text-brand-900 md:text-2xl">
-            "Ginabo dibuat untuk wanita aktif yang butuh skincare simpel dan efektif."
-          </blockquote>
-          <p className="mx-auto max-w-xl text-sm leading-relaxed text-brand-600">
-            Kami tidak percaya pada janji instan. GINABO lahir dari keyakinan bahwa kulit yang sehat adalah hasil dari rutinitas konsisten, bukan treatment agresif. Setiap produk kami dibangun di atas riset, komitmen pada keamanan, dan rasa hormat terhadap kulit kamu.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-6">
-            {[
-              { val: "2 Tahun", label: "Riset per formula" },
-              { val: "15+",     label: "Usia mulai pakai" },
-              { val: "50K+",    label: "Pelanggan aktif" },
-              { val: "4.9★",    label: "Rating rata-rata" },
-            ].map(s => (
-              <div key={s.label} className="flex flex-col items-center gap-1">
-                <div className="text-2xl font-extrabold text-brand-700">{s.val}</div>
-                <div className="text-xs text-brand-400">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FINAL CTA ── */}
-      <section className="bg-gradient-purple py-20 md:py-28">
-        <div className="mx-auto w-full max-w-8xl px-4 text-center md:px-8">
-          <h2 className="mb-4 text-3xl font-extrabold text-white md:text-4xl lg:text-5xl">Your Skin, But Better.</h2>
-          <p className="mx-auto mb-10 max-w-lg text-sm leading-relaxed text-white/80 md:text-base">
-            Mulai perjalanan skincare yang benar-benar konsisten. Tidak ada janji berlebihan — hanya hasil nyata dari rutinitas yang tepat.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link href="/shop"
-              className="rounded-xl bg-white px-10 py-4 text-base font-extrabold text-brand-800 shadow-brand-lg transition hover:bg-brand-50">
-              Shop Now →
-            </Link>
-            <Link href="/shop"
-              className="rounded-xl border-2 border-white/50 px-10 py-4 text-base font-semibold text-white transition hover:bg-white/10">
-              Coba First Try
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 10. BLOG ── */}
-      <section className="bg-brand-50 py-14 md:py-20">
-        <div className="mx-auto w-full max-w-8xl px-4 md:px-8">
-          <div className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Edukasi & Tips</div>
+      {/* ════════════════════════════════════════════
+          10. INFO TERKINI (KEEP)
+      ════════════════════════════════════════════ */}
+      <section className="bg-[#FDFAFF] py-14 md:py-20">
+        <div className="mx-auto w-full max-w-[1540px] px-5 md:px-10">
+          <SectionLabel>Edukasi & Tips</SectionLabel>
           <div className="mb-8 flex items-end justify-between">
             <h2 className="text-2xl font-bold text-brand-900 md:text-3xl">Info & Tips Terkini</h2>
-            <Link href="#" className="text-sm font-semibold text-brand-600 hover:text-brand-800 hover:underline">
-              Lihat Semua →
-            </Link>
+            <Link href="#" className="text-sm font-semibold text-brand-600 hover:text-brand-800 hover:underline">Lihat Semua →</Link>
           </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
+          >
             {blogPosts.map((post) => (
-              <Link key={post.title} href="#"
-                className="group flex flex-col overflow-hidden rounded-xl bg-white shadow-brand-sm transition hover:shadow-brand">
-                <div className="relative aspect-[16/10] overflow-hidden">
-                  <Image src={post.img} alt={post.title} fill className="object-cover transition duration-500 group-hover:scale-105" sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 25vw" />
-                  <span className="absolute left-3 top-3 rounded-md bg-brand-700 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-                    {post.tag}
-                  </span>
-                </div>
-                <div className="flex flex-1 flex-col gap-2 p-4">
-                  <div className="flex items-center gap-2 text-[11px] text-brand-400">
-                    <span>{post.date}</span><span>·</span><span>{post.read} read</span>
+              <motion.div key={post.title} variants={cardSlideUp}>
+                <Link href="#" className="group flex flex-col overflow-hidden rounded-xl bg-white shadow-brand-sm transition hover:shadow-brand h-full">
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <Image src={post.img} alt={post.title} fill className="object-cover transition duration-500 group-hover:scale-105" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,25vw" />
+                    <span className="absolute left-3 top-3 rounded-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white" style={{ background: "#78257C" }}>{post.tag}</span>
                   </div>
-                  <div className="text-sm font-semibold leading-snug text-brand-900 transition group-hover:text-brand-600">
-                    {post.title}
+                  <div className="flex flex-1 flex-col gap-2 p-4">
+                    <div className="flex items-center gap-2 text-[11px] text-brand-400">
+                      <span>{post.date}</span><span>·</span><span>{post.read} read</span>
+                    </div>
+                    <div className="text-sm font-semibold leading-snug text-brand-900 transition group-hover:text-brand-600">{post.title}</div>
+                    <div className="mt-auto pt-2 text-xs font-semibold text-brand-500 group-hover:text-brand-700">Baca selengkapnya →</div>
                   </div>
-                  <div className="mt-auto pt-2 text-xs font-semibold text-brand-500 group-hover:text-brand-700">
-                    Baca selengkapnya →
-                  </div>
-                </div>
-              </Link>
+                </Link>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 

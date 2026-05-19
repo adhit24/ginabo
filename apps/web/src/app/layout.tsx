@@ -1,7 +1,7 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Montserrat, Poppins, Staatliches } from "next/font/google";
 
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -15,6 +15,20 @@ const montserrat = Montserrat({
   weight: ["300", "400", "500", "600", "700", "800"],
 });
 
+const poppins = Poppins({
+  subsets: ["latin"],
+  variable: "--font-poppins",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const staatliches = Staatliches({
+  subsets: ["latin"],
+  variable: "--font-staatliches",
+  display: "swap",
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: "Ginabo — Sentuhan Mewah Setiap Hari",
   description: "Daily Skincare Solution: Brightening, Hydration, Soothing & Barrier Support. Cerah yang tetap nyaman."
@@ -22,13 +36,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={montserrat.variable}>
-      <body className="font-sans">
+    <html lang="id" className={`${montserrat.variable} ${poppins.variable} ${staatliches.variable}`}>
+      <body className="font-poppins">
         <AuthProvider>
           <CartProvider>
-            <div className="min-h-dvh bg-brand-50">
+            <div className="min-h-dvh bg-[#fffafa]">
               <SiteHeader />
-              <main className="mx-auto w-full max-w-6xl px-4 pb-[calc(2.5rem+var(--safe-bottom))] pt-6 md:px-6 md:pb-10 md:pt-10">{children}</main>
+              <main className="w-full">{children}</main>
               <SiteFooter />
             </div>
           </CartProvider>

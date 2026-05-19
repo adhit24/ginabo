@@ -60,3 +60,104 @@ h1, h2, h3, h4, h5, h6 {
 a {
   color: var(--color-link);
 }
+
+/* ── Badge-bg (Figma gradient pattern) ── */
+.badge-bg {
+  background-image: url('https://www.figma.com/api/mcp/asset/0a1c44e7-5614-4d0f-8a92-9ed4f9443ac8');
+  background-size: cover;
+  background-position: center;
+}
+
+/* ── Float animation ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-18px); }
+}
+.float-anim { animation: float 4.5s ease-in-out infinite; }
+
+/* ── Badge pulse ── */
+@keyframes badge-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201,114,189,0.45); }
+  55%       { box-shadow: 0 0 0 14px rgba(201,114,189,0); }
+}
+.badge-pulse { animation: badge-pulse 2.8s ease-in-out infinite; }
+
+/* ── Button hover ── */
+.btn-hover { transition: transform 0.22s, filter 0.22s, box-shadow 0.22s; }
+.btn-hover:hover { transform: translateY(-4px) scale(1.04); filter: brightness(1.1); box-shadow: 0 10px 28px rgba(102,93,172,0.32); }
+
+/* ── Pillar cards ── */
+.pillar-card { transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer; }
+.pillar-card:hover { transform: translateY(-10px) scale(1.025); box-shadow: 0 24px 44px rgba(201,114,189,0.45); }
+.card-icon { transition: transform 0.4s ease; }
+.pillar-card:hover .card-icon { transform: rotate(-10.63deg) scale(1.1) !important; }
+
+/* ── Character cards ── */
+.char-card { transition: transform 0.28s ease, box-shadow 0.28s ease; cursor: pointer; }
+.char-card:hover { transform: translateY(-8px); box-shadow: 0 18px 36px rgba(102,93,172,0.28); }
+
+/* ── Positioning tags ── */
+.tag-pill { transition: transform 0.2s, background 0.2s, box-shadow 0.2s; cursor: pointer; }
+.tag-pill:hover { transform: scale(1.08); background: #6952a8 !important; box-shadow: 0 6px 18px rgba(105,82,168,0.4); }
+
+/* ── Footer links ── */
+.footer-link { transition: color 0.2s, transform 0.2s; cursor: pointer; display: inline-block; }
+.footer-link:hover { color: #ffa8f8 !important; transform: translateX(5px); }
+
+/* ── Social icons ── */
+.social-icon { transition: transform 0.22s, filter 0.22s; cursor: pointer; }
+.social-icon:hover { transform: scale(1.25) rotate(-5deg); filter: brightness(1.3); }
+
+/* ── Subscribe ── */
+.subscribe-input { background: transparent; border: none; outline: none; width: 100%; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 17px; color: #876fc7; }
+.subscribe-input::placeholder { color: #876fc7; }
+.subscribe-btn { transition: filter 0.2s, transform 0.2s; cursor: pointer; }
+.subscribe-btn:hover { filter: brightness(1.18); transform: scale(1.04); }
+
+/* ── Nav link hover ── */
+.nav-link { transition: transform 0.2s ease; }
+.nav-link:hover { transform: translateY(-2px); }
+
+/* ── Nav scrolled glass ── */
+.nav-scrolled {
+  box-shadow: 0 4px 28px rgba(102,93,172,0.18);
+  backdrop-filter: blur(10px);
+  background: rgba(255,250,250,0.92) !important;
+}
+
+/* ── Scroll-to-top ── */
+.scroll-top-btn {
+  position: fixed; bottom: 32px; right: 32px;
+  width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: translateY(20px) scale(0.8);
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 999;
+}
+.scroll-top-btn.visible { opacity: 1; transform: translateY(0) scale(1); }
+.scroll-top-btn:hover { transform: translateY(-4px) scale(1.1) !important; filter: brightness(1.15); }
+
+/* ── Marquee ── */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee-scroll var(--marquee-speed, 30s) linear infinite;
+  animation-direction: var(--marquee-dir, normal);
+}
+.marquee-track:hover { animation-play-state: paused; }
+
+/* ── Respect reduced-motion preference ── */
+@media (prefers-reduced-motion: reduce) {
+  .float-anim,
+  .badge-pulse,
+  .marquee-track { animation: none !important; }
+  .btn-hover,
+  .pillar-card,
+  .char-card,
+  .tag-pill,
+  .footer-link,
+  .social-icon,
+  .nav-link { transition: none !important; }
+}

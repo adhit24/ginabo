@@ -1,90 +1,64 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { store } from "@/lib/adminStore";
 
-import { formatMoney } from "@/lib/money";
-
-type Overview = {
-  totals: { customers: number; orders: number; bookings: number };
-  last30d: { orders: number; bookings: number };
-  recentOrders: Array<{
-    orderNumber: string;
-    status: string;
-    totalMinor: number;
-    currency: "IDR" | "USD";
-    customerName: string;
-    createdAt: string;
-  }>;
-};
+function StatCard({ label, value, sub }: { label: string; value: number | string; sub?: string }) {
+  return (
+    <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)" }}>
+      <p className="text-[11px] font-bold uppercase tracking-widest text-white/40">{label}</p>
+      <p className="mt-2 text-3xl font-bold text-white">{value}</p>
+      {sub && <p className="mt-1 text-xs text-white/40">{sub}</p>}
+    </div>
+  );
+}
 
 export default function AdminOverviewPage() {
-  const [data, setData] = useState<Overview | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [counts, setCounts] = useState({ products: 0, bundles: 0, flash: 0 });
 
   useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const res = await fetch("/api/admin/overview");
-        const json = (await res.json()) as { ok: boolean; data?: Overview; error?: { message: string } };
-        if (!json.ok || !json.data) throw new Error(json.error?.message ?? "Failed to load");
-        if (!cancelled) setData(json.data);
-      } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : String(e));
-      }
-    }
-    void load();
-    return () => {
-      cancelled = true;
-    };
+    setCounts({
+      products: store.getProducts().length,
+      bundles:  store.getBundles().length,
+      flash:    store.getFlash().length,
+    });
   }, []);
 
-  return (
-    <div className="grid gap-6">
-      <h1 className="text-xl font-semibold tracking-tight text-gray-900">Overview</h1>
-      {error ? <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</div> : null}
-      {!data ? (
-        <div className="rounded-3xl border border-gray-100 bg-white p-8 text-sm text-gray-600">Memuat data...</div>
-      ) : (
-        <div className="grid gap-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-3xl border border-gray-100 bg-white p-6">
-              <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">Customers</div>
-              <div className="mt-2 text-2xl font-semibold text-gray-900">{data.totals.customers}</div>
-            </div>
-            <div className="rounded-3xl border border-gray-100 bg-white p-6">
-              <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">Orders</div>
-              <div className="mt-2 text-2xl font-semibold text-gray-900">{data.totals.orders}</div>
-              <div className="mt-2 text-sm text-gray-600">30d: {data.last30d.orders}</div>
-            </div>
-            <div className="rounded-3xl border border-gray-100 bg-white p-6">
-              <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">Bookings</div>
-              <div className="mt-2 text-2xl font-semibold text-gray-900">{data.totals.bookings}</div>
-              <div className="mt-2 text-sm text-gray-600">30d: {data.last30d.bookings}</div>
-            </div>
-          </div>
+  const quickLinks = [
+    { href: "/admin/products",  label: "Kelola Produk",    desc: `${counts.products} produk aktif`  },
+    { href: "/admin/bundles",   label: "Kelola Bundle",    desc: `${counts.bundles} bundle aktif`   },
+    { href: "/admin/flashsale", label: "Atur Flash Sale",  desc: `${counts.flash} item di flash sale` },
+  ];
 
-          <div className="rounded-3xl border border-gray-100 bg-white p-6">
-            <div className="text-sm font-semibold text-gray-900">Recent Orders</div>
-            <div className="mt-4 grid gap-2">
-              {data.recentOrders.length === 0 ? (
-                <div className="text-sm text-gray-600">Belum ada order.</div>
-              ) : (
-                data.recentOrders.map((o) => (
-                  <div key={o.orderNumber} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-100 p-4">
-                    <div className="min-w-0">
-                      <div className="text-sm font-semibold text-gray-900">{o.orderNumber}</div>
-                      <div className="mt-1 text-sm text-gray-600">{o.customerName}</div>
-                    </div>
-                    <div className="text-sm font-semibold text-gray-900">{formatMoney(o.totalMinor, o.currency)}</div>
-                    <div className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-800">{o.status}</div>
-                  </div>
-                ))
-              )}
+  return (
+    <div className="flex flex-col gap-8">
+      <div>
+        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <p className="text-sm text-white/40">Selamat datang di panel admin Ginabo</p>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <StatCard label="Produk" value={counts.products} sub="produk single" />
+        <StatCard label="Bundle" value={counts.bundles}  sub="paket bundle"  />
+        <StatCard label="Flash Sale" value={counts.flash} sub="item aktif"   />
+      </div>
+
+      {/* Quick Links */}
+      <div className="grid gap-3">
+        {quickLinks.map(q => (
+          <Link key={q.href} href={q.href}
+            className="flex items-center justify-between rounded-2xl p-5 transition hover:opacity-80"
+            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)" }}>
+            <div>
+              <p className="font-semibold text-white text-sm">{q.label}</p>
+              <p className="text-xs text-white/40 mt-0.5">{q.desc}</p>
             </div>
-          </div>
-        </div>
-      )}
+            <span className="text-white/30 text-lg">→</span>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

@@ -56,3 +56,19 @@ export const adminProductSchema = z.object({
   isActive: z.boolean().default(true),
   imageUrl: z.string().url().optional().or(z.literal(""))
 });
+
+export const resellerApplicationSchema = z.object({
+  name: z.string().min(2).max(120),
+  phone: z.string().min(8).max(30),
+  email: z.string().email().optional().or(z.literal("")),
+  city: z.string().max(120).optional().or(z.literal("")),
+  instagram: z.string().max(120).optional().or(z.literal("")),
+  experience: z.enum(["NEW", "SELLER", "STORE"]).default("NEW"),
+  message: z.string().max(500).optional().or(z.literal(""))
+});
+
+export const journey21ApplicationSchema = z.object({
+  name: z.string().min(2).max(120),
+  phone: z.string().min(8).max(30),
+  email: z.string().email().optional().or(z.literal(""))
+});
