@@ -5,8 +5,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
-import { getProductBySlug } from "@/lib/catalog";
+import { getProductBySlug, listActiveProducts } from "@/lib/catalog";
 import { formatMoney } from "@/lib/money";
+
+export async function generateStaticParams() {
+  const products = await listActiveProducts();
+  return products.map((p) => ({ slug: p.slug }));
+}
 
 export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
   const product = await getProductBySlug(params.slug);
