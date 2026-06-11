@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 /**
  * next-auth route handler
  * Handles all /api/auth/* routes (callback, signIn, signOut, session, csrf, etc.)

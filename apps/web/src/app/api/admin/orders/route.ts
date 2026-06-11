@@ -1,5 +1,7 @@
+export const runtime = 'edge';
+
 import { jsonError, jsonOk } from "@/lib/http";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 
 export async function GET(req: Request) {
   try {
@@ -7,40 +9,65 @@ export async function GET(req: Request) {
     const q = url.searchParams.get("q")?.trim();
     const status = url.searchParams.get("status")?.trim();
 
-    const orders = await prisma.order.findMany({
-      where: {
-        ...(status ? { status: status as any } : {}),
-        ...(q
-          ? {
-              OR: [
-                { orderNumber: { contains: q, mode: "insensitive" } },
-                { customer: { name: { contains: q, mode: "insensitive" } } },
-                { customer: { email: { contains: q, mode: "insensitive" } } }
-              ]
-            }
-          : {})
-      },
-      include: { customer: true, payments: { orderBy: { createdAt: "desc" } } },
-      orderBy: { createdAt: "desc" },
-      take: 200
-    });
+    let query = supabase
+      .from("Order")
+      .select("*, customer:Customer(*), payments:Payment(*)")
+      .order("createdAt", { ascending: false })
+      .limit(200);
+
+    if (status) {
+      query = query.eq("status", status);
+    }
+
+    const { data: orders, error } = await query;
+
+    if (error) throw new Error(error.message);
+
+    let filteredOrders = orders ?? [];
+
+    if (q) {
+      const lq = q.toLowerCase();
+      filteredOrders = filteredOrders.filter((o) => {
+        const matchOrderNumber = o.orderNumber?.toLowerCase().includes(lq);
+        const matchName = o.customer?.name?.toLowerCase().includes(lq);
+        const matchEmail = o.customer?.email?.toLowerCase().includes(lq);
+        return matchOrderNumber || matchName || matchEmail;
+      });
+    }
 
     return jsonOk(
-      orders.map((o) => ({
-        id: o.id,
-        orderNumber: o.orderNumber,
-        status: o.status,
-        totalMinor: o.totalMinor,
-        currency: o.currency,
-        createdAt: o.createdAt,
-        customer: { id: o.customerId, name: o.customer.name, email: o.customer.email, phone: o.customer.phone },
-        payment: o.payments[0]
-          ? { provider: o.payments[0].provider, status: o.payments[0].status, providerRef: o.payments[0].providerRef }
-          : null
-      }))
+      filteredOrders.map((o) => {
+        const sortedPayments = Array.isArray(o.payments)
+          ? [...o.payments].sort(
+              (a: { createdAt: string }, b: { createdAt: string }) =>
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            )
+          : [];
+
+        return {
+          id: o.id,
+          orderNumber: o.orderNumber,
+          status: o.status,
+          totalMinor: o.totalMinor,
+          currency: o.currency,
+          createdAt: o.createdAt,
+          customer: {
+            id: o.customerId,
+            name: o.customer?.name,
+            email: o.customer?.email,
+            phone: o.customer?.phone
+          },
+          payment: sortedPayments[0]
+            ? {
+                provider: sortedPayments[0].provider,
+                status: sortedPayments[0].status,
+                providerRef: sortedPayments[0].providerRef
+              }
+            : null
+        };
+      })
     );
   } catch (e) {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
   }
 }
-

@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { jsonError, jsonOk } from "@/lib/http";
 import { listActiveProducts } from "@/lib/catalog";
 
@@ -20,4 +22,3 @@ export async function GET() {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
   }
 }
-

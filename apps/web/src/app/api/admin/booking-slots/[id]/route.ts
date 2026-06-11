@@ -1,5 +1,7 @@
+export const runtime = 'edge';
+
 import { jsonError, jsonOk } from "@/lib/http";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { bookingSlotSchema } from "@/lib/validation";
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
@@ -8,16 +10,21 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     const parsed = bookingSlotSchema.partial().safeParse(body);
     if (!parsed.success) return jsonError("Invalid input", 400, parsed.error.flatten());
 
-    const updated = await prisma.bookingSlot.update({
-      where: { id: params.id },
-      data: {
-        startAt: parsed.data.startAt ? new Date(parsed.data.startAt) : undefined,
-        endAt: parsed.data.endAt ? new Date(parsed.data.endAt) : undefined,
-        capacity: parsed.data.capacity,
-        isActive: parsed.data.isActive
-      }
-    });
-    return jsonOk({ id: updated.id });
+    const updateData: Record<string, unknown> = {};
+    if (parsed.data.startAt !== undefined) updateData.startAt = new Date(parsed.data.startAt).toISOString();
+    if (parsed.data.endAt !== undefined) updateData.endAt = new Date(parsed.data.endAt).toISOString();
+    if (parsed.data.capacity !== undefined) updateData.capacity = parsed.data.capacity;
+    if (parsed.data.isActive !== undefined) updateData.isActive = parsed.data.isActive;
+
+    const { data: updated, error } = await supabase
+      .from("BookingSlot")
+      .update(updateData)
+      .eq("id", params.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return jsonOk({ id: updated!.id });
   } catch (e) {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
   }
@@ -25,10 +32,14 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   try {
-    await prisma.bookingSlot.delete({ where: { id: params.id } });
+    const { error } = await supabase
+      .from("BookingSlot")
+      .delete()
+      .eq("id", params.id);
+
+    if (error) throw error;
     return jsonOk({ deleted: true });
   } catch (e) {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
   }
 }
-

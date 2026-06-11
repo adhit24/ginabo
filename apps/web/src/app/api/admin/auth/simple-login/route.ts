@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { cookies } from "next/headers";
 
 import { createAdminSessionToken, getAdminSessionCookieName } from "@/lib/auth";
@@ -20,7 +22,7 @@ export async function POST(req: Request) {
       email: "admin@ginabo.id",
     });
 
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     cookieStore.set(getAdminSessionCookieName(), token, {
       httpOnly: true,
       sameSite: "lax",

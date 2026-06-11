@@ -1,5 +1,7 @@
+export const runtime = 'edge';
+
 import { jsonError, jsonOk } from "@/lib/http";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 
 async function sendEmail(job: { to: string; subject: string | null; body: string | null }) {
   const configured = Boolean(process.env.EMAIL_PROVIDER);
@@ -15,18 +17,23 @@ async function sendWhatsApp(job: { to: string; payload: unknown }) {
 
 export async function POST() {
   try {
-    const now = new Date();
-    const jobs = await prisma.notificationJob.findMany({
-      where: { status: "PENDING", OR: [{ scheduledAt: null }, { scheduledAt: { lte: now } }] },
-      orderBy: { createdAt: "asc" },
-      take: 50
-    });
+    const now = new Date().toISOString();
+
+    const { data: jobs, error: fetchError } = await supabase
+      .from("NotificationJob")
+      .select("*")
+      .eq("status", "PENDING")
+      .or(`scheduledAt.is.null,scheduledAt.lte.${now}`)
+      .order("createdAt", { ascending: true })
+      .limit(50);
+
+    if (fetchError) throw fetchError;
 
     let processed = 0;
     let sent = 0;
     let failed = 0;
 
-    for (const job of jobs) {
+    for (const job of jobs ?? []) {
       processed++;
       try {
         if (job.channel === "EMAIL") {
@@ -34,13 +41,16 @@ export async function POST() {
         } else {
           await sendWhatsApp({ to: job.to, payload: job.payload });
         }
-        await prisma.notificationJob.update({ where: { id: job.id }, data: { status: "SENT", sentAt: new Date() } });
+        await supabase
+          .from("NotificationJob")
+          .update({ status: "SENT", sentAt: new Date().toISOString() })
+          .eq("id", job.id);
         sent++;
       } catch (e) {
-        await prisma.notificationJob.update({
-          where: { id: job.id },
-          data: { status: "FAILED", error: e instanceof Error ? e.message : String(e) }
-        });
+        await supabase
+          .from("NotificationJob")
+          .update({ status: "FAILED", error: e instanceof Error ? e.message : String(e) })
+          .eq("id", job.id);
         failed++;
       }
     }
@@ -50,4 +60,3 @@ export async function POST() {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
   }
 }
-

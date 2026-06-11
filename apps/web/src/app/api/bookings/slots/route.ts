@@ -1,7 +1,9 @@
+export const runtime = 'edge';
+
 import { addMinutes, endOfDay, parseISO, startOfDay } from "date-fns";
 
 import { jsonError, jsonOk } from "@/lib/http";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 
 function isDatabaseUnavailableError(e: unknown) {
   const msg = e instanceof Error ? e.message : String(e);
@@ -42,21 +44,34 @@ export async function GET(req: Request) {
     if (Number.isNaN(startAt.getTime()) || Number.isNaN(endAt.getTime())) return jsonError("Invalid date", 400);
 
     try {
-      const slots = await prisma.bookingSlot.findMany({
-        where: { isActive: true, startAt: { gte: startAt, lte: endAt } },
-        orderBy: { startAt: "asc" }
-      });
+      const { data: slots, error: slotsError } = await supabase
+        .from("BookingSlot")
+        .select("*")
+        .gte("startAt", startAt.toISOString())
+        .lte("startAt", endAt.toISOString())
+        .eq("isActive", true)
+        .order("startAt", { ascending: true });
 
-      const counts = await prisma.booking.groupBy({
-        by: ["slotId"],
-        where: { slotId: { in: slots.map((s) => s.id) }, status: "CONFIRMED" },
-        _count: { _all: true }
-      });
+      if (slotsError) throw slotsError;
 
-      const countBySlot = new Map(counts.map((c) => [c.slotId, c._count._all]));
+      const slotIds = (slots ?? []).map((s) => s.id);
+
+      const { data: confirmedBookings, error: bookingsError } = await supabase
+        .from("Booking")
+        .select("slotId")
+        .in("slotId", slotIds.length ? slotIds : ["__none__"])
+        .eq("status", "CONFIRMED");
+
+      if (bookingsError) throw bookingsError;
+
+      // Count bookings per slot in JS
+      const countBySlot = new Map<string, number>();
+      for (const b of confirmedBookings ?? []) {
+        countBySlot.set(b.slotId, (countBySlot.get(b.slotId) ?? 0) + 1);
+      }
 
       return jsonOk(
-        slots.map((s) => {
+        (slots ?? []).map((s) => {
           const used = countBySlot.get(s.id) ?? 0;
           const remaining = Math.max(0, s.capacity - used);
           return {

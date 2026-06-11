@@ -1,5 +1,7 @@
+export const runtime = 'edge';
+
 import { jsonError, jsonOk } from "@/lib/http";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { bookingCreateSchema } from "@/lib/validation";
 import { generateBookingNumber } from "@/lib/ids";
 
@@ -14,27 +16,36 @@ export async function GET(req: Request) {
     const q = url.searchParams.get("q")?.trim();
     const status = url.searchParams.get("status")?.trim();
 
-    const bookings = await prisma.booking.findMany({
-      where: {
-        ...(status ? { status: status as any } : {}),
-        ...(q
-          ? {
-              OR: [
-                { bookingNumber: { contains: q, mode: "insensitive" } },
-                { customer: { name: { contains: q, mode: "insensitive" } } },
-                { customer: { email: { contains: q, mode: "insensitive" } } },
-                { customer: { phone: { contains: q, mode: "insensitive" } } }
-              ]
-            }
-          : {})
-      },
-      include: { customer: true, slot: true },
-      orderBy: { createdAt: "desc" },
-      take: 200
-    });
+    let query = supabase
+      .from("Booking")
+      .select("*, customer:Customer(*), slot:BookingSlot(*)")
+      .order("createdAt", { ascending: false })
+      .limit(200);
+
+    if (status) {
+      query = query.eq("status", status);
+    }
+
+    const { data: bookings, error } = await query;
+    if (error) throw error;
+
+    let results = bookings ?? [];
+
+    // Apply search filter in JS when q is provided
+    if (q) {
+      const lower = q.toLowerCase();
+      results = results.filter((b) => {
+        return (
+          b.bookingNumber?.toLowerCase().includes(lower) ||
+          b.customer?.name?.toLowerCase().includes(lower) ||
+          b.customer?.email?.toLowerCase().includes(lower) ||
+          b.customer?.phone?.toLowerCase().includes(lower)
+        );
+      });
+    }
 
     return jsonOk(
-      bookings.map((b) => ({
+      results.map((b) => ({
         id: b.id,
         bookingNumber: b.bookingNumber,
         status: b.status,
@@ -60,56 +71,105 @@ export async function POST(req: Request) {
     const phone = normalizeString(customerInput.phone ?? undefined);
     const notes = normalizeString(parsed.data.notes ?? undefined);
 
-    const result = await prisma.$transaction(async (tx) => {
-      const slot = await tx.bookingSlot.findUnique({ where: { id: parsed.data.slotId } });
-      if (!slot || !slot.isActive) return { ok: false as const, error: "Slot tidak tersedia" };
+    // Fetch slot
+    const { data: slot, error: slotError } = await supabase
+      .from("BookingSlot")
+      .select("*")
+      .eq("id", parsed.data.slotId)
+      .single();
 
-      const used = await tx.booking.count({ where: { slotId: slot.id, status: "CONFIRMED" } });
-      if (used >= slot.capacity) return { ok: false as const, error: "Slot penuh" };
+    if (slotError || !slot || !slot.isActive) return jsonError("Slot tidak tersedia", 400);
 
-      let customerId: string;
-      if (email) {
-        const existing = await tx.customer.findUnique({ where: { email } });
-        customerId = existing
-          ? (
-              await tx.customer.update({
-                where: { id: existing.id },
-                data: { name: customerInput.name, phone: phone ?? existing.phone }
-              })
-            ).id
-          : (await tx.customer.create({ data: { name: customerInput.name, email, phone } })).id;
-      } else if (phone) {
-        const existing = await tx.customer.findUnique({ where: { phone } });
-        customerId = existing
-          ? (
-              await tx.customer.update({
-                where: { id: existing.id },
-                data: { name: customerInput.name, email: email ?? existing.email }
-              })
-            ).id
-          : (await tx.customer.create({ data: { name: customerInput.name, email, phone } })).id;
+    // Count confirmed bookings
+    const { count: usedCount } = await supabase
+      .from("Booking")
+      .select("*", { count: "exact", head: true })
+      .eq("slotId", slot.id)
+      .eq("status", "CONFIRMED");
+
+    if ((usedCount ?? 0) >= slot.capacity) return jsonError("Slot penuh", 400);
+
+    // Upsert customer
+    let customerId: string;
+
+    if (email) {
+      const { data: existing } = await supabase
+        .from("Customer")
+        .select("*")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (existing) {
+        const { data: updated } = await supabase
+          .from("Customer")
+          .update({ name: customerInput.name, phone: phone ?? existing.phone })
+          .eq("id", existing.id)
+          .select()
+          .single();
+        customerId = updated!.id;
       } else {
-        customerId = (await tx.customer.create({ data: { name: customerInput.name } })).id;
+        const { data: created } = await supabase
+          .from("Customer")
+          .insert({ name: customerInput.name, email, phone })
+          .select()
+          .single();
+        customerId = created!.id;
       }
+    } else if (phone) {
+      const { data: existing } = await supabase
+        .from("Customer")
+        .select("*")
+        .eq("phone", phone)
+        .maybeSingle();
 
-      let bookingNumber = generateBookingNumber();
-      for (let i = 0; i < 3; i++) {
-        const exists = await tx.booking.findUnique({ where: { bookingNumber } });
-        if (!exists) break;
-        bookingNumber = generateBookingNumber();
+      if (existing) {
+        const { data: updated } = await supabase
+          .from("Customer")
+          .update({ name: customerInput.name, email: email ?? existing.email })
+          .eq("id", existing.id)
+          .select()
+          .single();
+        customerId = updated!.id;
+      } else {
+        const { data: created } = await supabase
+          .from("Customer")
+          .insert({ name: customerInput.name, email, phone })
+          .select()
+          .single();
+        customerId = created!.id;
       }
+    } else {
+      const { data: created } = await supabase
+        .from("Customer")
+        .insert({ name: customerInput.name })
+        .select()
+        .single();
+      customerId = created!.id;
+    }
 
-      const booking = await tx.booking.create({
-        data: { bookingNumber, status: "CONFIRMED", customerId, slotId: slot.id, notes }
-      });
+    // Generate unique booking number
+    let bookingNumber = generateBookingNumber();
+    for (let i = 0; i < 3; i++) {
+      const { data: exists } = await supabase
+        .from("Booking")
+        .select("id")
+        .eq("bookingNumber", bookingNumber)
+        .maybeSingle();
+      if (!exists) break;
+      bookingNumber = generateBookingNumber();
+    }
 
-      return { ok: true as const, booking };
-    });
+    // Create booking
+    const { data: booking, error: bookingError } = await supabase
+      .from("Booking")
+      .insert({ bookingNumber, status: "CONFIRMED", customerId, slotId: slot.id, notes })
+      .select()
+      .single();
 
-    if (!result.ok) return jsonError(result.error, 400);
-    return jsonOk({ bookingNumber: result.booking.bookingNumber, id: result.booking.id });
+    if (bookingError || !booking) throw bookingError ?? new Error("Failed to create booking");
+
+    return jsonOk({ bookingNumber: booking.bookingNumber, id: booking.id });
   } catch (e) {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
   }
 }
-

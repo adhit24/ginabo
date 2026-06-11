@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { jsonError, jsonOk } from "@/lib/http";
 import { getProductBySlug } from "@/lib/catalog";
 
@@ -19,4 +21,3 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
   }
 }
-
