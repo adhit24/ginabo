@@ -7,6 +7,14 @@ const publicAdminPaths = ["/admin/login", "/api/admin/auth/login", "/api/admin/a
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  if (pathname.startsWith("/shop/")) {
+    const res = NextResponse.next();
+    res.headers.set("Cloudflare-CDN-Cache-Control", "public, max-age=3600");
+    res.headers.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+    return res;
+  }
+
   const isAdminArea = adminPaths.some((p) => pathname.startsWith(p));
   if (!isAdminArea) return NextResponse.next();
 
@@ -30,5 +38,5 @@ function redirectToLogin(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"]
+  matcher: ["/admin/:path*", "/api/admin/:path*", "/shop/:path+"]
 };
