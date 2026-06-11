@@ -40,6 +40,7 @@ export default {
         serif:       ["Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
         mono:        ["ui-monospace", "monospace"],
         poppins:     ["var(--font-poppins)", "sans-serif"],
+        outfit:      ["var(--font-outfit)", "sans-serif"],
         staatliches: ["var(--font-staatliches)", "sans-serif"],
       },
       borderRadius: {

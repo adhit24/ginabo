@@ -1,428 +1,282 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState, useCallback } from "react";
 import { store, type GProduct } from "@/lib/adminStore";
+import { useCart } from "@/components/cart/CartProvider";
 
-const BEZIER = [0.25, 1, 0.5, 1] as const;
-
-const fadeUp = {
-  hidden:  { opacity: 0, y: 32 },
-  visible: (i: number = 0) => ({
-    opacity: 1, y: 0,
-    transition: { duration: 0.55, ease: BEZIER, delay: i * 0.1 },
-  }),
-};
-
-const stagger = {
-  hidden:  {},
-  visible: { transition: { staggerChildren: 0.12 } },
-};
-
-// ── Product data (matches homepage "Produk Kami") ──────────────────────────
-const SINGLE_PRODUCTS = [
+// ── Static product data ───────────────────────────────────────────────────────
+const STATIC_PRODUCTS = [
   {
-    slug:         "hydra-moist-gel-ultimate",
-    name:         "Hydra Moist\nGel Ultimate",
-    role:         "3-in-1 Hydration System",
-    benefits:     ["Moisturizer harian", "Makeup prep", "Sleeping mask"],
-    ingredients:  ["DNA Salmon", "Milk Protein"],
-    tag:          "Multifungsi",
-    rating:       "4.9",
-    reviews:      "178",
-    price:        "IDR 118.999",
-    img:          "/gel.png",
+    slug: "hydra-moist-gel-ultimate", name: "Hydra Moist Gel Ultimate",
+    category: "skincare", tag: "Multifungsi", rating: "4.9", reviews: "178",
+    price: "Rp 118.999", priceMinor: 118999, img: "/gel.png",
   },
   {
-    slug:         "bright-care-moisture-cream",
-    name:         "Bright & Care\nMoisture Cream",
-    role:         "Barrier Repair + Brightening",
-    benefits:     ["Perkuat skin barrier", "Kulit lebih cerah alami", "Menjaga kelembapan"],
-    ingredients:  ["5x Ceramides", "Glutathione", "Tranexamic Acid"],
-    tag:          "Barrier Care",
-    rating:       "4.9",
-    reviews:      "257",
-    price:        "IDR 79.999",
-    img:          "/bright_care.png",
+    slug: "bright-care-moisture-cream", name: "Bright & Care Moisture Cream",
+    category: "skincare", tag: "Barrier Care", rating: "4.9", reviews: "257",
+    price: "Rp 79.999", priceMinor: 79999, img: "/bright_care.png",
   },
   {
-    slug:         "glowage-multi-active-serum",
-    name:         "GlowAge Multi-\nActive Serum",
-    role:         "Brightening + Anti-aging + Hydration",
-    benefits:     ["Kulit lebih cerah & halus", "Merawat tanda penuaan", "Hidrasi intensif"],
-    ingredients:  ["Niacinamide", "Encapsulated Cysteamine", "Multipeptide"],
-    tag:          "Best Seller",
-    rating:       "4.9",
-    reviews:      "387",
-    price:        "IDR 89.999",
-    img:          "/serum.png",
+    slug: "glowage-multi-active-serum", name: "GlowAge Multi-Active Serum",
+    category: "skincare", tag: "Best Seller", rating: "4.9", reviews: "387",
+    price: "Rp 89.999", priceMinor: 89999, img: "/serum.png",
   },
 ];
 
-// ── Bundle data (matches homepage "Paket Bundling") ────────────────────────
-const BUNDLES = [
+const STATIC_BUNDLES = [
   {
-    id:            "complete-skin",
-    name:          "Ginabo Complete\nSkin Nutrition Set",
-    subtitle:      "Serum + Moisture Cream + Hydra Gel",
-    discountPct:   50,
-    price:         "Rp 287.999",
-    originalPrice: "Rp 575.999",
-    img:           "/ginabo_bundling_3.png",
-    href:          "/shop/daily-barrier-routine-set",
-    accent:        "#78257C",
+    slug: "ginabo-complete-skin", name: "Ginabo Complete Skin Nutrition Set",
+    category: "bundling", tag: "50% OFF", rating: "5.0", reviews: "127",
+    price: "Rp 287.999", priceMinor: 287999, originalPrice: "Rp 575.999", img: "/ginabo_bundling_3.png",
   },
   {
-    id:            "repair-glow",
-    name:          "Repair &\nGlow Set",
-    subtitle:      "Moisture Cream + Hydra Gel",
-    discountPct:   50,
-    price:         "Rp 207.999",
-    originalPrice: "Rp 415.999",
-    img:           "/bundling_repair_and_glow.png",
-    href:          "/shop/repair-glow-set",
-    accent:        "#c972bd",
+    slug: "repair-glow-set", name: "Repair & Glow Set",
+    category: "bundling", tag: "50% OFF", rating: "5.0", reviews: "89",
+    price: "Rp 207.999", priceMinor: 207999, originalPrice: "Rp 415.999", img: "/bundling_repair_and_glow.png",
   },
   {
-    id:            "daily-barrier",
-    name:          "Daily Skin\nBarrier Set",
-    subtitle:      "Moisture Cream + Hydra Gel",
-    discountPct:   50,
-    price:         "Rp 197.999",
-    originalPrice: "Rp 395.999",
-    img:           "/bundling_daily_skin_barrier.png",
-    href:          "/shop/daily-barrier-routine-set",
-    accent:        "#9b59b6",
+    slug: "daily-barrier-routine-set", name: "Daily Skin Barrier Set",
+    category: "bundling", tag: "50% OFF", rating: "5.0", reviews: "76",
+    price: "Rp 197.999", priceMinor: 197999, originalPrice: "Rp 395.999", img: "/bundling_daily_skin_barrier.png",
   },
   {
-    id:            "bright-renewal",
-    name:          "Bright\nRenewal Set",
-    subtitle:      "Serum + Moisture Cream",
-    discountPct:   50,
-    price:         "Rp 169.999",
-    originalPrice: "Rp 339.999",
-    img:           "/bundling_bright_renewal.png",
-    href:          "/shop/bright-renewal-set",
-    accent:        "#e91e8c",
+    slug: "bright-renewal-set", name: "Bright Renewal Set",
+    category: "bundling", tag: "50% OFF", rating: "5.0", reviews: "63",
+    price: "Rp 169.999", priceMinor: 169999, originalPrice: "Rp 339.999", img: "/bundling_bright_renewal.png",
   },
 ];
 
-// ── Icons ──────────────────────────────────────────────────────────────────
-function StarIcon() {
+type ShopProduct = typeof STATIC_PRODUCTS[0] & { originalPrice?: string };
+
+const CATEGORIES = [
+  { key: "all",      label: "Semua Produk" },
+  { key: "skincare", label: "Skincare" },
+  { key: "bodycare", label: "Bodycare" },
+  { key: "bundling", label: "Paket Bundling" },
+];
+
+const SORT_OPTIONS = [
+  { key: "newest",   label: "Terbaru" },
+  { key: "popular",  label: "Terpopuler" },
+  { key: "price-lo", label: "Harga Terendah" },
+  { key: "price-hi", label: "Harga Tertinggi" },
+];
+
+function StarRating({ rating }: { rating: string }) {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="#F59E0B">
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-    </svg>
+    <div className="flex items-center gap-1">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+      </svg>
+      <span className="text-[12px] text-[#808080]">{rating}</span>
+    </div>
   );
 }
 
-function UserIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
+function ProductCard({ product }: { product: ShopProduct }) {
+  const { addItem } = useCart();
 
-function CartIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-      <line x1="3" y1="6" x2="21" y2="6" />
-      <path d="M16 10a4 4 0 0 1-8 0" />
-    </svg>
-  );
-}
-
-// ── Section label pill ─────────────────────────────────────────────────────
-function SectionBadge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-block rounded-full px-4 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
-      style={{ background: "linear-gradient(135deg,#78257C,#c972bd)" }}>
-      {children}
-    </span>
-  );
-}
-
-// ── Helper: convert GProduct from admin store into shop card shape ────────
-function storeToShopProduct(p: GProduct) {
-  return {
-    slug:        p.slug || p.id,
-    name:        p.name,
-    role:        p.role || p.tag || "",
-    benefits:    p.benefits ?? [],
-    ingredients: p.ingredients ?? [],
-    tag:         p.tag || "",
-    rating:      p.rating,
-    reviews:     p.reviews,
-    price:       p.priceLabel ? `${p.priceLabel} ${p.priceVal}` : p.priceVal,
-    img:         p.img,
-  };
-}
-
-function storeToShopBundle(p: GProduct) {
-  return {
-    id:            p.id,
-    name:          p.name,
-    subtitle:      p.role || p.tag || "",
-    discountPct:   p.originalPrice ? 50 : 0,
-    price:         p.priceVal,
-    originalPrice: p.originalPrice || "",
-    img:           p.img,
-    href:          `/shop/${p.slug || p.id}`,
-    accent:        "#78257C",
-  };
-}
-
-// ── Page ───────────────────────────────────────────────────────────────────
-export default function ShopPage() {
-  const [extraProducts, setExtraProducts] = useState<typeof SINGLE_PRODUCTS>([]);
-  const [extraBundles, setExtraBundles]   = useState<typeof BUNDLES>([]);
-
-  useEffect(() => {
-    // Hardcoded IDs that already exist in the static arrays
-    const defaultProductIds = new Set(["p1", "p2", "p3"]);
-    const defaultBundleIds  = new Set(["b1", "b2", "b3", "b4"]);
-
-    const storeProducts = store.getProducts().filter(p => !defaultProductIds.has(p.id));
-    const storeBundles  = store.getBundles().filter(b => !defaultBundleIds.has(b.id));
-
-    setExtraProducts(storeProducts.map(storeToShopProduct));
-    setExtraBundles(storeBundles.map(storeToShopBundle));
-  }, []);
-
-  const allProducts = [...SINGLE_PRODUCTS, ...extraProducts];
-  const allBundles  = [...BUNDLES, ...extraBundles];
+  function handleCart(e: React.MouseEvent) {
+    e.preventDefault();
+    addItem({
+      productId:  product.slug,
+      slug:       product.slug,
+      name:       product.name,
+      priceMinor: product.priceMinor,
+      currency:   "IDR",
+      imageUrl:   product.img,
+    });
+  }
 
   return (
-    <div className="w-full bg-[#fffafa]">
-
-      {/* ══════════════════════════════════════════════
-          HERO — Shop Banner (Compact)
-      ══════════════════════════════════════════════ */}
-      <section
-        className="relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg,#2a1a3e 0%,#4a1a6b 50%,#78257C 100%)" }}
-      >
-        <div className="pointer-events-none absolute -top-16 right-0 h-[300px] w-[300px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle,#c972bd,transparent 70%)" }} />
-
-        <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center justify-center px-6 py-10 md:flex-row md:items-center md:gap-10 md:px-10 md:py-12">
-          {/* Left: Text */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: BEZIER }}
-            className="flex-1 text-center md:text-left"
+    <Link href={`/shop/${product.slug}`} className="group flex flex-col bg-white rounded-[5px] border border-[#E2E2E2] overflow-hidden hover:shadow-[0_4px_20px_rgba(0,0,0,0.10)] transition-shadow">
+      {/* Image */}
+      <div className="relative aspect-square overflow-hidden bg-[#fafafa]">
+        <img
+          src={product.img}
+          alt={product.name}
+          className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
+        />
+        {product.tag && (
+          <span
+            className="absolute top-2 left-2 rounded-[3px] px-2 py-0.5 text-[10px] font-bold text-white"
+            style={{ background: product.tag.includes("OFF") ? "#e53e3e" : "#78257C" }}
           >
-            <SectionBadge>Produk Ginabo</SectionBadge>
-            <h1 className="mt-3 font-staatliches text-[clamp(2rem,5vw,3.5rem)] font-normal leading-[1.05] text-white">
-              Kulit Sehat, <span style={{ color: "#e8b4e8" }}>Dirawat dengan Nutrisi</span>
-            </h1>
-            <p className="mt-2 max-w-md text-[14px] leading-relaxed text-white/60">
-              Skincare daily nutrition untuk wanita aktif — ringan, nyaman, dan tidak ribet.
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Trust badges strip */}
-        <div className="flex items-center justify-center gap-4 md:gap-6 border-t border-white/10 bg-black/20 px-4 py-2 backdrop-blur-sm">
-          {["✓ BPOM Terdaftar", "✓ Dermatologist Tested", "✓ Non-Comedogenic", "✓ Fragrance Free"].map(t => (
-            <span key={t} className="text-[11px] font-semibold text-white/80">{t}</span>
-          ))}
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
-          PRODUK KAMI
-      ══════════════════════════════════════════════ */}
-      <section id="produk" className="mx-auto max-w-6xl px-6 py-16 md:px-10 md:py-20">
-
-        {/* Header */}
-        <motion.div
-          variants={stagger} initial="hidden" whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
-          className="mb-10 flex flex-col items-start gap-2"
-        >
-          <motion.div variants={fadeUp}><SectionBadge>Produk Kami</SectionBadge></motion.div>
-          <motion.h2 variants={fadeUp}
-            className="font-staatliches text-[clamp(2.2rem,5vw,3.8rem)] leading-none text-[#2a2356]"
-          >
-            Temukan Skincare <span style={{ color: "#78257C" }}>Yang Tepat</span><br />untuk Kulitmu
-          </motion.h2>
-          <motion.p variants={fadeUp} className="max-w-xl text-sm text-[#666] leading-relaxed">
-            Setiap produk Ginabo diformulasikan dengan bahan aktif modern — membantu menutrisi, menjaga, dan merawat kulit dari dalam.
-          </motion.p>
-        </motion.div>
-
-        {/* Product cards */}
-        <motion.div
-          variants={stagger} initial="hidden" whileInView="visible"
-          viewport={{ once: true, margin: "-40px" }}
-          className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3"
-        >
-          {allProducts.map((p, i) => (
-            <motion.div
-              key={p.slug}
-              variants={fadeUp} custom={i}
-              whileHover={{ y: -10, boxShadow: "0 28px 56px rgba(120,37,124,0.18)" }}
-              className="overflow-hidden rounded-[24px] bg-white flex flex-col cursor-pointer"
-              style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.09)" }}
-            >
-              {/* Tag badge */}
-              <div className="relative aspect-square overflow-hidden sm:aspect-auto" style={{ minHeight: 160 }}>
-                <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
-                <span className="absolute top-2 left-2 sm:top-3 sm:left-3 rounded-full px-2 sm:px-3 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-bold text-white"
-                  style={{ background: "linear-gradient(135deg,#78257C,#c972bd)" }}>
-                  {p.tag}
-                </span>
-              </div>
-
-              {/* Info */}
-              <div className="flex flex-col gap-1.5 sm:gap-2 px-3 py-3 sm:px-5 sm:py-4 flex-1">
-                <p className="text-[9px] sm:text-[11px] font-semibold text-[#aaa] uppercase tracking-wide">Ginabo</p>
-                <h3 className="font-bold text-[#2a2356] text-[13px] sm:text-[16px] leading-snug whitespace-pre-line">{p.name}</h3>
-                <p className="text-[10px] sm:text-[12px] text-[#888] hidden sm:block">{p.role}</p>
-
-                {/* Benefits */}
-                <ul className="mt-1 flex-col gap-1 hidden sm:flex">
-                  {p.benefits.map(b => (
-                    <li key={b} className="flex items-center gap-2 text-[12px] text-[#555]">
-                      <span className="text-[#78257C]">✦</span> {b}
-                    </li>
-                  ))}
-                </ul>
-
-                {/* Ingredients */}
-                <div className="mt-2 flex-wrap gap-1 hidden sm:flex">
-                  {p.ingredients.map(ing => (
-                    <span key={ing} className="rounded-full border border-[#e8d5f0] px-2.5 py-0.5 text-[10px] font-medium text-[#78257C]">
-                      {ing}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Rating + Price + Cart */}
-                <div className="mt-auto pt-2 sm:pt-3 flex items-center justify-between border-t border-[#f5eafc]">
-                  <div>
-                    <div className="flex items-center gap-1 sm:gap-1.5">
-                      <StarIcon />
-                      <span className="text-[11px] sm:text-[12px] font-semibold text-[#555]">{p.rating}</span>
-                      <span className="text-[#ccc] hidden sm:inline">|</span>
-                      <span className="hidden sm:inline"><UserIcon /></span>
-                      <span className="text-[12px] font-semibold text-[#555] hidden sm:inline">{p.reviews}</span>
-                    </div>
-                    <p className="mt-0.5 font-bold text-[13px] sm:text-[15px]" style={{ color: "#be3ab4" }}>{p.price}</p>
-                  </div>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.92 }}
-                    className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-[12px] sm:rounded-[14px] flex-shrink-0"
-                    style={{ background: "linear-gradient(135deg,#78257C,#c972bd)" }}
-                  >
-                    <CartIcon />
-                  </motion.button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-
-      {/* Soft divider */}
-      <div className="mx-auto max-w-6xl px-6 md:px-10">
-        <div className="h-px w-full" style={{ background: "linear-gradient(90deg,transparent,#e8d5f0,transparent)" }} />
+            {product.tag}
+          </span>
+        )}
       </div>
 
-      {/* ══════════════════════════════════════════════
-          BUNDLING
-      ══════════════════════════════════════════════ */}
-      <section id="bundling" className="mx-auto max-w-6xl px-6 py-16 md:px-10 md:py-20">
+      {/* Info */}
+      <div className="flex flex-col gap-1.5 p-3 flex-1">
+        <p className="text-[11px] text-[#808080]">Ginabo</p>
+        <p className="text-[13px] font-semibold text-[#303030] leading-snug line-clamp-2">{product.name}</p>
+        <StarRating rating={product.rating} />
+        <div className="mt-auto pt-1">
+          {product.originalPrice && (
+            <p className="text-[11px] text-[#aaa] line-through">{product.originalPrice}</p>
+          )}
+          <p className="text-[14px] font-bold" style={{ color: "#78257C" }}>{product.price}</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
 
-        {/* Header */}
-        <motion.div
-          variants={stagger} initial="hidden" whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
-          className="mb-10 flex flex-col items-start gap-2"
-        >
-          <motion.div variants={fadeUp}><SectionBadge>Paket Bundling</SectionBadge></motion.div>
-          <motion.h2 variants={fadeUp}
-            className="font-staatliches text-[clamp(2.2rem,5vw,3.8rem)] leading-none text-[#2a2356]"
-          >
-            Hemat Lebih Banyak <span style={{ color: "#78257C" }}>dengan Paket</span>
-          </motion.h2>
-          <motion.p variants={fadeUp} className="max-w-xl text-sm text-[#666] leading-relaxed">
-            Paket bundling Ginabo dirancang sebagai sistem perawatan kulit — pilih sesuai concern kulitmu dan hemat hingga 50%.
-          </motion.p>
-        </motion.div>
+export default function ShopPage() {
+  const [allProducts, setAllProducts] = useState<ShopProduct[]>([...STATIC_PRODUCTS, ...STATIC_BUNDLES]);
+  const [category, setCategory]       = useState("all");
+  const [sort, setSort]               = useState("newest");
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
-        {/* Bundle cards */}
-        <motion.div
-          variants={stagger} initial="hidden" whileInView="visible"
-          viewport={{ once: true, margin: "-40px" }}
-          className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4"
-        >
-          {allBundles.map((b, i) => (
-            <motion.div
-              key={b.id}
-              variants={fadeUp} custom={i}
-              whileHover={{ y: -10, boxShadow: "0 28px 56px rgba(120,37,124,0.18)" }}
-              className="overflow-hidden rounded-[24px] bg-white flex flex-col cursor-pointer"
-              style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.09)" }}
-            >
-              {/* Image */}
-              <div className="relative overflow-hidden" style={{ height: 260 }}>
-                <img src={b.img} alt={b.name} className="w-full h-full object-cover transition duration-300 hover:scale-105" />
-                {/* Discount badge */}
-                <div className="absolute top-3 right-3 rounded-full px-3 py-1 text-[11px] font-bold text-white"
-                  style={{ background: "#ff4a4a" }}>
-                  {b.discountPct}% OFF
-                </div>
-              </div>
+  useEffect(() => {
+    const storeProds = store.getProducts().map(p => ({
+      slug: p.slug || p.id, name: p.name, category: "skincare",
+      tag: p.tag || "", rating: p.rating, reviews: p.reviews,
+      price: p.priceLabel ? `${p.priceLabel} ${p.priceVal}` : p.priceVal,
+      priceMinor: p.priceMinor, img: p.img ?? "",
+    }));
+    const storeBundles = store.getBundles().map(p => ({
+      slug: p.slug || p.id, name: p.name, category: "bundling",
+      tag: "Bundling", rating: p.rating, reviews: p.reviews,
+      price: p.priceVal, priceMinor: p.priceMinor, img: p.img ?? "",
+      originalPrice: p.originalPrice,
+    }));
+    const existingSlugs = new Set([...STATIC_PRODUCTS, ...STATIC_BUNDLES].map(p => p.slug));
+    const newProds = [...storeProds, ...storeBundles].filter(p => !existingSlugs.has(p.slug));
+    if (newProds.length > 0) setAllProducts(prev => [...prev, ...newProds]);
+  }, []);
 
-              {/* Info */}
-              <div className="flex flex-col gap-1.5 px-5 py-4 flex-1">
-                <p className="text-[11px] font-semibold text-[#aaa] uppercase tracking-wide">{b.subtitle}</p>
-                <h3 className="font-bold text-[#2a2356] text-[15px] leading-snug whitespace-pre-line">{b.name}</h3>
+  const filtered = allProducts
+    .filter(p => category === "all" || p.category === category)
+    .sort((a, b) => {
+      if (sort === "price-lo") return a.priceMinor - b.priceMinor;
+      if (sort === "price-hi") return b.priceMinor - a.priceMinor;
+      if (sort === "popular")  return parseInt(b.reviews) - parseInt(a.reviews);
+      return 0;
+    });
 
-                {/* Price */}
-                <div className="mt-auto pt-3 flex items-center justify-between border-t border-[#f5eafc]">
-                  <div>
-                    <p className="text-[11px] line-through text-[#bbb]">{b.originalPrice}</p>
-                    <p className="font-bold text-[15px]" style={{ color: "#be3ab4" }}>{b.price}</p>
-                  </div>
-                  <Link href={b.href}>
-                    <motion.button
-                      whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.92 }}
-                      className="flex h-10 w-10 items-center justify-center rounded-[12px] flex-shrink-0"
-                      style={{ background: `linear-gradient(135deg,${b.accent},#c972bd)` }}
+  return (
+    <div className="min-h-screen bg-white">
+
+      {/* ── Page Header ── */}
+      <div className="border-b border-[#f0f0f0] bg-white py-5 px-4 md:px-8">
+        <div className="mx-auto max-w-7xl">
+          <nav className="mb-1 flex items-center gap-1.5 text-[12px] text-[#808080]">
+            <Link href="/" className="hover:text-[#78257C]">Home</Link>
+            <span>/</span>
+            <span className="text-[#303030]">Semua Produk</span>
+          </nav>
+          <h1 className="text-[20px] font-bold text-[#303030]">Semua Produk ({filtered.length})</h1>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 md:px-8 py-6">
+        <div className="flex gap-6">
+
+          {/* ── Sidebar (desktop) ── */}
+          <aside className="hidden md:block w-[200px] flex-shrink-0">
+            <div className="sticky top-24">
+              <h3 className="mb-3 text-[12px] font-bold uppercase tracking-widest text-[#303030]">Kategori</h3>
+              <ul className="flex flex-col gap-0.5">
+                {CATEGORIES.map(cat => (
+                  <li key={cat.key}>
+                    <button
+                      onClick={() => setCategory(cat.key)}
+                      className={`w-full text-left px-3 py-2 rounded-[3px] text-[13px] transition ${
+                        category === cat.key
+                          ? "bg-[#78257C] text-white font-semibold"
+                          : "text-[#808080] hover:bg-[#fdf5ff] hover:text-[#78257C]"
+                      }`}
                     >
-                      <CartIcon />
-                    </motion.button>
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+                      {cat.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
 
-        {/* CTA */}
-        <motion.div
-          variants={fadeUp} initial="hidden" whileInView="visible"
-          viewport={{ once: true }} className="mt-10 text-center"
-        >
-          <p className="mb-4 text-sm text-[#888]">
-            Tidak yakin paket mana yang cocok? Konsultasikan dengan skin expert kami.
-          </p>
-          <Link href="/booking"
-            className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-bold text-white shadow-lg transition hover:opacity-90 hover:-translate-y-0.5"
-            style={{ background: "linear-gradient(135deg,#78257C,#c972bd)" }}
-          >
-            Konsultasi Gratis 
-          </Link>
-        </motion.div>
-      </section>
+          {/* ── Main Content ── */}
+          <div className="flex-1 min-w-0">
+
+            {/* Top bar: count + sort + mobile filter */}
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                {/* Mobile filter button */}
+                <button
+                  onClick={() => setMobileFilterOpen(true)}
+                  className="md:hidden flex items-center gap-1.5 border border-[#E2E2E2] rounded-[5px] px-3 py-1.5 text-[13px] text-[#303030]"
+                >
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
+                  </svg>
+                  Filter
+                </button>
+                <span className="text-[13px] text-[#808080] hidden md:inline">{filtered.length} produk</span>
+              </div>
+
+              {/* Sort */}
+              <select
+                value={sort}
+                onChange={e => setSort(e.target.value)}
+                className="border border-[#E2E2E2] rounded-[5px] px-3 py-1.5 text-[13px] text-[#303030] bg-white outline-none cursor-pointer"
+              >
+                {SORT_OPTIONS.map(o => (
+                  <option key={o.key} value={o.key}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Product Grid */}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {filtered.map(p => (
+                <ProductCard key={p.slug} product={p} />
+              ))}
+            </div>
+
+            {filtered.length === 0 && (
+              <div className="py-16 text-center text-[#808080]">
+                <p className="text-[15px]">Tidak ada produk dalam kategori ini.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Mobile Filter Drawer ── */}
+      {mobileFilterOpen && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/30" onClick={() => setMobileFilterOpen(false)} />
+          <div className="fixed bottom-0 left-0 right-0 z-[60] bg-white rounded-t-2xl p-5 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-[15px] font-bold text-[#303030]">Filter Kategori</h3>
+              <button onClick={() => setMobileFilterOpen(false)}>
+                <svg width="20" height="20" fill="none" stroke="#808080" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat.key}
+                  onClick={() => { setCategory(cat.key); setMobileFilterOpen(false); }}
+                  className={`rounded-[5px] py-2.5 text-[13px] font-semibold transition ${
+                    category === cat.key
+                      ? "text-white"
+                      : "border border-[#E2E2E2] text-[#808080]"
+                  }`}
+                  style={category === cat.key ? { background: "#78257C" } : {}}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

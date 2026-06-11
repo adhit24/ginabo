@@ -1,7 +1,7 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Montserrat, Poppins, Staatliches } from "next/font/google";
+import { Montserrat, Outfit, Poppins, Staatliches } from "next/font/google";
 
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -29,6 +29,13 @@ const staatliches = Staatliches({
   weight: "400",
 });
 
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Ginabo — Sentuhan Mewah Setiap Hari",
   description: "Daily Skincare Solution: Brightening, Hydration, Soothing & Barrier Support. Cerah yang tetap nyaman."
@@ -36,7 +43,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`${montserrat.variable} ${poppins.variable} ${staatliches.variable}`}>
+    <html lang="id" className={`${montserrat.variable} ${poppins.variable} ${staatliches.variable} ${outfit.variable}`}>
       <body className="font-poppins">
         <AuthProvider>
           <CartProvider>

@@ -1,108 +1,160 @@
 import Link from "next/link";
 import { ScrollTopButton } from "@/components/ui/ScrollTopButton";
 
+const footerLinks = [
+  {
+    heading: "Informasi",
+    items: [
+      { label: "Tentang Kami",       href: "/about" },
+      { label: "Hubungi Kami",       href: "/contact" },
+      { label: "Jadi Reseller",      href: "/reseller" },
+      { label: "Booking Konsultasi", href: "/booking" },
+      { label: "Karir",              href: "#" },
+    ],
+  },
+  {
+    heading: "Akun",
+    items: [
+      { label: "FAQ & Bantuan",           href: "#" },
+      { label: "Kebijakan Pengiriman",    href: "#" },
+      { label: "Syarat & Ketentuan",      href: "#" },
+      { label: "Kebijakan Privasi",       href: "#" },
+      { label: "Kebijakan Pengembalian",  href: "#" },
+    ],
+  },
+  {
+    heading: "Layanan Pengaduan",
+    items: [
+      { label: "PT Ginabo Nusantara",     href: "#" },
+      { label: "WA: 0812-3456-7890",      href: "https://wa.me/6281234567890" },
+      { label: "Email: cs@ginabo.id",     href: "mailto:cs@ginabo.id" },
+      { label: "Senin–Jumat, 09.00–17.00", href: "#" },
+    ],
+  },
+];
+
+const paymentIcons = ["BCA", "Mandiri", "BRI", "GoPay", "OVO", "Dana", "ShopeePay"];
+const shippingIcons = ["JNE", "J&T", "SiCepat", "Anteraja"];
+
 export function SiteFooter() {
   return (
     <>
-      <footer className="overflow-hidden" style={{ background: "#2e2a3b", padding: "60px 0 40px" }}>
-        <div className="mx-auto px-5 md:px-20" style={{ maxWidth: 1600 }}>
-          <div className="flex flex-col gap-10 md:flex-row md:gap-10">
+      <footer style={{ background: "#2e2a3b" }}>
 
-            {/* ── Brand column ── */}
-            <div className="flex-shrink-0 md:w-[400px]">
-              {/* Logo */}
-              <div className="mb-4">
-                <img
-                  src="/l0go.png"
-                  alt="Ginabo"
-                  className="object-contain"
-                  style={{ height: 59 }}
-                />
-              </div>
-              {/* Tagline */}
-              <p className="mb-6 text-[15px] font-semibold leading-snug text-white text-justify" style={{ maxWidth: 338 }}>
-                Skincare Friendly Expert : Seperti teman yang paling paham kulitmu. Cerah yang tetap nyaman, hari ini dan seterusnya
+        {/* ── Newsletter section ── */}
+        <div className="border-b border-white/10 py-10 px-5 md:px-10">
+          <div className="mx-auto max-w-7xl flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <h3 className="text-[18px] font-bold text-white mb-1">
+                Hei, tetap terhubung dengan kami!
+              </h3>
+              <p className="text-[13px] text-white/60">
+                Subscribe dan dapatkan diskon 10% untuk pembelian pertamamu.
               </p>
-              {/* Social icons */}
-              <div className="mb-6 flex gap-3">
+            </div>
+            <div className="flex w-full max-w-md overflow-hidden rounded-[5px]">
+              <input
+                type="email"
+                placeholder="Masukkan email kamu"
+                className="flex-1 bg-white/10 px-4 py-3 text-[13px] text-white placeholder-white/40 outline-none border-none"
+              />
+              <button
+                className="px-5 py-3 text-[13px] font-bold text-white flex-shrink-0 transition hover:opacity-90"
+                style={{ background: "#78257C" }}
+              >
+                Subscribe
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Main columns ── */}
+        <div className="mx-auto max-w-7xl px-5 md:px-10 py-10">
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+
+            {/* Brand column */}
+            <div className="col-span-2 md:col-span-1">
+              <img src="/l0go.png" alt="Ginabo" className="object-contain mb-4" style={{ height: 48 }} />
+              <p className="text-[13px] leading-relaxed text-white/60 mb-5">
+                Skincare Friendly Expert — seperti teman yang paling paham kulitmu.
+              </p>
+              <div className="flex gap-2">
                 <Link href="#" aria-label="Instagram"
-                  className="social-icon flex items-center justify-center overflow-hidden rounded-[5px]"
-                  style={{ background: "#6958bd", width: 38, height: 33 }}>
-                  <img src="/instagram.png" alt="Instagram" style={{ width: 24, height: 24 }} />
+                  className="flex h-8 w-8 items-center justify-center rounded-[5px]"
+                  style={{ background: "rgba(255,255,255,0.1)" }}>
+                  <img src="/instagram.png" alt="Instagram" style={{ width: 18, height: 18 }} />
                 </Link>
                 <Link href="#" aria-label="WhatsApp"
-                  className="social-icon flex items-center justify-center overflow-hidden rounded-[5px]"
-                  style={{ background: "#6958bd", width: 38, height: 33 }}>
-                  <img src="/whatsapp.png" alt="WhatsApp" style={{ width: 24, height: 24 }} />
+                  className="flex h-8 w-8 items-center justify-center rounded-[5px]"
+                  style={{ background: "rgba(255,255,255,0.1)" }}>
+                  <img src="/whatsapp.png" alt="WhatsApp" style={{ width: 18, height: 18 }} />
                 </Link>
                 <Link href="#" aria-label="TikTok"
-                  className="social-icon flex items-center justify-center overflow-hidden rounded-[5px]"
-                  style={{ background: "#6958bd", width: 38, height: 33 }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                  className="flex h-8 w-8 items-center justify-center rounded-[5px]"
+                  style={{ background: "rgba(255,255,255,0.1)" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
                     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15Z"/>
                   </svg>
                 </Link>
               </div>
-              {/* Email subscribe */}
-              <div className="flex overflow-hidden rounded-[10px]" style={{ background: "#4a3b72", width: "100%", maxWidth: 470, height: 44 }}>
-                <div className="flex flex-1 items-center px-6">
-                  <input type="email" placeholder="Email kamu" className="subscribe-input" />
-                </div>
-                <div className="subscribe-btn flex items-center px-6" style={{ background: "#6959bc", borderRadius: "0 5px 5px 0" }}>
-                  <span className="font-semibold text-white text-[17px]">Subscribe</span>
-                </div>
-              </div>
             </div>
 
-            {/* ── Link columns ── */}
-            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:flex md:flex-1 md:justify-end md:gap-10">
-            {[
-              {
-                heading: "Produk",
-                links: ["Serum", "Moisturizer", "Toner", "Sunscreen", "Bundling Set"],
-                hrefs: ["/shop", "/shop", "/shop", "/shop", "/shop"],
-              },
-              {
-                heading: "Ginabo",
-                links: ["Tentang Kami", "Campaign", "Konsultasi", "Blog & Tips", "Hubungi Kami"],
-                hrefs: ["/about", "/campaign", "/booking", "#", "/contact"],
-              },
-              {
-                heading: "Bantuan",
-                links: ["FAQ", "Kebijakan Pengiriman", "Kebijakan Pengembalian", "Syarat & Ketentuan", "Kebijakan Privasi"],
-                hrefs: ["#", "#", "#", "#", "#"],
-              },
-            ].map(col => (
+            {/* Link columns */}
+            {footerLinks.map(col => (
               <div key={col.heading}>
-                <h3 className="mb-2 text-white text-[28px] md:text-[32px] font-extrabold">{col.heading}</h3>
-                <ul className="flex flex-col gap-0.5">
-                  {col.links.map((label, i) => (
-                    <li key={label}>
-                      <Link href={col.hrefs[i]} className="footer-link text-white text-[15px] font-semibold">
-                        {label}
+                <h4 className="mb-3 text-[11px] font-bold uppercase tracking-widest text-white/40">
+                  {col.heading}
+                </h4>
+                <ul className="flex flex-col gap-2">
+                  {col.items.map(item => (
+                    <li key={item.label}>
+                      <Link href={item.href}
+                        className="text-[13px] text-white/70 transition hover:text-white">
+                        {item.label}
                       </Link>
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* ── Payment & Shipping ── */}
+        <div className="border-t border-white/10 py-5 px-5 md:px-10">
+          <div className="mx-auto max-w-7xl flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[11px] text-white/40 mr-1">Pembayaran:</span>
+              {paymentIcons.map(p => (
+                <span key={p}
+                  className="rounded-[3px] px-2 py-0.5 text-[10px] font-bold text-white/70"
+                  style={{ background: "rgba(255,255,255,0.1)" }}>
+                  {p}
+                </span>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[11px] text-white/40 mr-1">Pengiriman:</span>
+              {shippingIcons.map(s => (
+                <span key={s}
+                  className="rounded-[3px] px-2 py-0.5 text-[10px] font-bold text-white/70"
+                  style={{ background: "rgba(255,255,255,0.1)" }}>
+                  {s}
+                </span>
+              ))}
             </div>
           </div>
+        </div>
 
-          {/* ── Bottom bar ── */}
-          <div className="mt-10 flex flex-col items-center justify-end gap-2 md:flex-row">
-            <div className="flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M14.83 14.83a4 4 0 1 1 0-5.66" />
-              </svg>
-              <span className="font-bold text-white text-[11px]">Ginabo</span>
-              <span className="text-white text-[9px]">All Rights Reserved.</span>
-            </div>
-            <span className="text-white font-bold text-[15px] md:ml-6">Powered by</span>
-            <Link href="https://kinaryalokadigital.vercel.app/" target="_blank" rel="noopener noreferrer">
-              <img src="\k_logo.png" alt="Kinaryaloka Digital" className="object-contain" style={{ height: 31, width: 34 }} />
-            </Link>
+        {/* ── Bottom bar ── */}
+        <div className="border-t border-white/10 py-4 px-5 md:px-10">
+          <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-2">
+            <p className="text-[11px] text-white/40">
+              © 2026 PT Ginabo Nusantara. All rights reserved.
+            </p>
+            <p className="text-[11px] text-white/30">
+              BPOM Terdaftar · Halal MUI · Dermatologist Tested
+            </p>
           </div>
         </div>
       </footer>
