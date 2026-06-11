@@ -1,4 +1,4 @@
-export const runtime = 'edge';
+export const dynamicParams = false;
 
 import Image from "next/image";
 import Link from "next/link";

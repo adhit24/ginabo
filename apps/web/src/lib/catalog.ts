@@ -30,8 +30,8 @@ export async function listActiveProducts() {
     .eq("isActive", true)
     .order("createdAt", { ascending: false });
 
-  if (error) return demoProducts.filter((p) => p.isActive);
-  return data ?? demoProducts.filter((p) => p.isActive);
+  if (error || !data || data.length === 0) return demoProducts.filter((p) => p.isActive);
+  return data;
 }
 
 export async function getProductBySlug(slug: string) {
