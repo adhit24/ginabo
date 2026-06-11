@@ -5,11 +5,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { FlashSaleSection } from "@/components/FlashSaleSection";
 import { HeroBanner } from "@/components/HeroBanner";
 import { Reveal } from "@/components/ui/Reveal";
 import { Marquee } from "@/components/ui/Marquee";
-import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
+
 import { useCart } from "@/components/cart/CartProvider";
 import { store, type GProduct } from "@/lib/adminStore";
 
@@ -21,16 +20,11 @@ const IMG_SPRITE    = "https://www.figma.com/api/mcp/asset/71dedf14-7a07-4680-8f
 const IMG_CREAM     = "https://www.figma.com/api/mcp/asset/4db5c30d-969e-4093-aa64-026dd52a7f47"; // bright & care
 const IMG_HYDRA     = "https://www.figma.com/api/mcp/asset/691267df-2c74-42aa-9b09-e48cddcf41de"; // hydra moist gel
 const IMG_SERUM     = "https://www.figma.com/api/mcp/asset/42847e4c-7e8e-4690-a5d1-19adaf062ceb"; // glowage serum
-const IMG_G0        = "https://www.figma.com/api/mcp/asset/2dee09d9-e461-4704-a34f-f5cb85651358"; // pillar icon 0
-const IMG_G1        = "https://www.figma.com/api/mcp/asset/8824f9cf-5804-4ec0-9df4-5eab487a0c30"; // pillar icon 1
-const IMG_G2        = "https://www.figma.com/api/mcp/asset/f628e868-9c20-47c2-be27-9a5a2693c0e2"; // pillar icon 2
-const IMG_G3        = "https://www.figma.com/api/mcp/asset/129c7c57-ba52-4194-ab8e-b83458818851"; // pillar icon 3
+
 const IMG_CART1     = "https://www.figma.com/api/mcp/asset/4fa1de69-1da2-4be4-ae0d-59309b68e713"; // shopping cart (product card)
 const IMG_STAR      = "https://www.figma.com/api/mcp/asset/dd951a0c-532e-4daf-bd8f-5c5956a5da93"; // star
 const IMG_PROFILE   = "https://www.figma.com/api/mcp/asset/0df780a8-167c-4ae1-aca9-410075054133"; // profile/user icon
 const IMG_BOTTLE    = "https://www.figma.com/api/mcp/asset/be1d4cf7-e0dc-4442-b74b-959148b85f0f"; // squeeze bottle icon
-const IMG_ELLIPSE1  = "https://www.figma.com/api/mcp/asset/e909b8de-84fb-41af-aac4-3b99dada1ce6"; // decorative ellipse 1
-const IMG_ELLIPSE2  = "https://www.figma.com/api/mcp/asset/d999a210-ed98-4e40-8aef-f0297bdb4c26"; // decorative ellipse 2
 
 // ── Static Data ───────────────────────────────────────────────────────────────
 const marqueeItems = [
@@ -51,48 +45,6 @@ const bundleProducts = [
   { name: "Bright\nRenewal Set",               rating: "5.0", reviews: "127", originalPrice: "Rp 339.999", priceVal: "Rp 169.999", img: "/bundling_bright_renewal.png"    },
 ];
 
-const pillars: { title: string; desc: string; icon: ReactNode }[] = [
-  {
-    title: "Brightening while respecting the skin barrier",
-    desc: "Mencerahkan kulit tanpa mengorbankan lapisan pelindungnya. Hasil bertahap, aman dipakai rutin.",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-        <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7L12 2z"/>
-        <path d="M9 12l2 2 4-4"/>
-      </svg>
-    ),
-  },
-  {
-    title: "Hydration as the foundation",
-    desc: "Hidrasi bukan sekedar step rutinitas, ini merupakan standar dari semua langkah skincare kamu.",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-        <path d="M12 2C12 2 5 10 5 15a7 7 0 0 0 14 0c0-5-7-13-7-13z"/>
-      </svg>
-    ),
-  },
-  {
-    title: "Soothing for daily comfort",
-    desc: "Kulit yang tenang adalah kulit yang sehat. Setiap produk Ginabo diformulasikan untuk memberikan rasa nyaman sejak pemakaian pertama.",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-        <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-        <line x1="9" y1="9" x2="9.01" y2="9"/>
-        <line x1="15" y1="9" x2="15.01" y2="9"/>
-      </svg>
-    ),
-  },
-  {
-    title: "Anti-aging support",
-    desc: "Menjaga kualitas kulit jangka panjang. Bukan anti-aging yang agresif, tapi yang bekerja bersama kulitmu setiap hari.",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-        <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/>
-      </svg>
-    ),
-  },
-];
 
 const characters = [
   { title: "Warm",        desc: "Terasa hangat dan mudah didekati, bukan brand yang menghakimi kondisi kulitmu." },
@@ -267,11 +219,6 @@ export default function HomePage() {
       </div>
 
       {/* ════════════════════════════════════════════
-          3. FLASH SALE (KEEP)
-      ════════════════════════════════════════════ */}
-      <FlashSaleSection />
-
-      {/* ════════════════════════════════════════════
           5. PRODUK KAMI
       ════════════════════════════════════════════ */}
       <section className="bg-[#fffafa] pt-14 pb-4 md:pt-20 md:pb-4">
@@ -353,114 +300,6 @@ export default function HomePage() {
               </Link>
             </div>
           </Reveal>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════
-          7. BRAND PILLARS — 4 Pilar Fondasi Ginabo
-      ════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden py-20 md:py-28" style={{ background: "linear-gradient(135deg,#0f0a1e 0%,#1e0a38 50%,#2a1040 100%)" }}>
-        {/* Glow blobs */}
-        <div className="pointer-events-none absolute top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle,#8b5cf6,transparent 70%)" }} />
-        <div className="pointer-events-none absolute bottom-0 right-1/4 h-[400px] w-[400px] translate-x-1/2 translate-y-1/2 rounded-full opacity-15"
-          style={{ background: "radial-gradient(circle,#e879f9,transparent 70%)" }} />
-        <div className="pointer-events-none absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-10"
-          style={{ background: "radial-gradient(circle,#c026d3,transparent 70%)" }} />
-
-        <div className="relative mx-auto w-full max-w-7xl px-5 md:px-10">
-
-          {/* Header */}
-          <Reveal>
-            <div className="mb-14 text-center">
-              <span className="mb-4 inline-block rounded-full px-4 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
-                style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}>
-                Brand Pillars
-              </span>
-              <h2 className="font-staatliches text-[clamp(2.4rem,5vw,4rem)] leading-none text-white mt-3">
-                4 Pilar Fondasi{" "}
-                <span style={{ background: "linear-gradient(135deg,#c084fc,#e879f9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  Ginabo
-                </span>
-              </h2>
-              <p className="mx-auto mt-4 max-w-lg text-[14px] leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-                Setiap produk Ginabo dibangun di atas empat prinsip utama yang menjadi standar kualitas kami.
-              </p>
-            </div>
-          </Reveal>
-
-          <div className="flex flex-col lg:flex-row gap-10 lg:gap-6 items-center">
-
-            {/* ── Left: Hero Image ── */}
-            <Reveal direction="left" className="w-full lg:w-[50%] flex-shrink-0 lg:-ml-12">
-              <div className="relative rounded-3xl overflow-hidden"
-                style={{ boxShadow: "0 32px 150px rgba(139,92,246,0.35)" }}>
-                <img
-                  src="/studio.png"
-                  alt="Ginabo Studio"
-                  className="w-full h-auto block"
-                />
-                {/* Gradient overlay bottom */}
-                <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-                  style={{ background: "linear-gradient(to top,rgba(15,10,30,0.75),transparent)" }} />
-                {/* Accent border glow */}
-                <div className="absolute inset-0 rounded-3xl pointer-events-none"
-                  style={{ boxShadow: "inset 0 0 0 1px rgba(192,132,252,0.25)" }} />
-              </div>
-            </Reveal>
-
-            {/* ── Right: Cards ── */}
-            <div className="flex-1 min-w-0 lg:-mr-12">
-              {/* 4-card grid */}
-              <motion.div
-                variants={staggerContainer}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-40px" }}
-                className="grid grid-cols-2 gap-4"
-              >
-                {pillars.map((p, i) => (
-                  <motion.div
-                    key={p.title}
-                    variants={cardSlideUp}
-                    whileHover={{ y: -6, boxShadow: "0 24px 64px rgba(139,92,246,0.25)" }}
-                    className="relative overflow-hidden rounded-2xl p-7 flex flex-col gap-5"
-                    style={{
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px solid rgba(255,255,255,0.10)",
-                      backdropFilter: "blur(20px)",
-                    }}
-                  >
-                    {/* Top row: number + icon */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: "#c084fc" }}>
-                        0{i + 1}
-                      </span>
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl"
-                        style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}>
-                        {p.icon}
-                      </div>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="font-staatliches text-white leading-tight text-[clamp(1.5rem,2.8vw,2rem)]">
-                      {p.title}
-                    </h3>
-
-                    {/* Desc */}
-                    <p className="text-[13px] leading-relaxed flex-1" style={{ color: "rgba(255,255,255,0.60)" }}>
-                      {p.desc}
-                    </p>
-
-                    {/* Bottom accent line */}
-                    <div className="absolute bottom-0 left-0 right-0 h-[2px]"
-                      style={{ background: "linear-gradient(90deg,#8b5cf6,#e879f9,transparent)" }} />
-                  </motion.div>
-                ))}
-              </motion.div>
-            </div>
-
-          </div>
         </div>
       </section>
 
