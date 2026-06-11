@@ -15,7 +15,7 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
       priceMinor: product.priceMinor,
       currency: product.currency,
       stockQty: product.stockQty,
-      images: product.images.map((img) => ({ url: img.url, alt: img.alt, sortOrder: img.sortOrder }))
+      images: product.images.map((img: { url: string; alt: string | null; sortOrder: number }) => ({ url: img.url, alt: img.alt, sortOrder: img.sortOrder }))
     });
   } catch (e) {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
