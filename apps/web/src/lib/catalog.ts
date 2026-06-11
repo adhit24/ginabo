@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { getD1Db, d1ListActiveProducts, d1GetProductBySlug } from "@/lib/d1";
 
 type CatalogProduct = {
   id: string;
@@ -24,6 +25,16 @@ const demoProducts: CatalogProduct[] = [
 ];
 
 export async function listActiveProducts() {
+  // Runtime: try D1 first (edge-local, ~1ms)
+  const db = getD1Db();
+  if (db) {
+    try {
+      const rows = await d1ListActiveProducts(db);
+      if (rows.length > 0) return rows;
+    } catch { /* fall through */ }
+  }
+
+  // Build time / fallback: Supabase
   const { data, error } = await supabase
     .from("Product")
     .select(`*, images:ProductImage(url, alt, sortOrder)`)
@@ -35,6 +46,16 @@ export async function listActiveProducts() {
 }
 
 export async function getProductBySlug(slug: string) {
+  // Runtime: try D1 first
+  const db = getD1Db();
+  if (db) {
+    try {
+      const product = await d1GetProductBySlug(db, slug);
+      if (product) return product;
+    } catch { /* fall through */ }
+  }
+
+  // Build time / fallback: Supabase
   const { data, error } = await supabase
     .from("Product")
     .select(`*, images:ProductImage(url, alt, sortOrder)`)

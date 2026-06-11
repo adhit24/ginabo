@@ -2,3 +2,8 @@ name = "ginabo"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".vercel/output/static"
+
+[[d1_databases]]
+binding = "my_database"
+database_name = "my-database"
+database_id = "340a80cf-8a99-4078-9b51-18c4ea2a8ab7"
