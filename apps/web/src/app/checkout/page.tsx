@@ -148,7 +148,7 @@ export default function CheckoutPage() {
                 </button>
 
                 <div className="mt-3 text-center">
-                  <Link href="/cart" className="text-xs text-gray-400 hover:text-brand-600">← Kembali ke Keranjang</Link>
+                  <Link href="/cart" className="text-xs text-gray-400 hover:text-brand-600">Kembali ke Keranjang</Link>
                 </div>
               </div>
             </div>

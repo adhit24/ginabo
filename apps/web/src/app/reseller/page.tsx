@@ -132,7 +132,7 @@ export default function ResellerProgramPage() {
                 href="/reseller/register"
                 className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-7 py-3 text-sm font-extrabold text-[#1e6b68] shadow-sm transition hover:bg-emerald-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
               >
-                Daftar Sekarang →
+                Daftar Sekarang
               </Link>
               <a
                 href={waLink()}
@@ -509,7 +509,7 @@ export default function ResellerProgramPage() {
               href="/reseller/register"
               className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-8 py-3.5 text-sm font-extrabold text-[#1e6b68] shadow-sm transition hover:bg-emerald-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
             >
-              Daftar Sekarang →
+              Daftar Sekarang
             </Link>
             <a
               href={waLink()}

@@ -55,7 +55,7 @@ export default function AdminOverviewPage() {
               <p className="font-semibold text-white text-sm">{q.label}</p>
               <p className="text-xs text-white/40 mt-0.5">{q.desc}</p>
             </div>
-            <span className="text-white/30 text-lg">→</span>
+            <span className="text-white/30 text-lg">›</span>
           </Link>
         ))}
       </div>

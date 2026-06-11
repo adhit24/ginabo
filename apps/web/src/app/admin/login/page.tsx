@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { store } from "@/lib/adminStore";
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -18,6 +20,7 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ username, password }),
       });
       if (res.ok) {
+        store.setAdminSession(true);
         window.location.href = "/admin";
       } else {
         const data = await res.json().catch(() => ({}));
@@ -91,6 +94,13 @@ export default function AdminLoginPage() {
         <p className="mt-6 text-center text-xs text-white/30">
           Akses admin hanya untuk tim internal Ginabo.
         </p>
+
+        <Link
+          href="/"
+          className="mt-4 flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium text-white/50 transition hover:text-white/80"
+        >
+          Kembali ke Home
+        </Link>
       </div>
     </div>
   );

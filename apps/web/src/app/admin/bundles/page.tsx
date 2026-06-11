@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { store, genId, type GProduct } from "@/lib/adminStore";
 
@@ -19,6 +19,7 @@ export default function AdminBundlesPage() {
   const [modal, setModal]     = useState<{ mode: "add" | "edit"; item: GProduct } | null>(null);
   const [delId, setDelId]     = useState<string | null>(null);
   const [form, setForm]       = useState<Omit<GProduct, "id">>(EMPTY);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { setBundles(store.getBundles()); }, []);
 
@@ -44,6 +45,13 @@ export default function AdminBundlesPage() {
     setBundles(updated);
     setDelId(null);
   }
+  function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setForm(f => ({ ...f, img: reader.result as string }));
+    reader.readAsDataURL(file);
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -66,7 +74,7 @@ export default function AdminBundlesPage() {
           <Card key={b.id}>
             <div className="flex items-center gap-4">
               <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl" style={{ background: "rgba(255,255,255,0.08)" }}>
-                {b.img && <Image src={b.img} alt={b.name} fill className="object-contain p-1" sizes="56px" />}
+                {b.img && <Image src={b.img} alt={b.name} fill className="object-contain p-1" sizes="56px" unoptimized={b.img.startsWith("data:")} />}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-white text-sm whitespace-pre-line leading-snug">{b.name}</p>
@@ -89,13 +97,13 @@ export default function AdminBundlesPage() {
 
       {/* Add/Edit Modal */}
       {modal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl p-6" style={{ background: "#1a0a38", border: "1px solid rgba(255,255,255,0.12)" }}>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm overflow-y-auto py-8">
+          <div className="w-full max-w-md rounded-2xl p-6 my-auto" style={{ background: "#1a0a38", border: "1px solid rgba(255,255,255,0.12)" }}>
             <h2 className="mb-5 text-base font-bold text-white">{modal.mode === "add" ? "Tambah Bundle" : "Edit Bundle"}</h2>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 max-h-[65vh] overflow-y-auto pr-1">
               {([
                 ["Nama Bundle", "name", "text"], ["Harga Tampil", "priceVal", "text"], ["Harga (IDR angka)", "priceMinor", "number"],
-                ["Harga Asli (coret)", "originalPrice", "text"], ["URL Gambar", "img", "text"],
+                ["Harga Asli (coret)", "originalPrice", "text"],
                 ["Rating", "rating", "text"], ["Jumlah Ulasan", "reviews", "text"],
               ] as [string, keyof typeof form, string][]).map(([label, key, type]) => (
                 <div key={key} className="flex flex-col gap-1">
@@ -106,6 +114,28 @@ export default function AdminBundlesPage() {
                     style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }} />
                 </div>
               ))}
+
+              {/* Image upload */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-bold uppercase tracking-widest text-white/40">Gambar Bundle</label>
+                <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={handleImageUpload} className="hidden" />
+                <div className="flex items-center gap-3">
+                  <button type="button" onClick={() => fileRef.current?.click()}
+                    className="rounded-xl px-4 py-2.5 text-sm font-semibold text-white/70 transition hover:text-white"
+                    style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                    Upload Gambar
+                  </button>
+                  {form.img && (
+                    <div className="relative h-12 w-12 overflow-hidden rounded-lg" style={{ background: "rgba(255,255,255,0.08)" }}>
+                      <Image src={form.img} alt="preview" fill className="object-contain p-1" sizes="48px" unoptimized={form.img.startsWith("data:")} />
+                    </div>
+                  )}
+                </div>
+                <input type="text" value={form.img} placeholder="Atau masukkan URL gambar"
+                  onChange={e => setForm(f => ({ ...f, img: e.target.value }))}
+                  className="rounded-xl px-3 py-2.5 text-sm text-white outline-none mt-1"
+                  style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }} />
+              </div>
             </div>
             <div className="mt-5 flex gap-2 justify-end">
               <button onClick={() => setModal(null)} className="rounded-xl px-4 py-2 text-sm font-semibold text-white/50 hover:text-white transition">Batal</button>

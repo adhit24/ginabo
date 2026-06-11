@@ -9,6 +9,10 @@ export interface GProduct {
   rating: string;
   reviews: string;
   tag?: string;
+  slug?: string;
+  role?: string;
+  benefits?: string[];
+  ingredients?: string[];
 }
 
 export interface GFlashItem {

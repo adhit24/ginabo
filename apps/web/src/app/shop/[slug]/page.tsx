@@ -27,7 +27,7 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
       <div className="grid content-start gap-4">
         <div className="grid gap-2">
           <Link href="/shop" className="text-sm font-semibold text-brand-700 hover:text-brand-800">
-            ← Kembali ke Shop
+            Kembali ke Shop
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight text-gray-900 md:text-3xl">{product.name}</h1>
           <div className="text-lg font-semibold text-gray-900">{formatMoney(product.priceMinor, product.currency)}</div>

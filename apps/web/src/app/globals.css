@@ -63,7 +63,7 @@ a {
 
 /* ── Badge-bg (Figma gradient pattern) ── */
 .badge-bg {
-  background-image: url('https://www.figma.com/api/mcp/asset/0a1c44e7-5614-4d0f-8a92-9ed4f9443ac8');
+  background: linear-gradient(135deg, #8b5cf6, #c026d3, #e879f9);
   background-size: cover;
   background-position: center;
 }

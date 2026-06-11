@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { store, type GProduct } from "@/lib/adminStore";
 
 const BEZIER = [0.25, 1, 0.5, 1] as const;
 
@@ -145,75 +147,92 @@ function SectionBadge({ children }: { children: React.ReactNode }) {
   );
 }
 
+// ── Helper: convert GProduct from admin store into shop card shape ────────
+function storeToShopProduct(p: GProduct) {
+  return {
+    slug:        p.slug || p.id,
+    name:        p.name,
+    role:        p.role || p.tag || "",
+    benefits:    p.benefits ?? [],
+    ingredients: p.ingredients ?? [],
+    tag:         p.tag || "",
+    rating:      p.rating,
+    reviews:     p.reviews,
+    price:       p.priceLabel ? `${p.priceLabel} ${p.priceVal}` : p.priceVal,
+    img:         p.img,
+  };
+}
+
+function storeToShopBundle(p: GProduct) {
+  return {
+    id:            p.id,
+    name:          p.name,
+    subtitle:      p.role || p.tag || "",
+    discountPct:   p.originalPrice ? 50 : 0,
+    price:         p.priceVal,
+    originalPrice: p.originalPrice || "",
+    img:           p.img,
+    href:          `/shop/${p.slug || p.id}`,
+    accent:        "#78257C",
+  };
+}
+
 // ── Page ───────────────────────────────────────────────────────────────────
 export default function ShopPage() {
+  const [extraProducts, setExtraProducts] = useState<typeof SINGLE_PRODUCTS>([]);
+  const [extraBundles, setExtraBundles]   = useState<typeof BUNDLES>([]);
+
+  useEffect(() => {
+    // Hardcoded IDs that already exist in the static arrays
+    const defaultProductIds = new Set(["p1", "p2", "p3"]);
+    const defaultBundleIds  = new Set(["b1", "b2", "b3", "b4"]);
+
+    const storeProducts = store.getProducts().filter(p => !defaultProductIds.has(p.id));
+    const storeBundles  = store.getBundles().filter(b => !defaultBundleIds.has(b.id));
+
+    setExtraProducts(storeProducts.map(storeToShopProduct));
+    setExtraBundles(storeBundles.map(storeToShopBundle));
+  }, []);
+
+  const allProducts = [...SINGLE_PRODUCTS, ...extraProducts];
+  const allBundles  = [...BUNDLES, ...extraBundles];
+
   return (
     <div className="w-full bg-[#fffafa]">
 
       {/* ══════════════════════════════════════════════
-          HERO — Shop Banner
+          HERO — Shop Banner (Compact)
       ══════════════════════════════════════════════ */}
       <section
         className="relative overflow-hidden"
-        style={{
-          background: "linear-gradient(135deg,#2a1a3e 0%,#4a1a6b 50%,#78257C 100%)",
-          minHeight: "clamp(280px,40vw,440px)",
-        }}
+        style={{ background: "linear-gradient(135deg,#2a1a3e 0%,#4a1a6b 50%,#78257C 100%)" }}
       >
-        {/* Decorative glow blobs */}
-        <div className="pointer-events-none absolute -top-24 right-0 h-[420px] w-[420px] rounded-full opacity-25"
+        <div className="pointer-events-none absolute -top-16 right-0 h-[300px] w-[300px] rounded-full opacity-20"
           style={{ background: "radial-gradient(circle,#c972bd,transparent 70%)" }} />
-        <div className="pointer-events-none absolute bottom-0 left-0 h-[300px] w-[300px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle,#9b59b6,transparent 70%)" }} />
 
-        <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-start justify-center px-6 py-16 md:px-10 md:py-20">
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: BEZIER }}>
-            <SectionBadge>Produk Ginabo</SectionBadge>
-          </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, ease: BEZIER, delay: 0.1 }}
-            className="mt-4 max-w-2xl font-staatliches text-[clamp(2.6rem,6vw,5rem)] font-normal leading-none text-white"
-          >
-            Kulit Sehat,<br />
-            <span style={{ color: "#e8b4e8" }}>Dirawat dengan Nutrisi</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: BEZIER, delay: 0.2 }}
-            className="mt-4 max-w-lg text-[15px] leading-relaxed text-white/70"
-          >
-            Skincare daily nutrition untuk wanita aktif — ringan, nyaman, dan tidak ribet.
-          </motion.p>
+        <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center justify-center px-6 py-10 md:flex-row md:items-center md:gap-10 md:px-10 md:py-12">
+          {/* Left: Text */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: BEZIER, delay: 0.3 }}
-            className="mt-8 flex flex-wrap gap-3"
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: BEZIER }}
+            className="flex-1 text-center md:text-left"
           >
-            <a href="#produk"
-              className="rounded-full px-6 py-2.5 text-sm font-bold text-white shadow-lg transition hover:opacity-90 hover:-translate-y-0.5"
-              style={{ background: "linear-gradient(135deg,#78257C,#c972bd)" }}
-            >
-              Lihat Produk
-            </a>
-            <a href="#bundling"
-              className="rounded-full border border-white/30 bg-white/10 px-6 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
-            >
-              Lihat Bundling
-            </a>
+            <SectionBadge>Produk Ginabo</SectionBadge>
+            <h1 className="mt-3 font-staatliches text-[clamp(2rem,5vw,3.5rem)] font-normal leading-[1.05] text-white">
+              Kulit Sehat, <span style={{ color: "#e8b4e8" }}>Dirawat dengan Nutrisi</span>
+            </h1>
+            <p className="mt-2 max-w-md text-[14px] leading-relaxed text-white/60">
+              Skincare daily nutrition untuk wanita aktif — ringan, nyaman, dan tidak ribet.
+            </p>
           </motion.div>
         </div>
 
         {/* Trust badges strip */}
-        <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center gap-6 border-t border-white/10 bg-black/20 px-4 py-2.5 backdrop-blur-sm"
-        >
+        <div className="flex items-center justify-center gap-4 md:gap-6 border-t border-white/10 bg-black/20 px-4 py-2 backdrop-blur-sm">
           {["✓ BPOM Terdaftar", "✓ Dermatologist Tested", "✓ Non-Comedogenic", "✓ Fragrance Free"].map(t => (
             <span key={t} className="text-[11px] font-semibold text-white/80">{t}</span>
           ))}
-        </motion.div>
+        </div>
       </section>
 
       {/* ══════════════════════════════════════════════
@@ -242,9 +261,9 @@ export default function ShopPage() {
         <motion.div
           variants={stagger} initial="hidden" whileInView="visible"
           viewport={{ once: true, margin: "-40px" }}
-          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3"
         >
-          {SINGLE_PRODUCTS.map((p, i) => (
+          {allProducts.map((p, i) => (
             <motion.div
               key={p.slug}
               variants={fadeUp} custom={i}
@@ -253,22 +272,22 @@ export default function ShopPage() {
               style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.09)" }}
             >
               {/* Tag badge */}
-              <div className="relative overflow-hidden" style={{ height: 300 }}>
+              <div className="relative aspect-square overflow-hidden sm:aspect-auto" style={{ minHeight: 160 }}>
                 <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
-                <span className="absolute top-3 left-3 rounded-full px-3 py-1 text-[10px] font-bold text-white"
+                <span className="absolute top-2 left-2 sm:top-3 sm:left-3 rounded-full px-2 sm:px-3 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-bold text-white"
                   style={{ background: "linear-gradient(135deg,#78257C,#c972bd)" }}>
                   {p.tag}
                 </span>
               </div>
 
               {/* Info */}
-              <div className="flex flex-col gap-2 px-5 py-4 flex-1">
-                <p className="text-[11px] font-semibold text-[#aaa] uppercase tracking-wide">Ginabo</p>
-                <h3 className="font-bold text-[#2a2356] text-[16px] leading-snug whitespace-pre-line">{p.name}</h3>
-                <p className="text-[12px] text-[#888]">{p.role}</p>
+              <div className="flex flex-col gap-1.5 sm:gap-2 px-3 py-3 sm:px-5 sm:py-4 flex-1">
+                <p className="text-[9px] sm:text-[11px] font-semibold text-[#aaa] uppercase tracking-wide">Ginabo</p>
+                <h3 className="font-bold text-[#2a2356] text-[13px] sm:text-[16px] leading-snug whitespace-pre-line">{p.name}</h3>
+                <p className="text-[10px] sm:text-[12px] text-[#888] hidden sm:block">{p.role}</p>
 
                 {/* Benefits */}
-                <ul className="mt-1 flex flex-col gap-1">
+                <ul className="mt-1 flex-col gap-1 hidden sm:flex">
                   {p.benefits.map(b => (
                     <li key={b} className="flex items-center gap-2 text-[12px] text-[#555]">
                       <span className="text-[#78257C]">✦</span> {b}
@@ -277,7 +296,7 @@ export default function ShopPage() {
                 </ul>
 
                 {/* Ingredients */}
-                <div className="mt-2 flex flex-wrap gap-1">
+                <div className="mt-2 flex-wrap gap-1 hidden sm:flex">
                   {p.ingredients.map(ing => (
                     <span key={ing} className="rounded-full border border-[#e8d5f0] px-2.5 py-0.5 text-[10px] font-medium text-[#78257C]">
                       {ing}
@@ -286,20 +305,20 @@ export default function ShopPage() {
                 </div>
 
                 {/* Rating + Price + Cart */}
-                <div className="mt-auto pt-3 flex items-center justify-between border-t border-[#f5eafc]">
+                <div className="mt-auto pt-2 sm:pt-3 flex items-center justify-between border-t border-[#f5eafc]">
                   <div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1 sm:gap-1.5">
                       <StarIcon />
-                      <span className="text-[12px] font-semibold text-[#555]">{p.rating}</span>
-                      <span className="text-[#ccc]">|</span>
-                      <UserIcon />
-                      <span className="text-[12px] font-semibold text-[#555]">{p.reviews}</span>
+                      <span className="text-[11px] sm:text-[12px] font-semibold text-[#555]">{p.rating}</span>
+                      <span className="text-[#ccc] hidden sm:inline">|</span>
+                      <span className="hidden sm:inline"><UserIcon /></span>
+                      <span className="text-[12px] font-semibold text-[#555] hidden sm:inline">{p.reviews}</span>
                     </div>
-                    <p className="mt-0.5 font-bold text-[15px]" style={{ color: "#be3ab4" }}>{p.price}</p>
+                    <p className="mt-0.5 font-bold text-[13px] sm:text-[15px]" style={{ color: "#be3ab4" }}>{p.price}</p>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.92 }}
-                    className="flex h-11 w-11 items-center justify-center rounded-[14px] flex-shrink-0"
+                    className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-[12px] sm:rounded-[14px] flex-shrink-0"
                     style={{ background: "linear-gradient(135deg,#78257C,#c972bd)" }}
                   >
                     <CartIcon />
@@ -342,9 +361,9 @@ export default function ShopPage() {
         <motion.div
           variants={stagger} initial="hidden" whileInView="visible"
           viewport={{ once: true, margin: "-40px" }}
-          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4"
         >
-          {BUNDLES.map((b, i) => (
+          {allBundles.map((b, i) => (
             <motion.div
               key={b.id}
               variants={fadeUp} custom={i}
@@ -400,34 +419,10 @@ export default function ShopPage() {
             className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-bold text-white shadow-lg transition hover:opacity-90 hover:-translate-y-0.5"
             style={{ background: "linear-gradient(135deg,#78257C,#c972bd)" }}
           >
-            Konsultasi Gratis →
+            Konsultasi Gratis 
           </Link>
         </motion.div>
       </section>
-
-      {/* ══════════════════════════════════════════════
-          BRAND VALUE STRIP
-      ══════════════════════════════════════════════ */}
-      <section className="py-10" style={{ background: "linear-gradient(135deg,#78257C,#c972bd)" }}>
-        <motion.div
-          variants={stagger} initial="hidden" whileInView="visible"
-          viewport={{ once: true }}
-          className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-8 px-6 md:gap-16"
-        >
-          {[
-            { icon: "🌿", label: "Nutrition First" },
-            { icon: "✦",  label: "Barrier-Focused" },
-            { icon: "💧", label: "Hydration Based" },
-            { icon: "🛡️", label: "Daily Comfort" },
-          ].map((v, i) => (
-            <motion.div key={v.label} variants={fadeUp} custom={i} className="flex items-center gap-2 text-white">
-              <span className="text-xl">{v.icon}</span>
-              <span className="text-sm font-bold">{v.label}</span>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-
     </div>
   );
 }

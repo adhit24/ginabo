@@ -197,7 +197,7 @@ export function SkinTypeSection() {
             href="/shop"
             className="inline-flex items-center gap-2 rounded-full border border-brand-800 px-8 py-3 text-sm font-semibold text-brand-800 transition hover:bg-brand-800 hover:text-white"
           >
-            Lihat Semua Produk →
+            Lihat Semua Produk
           </Link>
         </div>
 

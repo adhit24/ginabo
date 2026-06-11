@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -14,78 +14,9 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const cardRef = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [12, -12]), { stiffness: 200, damping: 20 });
-  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-12, 12]), { stiffness: 200, damping: 20 });
-
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = cardRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    x.set((e.clientX - rect.left) / rect.width - 0.5);
-    y.set((e.clientY - rect.top) / rect.height - 0.5);
-  }
-
-  function handleMouseLeave() {
-    x.set(0);
-    y.set(0);
-  }
-
-  // Gyroscope effect for mobile
-  useEffect(() => {
-    const isMobile = window.matchMedia("(max-width: 1023px)").matches;
-    if (!isMobile) return;
-
-    let baseGamma = 0;
-    let baseBeta  = 0;
-    let calibrated = false;
-
-    function handleOrientation(e: DeviceOrientationEvent) {
-      const gamma = e.gamma ?? 0; // left/right tilt (-90 to 90)
-      const beta  = e.beta  ?? 0; // front/back tilt (-180 to 180)
-
-      if (!calibrated) {
-        baseGamma  = gamma;
-        baseBeta   = beta;
-        calibrated = true;
-        return;
-      }
-
-      const dx = Math.max(-30, Math.min(30, gamma - baseGamma));
-      const dy = Math.max(-30, Math.min(30, beta  - baseBeta));
-
-      x.set(dx / 30 * 0.5);
-      y.set(dy / 30 * 0.5);
-    }
-
-    // iOS 13+ requires permission
-    if (typeof (DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> }).requestPermission === "function") {
-      (DeviceOrientationEvent as unknown as { requestPermission: () => Promise<string> })
-        .requestPermission()
-        .then(res => {
-          if (res === "granted") window.addEventListener("deviceorientation", handleOrientation);
-        })
-        .catch(() => {});
-    } else {
-      window.addEventListener("deviceorientation", handleOrientation);
-    }
-
-    return () => window.removeEventListener("deviceorientation", handleOrientation);
-  }, [x, y]);
-
-  const [googleLoading, setGoogleLoading] = useState(false);
-
-  async function handleGoogleSignup() {
-    setGoogleLoading(true);
-    // Mock: simulate Google OAuth flow with a fake Google account
-    await new Promise(r => setTimeout(r, 1200));
-    const mockGoogleName  = "Pengguna Google";
-    const mockGoogleEmail = `google_${Math.random().toString(36).slice(2, 8)}@gmail.com`;
-    const result = await signup(mockGoogleName, mockGoogleEmail, "google-oauth");
-    setGoogleLoading(false);
-    if (result.ok) router.push("/member");
-  }
+  const handleGoogle = () => {
+    window.location.href = "/api/auth/google";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,172 +35,223 @@ export default function SignupPage() {
     }
   };
 
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const mouseX = useMotionValue(0.5);
+  const mouseY = useMotionValue(0.5);
+  const springX = useSpring(mouseX, { stiffness: 120, damping: 20 });
+  const springY = useSpring(mouseY, { stiffness: 120, damping: 20 });
+  const glowX = useTransform(springX, [0, 1], ["0%", "100%"]);
+  const glowY = useTransform(springY, [0, 1], ["0%", "100%"]);
+
+  function handleCardMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    mouseX.set((e.clientX - rect.left) / rect.width);
+    mouseY.set((e.clientY - rect.top) / rect.height);
+  }
+
+  function handleCardMouseLeave() {
+    mouseX.set(0.5);
+    mouseY.set(0.5);
+    setIsHovered(false);
+  }
+
+
+  const inputStyle = {
+    background: "rgba(255,255,255,0.07)",
+    border: "1px solid rgba(255,255,255,0.12)",
+  };
+  const inputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.currentTarget.style.border = "1px solid rgba(168,85,247,0.7)";
+  };
+  const inputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.currentTarget.style.border = "1px solid rgba(255,255,255,0.12)";
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center gap-10 bg-brand-50 px-6 py-12 lg:px-16">
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-10"
+      style={{ background: "linear-gradient(135deg,#0f0a1e 0%,#1e0a38 50%,#2a1040 100%)" }}
+    >
+      {/* Glow blobs */}
+      <div className="pointer-events-none fixed top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20"
+        style={{ background: "radial-gradient(circle,#8b5cf6,transparent 70%)" }} />
+      <div className="pointer-events-none fixed bottom-0 right-1/4 h-[400px] w-[400px] translate-x-1/2 translate-y-1/2 rounded-full opacity-15"
+        style={{ background: "radial-gradient(circle,#e879f9,transparent 70%)" }} />
 
-      {/* Left card — floating 3D, hidden on mobile */}
-      <motion.div
-        ref={cardRef}
-        className="hidden lg:block flex-shrink-0 overflow-hidden rounded-3xl cursor-pointer"
-        style={{
-          width: "clamp(320px, 36vw, 520px)",
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
-          transformPerspective: 800,
-          boxShadow: "0 30px 60px rgba(120,37,124,0.25), 0 8px 20px rgba(120,37,124,0.15)",
-        }}
-        animate={{ y: [0, -12, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        whileHover={{ scale: 1.03 }}
-      >
-        {/* Shine overlay */}
-        <div
-          className="pointer-events-none absolute inset-0 z-10 rounded-3xl"
-          style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%)" }}
-        />
-        <Image
-          src="/auth_signup.png"
-          alt="Ginabo signup"
-          width={520}
-          height={780}
-          className="w-full h-auto"
-          priority
-        />
-      </motion.div>
+      <div className="relative z-10 flex w-full max-w-5xl items-center gap-12">
 
-      {/* Right form panel */}
-      <div className="flex w-full max-w-md flex-col justify-center">
-        <div className="w-full max-w-md">
-          {/* Logo mobile */}
-          <div className="mb-8 text-center lg:hidden">
-            <Link href="/" className="text-2xl font-extrabold tracking-widest text-brand-700">GINABO</Link>
+        {/* Left — kartu member floating */}
+        <div className="hidden lg:flex flex-shrink-0 flex-col items-center gap-6">
+          <motion.div
+            ref={cardRef}
+            animate={{ y: [0, -14, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="relative flex cursor-pointer items-center justify-center"
+            onMouseMove={handleCardMouseMove}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={handleCardMouseLeave}
+            whileHover={{ scale: 1.03 }}
+          >
+            {/* Glow — follows mouse via motion values */}
+            <motion.div
+              className="absolute pointer-events-none rounded-full"
+              style={{
+                width: 460,
+                height: 300,
+                translateX: "-50%",
+                translateY: "-50%",
+                left: glowX,
+                top: glowY,
+                background: isHovered
+                  ? "radial-gradient(ellipse at center, rgba(168,85,247,0.85) 0%, rgba(232,121,249,0.50) 45%, transparent 72%)"
+                  : "radial-gradient(ellipse at center, rgba(168,85,247,0.45) 0%, rgba(232,121,249,0.20) 45%, transparent 75%)",
+                filter: isHovered ? "blur(24px)" : "blur(36px)",
+                transition: "background 0.25s ease, filter 0.25s ease",
+                zIndex: 0,
+              }}
+            />
+            <Image
+              src="/kartu_member.png"
+              alt="Kartu Member Ginabo"
+              width={510}
+              height={330}
+              className="relative rounded-2xl"
+              style={{ zIndex: 1 }}
+              priority
+            />
+          </motion.div>
+
+          {/* Info below card */}
+          <div className="text-center">
+            <p className="text-xs font-bold uppercase tracking-widest text-white/40">Member Card</p>
+            <p className="mt-1 text-sm font-medium text-white/60">Dapatkan kartu member eksklusif</p>
+            <div className="mt-4 flex flex-col gap-2">
+              {["Poin reward setiap pembelian", "Diskon eksklusif member", "Akses flash sale lebih awal"].map(t => (
+                <div key={t} className="flex items-center gap-2 text-xs text-white/50">
+                  <span style={{ color: "#a855f7" }}>✦</span> {t}
+                </div>
+              ))}
+            </div>
           </div>
+        </div>
 
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-brand-900">Buat Akun Baru</h1>
-            <p className="mt-1 text-sm text-brand-500">
-              Sudah punya akun?{" "}
-              <Link href="/auth/login" className="font-semibold text-brand-700 hover:underline">Masuk di sini</Link>
-            </p>
+        {/* Right — glass form card */}
+        <div
+          className="w-full max-w-md rounded-3xl p-8"
+          style={{
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            backdropFilter: "blur(24px)",
+          }}
+        >
+          {/* Header */}
+          <div className="mb-6 text-center">
+            <span className="text-3xl font-extrabold tracking-widest text-white">GINABO</span>
+            <span
+              className="ml-2 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white align-middle"
+              style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}
+            >
+              MEMBER
+            </span>
+            <p className="mt-2 text-sm text-white/50">Buat akun dan mulai perjalanan kulitmu</p>
           </div>
 
           {error && (
-            <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/* Google Button */}
+          <button
+            type="button"
+            onClick={handleGoogle}
+            className="mb-5 flex w-full items-center justify-center gap-3 rounded-xl py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10"
+            style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)" }}
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
+              <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+            </svg>
+            Daftar dengan Google
+          </button>
+
+          {/* Divider */}
+          <div className="mb-5 flex items-center gap-3">
+            <div className="h-px flex-1" style={{ background: "rgba(255,255,255,0.12)" }} />
+            <span className="text-xs text-white/30">atau daftar dengan email</span>
+            <div className="h-px flex-1" style={{ background: "rgba(255,255,255,0.12)" }} />
+          </div>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wide text-brand-600">Nama Lengkap</label>
-              <input
-                type="text"
-                required
-                placeholder="Nama kamu"
-                value={form.name}
-                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-[16px] text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 md:text-sm"
-              />
+              <label className="text-xs font-bold uppercase tracking-widest text-white/50">Nama Lengkap</label>
+              <input type="text" required placeholder="Nama kamu"
+                value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition"
+                style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wide text-brand-600">Email</label>
-              <input
-                type="email"
-                required
-                placeholder="email@kamu.com"
-                value={form.email}
-                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-[16px] text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 md:text-sm"
-              />
+              <label className="text-xs font-bold uppercase tracking-widest text-white/50">Email</label>
+              <input type="email" required placeholder="email@kamu.com"
+                value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition"
+                style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wide text-brand-600">No. WhatsApp</label>
-              <input
-                type="tel"
-                placeholder="08xx-xxxx-xxxx"
-                value={form.phone}
-                onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-[16px] text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 md:text-sm"
-              />
+              <label className="text-xs font-bold uppercase tracking-widest text-white/50">No. WhatsApp</label>
+              <input type="tel" placeholder="08xx-xxxx-xxxx"
+                value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition"
+                style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wide text-brand-600">Password</label>
-              <input
-                type="password"
-                required
-                placeholder="Min. 8 karakter"
-                value={form.password}
-                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-[16px] text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 md:text-sm"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-widest text-white/50">Password</label>
+                <input type="password" required placeholder="Min. 8 karakter"
+                  value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                  className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition"
+                  style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-widest text-white/50">Konfirmasi</label>
+                <input type="password" required placeholder="Ulangi"
+                  value={form.confirm} onChange={e => setForm(f => ({ ...f, confirm: e.target.value }))}
+                  className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition"
+                  style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} />
+              </div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wide text-brand-600">Konfirmasi Password</label>
-              <input
-                type="password"
-                required
-                placeholder="Ulangi password"
-                value={form.confirm}
-                onChange={e => setForm(f => ({ ...f, confirm: e.target.value }))}
-                className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-[16px] text-brand-900 outline-none placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 md:text-sm"
-              />
-            </div>
-
-            <p className="text-[11px] text-brand-400">
+            <p className="text-[11px] text-white/25">
               Dengan mendaftar, kamu menyetujui{" "}
-              <Link href="#" className="text-brand-600 hover:underline">Syarat & Ketentuan</Link>{" "}
+              <Link href="#" className="text-white/50 hover:text-white/70 underline">Syarat & Ketentuan</Link>{" "}
               dan{" "}
-              <Link href="#" className="text-brand-600 hover:underline">Kebijakan Privasi</Link> Ginabo.
+              <Link href="#" className="text-white/50 hover:text-white/70 underline">Kebijakan Privasi</Link> Ginabo.
             </p>
 
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 rounded-xl bg-brand-700 py-3.5 text-sm font-bold text-white shadow-brand transition hover:bg-brand-800 disabled:opacity-60"
+              className="mt-1 rounded-xl py-3.5 text-sm font-bold text-white transition disabled:opacity-60"
+              style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)", boxShadow: "0 4px 20px rgba(139,92,246,0.35)" }}
             >
               {loading ? "Memproses..." : "Daftar Sekarang"}
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="mt-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-brand-200" />
-            <span className="text-xs text-brand-400">atau daftar dengan</span>
-            <div className="h-px flex-1 bg-brand-200" />
+          <div className="mt-5 flex items-center justify-center gap-1 text-sm text-white/30">
+            <span>Sudah punya akun?</span>
+            <Link href="/auth/login" className="font-semibold text-white/60 hover:text-white transition">Masuk di sini</Link>
           </div>
-
-          {/* Google Sign Up */}
-          <button
-            type="button"
-            onClick={handleGoogleSignup}
-            disabled={googleLoading}
-            className="mt-4 flex w-full items-center justify-center gap-3 rounded-xl border border-[#dadce0] bg-white px-4 py-3 text-sm font-semibold text-[#3c4043] shadow-sm transition hover:bg-[#f8f9fa] hover:shadow-md active:scale-[0.98] disabled:opacity-60"
-          >
-            {googleLoading ? (
-              <svg className="h-5 w-5 animate-spin text-brand-500" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z" />
-              </svg>
-            ) : (
-              <svg className="h-5 w-5" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-            )}
-            {googleLoading ? "Menghubungkan..." : "Lanjutkan dengan Google"}
-          </button>
-
-          <div className="mt-6 text-center">
-            <Link href="/" className="text-xs text-brand-400 hover:text-brand-600">← Kembali ke beranda</Link>
+          <div className="mt-2 text-center">
+            <Link href="/" className="text-xs text-white/20 hover:text-white/40 transition">Kembali ke beranda</Link>
           </div>
         </div>
       </div>

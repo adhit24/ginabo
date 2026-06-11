@@ -3,16 +3,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { CartMini } from "@/components/cart/CartMini";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 const EASE = [0.25, 1, 0.5, 1] as const;
 
 const announcements = [
-  { text: "✨ Gratis ongkir untuk pembelian di atas Rp 200.000", cta: "Belanja", href: "/shop" },
-  { text: "🎁 Member baru dapat 100 poin selamat datang!", cta: "Daftar", href: "/auth/signup" },
-  { text: "💜 Konsultasi kulit gratis bersama skin expert kami", cta: "Booking", href: "/booking" },
+  { text: "Gratis ongkir untuk pembelian di atas Rp 200.000", cta: "Belanja", href: "/shop" },
+  { text: "Member baru dapat 100 poin selamat datang!", cta: "Daftar", href: "/auth/signup" },
+  { text: "Konsultasi kulit gratis bersama skin expert kami", cta: "Booking", href: "/booking" },
 ];
 
 const navItems = [
@@ -25,11 +26,12 @@ const navItems = [
 
 export function SiteHeader() {
   const pathname                        = usePathname();
+  const router                          = useRouter();
+  const { user, logout }                = useAuth();
   const [annIdx, setAnnIdx]             = useState(0);
   const [drawerOpen, setDrawerOpen]     = useState(false);
   const [userOpen, setUserOpen]         = useState(false);
   const [scrolled, setScrolled]         = useState(false);
-  const [user, setUser]                 = useState<{ name: string } | null>(null);
   const timerRef                        = useRef<ReturnType<typeof setInterval> | null>(null);
   const userMenuRef                     = useRef<HTMLDivElement>(null);
 
@@ -45,13 +47,6 @@ export function SiteHeader() {
   }, []);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("ginabo_user");
-      if (stored) setUser(JSON.parse(stored));
-    } catch {}
-  }, []);
-
-  useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
         setUserOpen(false);
@@ -62,9 +57,9 @@ export function SiteHeader() {
   }, []);
 
   function handleLogout() {
-    localStorage.removeItem("ginabo_user");
-    setUser(null);
+    logout();
     setUserOpen(false);
+    router.push("/");
   }
 
   function isActive(href: string) {
@@ -98,7 +93,7 @@ export function SiteHeader() {
             href={ann.href}
             className="shrink-0 rounded-full border border-white/40 bg-white/10 px-3 py-0.5 text-[11px] font-semibold text-white transition hover:bg-white/25"
           >
-            {ann.cta} →
+            {ann.cta}
           </Link>
         </div>
       </div>
@@ -110,39 +105,20 @@ export function SiteHeader() {
           : "bg-[#fffafa]"
       }`}>
 
-        {/* ── Mobile logo row (above navbar) ── */}
-        <div className="flex items-center justify-center py-2 md:hidden border-b border-[#f0d8eb]/50">
-          <Link href="/">
-            <div style={{ width: 108, height: 26, overflow: "hidden", position: "relative" }}>
-              <Image
-                src="/logo.png"
-                alt="Ginabo"
-                width={400}
-                height={160}
-                style={{
-                  position: "absolute",
-                  top: "-42%",
-                  left: "-2%",
-                  width: "104%",
-                  height: "auto",
-                  filter: "invert(29%) sepia(60%) saturate(500%) hue-rotate(240deg) brightness(80%)",
-                }}
-              />
-            </div>
-          </Link>
-        </div>
-
-        <div className="mx-auto flex w-full max-w-7xl items-center gap-4 px-5 md:px-8" style={{ height: 68 }}>
+        <div className="mx-auto flex w-full max-w-7xl items-center gap-4 px-5 md:px-8" style={{ height: 56 }}>
 
           {/* ── Hamburger (mobile) ── */}
           <button
             onClick={() => setDrawerOpen(true)}
-            className="flex h-9 w-9 flex-col items-center justify-center gap-[5px] rounded-xl md:hidden"
+            className="flex h-10 w-10 flex-col items-center justify-center gap-[5px] rounded-2xl md:hidden"
+            style={{
+              background: "linear-gradient(135deg, rgba(139,92,246,0.1), rgba(232,121,249,0.1))",
+              border: "1.5px solid rgba(139,92,246,0.25)",
+            }}
             aria-label="Menu"
           >
-            <span className="block h-[2px] w-[18px] rounded-full bg-[#78257C] transition-all" />
-            <span className="block h-[2px] w-[18px] rounded-full bg-[#78257C] transition-all" />
-            <span className="block h-[2px] w-[12px] self-start rounded-full bg-[#78257C] transition-all" />
+            <span className="block h-[2.5px] w-[16px] rounded-full bg-gradient-to-r from-[#8b5cf6] to-[#c026d3] transition-all" />
+            <span className="block h-[2.5px] w-[12px] rounded-full bg-gradient-to-r from-[#8b5cf6] to-[#c026d3] transition-all" />
           </button>
 
           {/* ── Logo (desktop only) ── */}
@@ -207,27 +183,35 @@ export function SiteHeader() {
           {/* ── Right Actions ── */}
           <div className="ml-auto flex items-center gap-2 md:ml-0">
 
-            {/* Shop CTA — desktop only */}
+            {/* Shop CTA */}
             <Link
               href="/shop"
-              className="hidden md:inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#8b5cf6] via-[#c026d3] to-[#e879f9] px-5 py-2 text-[13px] font-bold text-white shadow-sm transition hover:opacity-90 hover:shadow-md hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#8b5cf6] via-[#c026d3] to-[#e879f9] px-4 py-1.5 text-[12px] md:px-5 md:py-2 md:text-[13px] font-bold text-white shadow-sm transition hover:opacity-90 hover:shadow-md hover:-translate-y-0.5"
             >
               Belanja
             </Link>
 
-            {/* Account — desktop only */}
-            <div className="relative hidden md:block" ref={userMenuRef}>
+            {/* Account */}
+            <div className="relative" ref={userMenuRef}>
+              {/* Profile button */}
               <button
                 onClick={() => setUserOpen(v => !v)}
-                className={`flex h-9 w-9 items-center justify-center rounded-full border-2 transition hover:scale-105 ${
-                  userOpen ? "border-[#78257C]" : "border-[#f0d8eb]"
-                } bg-[#FBF0F8]`}
+                className="relative flex h-9 w-9 items-center justify-center rounded-full transition hover:scale-105"
+                style={{
+                  background: userOpen
+                    ? "linear-gradient(135deg,#8b5cf6,#e879f9)"
+                    : "linear-gradient(135deg,rgba(139,92,246,0.15),rgba(232,121,249,0.15))",
+                  border: userOpen ? "none" : "1.5px solid rgba(139,92,246,0.35)",
+                  boxShadow: userOpen ? "0 0 16px rgba(168,85,247,0.45)" : "none",
+                }}
                 aria-label="Akun"
               >
                 {user ? (
-                  <span className="text-[13px] font-bold text-[#78257C]">{user.name.charAt(0).toUpperCase()}</span>
+                  <span className={`text-[13px] font-bold ${userOpen ? "text-white" : "text-[#8b5cf6]"}`}>
+                    {user.name.charAt(0).toUpperCase()}
+                  </span>
                 ) : (
-                  <svg className="h-4 w-4 text-[#78257C]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <svg className="h-4 w-4" fill="none" stroke={userOpen ? "#fff" : "#8b5cf6"} strokeWidth="2" viewBox="0 0 24 24">
                     <circle cx="12" cy="8" r="4" />
                     <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round" />
                   </svg>
@@ -237,40 +221,143 @@ export function SiteHeader() {
               <AnimatePresence>
                 {userOpen && (
                   <motion.div
-                    className="absolute right-0 top-11 z-50 w-52 overflow-hidden rounded-2xl border border-[#f0d8eb] bg-white shadow-xl"
-                    initial={{ opacity: 0, scale: 0.94, y: -8 }}
+                    className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-2xl"
+                    style={{
+                      background: "linear-gradient(160deg,#1a0a2e 0%,#2a1040 100%)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      backdropFilter: "blur(24px)",
+                      boxShadow: "0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(168,85,247,0.1)",
+                    }}
+                    initial={{ opacity: 0, scale: 0.95, y: -6 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.94, y: -8 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -6 }}
                     transition={{ duration: 0.18, ease: EASE }}
                   >
                     {user ? (
                       <>
-                        <div className="border-b border-[#f0d8eb] px-4 py-3">
-                          <p className="text-xs text-[#999]">Masuk sebagai</p>
-                          <p className="text-sm font-bold text-[#78257C]">{user.name}</p>
+                        {/* User header */}
+                        <div className="px-5 pt-5 pb-4">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                              style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}
+                            >
+                              {user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-bold text-white">{user.name}</p>
+                              <p className="text-[11px] text-white/40 truncate">{user.email}</p>
+                              <span
+                                className="mt-0.5 inline-block rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
+                                style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}
+                              >
+                                {user.tier}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="p-2">
-                          <Link href="/member" onClick={() => setUserOpen(false)}
-                            className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-[#333] hover:bg-[#FBF0F8]">
-                            Dashboard Member
+
+                        {/* Points strip */}
+                        <div className="mx-4 mb-3 flex items-center justify-between rounded-xl px-3 py-2" style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.2)" }}>
+                          <span className="text-[11px] font-medium text-white/60">Poin Saya</span>
+                          <span className="text-sm font-bold text-[#e879f9]">{user.points} Poin</span>
+                        </div>
+
+                        {/* Divider */}
+                        <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", margin: "0 16px" }} />
+
+                        {/* Links */}
+                        <div className="p-3 flex flex-col gap-1">
+                          <Link
+                            href="/member"
+                            onClick={() => setUserOpen(false)}
+                            className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
+                          >
+                            <svg className="h-4 w-4 opacity-60" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <circle cx="12" cy="8" r="4" />
+                              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round" />
+                            </svg>
+                            Profil Saya
                           </Link>
-                          <button onClick={handleLogout}
-                            className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50">
+                          <Link
+                            href="/member"
+                            onClick={() => setUserOpen(false)}
+                            className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
+                          >
+                            <svg className="h-4 w-4 opacity-60" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <rect x="3" y="3" width="18" height="18" rx="2" />
+                              <path d="M8 7h8M8 11h8M8 15h5" />
+                            </svg>
+                            Pesanan Saya
+                          </Link>
+                          <Link
+                            href="/member"
+                            onClick={() => setUserOpen(false)}
+                            className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
+                          >
+                            <svg className="h-4 w-4 opacity-60" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                            </svg>
+                            Wishlist
+                          </Link>
+                        </div>
+
+                        {/* Divider */}
+                        <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", margin: "0 16px" }} />
+
+                        {/* Logout */}
+                        <div className="p-3">
+                          <button
+                            onClick={handleLogout}
+                            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-500/10 hover:text-red-300"
+                          >
+                            <svg className="h-4 w-4 opacity-70" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                              <polyline points="16 17 21 12 16 7"/>
+                              <line x1="21" y1="12" x2="9" y2="12"/>
+                            </svg>
                             Keluar
                           </button>
                         </div>
                       </>
                     ) : (
-                      <div className="p-2">
-                        <Link href="/auth/login" onClick={() => setUserOpen(false)}
-                          className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-[#333] hover:bg-[#FBF0F8]">
-                          Masuk
-                        </Link>
-                        <Link href="/auth/signup" onClick={() => setUserOpen(false)}
-                          className="mt-1 flex items-center justify-center gap-2 rounded-xl badge-bg px-3 py-2.5 text-sm font-bold text-white">
-                          Daftar Gratis →
-                        </Link>
-                      </div>
+                      <>
+                        {/* Brand header */}
+                        <div className="px-5 pt-5 pb-4 text-center">
+                          <span className="text-base font-extrabold tracking-widest text-white">GINABO</span>
+                          <span
+                            className="ml-1.5 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white align-middle"
+                            style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}
+                          >
+                            MEMBER
+                          </span>
+                          <p className="mt-1.5 text-xs text-white/40">Masuk untuk akses penuh</p>
+                        </div>
+
+                        <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", margin: "0 16px" }} />
+
+                        <div className="p-3 flex flex-col gap-2">
+                          <Link
+                            href="/auth/login"
+                            onClick={() => setUserOpen(false)}
+                            className="flex w-full items-center justify-center rounded-xl py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
+                            style={{ border: "1px solid rgba(255,255,255,0.15)" }}
+                          >
+                            Masuk
+                          </Link>
+                          <Link
+                            href="/auth/signup"
+                            onClick={() => setUserOpen(false)}
+                            className="flex w-full items-center justify-center rounded-xl py-2.5 text-sm font-bold text-white transition hover:opacity-90"
+                            style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)", boxShadow: "0 4px 14px rgba(139,92,246,0.35)" }}
+                          >
+                            Daftar Gratis
+                          </Link>
+                        </div>
+                        <div className="pb-4 text-center">
+                          <p className="text-[10px] text-white/20">Gratis • Tanpa biaya pendaftaran</p>
+                        </div>
+                      </>
                     )}
                   </motion.div>
                 )}
@@ -282,16 +369,27 @@ export function SiteHeader() {
           </div>
         </div>
 
-        {/* ── Mobile quick-nav pill strip ── */}
-        <nav className="flex gap-1.5 overflow-x-auto border-t border-[#f0d8eb]/60 px-4 py-2 md:hidden scrollbar-none">
+        {/* ── Mobile quick-nav pill strip (glassmorphism) ── */}
+        <nav
+          className="mx-4 mb-2 relative z-20 flex gap-1.5 overflow-x-auto rounded-2xl px-2 py-2 md:hidden scrollbar-none"
+          style={{
+            background: "linear-gradient(135deg, rgba(245,234,252,0.85), rgba(255,255,255,0.7))",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            border: "1px solid rgba(168,85,247,0.15)",
+            boxShadow: "0 4px 20px rgba(120,37,124,0.06), 0 1px 3px rgba(120,37,124,0.04)",
+          }}
+        >
           {navItems.map(item => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`shrink-0 rounded-full px-4 py-1.5 text-[12px] font-semibold transition ${
-                  active ? "badge-bg text-white shadow-sm" : "text-[#78257C] hover:bg-[#f5eafc]"
+                className={`shrink-0 rounded-xl px-4 py-2 text-[11px] font-bold tracking-wide transition-all duration-200 ${
+                  active
+                    ? "bg-gradient-to-r from-[#8b5cf6] to-[#c026d3] text-white shadow-[0_2px_12px_rgba(139,92,246,0.4)]"
+                    : "text-[#6b3fa0] hover:bg-white/90 hover:shadow-sm"
                 }`}
               >
                 {item.label}
@@ -375,7 +473,7 @@ export function SiteHeader() {
                   >
                     {item.label}
                     {isActive(item.href) && (
-                      <span className="ml-auto text-white/70">→</span>
+                      <span className="ml-auto h-1.5 w-1.5 rounded-full bg-white/70" />
                     )}
                   </Link>
                 </motion.div>

@@ -28,7 +28,7 @@ export default function CartPage() {
         <div className="rounded-3xl border border-gray-100 bg-white p-10 text-center">
           <div className="text-sm font-semibold text-gray-900">Cart kamu kosong</div>
           <Link href="/shop" className="mt-3 inline-flex text-sm font-semibold text-brand-700 hover:text-brand-800">
-            Mulai belanja →
+            Mulai belanja
           </Link>
         </div>
       ) : (

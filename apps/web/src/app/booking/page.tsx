@@ -90,69 +90,78 @@ export default function BookingPage() {
   return (
     <div className="bg-[#FDFAFF] text-[#2a2a2a]">
 
-      {/* ── HERO ── */}
+      {/* ── HERO + BOOKING FORM ── */}
       <section
-        className="relative overflow-hidden"
-        style={{
-          background: "linear-gradient(135deg, #2a1635 0%, #78257C 55%, #CF99B4 100%)",
-          minHeight: 220,
-        }}
+        className="relative overflow-hidden pb-10 md:pb-16"
+        style={{ background: "linear-gradient(135deg,#0f0a1e 0%,#1e0a38 50%,#2a1040 100%)" }}
       >
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: "radial-gradient(circle at 25% 55%, white 1px, transparent 1px), radial-gradient(circle at 75% 25%, white 1px, transparent 1px)",
-            backgroundSize: "52px 52px",
-          }}
-        />
-        <div className="relative mx-auto flex min-h-[220px] max-w-4xl flex-col items-center justify-center px-6 py-12 text-center">
-          <span className="mb-3 inline-block rounded-full border border-white/30 bg-white/15 px-5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-white backdrop-blur">
+        {/* Glow blobs */}
+        <div className="pointer-events-none absolute top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle,#8b5cf6,transparent 70%)" }} />
+        <div className="pointer-events-none absolute bottom-0 right-1/4 h-[400px] w-[400px] translate-x-1/2 translate-y-1/3 rounded-full opacity-10"
+          style={{ background: "radial-gradient(circle,#e879f9,transparent 70%)" }} />
+
+        {/* Header */}
+        <div className="relative mx-auto flex max-w-4xl flex-col items-center justify-center px-6 pt-14 pb-10 text-center">
+          <span
+            className="mb-4 inline-block rounded-full px-4 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
+            style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}
+          >
             Konsultasi Kulit
           </span>
           <h1 className="mb-3 text-3xl font-bold leading-tight text-white md:text-4xl">
             Booking{" "}
-            <span className="font-light italic">Konsultasi</span>
+            <span
+              className="font-light italic"
+              style={{ background: "linear-gradient(135deg,#c084fc,#e879f9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+            >
+              Konsultasi
+            </span>
           </h1>
-          <p className="max-w-sm text-sm leading-relaxed text-white/80">
+          <p className="max-w-sm text-sm leading-relaxed text-white/50">
             Pilih slot konsultasi gratis bersama skin expert kami. Slot otomatis tertutup saat penuh.
           </p>
         </div>
-      </section>
 
-      {/* ── BOOKING FORM ── */}
-      <section className="py-10 md:py-16">
-        <div className="mx-auto w-full max-w-4xl px-4 md:px-8">
+        <div className="relative mx-auto w-full max-w-4xl px-4 md:px-8">
           <div className="grid gap-6 md:grid-cols-2">
 
             {/* Left: Date + Slots */}
             <div className="grid gap-4">
               <div className="grid gap-1">
-                <h2 className="text-lg font-bold text-[#2a2a2a]">Pilih Jadwal</h2>
-                <p className="text-sm" style={{ color: "#888" }}>Slot tersedia ditampilkan berdasarkan tanggal pilihan.</p>
+                <h2 className="text-lg font-bold text-white">Pilih Jadwal</h2>
+                <p className="text-sm text-white/40">Slot tersedia ditampilkan berdasarkan tanggal pilihan.</p>
               </div>
 
-              <div className="grid gap-3 rounded-3xl bg-white p-6 shadow-sm" style={{ border: "1.5px solid #f0d8eb" }}>
+              <div
+                className="grid gap-3 rounded-3xl p-6"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  backdropFilter: "blur(24px)",
+                }}
+              >
                 <label className="grid gap-1 text-sm">
-                  <span className="font-semibold text-[#2a2a2a]">Tanggal</span>
+                  <span className="font-semibold text-white/70">Tanggal</span>
                   <input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="rounded-2xl border px-4 py-3 text-[16px] outline-none transition md:text-sm"
-                    style={{ borderColor: "#f0d8eb" }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = "#78257C"; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = "#f0d8eb"; }}
+                    className="rounded-xl px-4 py-3 text-[16px] text-white placeholder-white/30 outline-none transition md:text-sm"
+                    style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}
+                    onFocus={(e) => { e.currentTarget.style.border = "1px solid rgba(168,85,247,0.7)"; }}
+                    onBlur={(e) => { e.currentTarget.style.border = "1px solid rgba(255,255,255,0.12)"; }}
                   />
                 </label>
 
                 <div className="grid gap-2">
-                  <div className="text-sm font-semibold text-[#2a2a2a]">Slot Tersedia</div>
-                  <div className="text-xs" style={{ color: "#CF99B4" }}>{selectedDayLabel}</div>
+                  <div className="text-sm font-semibold text-white/70">Slot Tersedia</div>
+                  <div className="text-xs" style={{ color: "#c084fc" }}>{selectedDayLabel}</div>
                   <div className="grid gap-2">
                     {state.status === "loading" ? (
-                      <div className="rounded-2xl border p-4 text-sm" style={{ borderColor: "#f0d8eb", color: "#888" }}>Memuat slot...</div>
+                      <div className="rounded-xl p-4 text-sm text-white/40" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>Memuat slot...</div>
                     ) : slots.length === 0 ? (
-                      <div className="rounded-2xl border p-4 text-sm" style={{ borderColor: "#f0d8eb", color: "#888" }}>Belum ada slot untuk tanggal ini.</div>
+                      <div className="rounded-xl p-4 text-sm text-white/40" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>Belum ada slot untuk tanggal ini.</div>
                     ) : (
                       slots.map((s) => {
                         const start = new Date(s.startAt);
@@ -166,16 +175,17 @@ export default function BookingPage() {
                             type="button"
                             onClick={() => setSelectedSlotId(s.id)}
                             disabled={disabled}
-                            className="flex items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm transition"
+                            className="flex items-center justify-between rounded-xl px-4 py-3 text-left text-sm transition"
                             style={{
-                              borderColor: active ? "#78257C" : disabled ? "#f0d8eb" : "#f0d8eb",
-                              background: active ? "#FBF0F8" : disabled ? "#fafafa" : "white",
-                              color: disabled ? "#bbb" : "#2a2a2a",
+                              border: active ? "1px solid rgba(168,85,247,0.7)" : "1px solid rgba(255,255,255,0.1)",
+                              background: active ? "rgba(139,92,246,0.15)" : disabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)",
+                              color: disabled ? "rgba(255,255,255,0.25)" : "white",
                               cursor: disabled ? "not-allowed" : "pointer",
+                              boxShadow: active ? "0 0 16px rgba(139,92,246,0.2)" : "none",
                             }}
                           >
                             <span className="font-semibold">{label}</span>
-                            <span className="text-xs" style={{ color: disabled ? "#bbb" : "#CF99B4" }}>
+                            <span className="text-xs" style={{ color: disabled ? "rgba(255,255,255,0.25)" : "#c084fc" }}>
                               {disabled ? "Penuh" : `${s.remaining} slot`}
                             </span>
                           </button>
@@ -187,8 +197,11 @@ export default function BookingPage() {
               </div>
 
               {/* Benefits strip */}
-              <div className="rounded-2xl p-4" style={{ background: "#FBF0F8", border: "1px solid #f0d8eb" }}>
-                <div className="mb-2 text-xs font-bold uppercase tracking-wider" style={{ color: "#78257C" }}>Kenapa Konsultasi?</div>
+              <div
+                className="rounded-2xl p-4"
+                style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.15)" }}
+              >
+                <div className="mb-2 text-xs font-bold uppercase tracking-wider" style={{ color: "#c084fc" }}>Kenapa Konsultasi?</div>
                 <ul className="flex flex-col gap-1.5">
                   {[
                     "Gratis — tidak ada biaya apapun",
@@ -196,8 +209,8 @@ export default function BookingPage() {
                     "Rutinitas AM/PM yang tepat untukmu",
                     "Dipandu skin expert berpengalaman",
                   ].map(b => (
-                    <li key={b} className="flex items-center gap-2 text-xs" style={{ color: "#555" }}>
-                      <span style={{ color: "#CF99B4" }}>✦</span> {b}
+                    <li key={b} className="flex items-center gap-2 text-xs text-white/60">
+                      <span style={{ color: "#c084fc" }}>✦</span> {b}
                     </li>
                   ))}
                 </ul>
@@ -207,49 +220,56 @@ export default function BookingPage() {
             {/* Right: Form */}
             <div className="grid content-start gap-4">
               <div className="grid gap-1">
-                <h2 className="text-lg font-bold text-[#2a2a2a]">Data Kamu</h2>
-                <p className="text-sm" style={{ color: "#888" }}>Isi data dengan benar agar kami bisa menghubungimu.</p>
+                <h2 className="text-lg font-bold text-white">Data Kamu</h2>
+                <p className="text-sm text-white/40">Isi data dengan benar agar kami bisa menghubungimu.</p>
               </div>
 
-              <div className="rounded-3xl bg-white p-6 shadow-sm" style={{ border: "1.5px solid #f0d8eb" }}>
+              <div
+                className="rounded-3xl p-6"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  backdropFilter: "blur(24px)",
+                }}
+              >
                 <div className="grid gap-3">
                   {[
                     { label: "Nama", value: name, onChange: (v: string) => setName(v), placeholder: "Nama lengkap", type: "text" },
                     { label: "Email", value: email, onChange: (v: string) => setEmail(v), placeholder: "email@contoh.com", type: "email" },
                     { label: "Phone", value: phone, onChange: (v: string) => setPhone(v), placeholder: "+62...", type: "tel" },
                   ].map(f => (
-                    <label key={f.label} className="grid gap-1 text-sm">
-                      <span className="font-semibold text-[#2a2a2a]">{f.label}</span>
+                    <label key={f.label} className="grid gap-1.5 text-sm">
+                      <span className="text-xs font-bold uppercase tracking-widest text-white/50">{f.label}</span>
                       <input
                         type={f.type}
                         value={f.value}
                         onChange={(e) => f.onChange(e.target.value)}
-                        className="rounded-2xl border px-4 py-3 text-[16px] outline-none transition md:text-sm"
-                        style={{ borderColor: "#f0d8eb" }}
-                        onFocus={(e) => { e.currentTarget.style.borderColor = "#78257C"; }}
-                        onBlur={(e) => { e.currentTarget.style.borderColor = "#f0d8eb"; }}
+                        className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition"
+                        style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}
+                        onFocus={(e) => { e.currentTarget.style.border = "1px solid rgba(168,85,247,0.7)"; }}
+                        onBlur={(e) => { e.currentTarget.style.border = "1px solid rgba(255,255,255,0.12)"; }}
                         placeholder={f.placeholder}
                       />
                     </label>
                   ))}
-                  <label className="grid gap-1 text-sm">
-                    <span className="font-semibold text-[#2a2a2a]">Catatan</span>
+                  <label className="grid gap-1.5 text-sm">
+                    <span className="text-xs font-bold uppercase tracking-widest text-white/50">Catatan</span>
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      className="min-h-24 rounded-2xl border px-4 py-3 text-[16px] outline-none transition md:text-sm"
-                      style={{ borderColor: "#f0d8eb" }}
-                      onFocus={(e) => { e.currentTarget.style.borderColor = "#78257C"; }}
-                      onBlur={(e) => { e.currentTarget.style.borderColor = "#f0d8eb"; }}
+                      className="min-h-24 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition"
+                      style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}
+                      onFocus={(e) => { e.currentTarget.style.border = "1px solid rgba(168,85,247,0.7)"; }}
+                      onBlur={(e) => { e.currentTarget.style.border = "1px solid rgba(255,255,255,0.12)"; }}
                       placeholder="Ceritakan kondisi kulit / tujuan..."
                     />
                   </label>
                 </div>
 
                 {selectedSlot && (
-                  <div className="mt-4 rounded-2xl p-4 text-sm" style={{ background: "#FBF0F8", color: "#555" }}>
+                  <div className="mt-4 rounded-xl p-4 text-sm text-white/70" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
                     Slot dipilih:{" "}
-                    <span className="font-semibold" style={{ color: "#78257C" }}>
+                    <span className="font-semibold" style={{ color: "#c084fc" }}>
                       {format(new Date(selectedSlot.startAt), "HH:mm")}–{format(new Date(selectedSlot.endAt), "HH:mm")}
                     </span>
                     {" · "}{selectedDayLabel}
@@ -257,10 +277,10 @@ export default function BookingPage() {
                 )}
 
                 {state.status === "error" && (
-                  <div className="mt-4 text-sm font-semibold text-red-600">{state.message}</div>
+                  <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">{state.message}</div>
                 )}
                 {state.status === "success" && (
-                  <div className="mt-4 rounded-2xl p-4 text-sm" style={{ background: "#f0fdf4", color: "#166534" }}>
+                  <div className="mt-4 rounded-xl p-4 text-sm" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", color: "#86efac" }}>
                     ✅ Booking berhasil! ID: <span className="font-bold">{state.bookingNumber}</span>
                   </div>
                 )}
@@ -269,16 +289,19 @@ export default function BookingPage() {
                   type="button"
                   onClick={submit}
                   disabled={!selectedSlotId || state.status === "submitting" || state.status === "loading"}
-                  className="mt-5 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
-                  style={{ background: "linear-gradient(135deg, #665dac, #78257C)" }}
+                  className="mt-5 inline-flex w-full items-center justify-center rounded-xl px-5 py-3.5 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
+                  style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)", boxShadow: "0 4px 20px rgba(139,92,246,0.35)" }}
                 >
-                  {state.status === "submitting" ? "Memproses..." : "Konfirmasi Booking →"}
+                  {state.status === "submitting" ? "Memproses..." : "Konfirmasi Booking"}
                 </button>
               </div>
 
               {/* Notification note */}
-              <div className="rounded-2xl p-4 text-xs" style={{ background: "#F0EBFA", color: "#665dac", border: "1px solid #ddd6fe" }}>
-                <span className="font-bold">Notifikasi otomatis</span> — konfirmasi Email & WhatsApp dikirim setelah booking berhasil, dan reminder H-1 sebelum jadwal.
+              <div
+                className="rounded-2xl p-4 text-xs text-white/60"
+                style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.15)" }}
+              >
+                <span className="font-bold text-white/80">Notifikasi otomatis</span> — konfirmasi Email & WhatsApp dikirim setelah booking berhasil, dan reminder H-1 sebelum jadwal.
               </div>
             </div>
           </div>

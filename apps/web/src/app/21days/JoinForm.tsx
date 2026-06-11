@@ -104,7 +104,7 @@ export function JoinForm() {
           disabled={!canSubmit}
           className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-8 py-3 text-sm font-extrabold text-white shadow-brand transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {state.status === "submitting" ? "Mengirim..." : "Ikuti Program →"}
+          {state.status === "submitting" ? "Mengirim..." : "Ikuti Program"}
         </button>
 
         <div className="text-center text-xs text-gray-500">

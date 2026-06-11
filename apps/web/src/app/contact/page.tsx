@@ -13,30 +13,31 @@ export default function ContactPage() {
       {/* ── HERO ── */}
       <section
         className="relative overflow-hidden"
-        style={{
-          background: "linear-gradient(135deg, #2a1635 0%, #78257C 55%, #CF99B4 100%)",
-          minHeight: 260,
-        }}
+        style={{ background: "linear-gradient(135deg,#2a1a3e 0%,#4a1a6b 50%,#78257C 100%)" }}
       >
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 25% 55%, white 1px, transparent 1px), radial-gradient(circle at 75% 25%, white 1px, transparent 1px)",
-            backgroundSize: "52px 52px",
-          }}
-        />
-        <div className="relative mx-auto flex min-h-[260px] max-w-4xl flex-col items-center justify-center px-6 py-14 text-center">
-          <span className="mb-4 inline-block rounded-full border border-white/30 bg-white/15 px-5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-white backdrop-blur">
+        <div className="pointer-events-none absolute -top-16 right-0 h-[300px] w-[300px] rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle,#c972bd,transparent 70%)" }} />
+
+        <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center justify-center px-6 py-10 md:px-10 md:py-12 text-center">
+          <span
+            className="mb-3 inline-block rounded-full px-4 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
+            style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}
+          >
             Hubungi Kami
           </span>
-          <h1 className="mb-4 text-3xl font-bold leading-tight text-white md:text-5xl">
-            Kami Siap{" "}
-            <span className="font-light italic">Membantu.</span>
+          <h1 className="mt-3 font-staatliches text-[clamp(2rem,5vw,3.5rem)] font-normal leading-[1.05] text-white">
+            Kami Siap, <span style={{ color: "#e8b4e8" }}>Membantu.</span>
           </h1>
-          <p className="max-w-md text-sm leading-relaxed text-white/80">
+          <p className="mt-2 max-w-md text-[14px] leading-relaxed text-white/60">
             Punya pertanyaan soal produk, rutinitas, atau program mitra? Tim Ginabo siap merespons kamu.
           </p>
+        </div>
+
+        {/* Trust badges strip */}
+        <div className="flex items-center justify-center gap-4 md:gap-6 border-t border-white/10 bg-black/20 px-4 py-2 backdrop-blur-sm">
+          {["✓ Respons Cepat", "✓ Konsultasi Gratis", "✓ Tim Profesional", "✓ Privasi Terjaga"].map(t => (
+            <span key={t} className="text-[11px] font-semibold text-white/80">{t}</span>
+          ))}
         </div>
       </section>
 
@@ -81,7 +82,7 @@ export default function ContactPage() {
                   className="mt-auto rounded-xl py-3 text-center text-sm font-bold text-white transition hover:opacity-90"
                   style={{ background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)" }}
                 >
-                  Chat via WhatsApp →
+                  Chat via WhatsApp
                 </Link>
               </div>
             </div>
@@ -121,7 +122,7 @@ export default function ContactPage() {
                   className="mt-auto rounded-xl py-3 text-center text-sm font-bold text-white transition hover:opacity-90"
                   style={{ background: "linear-gradient(135deg, #665dac 0%, #78257C 100%)" }}
                 >
-                  Kirim Email →
+                  Kirim Email
                 </Link>
               </div>
             </div>
@@ -159,36 +160,13 @@ export default function ContactPage() {
                   Tertarik jadi reseller atau stockist Ginabo?
                 </div>
                 <Link href="/reseller" className="mt-1 inline-flex w-fit items-center gap-1 text-xs font-bold transition hover:opacity-80" style={{ color: "#78257C" }}>
-                  Lihat GPP →
+                  Lihat GPP
                 </Link>
               </div>
             </div>
           </div>
         </div>
       </section>
-
-      {/* ── BOTTOM CTA ── */}
-      <section
-        className="py-14 text-center"
-        style={{ background: "linear-gradient(135deg, #78257C, #BD6CC9)" }}
-      >
-        <div className="mx-auto max-w-xl px-5">
-          <h2 className="mb-3 text-2xl font-bold text-white md:text-3xl">
-            Belum Yakin Harus Mulai dari Mana?
-          </h2>
-          <p className="mb-7 text-sm text-white/80">
-            Booking konsultasi kulit gratis bersama skin expert kami dan temukan rutinitas yang paling cocok.
-          </p>
-          <Link
-            href="/booking"
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 text-sm font-extrabold transition hover:bg-purple-50"
-            style={{ color: "#78257C" }}
-          >
-            Booking Konsultasi Gratis →
-          </Link>
-        </div>
-      </section>
-
     </div>
   );
 }

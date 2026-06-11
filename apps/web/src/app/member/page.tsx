@@ -18,14 +18,77 @@ const tierNext: Record<string, string> = {
   Platinum: "Selamat! Kamu sudah berada di tier tertinggi Ginabo.",
 };
 
+function IconProfile() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+    </svg>
+  );
+}
+function IconOrders() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M8 7h8M8 11h8M8 15h5" />
+    </svg>
+  );
+}
+function IconAddress() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+      <circle cx="12" cy="9" r="2.5" />
+    </svg>
+  );
+}
+function IconReviews() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+function IconWishlist() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+  );
+}
+function IconPoints() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 6v6l4 2" />
+    </svg>
+  );
+}
+function IconReferral() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+    </svg>
+  );
+}
+function IconLogout() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  );
+}
+
 const menuItems = [
-  { id: "profile",   label: "Pengaturan Akun",   icon: "👤" },
-  { id: "orders",    label: "Pesanan Saya",       icon: "📋" },
-  { id: "address",   label: "Alamat Pengiriman",  icon: "📍" },
-  { id: "reviews",   label: "Ulasan",             icon: "💬" },
-  { id: "wishlist",  label: "Wishlist",           icon: "🤍" },
-  { id: "points",    label: "Riwayat Poin",       icon: "🎯" },
-  { id: "referral",  label: "Kode Referral",      icon: "🔗" },
+  { id: "profile",   label: "Pengaturan Akun",   icon: <IconProfile /> },
+  { id: "orders",    label: "Pesanan Saya",       icon: <IconOrders /> },
+  { id: "address",   label: "Alamat Pengiriman",  icon: <IconAddress /> },
+  { id: "reviews",   label: "Ulasan",             icon: <IconReviews /> },
+  { id: "wishlist",  label: "Wishlist",           icon: <IconWishlist /> },
+  { id: "points",    label: "Riwayat Poin",       icon: <IconPoints /> },
+  { id: "referral",  label: "Kode Referral",      icon: <IconReferral /> },
 ];
 
 export default function MemberPage() {
@@ -159,7 +222,7 @@ export default function MemberPage() {
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }`}
                 >
-                  <span className="text-base">{m.icon}</span>
+                  <span className="flex-shrink-0">{m.icon}</span>
                   {m.label}
                 </button>
               ))}
@@ -167,7 +230,7 @@ export default function MemberPage() {
                 onClick={handleLogout}
                 className="mt-4 flex items-center gap-3 rounded-lg px-4 py-3 text-left text-sm text-red-400 transition hover:bg-red-50"
               >
-                <span className="text-base">🚪</span> Keluar
+                <span className="flex-shrink-0"><IconLogout /></span> Keluar
               </button>
             </nav>
           </aside>

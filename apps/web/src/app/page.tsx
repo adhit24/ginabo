@@ -272,68 +272,6 @@ export default function HomePage() {
       <FlashSaleSection />
 
       {/* ════════════════════════════════════════════
-          4. BRAND ESSENCE
-      ════════════════════════════════════════════ */}
-      <section className="overflow-hidden" style={{ background: "#2a2356", minHeight: 580 }}>
-        <div className="flex w-full flex-col md:flex-row" style={{ minHeight: 580 }}>
-
-          <motion.div
-            variants={fadeInLeft}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="flex-shrink-0 md:w-[46%] lg:w-[44%]"
-            style={{ minHeight: 280 }}
-          >
-            <div className="relative h-full" style={{ minHeight: 280 }}>
-              <img src={IMG_STORE} alt="Ginabo Store" className="h-full w-full object-cover" style={{ minHeight: 280 }} />
-            </div>
-          </motion.div>
-
-          <motion.div
-            variants={fadeInRight}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="flex flex-1 flex-col justify-center px-8 py-14 md:px-14 md:py-20 lg:px-20"
-          >
-            <Badge>Brand Essence</Badge>
-
-            <h2 className="mb-6 font-bold leading-tight" style={{ color: "#ffa8f8", fontSize: "clamp(1.8rem,4vw,3rem)" }}>
-              &quot;Cerah yang tetap nyaman.&quot;
-            </h2>
-            <p className="mb-10 text-[14px] leading-[22px] text-justify text-white opacity-90" style={{ maxWidth: 620 }}>
-              GINABO membantu kulitmu tampak lebih cerah dan terawat melalui rutinitas yang nyaman dan konsisten.
-              Bukan skincare instan, tapi perawatan yang bikin kulit terasa nyaman, terawat, dan hasilnya makin konsisten dari waktu ke waktu.
-            </p>
-
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="flex flex-wrap gap-10"
-            >
-              {[
-                { label: "Riset Per Produk",     val: null,  counter: null,                  fallback: "~2 Tahun" },
-                { label: "Usia Mulai Pemakaian", val: null,  counter: { to: 15, suffix: "+" }, fallback: null },
-                { label: "Rutinitas Simpel",     val: "AM/PM", counter: null,                 fallback: null },
-              ].map((s) => (
-                <motion.div key={s.label} variants={cardSlideUp}>
-                  <p className="font-bold leading-[30px]" style={{ color: "#ffa8f8", fontSize: "2rem" }}>
-                    {s.counter
-                      ? <AnimatedCounter to={s.counter.to} suffix={s.counter.suffix} />
-                      : (s.val ?? s.fallback)}
-                  </p>
-                  <p className="font-semibold text-white text-[15px] leading-[20px]">{s.label}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════
           5. PRODUK KAMI
       ════════════════════════════════════════════ */}
       <section className="bg-[#fffafa] pt-14 pb-4 md:pt-20 md:pb-4">
@@ -350,7 +288,7 @@ export default function HomePage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-40px" }}
-            className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+            className="grid grid-cols-2 gap-3 lg:grid-cols-3"
           >
             {products.map((p) => (
               <ProductCard
@@ -388,7 +326,7 @@ export default function HomePage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-40px" }}
-            className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+            className="grid grid-cols-2 gap-3 lg:grid-cols-3"
           >
             {bundles.map((p) => (
               <ProductCard
@@ -411,7 +349,7 @@ export default function HomePage() {
                 href="/shop"
                 className="inline-flex items-center gap-2 rounded-[10px] badge-bg px-8 py-3 text-sm font-bold text-white transition hover:opacity-90"
               >
-                Lihat Semua Produk →
+                Lihat Semua Produk
               </Link>
             </div>
           </Reveal>
@@ -430,7 +368,7 @@ export default function HomePage() {
         <div className="pointer-events-none absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-10"
           style={{ background: "radial-gradient(circle,#c026d3,transparent 70%)" }} />
 
-        <div className="relative mx-auto w-full max-w-5xl px-5 md:px-10">
+        <div className="relative mx-auto w-full max-w-7xl px-5 md:px-10">
 
           {/* Header */}
           <Reveal>
@@ -451,236 +389,142 @@ export default function HomePage() {
             </div>
           </Reveal>
 
-          {/* 4-card grid */}
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-          >
-            {pillars.map((p, i) => (
+          <div className="flex flex-col lg:flex-row gap-10 lg:gap-6 items-center">
+
+            {/* ── Left: Hero Image ── */}
+            <Reveal direction="left" className="w-full lg:w-[50%] flex-shrink-0 lg:-ml-12">
+              <div className="relative rounded-3xl overflow-hidden"
+                style={{ boxShadow: "0 32px 150px rgba(139,92,246,0.35)" }}>
+                <img
+                  src="/studio.png"
+                  alt="Ginabo Studio"
+                  className="w-full h-auto block"
+                />
+                {/* Gradient overlay bottom */}
+                <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+                  style={{ background: "linear-gradient(to top,rgba(15,10,30,0.75),transparent)" }} />
+                {/* Accent border glow */}
+                <div className="absolute inset-0 rounded-3xl pointer-events-none"
+                  style={{ boxShadow: "inset 0 0 0 1px rgba(192,132,252,0.25)" }} />
+              </div>
+            </Reveal>
+
+            {/* ── Right: Cards ── */}
+            <div className="flex-1 min-w-0 lg:-mr-12">
+              {/* 4-card grid */}
               <motion.div
-                key={p.title}
-                variants={cardSlideUp}
-                whileHover={{ y: -6, boxShadow: "0 24px 64px rgba(139,92,246,0.25)" }}
-                className="relative overflow-hidden rounded-2xl p-7 flex flex-col gap-5"
-                style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.10)",
-                  backdropFilter: "blur(20px)",
-                }}
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                className="grid grid-cols-2 gap-4"
               >
-                {/* Top row: number + icon */}
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: "#c084fc" }}>
-                    0{i + 1}
-                  </span>
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl"
-                    style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}>
-                    {p.icon}
-                  </div>
-                </div>
+                {pillars.map((p, i) => (
+                  <motion.div
+                    key={p.title}
+                    variants={cardSlideUp}
+                    whileHover={{ y: -6, boxShadow: "0 24px 64px rgba(139,92,246,0.25)" }}
+                    className="relative overflow-hidden rounded-2xl p-7 flex flex-col gap-5"
+                    style={{
+                      background: "rgba(255,255,255,0.05)",
+                      border: "1px solid rgba(255,255,255,0.10)",
+                      backdropFilter: "blur(20px)",
+                    }}
+                  >
+                    {/* Top row: number + icon */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: "#c084fc" }}>
+                        0{i + 1}
+                      </span>
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl"
+                        style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}>
+                        {p.icon}
+                      </div>
+                    </div>
 
-                {/* Title */}
-                <h3 className="font-staatliches text-white leading-tight text-[clamp(1.5rem,2.8vw,2rem)]">
-                  {p.title}
-                </h3>
+                    {/* Title */}
+                    <h3 className="font-staatliches text-white leading-tight text-[clamp(1.5rem,2.8vw,2rem)]">
+                      {p.title}
+                    </h3>
 
-                {/* Desc */}
-                <p className="text-[13px] leading-relaxed flex-1" style={{ color: "rgba(255,255,255,0.60)" }}>
-                  {p.desc}
-                </p>
+                    {/* Desc */}
+                    <p className="text-[13px] leading-relaxed flex-1" style={{ color: "rgba(255,255,255,0.60)" }}>
+                      {p.desc}
+                    </p>
 
-                {/* Bottom accent line */}
-                <div className="absolute bottom-0 left-0 right-0 h-[2px]"
-                  style={{ background: "linear-gradient(90deg,#8b5cf6,#e879f9,transparent)" }} />
+                    {/* Bottom accent line */}
+                    <div className="absolute bottom-0 left-0 right-0 h-[2px]"
+                      style={{ background: "linear-gradient(90deg,#8b5cf6,#e879f9,transparent)" }} />
+                  </motion.div>
+                ))}
               </motion.div>
-            ))}
-          </motion.div>
+            </div>
+
+          </div>
         </div>
       </section>
 
       {/* ════════════════════════════════════════════
-          8. BRAND CHARACTER — Jika Ginabo Adalah Seseorang
-      ════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden py-20 md:py-28" style={{ background: "linear-gradient(160deg,#fdf4ff 0%,#f5f0ff 50%,#fdf4ff 100%)" }}>
-        {/* Subtle bg blobs */}
-        <div className="pointer-events-none absolute -top-32 -right-32 h-[500px] w-[500px] rounded-full opacity-30"
-          style={{ background: "radial-gradient(circle,#e879f9,transparent 70%)" }} />
-        <div className="pointer-events-none absolute -bottom-24 -left-24 h-[400px] w-[400px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle,#8b5cf6,transparent 70%)" }} />
-
-        <div className="relative mx-auto w-full max-w-5xl px-5 md:px-10">
-
-          {/* Header */}
-          <Reveal>
-            <div className="mb-14 text-center">
-              <span className="mb-4 inline-block rounded-full px-4 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
-                style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}>
-                Brand Character
-              </span>
-              <h2 className="font-staatliches mt-3 text-[clamp(2.4rem,5vw,4rem)] leading-none" style={{ color: "#2a1a4e" }}>
-                Jika Ginabo Adalah{" "}
-                <span style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  Seseorang
-                </span>
-              </h2>
-              <p className="mx-auto mt-4 max-w-md text-[14px] leading-relaxed" style={{ color: "#888" }}>
-                Empat sifat yang mencerminkan kepribadian brand Ginabo dalam setiap produk dan komunikasinya.
-              </p>
-            </div>
-          </Reveal>
-
-          {/* Character cards */}
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-          >
-            {[
-              { title: "Warm",        desc: "Terasa hangat dan mudah didekati, bukan brand yang menghakimi kondisi kulitmu.", color: "#f97316", icon: (
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-              )},
-              { title: "Reliable",    desc: "Riset bertahun-tahun untuk formula yang seimbang antara performa dan kenyamanan.", color: "#8b5cf6", icon: (
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                  <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7L12 2z"/>
-                  <path d="M9 12l2 2 4-4"/>
-                </svg>
-              )},
-              { title: "Trustworthy", desc: "Kami serius di kualitas, karena kulit kamu bukan tempat coba-coba.", color: "#06b6d4", icon: (
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                  <circle cx="12" cy="12" r="10"/>
-                  <path d="M12 8v4l3 3"/>
-                </svg>
-              )},
-              { title: "Clear",       desc: "Komunikasi jujur & realistis. Tidak ada klaim berlebihan seperti \"putih instan\" atau \"1 malam langsung\".", color: "#e879f9", icon: (
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                </svg>
-              )},
-            ].map((c, i) => (
-              <motion.div
-                key={c.title}
-                variants={cardSlideUp}
-                whileHover={{ y: -6, boxShadow: `0 24px 64px ${c.color}44` }}
-                className="relative overflow-hidden rounded-2xl p-7 flex flex-col gap-3"
-                style={{ background: c.color, boxShadow: `0 4px 20px ${c.color}33` }}
-              >
-                {/* Number */}
-                <span className="text-[11px] font-bold uppercase tracking-widest text-white/60">
-                  0{i + 1}
-                </span>
-
-                {/* Title */}
-                <h3 className="font-staatliches text-white text-[clamp(1.6rem,3vw,2rem)] leading-none">
-                  {c.title}
-                </h3>
-
-                {/* Desc */}
-                <p className="text-[13px] leading-relaxed text-white/80">
-                  {c.desc}
-                </p>
-
-                {/* Decorative circle */}
-                <div className="pointer-events-none absolute -bottom-8 -right-8 h-28 w-28 rounded-full bg-white/10" />
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════
-          9. POSITIONING — "Friendly Expert"
-      ════════════════════════════════════════════ */}
-      <section className="overflow-hidden py-16 md:py-24 text-center" style={{ background: "#1e1840" }}>
-        <div className="mx-auto w-full max-w-[1340px] px-5 md:px-10">
-          <Reveal>
-            <div className="flex justify-center mb-8">
-              <Badge>Positioning</Badge>
-            </div>
-          </Reveal>
-
-          <Reveal direction="up" delay={0.1}>
-            <h2 className="font-bold mb-6" style={{ color: "#ffa8f8", fontSize: "clamp(2rem,5vw,3rem)" }}>
-              &quot;Friendly expert.&quot;
-            </h2>
-          </Reveal>
-
-          <Reveal direction="up" delay={0.2}>
-            <p className="mx-auto mb-10 font-semibold text-white text-[clamp(14px,2vw,20px)] leading-[1.7] opacity-90" style={{ maxWidth: 900 }}>
-              Ginabo berbicara seperti teman yang memahami perawatan kulit, bukan seperti sales yang mengejar penjualan.
-              Informatif, not judging. Jujur dan memberikan rasa aman.
-            </p>
-          </Reveal>
-
-          {/* Trait pills */}
-          <Reveal direction="up" delay={0.3}>
-            <div className="flex flex-wrap gap-3 justify-center mb-12">
-              {["Calm & Mature", "Informative", "Not Judging", "Honest"].map((tag) => (
-                <motion.span
-                  key={tag}
-                  whileHover={{ scale: 1.06, backgroundColor: "#6958c0" }}
-                  className="rounded-[10px] px-6 py-2.5 font-semibold text-white text-[15px] cursor-default select-none"
-                  style={{ background: "#4a3662" }}
-                >
-                  {tag}
-                </motion.span>
-              ))}
-            </div>
-          </Reveal>
-
-          {/* CTA */}
-          <Reveal direction="up" delay={0.4}>
-            <div className="flex justify-center">
-              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-                <Link
-                  href="/shop"
-                  className="inline-flex items-center gap-3 rounded-[10px] badge-bg px-8 py-4 font-semibold text-white text-[17px] shadow-lg"
-                >
-                  <img src={IMG_BOTTLE} alt="" className="w-7 h-7 flex-shrink-0" />
-                  Rawat Sekarang
-                </Link>
-              </motion.div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════
-          10. INFO TERKINI (KEEP)
+          10. INFO TERKINI
       ════════════════════════════════════════════ */}
       <section className="bg-[#FDFAFF] py-14 md:py-20">
-        <div className="mx-auto w-full max-w-[1540px] px-5 md:px-10">
-          <SectionLabel>Edukasi & Tips</SectionLabel>
-          <div className="mb-8 flex items-end justify-between">
-            <h2 className="text-2xl font-bold text-brand-900 md:text-3xl">Info & Tips Terkini</h2>
-            <Link href="#" className="text-sm font-semibold text-brand-600 hover:text-brand-800 hover:underline">Lihat Semua →</Link>
-          </div>
+        <div className="mx-auto w-full max-w-7xl px-5 md:px-10">
+          {/* Header */}
+          <Reveal>
+            <div className="mb-12 flex flex-col items-center text-center sm:flex-row sm:items-end sm:justify-between sm:text-left">
+              <div>
+                <span className="mb-3 inline-block rounded-full px-4 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
+                  style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}>
+                  Edukasi & Tips
+                </span>
+                <h2 className="mt-3 font-staatliches text-[clamp(2rem,4vw,3rem)] leading-none" style={{ color: "#2a1a4e" }}>
+                  Info & Tips{" "}
+                  <span style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                    Terkini
+                  </span>
+                </h2>
+              </div>
+              <Link href="#" className="mt-4 text-sm font-semibold transition hover:underline sm:mt-0" style={{ color: "#8b5cf6" }}>
+                Lihat Semua
+              </Link>
+            </div>
+          </Reveal>
+
+          {/* Cards */}
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-40px" }}
-            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
+            className="grid grid-cols-2 gap-5 lg:grid-cols-4"
           >
             {blogPosts.map((post) => (
               <motion.div key={post.title} variants={cardSlideUp}>
-                <Link href="#" className="group flex flex-col overflow-hidden rounded-xl bg-white shadow-brand-sm transition hover:shadow-brand h-full">
+                <Link href="#" className="group flex flex-col overflow-hidden rounded-2xl h-full transition hover:-translate-y-2 hover:shadow-xl"
+                  style={{
+                    background: "linear-gradient(135deg,rgba(139,92,246,0.08),rgba(232,121,249,0.06))",
+                    border: "1px solid rgba(139,92,246,0.15)",
+                    backdropFilter: "blur(12px)",
+                    boxShadow: "0 4px 20px rgba(139,92,246,0.08)",
+                  }}>
+                  {/* Image */}
                   <div className="relative aspect-[16/10] overflow-hidden">
-                    <Image src={post.img} alt={post.title} fill className="object-cover transition duration-500 group-hover:scale-105" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,25vw" />
-                    <span className="absolute left-3 top-3 rounded-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white" style={{ background: "#78257C" }}>{post.tag}</span>
+                    <Image src={post.img} alt={post.title} fill className="object-cover transition duration-500 group-hover:scale-110" sizes="(max-width:640px) 50vw,(max-width:1024px) 50vw,25vw" />
+                    <div className="absolute inset-0" style={{ background: "linear-gradient(to top,rgba(42,26,78,0.5),transparent 50%)" }} />
+                    <span className="absolute left-3 top-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white"
+                      style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}>
+                      {post.tag}
+                    </span>
                   </div>
+                  {/* Body */}
                   <div className="flex flex-1 flex-col gap-2 p-4">
-                    <div className="flex items-center gap-2 text-[11px] text-brand-400">
+                    <div className="flex items-center gap-2 text-[11px]" style={{ color: "#999" }}>
                       <span>{post.date}</span><span>·</span><span>{post.read} read</span>
                     </div>
-                    <div className="text-sm font-semibold leading-snug text-brand-900 transition group-hover:text-brand-600">{post.title}</div>
-                    <div className="mt-auto pt-2 text-xs font-semibold text-brand-500 group-hover:text-brand-700">Baca selengkapnya →</div>
+                    <div className="text-sm font-semibold leading-snug transition group-hover:text-purple-600" style={{ color: "#2a1a4e" }}>{post.title}</div>
+                    <div className="mt-auto pt-2 text-xs font-semibold transition" style={{ color: "#8b5cf6" }}>
+                      <span className="group-hover:underline">Baca selengkapnya</span>
+                    </div>
                   </div>
                 </Link>
               </motion.div>

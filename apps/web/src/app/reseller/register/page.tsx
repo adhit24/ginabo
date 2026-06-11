@@ -80,7 +80,7 @@ export default function ResellerRegisterPage() {
                     href="/shop"
                     className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2a7c78] px-7 py-3 text-sm font-extrabold text-white transition hover:opacity-95"
                   >
-                    Lihat Produk →
+                    Lihat Produk
                   </Link>
                   <Link
                     href="/reseller"
@@ -191,14 +191,14 @@ export default function ResellerRegisterPage() {
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <Link href="/reseller" className="text-sm font-semibold text-[#1e6b68] hover:underline">
-                    ← Kembali ke info program
+                    Kembali ke info program
                   </Link>
                   <button
                     type="submit"
                     disabled={!canSubmit}
                     className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2a7c78] px-8 py-3 text-sm font-extrabold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {state.status === "submitting" ? "Mengirim..." : "Gabung Sekarang →"}
+                    {state.status === "submitting" ? "Mengirim..." : "Gabung Sekarang"}
                   </button>
                 </div>
               </div>

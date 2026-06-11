@@ -63,7 +63,7 @@ export default function Journey21Page() {
                 href="#join"
                 className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-7 py-3 text-sm font-extrabold text-[#78257C] shadow-sm transition hover:bg-purple-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#78257C]"
               >
-                Ikuti Program →
+                Ikuti Program
               </Link>
               <a
                 href={waLink()}
@@ -199,7 +199,7 @@ export default function Journey21Page() {
                   </div>
                   <div className="pt-1">
                     <Link href="/shop" className="text-sm font-semibold text-brand-700 hover:text-brand-800 hover:underline">
-                      Lihat detail produk →
+                      Lihat detail produk
                     </Link>
                   </div>
                 </div>
@@ -359,7 +359,7 @@ export default function Journey21Page() {
                 rel="noreferrer"
                 className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[#25D366] px-6 py-3 text-sm font-extrabold text-white transition hover:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/40 focus-visible:ring-offset-2"
               >
-                Chat WhatsApp →
+                Chat WhatsApp
               </a>
             </div>
           </div>
@@ -381,7 +381,7 @@ export default function Journey21Page() {
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-3.5 text-sm font-extrabold transition hover:bg-purple-50"
             style={{ color: "#78257C" }}
           >
-            Gabung Sekarang →
+            Gabung Sekarang
           </Link>
         </div>
       </section>

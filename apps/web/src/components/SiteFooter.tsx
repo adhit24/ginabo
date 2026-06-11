@@ -13,7 +13,7 @@ export function SiteFooter() {
               {/* Logo */}
               <div className="mb-4">
                 <img
-                  src="https://www.figma.com/api/mcp/asset/e5797810-a867-406f-acef-b33c8d7875be"
+                  src="/l0go.png"
                   alt="Ginabo"
                   className="object-contain"
                   style={{ height: 59 }}
@@ -25,17 +25,23 @@ export function SiteFooter() {
               </p>
               {/* Social icons */}
               <div className="mb-6 flex gap-3">
-                {[
-                  { label: "Instagram", icon: "https://www.figma.com/api/mcp/asset/9d1c7c74-408c-4c1f-8a20-6b0d80ba3254" },
-                  { label: "WhatsApp",  icon: "https://www.figma.com/api/mcp/asset/03017871-7669-40bd-ae8a-2eceb7a36c6c" },
-                  { label: "TikTok",    icon: "https://www.figma.com/api/mcp/asset/e294cac6-66c8-4caf-9272-784cc56564f6" },
-                ].map(s => (
-                  <Link key={s.label} href="#" aria-label={s.label}
-                    className="social-icon flex items-center justify-center overflow-hidden rounded-[5px]"
-                    style={{ background: "#6958bd", width: 38, height: 33 }}>
-                    <img src={s.icon} alt={s.label} style={{ width: 24, height: 24 }} />
-                  </Link>
-                ))}
+                <Link href="#" aria-label="Instagram"
+                  className="social-icon flex items-center justify-center overflow-hidden rounded-[5px]"
+                  style={{ background: "#6958bd", width: 38, height: 33 }}>
+                  <img src="/instagram.png" alt="Instagram" style={{ width: 24, height: 24 }} />
+                </Link>
+                <Link href="#" aria-label="WhatsApp"
+                  className="social-icon flex items-center justify-center overflow-hidden rounded-[5px]"
+                  style={{ background: "#6958bd", width: 38, height: 33 }}>
+                  <img src="/whatsapp.png" alt="WhatsApp" style={{ width: 24, height: 24 }} />
+                </Link>
+                <Link href="#" aria-label="TikTok"
+                  className="social-icon flex items-center justify-center overflow-hidden rounded-[5px]"
+                  style={{ background: "#6958bd", width: 38, height: 33 }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15Z"/>
+                  </svg>
+                </Link>
               </div>
               {/* Email subscribe */}
               <div className="flex overflow-hidden rounded-[10px]" style={{ background: "#4a3b72", width: "100%", maxWidth: 470, height: 44 }}>
@@ -86,13 +92,16 @@ export function SiteFooter() {
           {/* ── Bottom bar ── */}
           <div className="mt-10 flex flex-col items-center justify-end gap-2 md:flex-row">
             <div className="flex items-center gap-2">
-              <img src="https://www.figma.com/api/mcp/asset/a4393ce6-d180-413b-bb3d-a3ca9d9a3c7d" alt="" style={{ width: 16, height: 16 }} />
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M14.83 14.83a4 4 0 1 1 0-5.66" />
+              </svg>
               <span className="font-bold text-white text-[11px]">Ginabo</span>
               <span className="text-white text-[9px]">All Rights Reserved.</span>
             </div>
             <span className="text-white font-bold text-[15px] md:ml-6">Powered by</span>
             <Link href="https://kinaryalokadigital.vercel.app/" target="_blank" rel="noopener noreferrer">
-              <img src="https://www.figma.com/api/mcp/asset/d0c38736-757a-469f-a5b8-5e3e96d096d0" alt="Kinaryaloka Digital" className="object-contain" style={{ height: 31, width: 34 }} />
+              <img src="\k_logo.png" alt="Kinaryaloka Digital" className="object-contain" style={{ height: 31, width: 34 }} />
             </Link>
           </div>
         </div>

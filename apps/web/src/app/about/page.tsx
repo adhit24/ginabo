@@ -436,7 +436,7 @@ export default function AboutPage() {
               className="rounded-xl bg-white px-8 py-3.5 text-sm font-extrabold transition hover:bg-purple-50"
               style={{ color: "#78257C" }}
             >
-              Mulai Rawat Kulitmu →
+              Mulai Rawat Kulitmu
             </Link>
             <Link
               href="/booking"

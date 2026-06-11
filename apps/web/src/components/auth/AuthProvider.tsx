@@ -13,6 +13,12 @@ export interface User {
   joinedAt: string;
 }
 
+interface RegisteredAccount {
+  email: string;
+  password: string;
+  user: User;
+}
+
 interface AuthContextValue {
   user: User | null;
   isLoading: boolean;
@@ -23,16 +29,31 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function mockUser(email: string, name?: string): User {
-  const prefix = name ?? email.split("@")[0];
-  const displayName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+const ACCOUNTS_KEY = "ginabo_accounts";
+
+function getAccounts(): RegisteredAccount[] {
+  try {
+    const raw = localStorage.getItem(ACCOUNTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveAccounts(accounts: RegisteredAccount[]) {
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+}
+
+function createUser(email: string, name: string): User {
+  const now = new Date();
+  const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
   return {
     id: `usr_${Math.random().toString(36).slice(2, 10)}`,
-    name: displayName,
+    name,
     email,
-    tier: "Silver",
-    points: 1250,
-    joinedAt: "Januari 2024",
+    tier: "Regular",
+    points: 100,
+    joinedAt: `${months[now.getMonth()]} ${now.getFullYear()}`,
   };
 }
 
@@ -52,26 +73,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  async function login(email: string, _password: string) {
+  async function login(email: string, password: string) {
     if (!email.includes("@")) {
       return { ok: false, error: "Format email tidak valid." };
     }
-    const u = mockUser(email);
-    localStorage.setItem("ginabo_user", JSON.stringify(u));
-    setUser(u);
+    if (!password) {
+      return { ok: false, error: "Password tidak boleh kosong." };
+    }
+
+    const accounts = getAccounts();
+    const account = accounts.find(
+      a => a.email.toLowerCase() === email.toLowerCase() && a.password === password
+    );
+
+    if (!account) {
+      return { ok: false, error: "Email atau password salah. Silakan coba lagi atau daftar terlebih dahulu." };
+    }
+
+    localStorage.setItem("ginabo_user", JSON.stringify(account.user));
+    setUser(account.user);
     return { ok: true };
   }
 
-  async function signup(name: string, email: string, _password: string) {
+  async function signup(name: string, email: string, password: string) {
     if (!email.includes("@")) {
       return { ok: false, error: "Format email tidak valid." };
     }
     if (!name.trim()) {
       return { ok: false, error: "Nama tidak boleh kosong." };
     }
-    const u = mockUser(email, name);
-    u.points = 100;
-    u.tier = "Regular";
+    if (!password || password.length < 6) {
+      return { ok: false, error: "Password minimal 6 karakter." };
+    }
+
+    const accounts = getAccounts();
+    const exists = accounts.find(a => a.email.toLowerCase() === email.toLowerCase());
+    if (exists) {
+      return { ok: false, error: "Email sudah terdaftar. Silakan login." };
+    }
+
+    const u = createUser(email, name.trim());
+    accounts.push({ email: email.toLowerCase(), password, user: u });
+    saveAccounts(accounts);
+
     localStorage.setItem("ginabo_user", JSON.stringify(u));
     setUser(u);
     return { ok: true };

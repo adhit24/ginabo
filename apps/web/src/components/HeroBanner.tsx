@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -14,7 +14,7 @@ type BannerSlide = {
 
 const banners: BannerSlide[] = [
   {
-    src: "/Banner1.png",
+    src: "/bannnneerr.png",
     alt: "Banner Ginabo 1",
     cta1: { img: "/belanja_sekarang.png", alt: "Belanja Sekarang", href: "/shop" },
     cta2: { img: "/tentang_kami.png",     alt: "Tentang Kami",     href: "/about" },
@@ -84,11 +84,36 @@ export function HeroBanner() {
     return () => clearInterval(t);
   }, [go, paused]);
 
+  // ── Touch swipe ──
+  const touchStart = useRef<number | null>(null);
+  const touchEnd   = useRef<number | null>(null);
+  const MIN_SWIPE  = 50;
+
+  function onTouchStart(e: React.TouchEvent) {
+    touchEnd.current = null;
+    touchStart.current = e.targetTouches[0].clientX;
+  }
+  function onTouchMove(e: React.TouchEvent) {
+    touchEnd.current = e.targetTouches[0].clientX;
+  }
+  function onTouchEnd() {
+    if (touchStart.current === null || touchEnd.current === null) return;
+    const dist = touchStart.current - touchEnd.current;
+    if (Math.abs(dist) >= MIN_SWIPE) {
+      go(dist > 0 ? 1 : -1);
+    }
+    touchStart.current = null;
+    touchEnd.current = null;
+  }
+
   return (
     <section
-      className="relative w-full overflow-hidden select-none [aspect-ratio:4/3] sm:[aspect-ratio:16/7] md:[aspect-ratio:16/6]"
+      className="relative w-full mb-10 sm:mb-12 select-none [aspect-ratio:16/9] sm:[aspect-ratio:16/7] md:[aspect-ratio:16/6]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
       {/* ── Slides ── */}
       <AnimatePresence initial={false} custom={dir} mode="popLayout">
@@ -112,8 +137,7 @@ export function HeroBanner() {
 
           {/* ── CTA overlay: all slides ── */}
           <motion.div
-            className="absolute z-10 flex items-center gap-3 md:gap-4"
-            style={{ bottom: "18%", left: "17%" }}
+            className="absolute z-10 flex items-center gap-3 md:gap-4 bottom-[15%] left-[5%] sm:bottom-[20%] sm:left-[10%] md:bottom-[18%] md:left-[17%]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: BEZIER, delay: 0.3 }}
@@ -131,14 +155,15 @@ export function HeroBanner() {
                   alt={banners[index].cta1.alt}
                   width={220}
                   height={60}
-                  className="h-auto w-[90px] xs:w-[110px] sm:w-[145px] md:w-[185px] lg:w-[210px]"
+                  className="h-auto w-[160px] sm:w-[145px] md:w-[185px] lg:w-[210px]"
                   priority
                 />
               </Link>
             </motion.div>
 
-            {/* Button 2 */}
+            {/* Button 2 — hidden on mobile */}
             <motion.div
+              className="hidden sm:block"
               whileHover={{ scale: 1.06, y: -3 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
@@ -150,7 +175,7 @@ export function HeroBanner() {
                   alt={banners[index].cta2.alt}
                   width={220}
                   height={60}
-                  className="h-auto w-[90px] xs:w-[110px] sm:w-[145px] md:w-[185px] lg:w-[210px]"
+                  className="h-auto sm:w-[145px] md:w-[185px] lg:w-[210px]"
                   priority
                 />
               </Link>
@@ -166,7 +191,7 @@ export function HeroBanner() {
         aria-label="Previous"
         whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.95)" }}
         whileTap={{ scale: 0.92 }}
-        className="absolute left-4 top-1/2 z-10 -translate-y-1/2 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white/75 shadow-lg backdrop-blur-sm transition"
+        className="absolute left-4 top-1/2 z-10 -translate-y-1/2 hidden sm:flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white/75 shadow-lg backdrop-blur-sm transition"
       >
         <svg width="20" height="20" fill="none" stroke="#78257C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
           <path d="M15 18l-6-6 6-6" />
@@ -179,27 +204,37 @@ export function HeroBanner() {
         aria-label="Next"
         whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.95)" }}
         whileTap={{ scale: 0.92 }}
-        className="absolute right-4 top-1/2 z-10 -translate-y-1/2 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white/75 shadow-lg backdrop-blur-sm transition"
+        className="absolute right-4 top-1/2 z-10 -translate-y-1/2 hidden sm:flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white/75 shadow-lg backdrop-blur-sm transition"
       >
         <svg width="20" height="20" fill="none" stroke="#78257C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
           <path d="M9 18l6-6-6-6" />
         </svg>
       </motion.button>
 
-      {/* ── Dot indicators ── */}
-      <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 flex items-center gap-2">
+      {/* ── Dot indicators (glassmorphic) ── */}
+      <div
+        className="absolute -bottom-8 left-1/2 z-20 -translate-x-1/2 flex items-center gap-2.5 rounded-full px-4 py-2.5"
+        style={{
+          background: "rgba(20,5,40,0.7)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          border: "1px solid rgba(255,255,255,0.15)",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+        }}
+      >
         {banners.map((_, i) => (
           <motion.button
             key={i}
             onClick={() => goTo(i)}
             aria-label={`Slide ${i + 1}`}
             animate={{
-              width: i === index ? 28 : 8,
-              backgroundColor: i === index ? "#78257C" : "rgba(255,255,255,0.7)",
+              width: i === index ? 28 : 10,
+              backgroundColor: i === index ? "#a855f7" : "rgba(255,255,255,0.5)",
+              boxShadow: i === index ? "0 0 10px rgba(168,85,247,0.6)" : "none",
             }}
             transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
-            className="h-2 rounded-full shadow"
-            style={{ minWidth: 8 }}
+            className="h-2.5 rounded-full"
+            style={{ minWidth: 10 }}
           />
         ))}
       </div>

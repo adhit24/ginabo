@@ -59,7 +59,7 @@ export default function AdminCustomerProfilePage({ params }: { params: { id: str
     return (
       <div className="grid gap-4">
         <Link href="/admin/customers" className="text-sm font-semibold text-brand-700 hover:text-brand-800">
-          ← Back
+          Back
         </Link>
         <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-700">{state.message}</div>
       </div>
@@ -73,7 +73,7 @@ export default function AdminCustomerProfilePage({ params }: { params: { id: str
   return (
     <div className="grid gap-6">
       <Link href="/admin/customers" className="text-sm font-semibold text-brand-700 hover:text-brand-800">
-        ← Back
+        Back
       </Link>
       <div className="rounded-3xl border border-gray-100 bg-white p-6">
         <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">Customer</div>

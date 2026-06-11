@@ -29,7 +29,7 @@ export default async function OrderConfirmationPage({ params }: { params: { orde
         <div className="text-sm font-semibold text-gray-900">Order belum bisa ditampilkan</div>
         <div className="mt-2 text-sm text-gray-600">Database belum terhubung/jalan. UI tetap bisa kamu cek tanpa data order.</div>
         <Link href="/shop" className="mt-3 inline-flex text-sm font-semibold text-brand-700 hover:text-brand-800">
-          Kembali ke Shop →
+          Kembali ke Shop
         </Link>
       </div>
     );
