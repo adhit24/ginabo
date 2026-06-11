@@ -1,0 +1,7 @@
+/shop/*
+  Cloudflare-CDN-Cache-Control: public, max-age=3600
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/shop
+  Cloudflare-CDN-Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=300, stale-while-revalidate=3600
