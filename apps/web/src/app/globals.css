@@ -60,3 +60,12 @@ h1, h2, h3, h4, h5, h6 {
 a {
   color: var(--color-link);
 }
+
+@keyframes marquee-x {
+  from { transform: translateX(0) }
+  to   { transform: translateX(-50%) }
+}
+
+.animate-marquee {
+  animation: marquee-x 28s linear infinite;
+}

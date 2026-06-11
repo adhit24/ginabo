@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SkinTypeSection } from "@/components/SkinTypeSection";
+import { HomeBannerCarousel } from "@/components/HomeBannerCarousel";
 
 const products = [
   {
@@ -88,57 +89,28 @@ export default function HomePage() {
   return (
     <div>
 
-      {/* ── 1. HERO ── */}
-      <section className="relative overflow-hidden bg-brand-900" style={{minHeight: "420px"}}>
-        <div className="absolute inset-0">
-          <Image
-            src="/hero/hero-woman.jpg"
-            alt="Ginabo hero"
-            fill
-            className="object-cover object-right"
-            priority
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-900/85 via-brand-900/65 to-brand-900/20" />
-        </div>
+      {/* ── 1. BANNER CAROUSEL ── */}
+      <HomeBannerCarousel
+        slides={[
+          { src: "/hero/slide-1.png", alt: "Beauty Timeline Promo Ginabo", href: "/shop" },
+          { src: "/hero/slide-2.png", alt: "Extra Voucher Ginabo", href: "/shop" },
+        ]}
+        className="-mx-4 -mt-6 overflow-hidden md:-mx-6 md:-mt-10"
+        aspectClassName="relative aspect-[16/7] w-full md:aspect-[16/5]"
+        imageClassName="object-cover"
+      />
 
-        <div className="relative flex min-h-[420px] flex-col justify-center px-5 py-14 md:min-h-[500px] md:grid md:grid-cols-12 md:items-center md:px-12 md:py-20 mx-auto w-full max-w-8xl">
-          <div className="md:col-span-6">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-semibold tracking-[0.15em] text-white/90 backdrop-blur">
-              BARRIER-FIRST · DAILY · TRUST-BASED
-            </div>
-            <h1 className="text-[2rem] font-extrabold leading-[1.1] text-white md:text-5xl">
-              Kulit Sehat<br />
-              Dimulai dari<br />
-              Rutinitas yang<br />
-              Tepat
-            </h1>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/80 md:max-w-sm">
-              Ginabo hadir untuk membantu kamu merawat kulit dengan cara yang sederhana, konsisten, dan aman untuk pemakaian harian.
-            </p>
-            <div className="mt-6 flex gap-3">
-              <Link
-                href="/shop"
-                className="inline-flex flex-1 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-bold text-brand-800 shadow-sm transition hover:bg-brand-50 md:flex-none md:px-7"
-              >
-                Belanja Sekarang
-              </Link>
-              <Link
-                href="/about"
-                className="inline-flex flex-1 items-center justify-center rounded-xl border border-white/40 bg-transparent px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10 md:flex-none md:px-7"
-              >
-                Tentang Kami
-              </Link>
-            </div>
-          </div>
+      {/* ── 2. MARQUEE STRIP ── */}
+      <div className="-mx-4 overflow-hidden bg-brand-700 md:-mx-6" aria-hidden>
+        <div className="animate-marquee flex whitespace-nowrap py-2.5">
+          {(["No Parabens", "Barrier-First", "Gentle Formula", "Dermatologist Tested", "BPOM Registered", "Cruelty Free",
+             "No Parabens", "Barrier-First", "Gentle Formula", "Dermatologist Tested", "BPOM Registered", "Cruelty Free"]).map((text, i) => (
+            <span key={i} className="flex shrink-0 items-center gap-3 px-5 text-[11px] font-bold tracking-[0.15em] text-white/90">
+              {text} <span className="text-white/40">✦</span>
+            </span>
+          ))}
         </div>
-
-        {/* Dots indicator */}
-        <div className="absolute bottom-4 inset-x-0 flex justify-center gap-2">
-          <span className="h-1.5 w-5 rounded-full bg-white/80" />
-          <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
-        </div>
-      </section>
+      </div>
 
       {/* ── 3. CUSTOMER FAVORITE ── */}
       <section className="bg-brand-50 py-10 md:py-20">
