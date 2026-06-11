@@ -44,8 +44,7 @@ export function HeroBanner() {
 
   return (
     <section
-      className="relative w-full overflow-hidden select-none"
-      style={{ aspectRatio: "16/5" }}
+      className="relative w-full overflow-hidden select-none aspect-[16/9] md:aspect-[16/5]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={onTouchStart}

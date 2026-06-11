@@ -15,29 +15,18 @@ const announcements = [
 ];
 
 const shopMenu = [
-  {
-    label: "Skincare",
-    items: ["Serum", "Moisturizer", "Cleanser", "Toner", "Sunscreen"],
-    hrefs: ["/shop?cat=serum", "/shop?cat=moisturizer", "/shop?cat=cleanser", "/shop?cat=toner", "/shop?cat=sunscreen"],
-  },
-  {
-    label: "Bodycare",
-    items: ["Body Lotion", "Body Wash", "Body Serum"],
-    hrefs: ["/shop?cat=body-lotion", "/shop?cat=body-wash", "/shop?cat=body-serum"],
-  },
-  {
-    label: "Koleksi",
-    items: ["New Arrival", "Best Sellers", "Bundling"],
-    hrefs: ["/shop?col=new", "/shop?col=bestseller", "/shop?col=bundling"],
-  },
+  { label: "Semua Produk",  href: "/shop" },
+  { label: "New Arrival",   href: "/shop?col=new" },
+  { label: "Best Sellers",  href: "/shop?col=bestseller" },
+  { label: "Bundling",      href: "/shop?col=bundling" },
 ];
 
 const infoMenu = [
-  { label: "FAQ",             href: "/faq" },
-  { label: "Kontak Kami",     href: "/contact" },
-  { label: "Jadi Reseller",   href: "/reseller" },
-  { label: "Syarat & Ketentuan", href: "/terms" },
-  { label: "Kebijakan Privasi", href: "/privacy" },
+  { label: "FAQ",                  href: "/faq" },
+  { label: "Kontak Kami",          href: "/contact" },
+  { label: "Jadi Reseller",        href: "/reseller" },
+  { label: "Syarat & Ketentuan",   href: "/terms" },
+  { label: "Kebijakan Privasi",    href: "/privacy" },
 ];
 
 export function SiteHeader() {
@@ -114,33 +103,20 @@ export function SiteHeader() {
               </button>
 
               {shopOpen && (
-                <div className="absolute left-0 top-full z-50 mt-0 w-[480px] rounded-b-[5px] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-[#f0f0f0] border-t-0">
-                  <div className="grid grid-cols-3 gap-0 p-5">
-                    {shopMenu.map((group) => (
-                      <div key={group.label}>
-                        <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-[#78257C]">{group.label}</p>
-                        <ul className="flex flex-col gap-1.5">
-                          {group.items.map((item, idx) => (
-                            <li key={item}>
-                              <Link
-                                href={group.hrefs[idx]}
-                                onClick={() => setShopOpen(false)}
-                                className="text-[13px] text-[#808080] transition hover:text-[#78257C]"
-                              >
-                                {item}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                <div className="absolute left-0 top-full z-50 mt-0 w-48 rounded-b-[5px] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-[#f0f0f0] border-t-0">
+                  <ul className="flex flex-col py-2">
+                    {shopMenu.map((item) => (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setShopOpen(false)}
+                          className="block px-5 py-2.5 text-[13px] text-[#808080] transition hover:bg-[#fdf5ff] hover:text-[#78257C]"
+                        >
+                          {item.label}
+                        </Link>
+                      </li>
                     ))}
-                  </div>
-                  <div className="border-t border-[#f5f5f5] px-5 py-3">
-                    <Link href="/shop" onClick={() => setShopOpen(false)}
-                      className="text-[12px] font-semibold text-[#78257C] hover:underline">
-                      Lihat Semua Produk →
-                    </Link>
-                  </div>
+                  </ul>
                 </div>
               )}
             </div>
@@ -176,9 +152,6 @@ export function SiteHeader() {
               )}
             </div>
 
-            <Link href="/campaign" className="px-4 py-2 text-[13px] font-semibold text-[#303030] transition hover:text-[#78257C]">
-              Campaign
-            </Link>
           </div>
 
           {/* Center: Logo */}
@@ -335,21 +308,12 @@ export function SiteHeader() {
             <nav className="flex flex-col flex-1 overflow-y-auto">
               <div className="border-b border-[#f5f5f5] py-3 px-5">
                 <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-[#78257C]">Produk</p>
-                {shopMenu.map((group) => (
-                  <div key={group.label} className="mb-3">
-                    <p className="mb-1 text-[11px] font-semibold uppercase text-[#aaa]">{group.label}</p>
-                    {group.items.map((item, idx) => (
-                      <Link key={item} href={group.hrefs[idx]} onClick={() => setDrawerOpen(false)}
-                        className="block py-1.5 text-[14px] text-[#303030] hover:text-[#78257C]">
-                        {item}
-                      </Link>
-                    ))}
-                  </div>
+                {shopMenu.map((item) => (
+                  <Link key={item.href} href={item.href} onClick={() => setDrawerOpen(false)}
+                    className="block py-1.5 text-[14px] text-[#303030] hover:text-[#78257C]">
+                    {item.label}
+                  </Link>
                 ))}
-                <Link href="/shop" onClick={() => setDrawerOpen(false)}
-                  className="text-[13px] font-semibold text-[#78257C]">
-                  Lihat Semua →
-                </Link>
               </div>
 
               <div className="border-b border-[#f5f5f5] py-3 px-5">
@@ -363,10 +327,6 @@ export function SiteHeader() {
               </div>
 
               <div className="py-3 px-5">
-                <Link href="/campaign" onClick={() => setDrawerOpen(false)}
-                  className="block py-1.5 text-[14px] text-[#303030] hover:text-[#78257C]">
-                  Campaign
-                </Link>
                 <Link href="/booking" onClick={() => setDrawerOpen(false)}
                   className="block py-1.5 text-[14px] text-[#303030] hover:text-[#78257C]">
                   Konsultasi
