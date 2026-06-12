@@ -138,22 +138,48 @@ export function SiteFooter() {
         <div className="border-t border-white/10 py-5 px-5 md:px-10">
           <div className="mx-auto max-w-7xl flex flex-col gap-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] text-white/40 mr-1">Pembayaran:</span>
-              {paymentIcons.map(p => (
-                <span key={p}
-                  className="rounded-[3px] px-2 py-0.5 text-[10px] font-bold text-white/70"
-                  style={{ background: "rgba(255,255,255,0.1)" }}>
-                  {p}
+              <span className="text-[11px] text-white/40 mr-1 flex-shrink-0">Pembayaran:</span>
+              {paymentLogos.map(p => (
+                <span key={p.name}
+                  className="flex items-center justify-center bg-white rounded-[4px] overflow-hidden"
+                  style={{ width: 44, height: 28 }}>
+                  <img
+                    src={p.src}
+                    alt={p.name}
+                    loading="lazy"
+                    className="object-contain"
+                    style={{ width: 36, height: 22 }}
+                    onError={(e) => {
+                      const t = e.currentTarget;
+                      t.style.display = "none";
+                      const fb = t.nextElementSibling as HTMLElement | null;
+                      if (fb) fb.style.display = "block";
+                    }}
+                  />
+                  <span className="hidden text-[8px] font-bold text-gray-600 px-1 leading-tight text-center">{p.name}</span>
                 </span>
               ))}
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] text-white/40 mr-1">Pengiriman:</span>
-              {shippingIcons.map(s => (
-                <span key={s}
-                  className="rounded-[3px] px-2 py-0.5 text-[10px] font-bold text-white/70"
-                  style={{ background: "rgba(255,255,255,0.1)" }}>
-                  {s}
+              <span className="text-[11px] text-white/40 mr-1 flex-shrink-0">Pengiriman:</span>
+              {shippingLogos.map(s => (
+                <span key={s.name}
+                  className="flex items-center justify-center bg-white rounded-[4px] overflow-hidden"
+                  style={{ width: 52, height: 28 }}>
+                  <img
+                    src={s.src}
+                    alt={s.name}
+                    loading="lazy"
+                    className="object-contain"
+                    style={{ width: 44, height: 22 }}
+                    onError={(e) => {
+                      const t = e.currentTarget;
+                      t.style.display = "none";
+                      const fb = t.nextElementSibling as HTMLElement | null;
+                      if (fb) fb.style.display = "block";
+                    }}
+                  />
+                  <span className="hidden text-[8px] font-bold text-gray-600 px-1 leading-tight text-center">{s.name}</span>
                 </span>
               ))}
             </div>
