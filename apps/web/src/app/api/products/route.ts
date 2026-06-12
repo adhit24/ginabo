@@ -1,7 +1,5 @@
-export const runtime = 'edge';
-
 import { jsonError, jsonOk } from "@/lib/http";
-import { listActiveProducts } from "@/lib/catalog";
+import { listActiveProducts, type CatalogProduct } from "@/lib/catalog";
 
 export async function GET() {
   try {
