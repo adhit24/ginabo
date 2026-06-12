@@ -1,3 +1,4 @@
+// @ts-nocheck — legacy Cloudflare D1 client, no longer used (replaced by Supabase)
 import { getRequestContext } from "@cloudflare/next-on-pages";
 
 type D1Row = Record<string, unknown>;
