@@ -9,7 +9,7 @@ import {
 } from '@/lib/midtrans'
 import { createAdminClient } from '@/lib/supabase/server'
 import type { MidtransNotification } from '@/types/midtrans'
-import type { OrderStatus, PaymentStatus } from '@/types/database'
+import type { OrderStatus, PaymentStatus, OrderItemRow, ProductVariantRow, ProductRow } from '@/types/database'
 
 // ─── Status mapping ───────────────────────────────────────────────────────────
 
@@ -21,7 +21,7 @@ function resolveOrderStatus(
     return fraudStatus === 'accept' || !fraudStatus ? 'paid' : null
   }
   if (transactionStatus === 'settlement') return 'paid'
-  if (transactionStatus === 'pending') return 'pending_payment'
+  if (transactionStatus === 'pending') return 'pending'
   if (['deny', 'cancel', 'expire', 'failure'].includes(transactionStatus)) return 'cancelled'
   return null
 }
@@ -62,32 +62,37 @@ export async function POST(req: NextRequest) {
   const orderNumber = notification.order_id // Midtrans order_id = our order_number
 
   // 3. Fetch order
-  const { data: order, error: orderFetchError } = await admin
+  const { data: rawOrder, error: orderFetchError } = await admin
     .from('orders')
     .select('id, status, user_id')
-    .eq('order_number', orderNumber)
+    .eq('order_number', orderNumber as never)
     .single()
 
-  if (orderFetchError || !order) {
+  if (orderFetchError || !rawOrder) {
     console.error('[webhook] Order not found for order_number:', orderNumber)
     return ok()
   }
 
+  const order = rawOrder as Pick<OrderRow, 'id' | 'status' | 'user_id'>
+
   // 4. Update payment row
-  const paymentUpdate = {
-    midtrans_transaction_id: notification.transaction_id,
-    payment_type: notification.payment_type,
-    status: resolvePaymentStatus(notification.transaction_status, notification.fraud_status),
-    gross_amount: parseFloat(notification.gross_amount),
-    fraud_status: notification.fraud_status ?? null,
-    settlement_time: notification.settlement_time ?? null,
-    raw_response: notification as unknown as Record<string, unknown>,
-  }
+  const paymentStatus = resolvePaymentStatus(
+    notification.transaction_status,
+    notification.fraud_status,
+  )
 
   await admin
     .from('payments')
-    .update(paymentUpdate)
-    .eq('midtrans_order_id', orderNumber)
+    .update({
+      midtrans_transaction_id: notification.transaction_id,
+      payment_type: notification.payment_type,
+      status: paymentStatus,
+      gross_amount: parseFloat(notification.gross_amount),
+      fraud_status: notification.fraud_status ?? null,
+      settlement_time: notification.settlement_time ?? null,
+      raw_response: notification as unknown as Record<string, unknown>,
+    } as never)
+    .eq('midtrans_order_id', orderNumber as never)
 
   // 5. Resolve new order status
   const newOrderStatus = resolveOrderStatus(
@@ -95,15 +100,13 @@ export async function POST(req: NextRequest) {
     notification.fraud_status,
   )
 
-  if (!newOrderStatus || newOrderStatus === order.status) {
-    return ok()
-  }
+  if (!newOrderStatus || newOrderStatus === order.status) return ok()
 
   // 6. Update order status
   const { error: orderUpdateError } = await admin
     .from('orders')
-    .update({ status: newOrderStatus })
-    .eq('id', order.id)
+    .update({ status: newOrderStatus } as never)
+    .eq('id', order.id as never)
 
   if (orderUpdateError) {
     console.error('[webhook] Failed to update order status:', orderUpdateError.message)
@@ -126,49 +129,52 @@ async function handlePaymentSucceeded(
   orderNumber: string,
   admin: Awaited<ReturnType<typeof createAdminClient>>,
 ) {
-  await decrementStock(orderId, admin)
-  await createOrderNotification(userId, orderNumber, admin)
+  await Promise.allSettled([
+    decrementStock(orderId, admin),
+    createOrderNotification(userId, orderNumber, admin),
+  ])
 }
 
 async function decrementStock(
   orderId: string,
   admin: Awaited<ReturnType<typeof createAdminClient>>,
 ) {
-  const { data: items } = await admin
+  const { data: rawItems } = await admin
     .from('order_items')
     .select('product_id, variant_id, quantity')
-    .eq('order_id', orderId)
+    .eq('order_id', orderId as never)
 
-  if (!items) return
+  if (!rawItems) return
+  const items = rawItems as Pick<OrderItemRow, 'product_id' | 'variant_id' | 'quantity'>[]
 
   for (const item of items) {
     if (item.variant_id) {
-      // Decrement variant stock
-      const { data: variant } = await admin
+      const { data: rawVariant } = await admin
         .from('product_variants')
         .select('stock')
-        .eq('id', item.variant_id)
+        .eq('id', item.variant_id as never)
         .single()
 
-      if (variant) {
+      if (rawVariant) {
+        const variant = rawVariant as Pick<ProductVariantRow, 'stock'>
         await admin
           .from('product_variants')
-          .update({ stock: Math.max(0, variant.stock - item.quantity) })
-          .eq('id', item.variant_id)
+          .update({ stock: Math.max(0, variant.stock - item.quantity) } as never)
+          .eq('id', item.variant_id as never)
       }
     } else {
-      // Decrement product stock
-      const { data: product } = await admin
+      const { data: rawProduct } = await admin
         .from('products')
         .select('stock')
-        .eq('id', item.product_id)
+        .eq('id', item.product_id as never)
         .single()
 
-      if (product) {
+      if (rawProduct) {
+        const product = rawProduct as Pick<ProductRow, 'stock'>
         await admin
           .from('products')
-          .update({ stock: Math.max(0, product.stock - item.quantity) })
-          .eq('id', item.product_id)
+          .update({ stock: Math.max(0, product.stock - item.quantity) } as never)
+          .eq('id', item.product_id as never)
       }
     }
   }
@@ -188,7 +194,7 @@ async function createOrderNotification(
     metadata: { order_number: orderNumber } as Record<string, unknown>,
     sent_at: null,
     read_at: null,
-  })
+  } as never)
 }
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
