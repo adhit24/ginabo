@@ -4,9 +4,12 @@
 // Loaded dynamically so the Snap.js script only runs client-side.
 
 import { useEffect, useRef, useState } from 'react'
-import { isMidtransProduction } from '@/lib/midtrans'
 
-const SNAP_JS_URL = isMidtransProduction
+// Derive Snap URL from the public client key environment variable.
+// NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION should be "true" in production.
+const IS_PRODUCTION = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === 'true'
+
+const SNAP_JS_URL = IS_PRODUCTION
   ? 'https://app.midtrans.com/snap/snap.js'
   : 'https://app.sandbox.midtrans.com/snap/snap.js'
 
