@@ -118,6 +118,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
     tax_amount: number
     total_amount: number
     shipping_provider: string | null
+    shipping_courier: string | null
     tracking_number: string | null
     created_at: string
     shipping_address: AddressRecord | null
