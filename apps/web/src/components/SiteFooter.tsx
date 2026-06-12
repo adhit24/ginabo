@@ -137,25 +137,25 @@ export function SiteFooter() {
         {/* ── Payment & Shipping ── */}
         <div className="border-t border-white/10 py-5 px-5 md:px-10">
           <div className="mx-auto max-w-7xl flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-[11px] text-white/40 mr-1 flex-shrink-0">Pembayaran:</span>
               {paymentLogos.map(p => (
                 <span key={p.name}
-                  className="flex items-center gap-1 px-2 rounded-[4px]"
-                  style={{ background: p.bg, height: 26 }}>
-                  <img src={p.src} alt="" loading="lazy" className="rounded-sm flex-shrink-0" style={{ width: 14, height: 14 }} />
-                  <span className="text-[9px] font-bold text-white whitespace-nowrap">{p.name}</span>
+                  className="flex items-center justify-center rounded-[5px] overflow-hidden flex-shrink-0"
+                  style={{ background: "#ffffff", height: 28, padding: "4px 8px" }}>
+                  <img src={p.src} alt={p.name} loading="lazy"
+                    style={{ height: 18, width: "auto", maxWidth: 76, objectFit: "contain", display: "block" }} />
                 </span>
               ))}
             </div>
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-[11px] text-white/40 mr-1 flex-shrink-0">Pengiriman:</span>
               {shippingLogos.map(s => (
                 <span key={s.name}
-                  className="flex items-center gap-1 px-2 rounded-[4px]"
-                  style={{ background: s.bg, height: 26 }}>
-                  <img src={s.src} alt="" loading="lazy" className="rounded-sm flex-shrink-0" style={{ width: 14, height: 14 }} />
-                  <span className="text-[9px] font-bold text-white whitespace-nowrap">{s.name}</span>
+                  className="flex items-center justify-center rounded-[5px] overflow-hidden flex-shrink-0"
+                  style={{ background: "#ffffff", height: 28, padding: "4px 8px" }}>
+                  <img src={s.src} alt={s.name} loading="lazy"
+                    style={{ height: 18, width: "auto", maxWidth: 76, objectFit: "contain", display: "block" }} />
                 </span>
               ))}
             </div>
