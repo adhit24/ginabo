@@ -322,10 +322,10 @@ export default function ResellerProgramPage() {
             <div className="overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-sm">
               <div className="relative aspect-[4/5]">
                 <Image
-                  src="/product-bundle.png"
-                  alt="Ginabo Products"
+                  src="/resellerprogram.png"
+                  alt="Ginabo Partner Program"
                   fill
-                  className="object-cover"
+                  className="object-cover object-top"
                   sizes="(max-width:768px) 90vw, 380px"
                 />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(45,10,94,0.75) 0%, transparent 55%)" }} />
