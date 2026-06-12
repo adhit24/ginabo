@@ -50,7 +50,7 @@ export async function createServerSupabaseClient() {
  * Bypasses RLS — use only in trusted server contexts (cron jobs, webhooks, admin APIs).
  * NEVER expose this client to the browser or pass it to client components.
  */
-export async function createAdminClient() {
+export function createAdminClient() {
   const url = getRequiredEnv('NEXT_PUBLIC_SUPABASE_URL')
   const serviceKey = getRequiredEnv('SUPABASE_SERVICE_ROLE_KEY')
 
