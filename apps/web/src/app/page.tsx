@@ -208,57 +208,84 @@ export default function HomePage() {
 
       {/* ════════════════════════════════════════════
           1b. FEATURE CARDS (SkinCheck / Reseller / Halal+BPOM)
+          Layout: 2:2:1 mirroring Somethinc-style feature card strip
       ════════════════════════════════════════════ */}
       <div className="w-full md:px-5 lg:px-8 xl:px-10 md:pb-4">
-        <div className="grid grid-cols-3 divide-x divide-[#f0e6f6] bg-white md:rounded-b-2xl shadow-sm md:shadow-md overflow-hidden">
-          {[
-            {
-              href: "/skincheck",
-              icon: (
-                <svg width="26" height="26" fill="none" stroke="#78257C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                  <path d="M11 8v6M8 11h6"/>
+        <div className="grid grid-cols-3 md:grid-cols-5 overflow-hidden md:rounded-b-2xl shadow-sm md:shadow-md">
+
+          {/* Card 1 — Cek Kulitmu */}
+          <a href="/skincheck"
+            className="relative col-span-1 md:col-span-2 flex items-end overflow-hidden min-h-[100px] md:min-h-[152px] group"
+            style={{ background: "linear-gradient(135deg,#b67ef8 0%,#7c3aed 100%)" }}
+          >
+            <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-white/10 pointer-events-none" />
+            <div className="absolute top-2 right-3 md:right-5 opacity-[0.15] group-hover:opacity-25 transition-opacity duration-300 pointer-events-none">
+              <svg width="70" height="70" fill="none" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v6M8 11h6"/>
+              </svg>
+            </div>
+            <div className="relative z-10 p-3 md:p-6 pb-3 md:pb-6">
+              <p className="text-white/60 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5 md:mb-1 hidden sm:block">Gratis · AI Powered</p>
+              <p className="text-white font-bold text-[13px] md:text-[20px] leading-tight">Cek<br/>Kulitmu</p>
+              <div className="mt-1 md:mt-2 hidden md:flex items-center gap-1.5 text-white/75 text-[11px] font-semibold">
+                <span>Mulai Analisis</span>
+                <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
-              ),
-              label: "Cek Kulitmu",
-              sub: "Analisis AI",
-            },
-            {
-              href: "/reseller",
-              icon: (
-                <svg width="26" height="26" fill="none" stroke="#78257C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-              ),
-              label: "Jadi Reseller",
-              sub: "Keuntungan Eksklusif",
-            },
-            {
-              href: "/about",
-              icon: (
-                <svg width="26" height="26" fill="none" stroke="#78257C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                  <path d="m9 12 2 2 4-4"/>
-                </svg>
-              ),
-              label: "Halal & BPOM",
-              sub: "Sudah Tersertifikasi",
-            },
-          ].map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className="flex flex-col items-center gap-1.5 px-3 py-4 md:flex-row md:gap-3 md:px-6 md:py-5 transition hover:bg-[#fdf5ff] group"
-            >
-              <div className="flex-shrink-0 opacity-80 group-hover:opacity-100 transition">{item.icon}</div>
-              <div className="text-center md:text-left">
-                <p className="text-[12px] md:text-[14px] font-bold text-[#303030] group-hover:text-[#78257C] transition leading-tight">{item.label}</p>
-                <p className="hidden md:block mt-0.5 text-[11px] text-[#999] leading-snug">{item.sub}</p>
               </div>
-            </a>
-          ))}
+            </div>
+          </a>
+
+          {/* Card 2 — Jadi Reseller */}
+          <a href="/reseller"
+            className="relative col-span-1 md:col-span-2 flex items-end overflow-hidden min-h-[100px] md:min-h-[152px] group border-l border-white/25"
+            style={{ background: "linear-gradient(135deg,#e879f9 0%,#be3ab4 100%)" }}
+          >
+            <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-white/10 pointer-events-none" />
+            <div className="absolute top-2 right-3 md:right-5 opacity-[0.15] group-hover:opacity-25 transition-opacity duration-300 pointer-events-none">
+              <svg width="70" height="70" fill="none" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div className="relative z-10 p-3 md:p-6 pb-3 md:pb-6">
+              <p className="text-white/60 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5 md:mb-1 hidden sm:block">Komisi s/d 30%</p>
+              <p className="text-white font-bold text-[13px] md:text-[20px] leading-tight">Jadi<br/>Reseller</p>
+              <div className="mt-1 md:mt-2 hidden md:flex items-center gap-1.5 text-white/75 text-[11px] font-semibold">
+                <span>Daftar Gratis</span>
+                <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </div>
+          </a>
+
+          {/* Card 3 — Halal & BPOM */}
+          <a href="/about"
+            className="col-span-1 md:col-span-1 flex flex-col items-center justify-center gap-2 md:gap-3 py-3 px-2 bg-white border-l border-[#ede5f8] hover:bg-[#fdf5ff] transition-colors duration-200 min-h-[100px] md:min-h-[152px]"
+          >
+            <div className="flex flex-col items-center gap-0.5">
+              <svg width="18" height="18" fill="none" stroke="#78257C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>
+              </svg>
+              <span className="text-[8px] md:text-[10px] font-bold text-[#4a1466] tracking-wide">HALAL</span>
+            </div>
+            <div className="w-5 h-px bg-[#e8d5f5]" />
+            <div className="flex flex-col items-center gap-0.5">
+              <svg width="18" height="18" fill="none" stroke="#78257C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+              </svg>
+              <span className="text-[8px] md:text-[10px] font-bold text-[#4a1466] tracking-wide">BPOM</span>
+            </div>
+            <div className="w-5 h-px bg-[#e8d5f5]" />
+            <div className="flex flex-col items-center gap-0.5">
+              <svg width="18" height="18" fill="none" stroke="#78257C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="3"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+              <span className="text-[8px] md:text-[10px] font-bold text-[#4a1466] tracking-wide text-center leading-tight">DERMA<br/>TESTED</span>
+            </div>
+          </a>
+
         </div>
       </div>
 
