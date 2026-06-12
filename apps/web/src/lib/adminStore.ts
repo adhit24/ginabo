@@ -47,9 +47,9 @@ export const DEFAULT_BUNDLES: GProduct[] = [
 ];
 
 export const DEFAULT_FLASH: GFlashItem[] = [
-  { id: "p3", name: "GlowAge Multi-Active Serum",   type: "Serum · 30ml",      salePrice: "Rp 228.000", salePriceMinor: 228000, original: "Rp 285.000", discount: "20%", img: "/serum.png"       },
-  { id: "p2", name: "Bright & Care Moisture Cream", type: "Moisturizer · 10g", salePrice: "Rp 146.000", salePriceMinor: 146000, original: "Rp 195.000", discount: "25%", img: "/bright_care.png" },
-  { id: "p1", name: "Hydra Moist Gel Ultimate",     type: "DNA Salmon · 30ml", salePrice: "Rp 150.000", salePriceMinor: 150000, original: "Rp 215.000", discount: "30%", img: "/gel.png"         },
+  { id: "p3", name: "GlowAge Multi-Active Serum",   type: "Serum · 30ml",      salePrice: "Rp 228.000", salePriceMinor: 228000, original: "Rp 285.000", discount: "20%", img: "/serumfix.png"  },
+  { id: "p2", name: "Bright & Care Moisture Cream", type: "Moisturizer · 10g", salePrice: "Rp 146.000", salePriceMinor: 146000, original: "Rp 195.000", discount: "25%", img: "/moistfix.png"  },
+  { id: "p1", name: "Hydra Moist Gel Ultimate",     type: "DNA Salmon · 30ml", salePrice: "Rp 150.000", salePriceMinor: 150000, original: "Rp 215.000", discount: "30%", img: "/salmonfix.png" },
 ];
 
 function read<T>(key: string, fallback: T): T {
