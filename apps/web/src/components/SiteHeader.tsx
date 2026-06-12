@@ -34,11 +34,12 @@ export function SiteHeader() {
   const router               = useRouter();
   const { user, logout }     = useAuth();
   const [annIdx, setAnnIdx]  = useState(0);
-  const [shopOpen, setShopOpen] = useState(false);
-  const [infoOpen, setInfoOpen] = useState(false);
+  const [shopOpen, setShopOpen]   = useState(false);
+  const [infoOpen, setInfoOpen]   = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [userOpen, setUserOpen]     = useState(false);
-  const [scrolled, setScrolled]     = useState(false);
+  const [drawerTab, setDrawerTab] = useState<"produk" | "info">("produk");
+  const [userOpen, setUserOpen]   = useState(false);
+  const [scrolled, setScrolled]   = useState(false);
 
   const shopRef = useRef<HTMLDivElement>(null);
   const infoRef = useRef<HTMLDivElement>(null);
@@ -285,81 +286,122 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* ── Mobile Drawer ── */}
+      {/* ── Mobile Full-Screen Menu ── */}
       {drawerOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-50 bg-black/30 md:hidden"
-            onClick={() => setDrawerOpen(false)}
-          />
-          <aside className="fixed left-0 top-0 z-[60] flex h-full w-72 flex-col bg-white shadow-2xl md:hidden">
-            <div className="flex items-center justify-between border-b border-[#f0f0f0] px-5 py-4">
-              <span className="text-sm font-bold text-[#78257C]">Menu</span>
+        <div className="fixed inset-0 z-[60] flex flex-col bg-white md:hidden">
+
+          {/* Tab bar header */}
+          <div className="flex items-end justify-between px-5 pt-5 pb-0">
+            <div className="flex gap-6">
               <button
-                onClick={() => setDrawerOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f5f5f5] text-[#808080]"
+                onClick={() => setDrawerTab("produk")}
+                className={`pb-3 text-[14px] font-bold border-b-2 transition-colors ${
+                  drawerTab === "produk"
+                    ? "border-[#78257C] text-[#78257C]"
+                    : "border-transparent text-[#aaaaaa]"
+                }`}
               >
-                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" strokeLinecap="round">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
+                PRODUK
+              </button>
+              <button
+                onClick={() => setDrawerTab("info")}
+                className={`pb-3 text-[14px] font-bold border-b-2 transition-colors ${
+                  drawerTab === "info"
+                    ? "border-[#78257C] text-[#78257C]"
+                    : "border-transparent text-[#aaaaaa]"
+                }`}
+              >
+                INFO
               </button>
             </div>
+            <button
+              onClick={() => setDrawerOpen(false)}
+              className="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-[#f5f5f5]"
+              aria-label="Tutup menu"
+            >
+              <svg width="14" height="14" fill="none" stroke="#808080" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-            <nav className="flex flex-col flex-1 overflow-y-auto">
-              <div className="border-b border-[#f5f5f5] py-3 px-5">
-                <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-[#78257C]">Produk</p>
-                {shopMenu.map((item) => (
-                  <Link key={item.href} href={item.href} onClick={() => setDrawerOpen(false)}
-                    className="block py-1.5 text-[14px] text-[#303030] hover:text-[#78257C]">
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
+          <div className="h-px bg-[#f0f0f0]" />
 
-              <div className="border-b border-[#f5f5f5] py-3 px-5">
-                <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-[#78257C]">Info</p>
+          {/* Tab content */}
+          <nav className="flex-1 overflow-y-auto">
+            {drawerTab === "produk" && shopMenu.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setDrawerOpen(false)}
+                className="flex items-center justify-between px-5 py-4 text-[16px] font-medium text-[#303030] border-b border-[#f5f5f5] hover:text-[#78257C]"
+              >
+                {item.label}
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </Link>
+            ))}
+
+            {drawerTab === "info" && (
+              <>
                 {infoMenu.map((item) => (
-                  <Link key={item.href} href={item.href} onClick={() => setDrawerOpen(false)}
-                    className="block py-1.5 text-[14px] text-[#303030] hover:text-[#78257C]">
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center px-5 py-4 text-[16px] font-medium text-[#303030] border-b border-[#f5f5f5] hover:text-[#78257C]"
+                  >
                     {item.label}
                   </Link>
                 ))}
-              </div>
-
-              <div className="py-3 px-5">
-                <Link href="/booking" onClick={() => setDrawerOpen(false)}
-                  className="block py-1.5 text-[14px] text-[#303030] hover:text-[#78257C]">
+                <Link
+                  href="/booking"
+                  onClick={() => setDrawerOpen(false)}
+                  className="flex items-center px-5 py-4 text-[16px] font-medium text-[#303030] border-b border-[#f5f5f5] hover:text-[#78257C]"
+                >
                   Konsultasi
                 </Link>
-              </div>
-            </nav>
+              </>
+            )}
+          </nav>
 
-            <div className="border-t border-[#f5f5f5] p-4">
-              {user ? (
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[13px] font-semibold text-[#303030]">{user.name}</p>
-                    <p className="text-[11px] text-[#808080]">{user.email}</p>
-                  </div>
-                  <button onClick={() => { handleLogout(); setDrawerOpen(false); }}
-                    className="text-[12px] text-red-500">Keluar</button>
+          {/* Bottom CTA */}
+          <div className="border-t border-[#f0f0f0] p-4">
+            {user ? (
+              <div className="flex items-center justify-between py-1">
+                <div>
+                  <p className="text-[13px] font-semibold text-[#303030]">{user.name}</p>
+                  <p className="text-[11px] text-[#808080]">{user.email}</p>
                 </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <Link href="/auth/login" onClick={() => setDrawerOpen(false)}
-                    className="block w-full rounded-[5px] border border-[#78257C] py-2 text-center text-[13px] font-semibold text-[#78257C]">
-                    Masuk
-                  </Link>
-                  <Link href="/auth/signup" onClick={() => setDrawerOpen(false)}
-                    className="block w-full rounded-[5px] py-2 text-center text-[13px] font-bold text-white"
-                    style={{ background: "#78257C" }}>
-                    Daftar Gratis
-                  </Link>
-                </div>
-              )}
-            </div>
-          </aside>
-        </>
+                <button
+                  onClick={() => { handleLogout(); setDrawerOpen(false); }}
+                  className="text-[12px] text-red-500"
+                >
+                  Keluar
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/auth/login"
+                  onClick={() => setDrawerOpen(false)}
+                  className="block w-full rounded-[5px] border border-[#78257C] py-3 text-center text-[13px] font-semibold text-[#78257C] hover:bg-[#fdf5ff]"
+                >
+                  Masuk
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  onClick={() => setDrawerOpen(false)}
+                  className="block w-full rounded-[5px] py-3 text-center text-[13px] font-bold text-white hover:opacity-90"
+                  style={{ background: "#78257C" }}
+                >
+                  Daftar Gratis
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </header>
   );
