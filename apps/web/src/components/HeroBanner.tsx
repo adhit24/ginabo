@@ -45,7 +45,7 @@ export function HeroBanner() {
   return (
     <div className="w-full md:px-5 lg:px-8 xl:px-10 md:pt-3">
     <section
-      className="relative w-full overflow-hidden select-none h-[56.25vw] md:h-auto md:aspect-[2/1] md:rounded-2xl"
+      className="relative w-full overflow-hidden select-none aspect-[3/1] md:rounded-2xl"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={onTouchStart}
