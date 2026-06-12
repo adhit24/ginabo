@@ -216,18 +216,21 @@ export default function HomePage() {
           {/* Card 1 — Cek Kulitmu */}
           <a href="/skincheck"
             className="relative col-span-1 md:col-span-2 flex items-end overflow-hidden min-h-[100px] md:min-h-[152px] group"
-            style={{ background: "linear-gradient(135deg,#b67ef8 0%,#7c3aed 100%)" }}
           >
-            <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-white/10 pointer-events-none" />
-            <div className="absolute top-2 right-3 md:right-5 opacity-[0.15] group-hover:opacity-25 transition-opacity duration-300 pointer-events-none">
-              <svg width="70" height="70" fill="none" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v6M8 11h6"/>
-              </svg>
-            </div>
+            {/* Background image */}
+            <Image
+              src="/skin_analist.png"
+              alt="Cek Kulitmu"
+              fill
+              className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width:768px) 33vw, (max-width:1280px) calc((100vw - 40px) * 2/5), 540px"
+            />
+            {/* Gradient overlay so text stays readable */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#5b1fa0]/80 via-[#7c3aed]/30 to-transparent pointer-events-none" />
             <div className="relative z-10 p-3 md:p-6 pb-3 md:pb-6">
-              <p className="text-white/60 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5 md:mb-1 hidden sm:block">Gratis · AI Powered</p>
-              <p className="text-white font-bold text-[13px] md:text-[20px] leading-tight">Cek<br/>Kulitmu</p>
-              <div className="mt-1 md:mt-2 hidden md:flex items-center gap-1.5 text-white/75 text-[11px] font-semibold">
+              <p className="text-white/70 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5 md:mb-1 hidden sm:block">Gratis · AI Powered</p>
+              <p className="text-white font-bold text-[13px] md:text-[20px] leading-tight drop-shadow">Cek<br/>Kulitmu</p>
+              <div className="mt-1 md:mt-2 hidden md:flex items-center gap-1.5 text-white/80 text-[11px] font-semibold">
                 <span>Mulai Analisis</span>
                 <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
