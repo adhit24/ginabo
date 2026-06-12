@@ -142,7 +142,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
     : []
   const latestPayment = payments[0] ?? null
 
-  const isPendingPayment = order.status === 'pending_payment'
+  const isPendingPayment = order.status === 'pending'
   const isShipped = order.status === 'shipped'
 
   // Resolve address
