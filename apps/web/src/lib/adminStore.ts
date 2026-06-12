@@ -40,10 +40,10 @@ export const DEFAULT_PRODUCTS: GProduct[] = [
 ];
 
 export const DEFAULT_BUNDLES: GProduct[] = [
-  { id: "b1", name: "Ginabo Complete\nSkin Nutrition Set", priceVal: "Rp 287.999", priceMinor: 287999, originalPrice: "Rp 575.999", img: "/ginabo_bundling_3.png",          rating: "5.0", reviews: "127" },
-  { id: "b2", name: "Repair &\nGlow Set",                  priceVal: "Rp 207.999", priceMinor: 207999, originalPrice: "Rp 415.999", img: "/bundling_repair_and_glow.png",   rating: "5.0", reviews: "127" },
-  { id: "b3", name: "Daily Skin\nBarrier Set",              priceVal: "Rp 197.999", priceMinor: 197999, originalPrice: "Rp 395.999", img: "/bundling_daily_skin_barrier.png", rating: "5.0", reviews: "127" },
-  { id: "b4", name: "Bright\nRenewal Set",                  priceVal: "Rp 169.999", priceMinor: 169999, originalPrice: "Rp 339.999", img: "/bundling_bright_renewal.png",    rating: "5.0", reviews: "127" },
+  { id: "b1", name: "Ginabo Complete\nSkin Nutrition Set", priceVal: "Rp 287.999", priceMinor: 287999, originalPrice: "Rp 575.999", img: "/essential.png",    rating: "5.0", reviews: "127" },
+  { id: "b2", name: "Repair &\nGlow Set",                  priceVal: "Rp 207.999", priceMinor: 207999, originalPrice: "Rp 415.999", img: "/repair_glow.png",  rating: "5.0", reviews: "127" },
+  { id: "b3", name: "Daily Skin\nBarrier Set",              priceVal: "Rp 197.999", priceMinor: 197999, originalPrice: "Rp 395.999", img: "/skin_barrier.png", rating: "5.0", reviews: "127" },
+  { id: "b4", name: "Bright\nRenewal Set",                  priceVal: "Rp 169.999", priceMinor: 169999, originalPrice: "Rp 339.999", img: "/bright_renewal.png", rating: "5.0", reviews: "127" },
 ];
 
 export const DEFAULT_FLASH: GFlashItem[] = [
