@@ -140,6 +140,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
       tax_amount,
       total_amount,
       shipping_provider,
+      shipping_courier,
       tracking_number,
       created_at,
       shipping_address:addresses(
