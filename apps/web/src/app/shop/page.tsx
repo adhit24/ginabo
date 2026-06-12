@@ -10,17 +10,17 @@ const STATIC_PRODUCTS = [
   {
     slug: "hydra-moist-gel-ultimate", name: "Hydra Moist Gel Ultimate",
     category: "skincare", tag: "Multifungsi", rating: "4.9", reviews: "178",
-    price: "Rp 118.999", priceMinor: 118999, img: "/gel.png",
+    price: "Rp 118.999", priceMinor: 118999, img: "/salmonfix.png",
   },
   {
     slug: "bright-care-moisture-cream", name: "Bright & Care Moisture Cream",
     category: "skincare", tag: "Barrier Care", rating: "4.9", reviews: "257",
-    price: "Rp 79.999", priceMinor: 79999, img: "/bright_care.png",
+    price: "Rp 79.999", priceMinor: 79999, img: "/moistfix.png",
   },
   {
     slug: "glowage-multi-active-serum", name: "GlowAge Multi-Active Serum",
     category: "skincare", tag: "Best Seller", rating: "4.9", reviews: "387",
-    price: "Rp 89.999", priceMinor: 89999, img: "/serum.png",
+    price: "Rp 89.999", priceMinor: 89999, img: "/serumfix.png",
   },
 ];
 
