@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
 
-type ProductImage = { url: string; alt: string; sortOrder: number };
+type ProductImage = { url: string; alt: string | null; sortOrder: number };
 
 type Props = {
   product: {
