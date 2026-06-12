@@ -376,10 +376,10 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#f0f0f0]">
             {[
               {
-                icon: <Image src="/order.png"    alt="Cara Order"    width={44} height={44} className="object-contain" />,
-                title: "Cara Order",
-                desc: "Mudah, cepat, dan aman. Belanja di website atau marketplace favorit kamu.",
-                href: "/shop",
+                icon: <Image src="/storeloc.png" alt="Store Locator" width={44} height={44} className="object-contain" />,
+                title: "Store Locator",
+                desc: "Temukan toko Ginabo terdekat — fisik di mall atau official store di marketplace.",
+                href: "/stores",
               },
               {
                 icon: <Image src="/reseller.png" alt="Jadi Reseller" width={44} height={44} className="object-contain" />,
