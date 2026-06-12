@@ -249,22 +249,15 @@ export function SiteHeader() {
 
         {/* Logo center */}
         <Link href="/" className="absolute left-1/2 -translate-x-1/2">
-          <div style={{ width: 100, height: 25, overflow: "hidden", position: "relative" }}>
-            <Image
-              src="/logo.png"
-              alt="Ginabo"
-              width={400}
-              height={160}
-              style={{
-                position: "absolute",
-                top: "-42%",
-                left: "-2%",
-                width: "104%",
-                height: "auto",
-                filter: "invert(29%) sepia(60%) saturate(500%) hue-rotate(240deg) brightness(80%)",
-              }}
-            />
-          </div>
+          <Image
+            src="/logo_diamond.png"
+            alt="Ginabo"
+            width={124}
+            height={44}
+            className="object-contain"
+            style={{ height: 44, width: "auto" }}
+            priority
+          />
         </Link>
 
         {/* Right: user + cart */}
