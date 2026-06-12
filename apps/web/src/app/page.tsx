@@ -33,9 +33,9 @@ const marqueeItems = [
 ];
 
 const singleProducts = [
-  { name: "Hydra Moist\nGel Ultimate",       rating: "5.0", reviews: "127", priceLabel: "IDR", priceVal: " 120K", img: "/gel.png"         },
-  { name: "Bright & Care\nMoisture Cream",   rating: "5.0", reviews: "127", priceLabel: "IDR", priceVal: " 75K",  img: "/bright_care.png" },
-  { name: "GlowAge Multi-\nActive Serum",    rating: "5.0", reviews: "127", priceLabel: "IDR", priceVal: " 90K",  img: "/serum.png"       },
+  { name: "Hydra Moist\nGel Ultimate",       rating: "5.0", reviews: "127", priceVal: "Rp 120.000", img: "/salmonfix.png" },
+  { name: "Bright & Care\nMoisture Cream",   rating: "5.0", reviews: "127", priceVal: "Rp 75.000",  img: "/moistfix.png"  },
+  { name: "GlowAge Multi-\nActive Serum",    rating: "5.0", reviews: "127", priceVal: "Rp 90.000",  img: "/serumfix.png"  },
 ];
 
 const bundleProducts = [
