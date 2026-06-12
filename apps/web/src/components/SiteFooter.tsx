@@ -151,14 +151,7 @@ export function SiteFooter() {
                     loading="lazy"
                     className="object-contain"
                     style={{ width: 36, height: 22 }}
-                    onError={(e) => {
-                      const t = e.currentTarget;
-                      t.style.display = "none";
-                      const fb = t.nextElementSibling as HTMLElement | null;
-                      if (fb) fb.style.display = "block";
-                    }}
                   />
-                  <span className="hidden text-[8px] font-bold text-gray-600 px-1 leading-tight text-center">{p.name}</span>
                 </span>
               ))}
             </div>
@@ -174,14 +167,7 @@ export function SiteFooter() {
                     loading="lazy"
                     className="object-contain"
                     style={{ width: 44, height: 22 }}
-                    onError={(e) => {
-                      const t = e.currentTarget;
-                      t.style.display = "none";
-                      const fb = t.nextElementSibling as HTMLElement | null;
-                      if (fb) fb.style.display = "block";
-                    }}
                   />
-                  <span className="hidden text-[8px] font-bold text-gray-600 px-1 leading-tight text-center">{s.name}</span>
                 </span>
               ))}
             </div>
