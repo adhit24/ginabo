@@ -330,15 +330,24 @@ export default async function OrderDetailPage({ params }: PageProps) {
 
           {/* Tracking info for shipped orders */}
           {isShipped && order.tracking_number && (
-            <div className="rounded-2xl border border-purple-100 bg-purple-50 p-4 text-sm">
-              <div className="font-semibold text-purple-900">Info Pengiriman</div>
-              <div className="mt-1 text-purple-700">
-                Kurir:{' '}
-                <span className="font-medium">{order.shipping_provider ?? '—'}</span>
+            <div className="rounded-2xl border border-purple-100 bg-purple-50 p-5 text-sm">
+              <div className="mb-1 font-semibold text-purple-900">Info Pengiriman</div>
+              <div className="mb-3 text-purple-700">
+                <span className="font-medium">
+                  {order.shipping_courier?.toUpperCase() ?? order.shipping_provider ?? '—'}
+                </span>
+                {' · '}
+                <span className="font-mono">{order.tracking_number}</span>
               </div>
-              <div className="text-purple-700">
-                No. Resi:{' '}
-                <span className="font-mono font-medium">{order.tracking_number}</span>
+              {/* Live tracking form pre-filled */}
+              <div
+                className="rounded-xl p-4"
+                style={{ background: 'rgba(88,28,135,0.06)', border: '1px solid rgba(147,51,234,0.2)' }}
+              >
+                <TrackingForm
+                  defaultWaybill={order.tracking_number}
+                  defaultCourier={(order.shipping_courier?.toLowerCase() ?? 'jne') as CourierCode}
+                />
               </div>
             </div>
           )}
