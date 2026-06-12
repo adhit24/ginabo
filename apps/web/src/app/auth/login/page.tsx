@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, signInWithGoogle } = useAuth();
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -27,7 +27,7 @@ export default function LoginPage() {
   };
 
   const handleGoogle = () => {
-    window.location.href = "/api/auth/google";
+    signInWithGoogle();
   };
 
   return (
