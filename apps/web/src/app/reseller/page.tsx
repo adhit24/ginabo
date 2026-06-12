@@ -215,70 +215,39 @@ export default function ResellerProgramPage() {
     <div className="bg-[#FDFAFF] text-[#2a2a2a]">
 
       {/* ══ 1. HERO ══════════════════════════════════════════════════════════ */}
-      <section aria-label="Hero" className="relative overflow-hidden" style={{ background: "#f8f4f0" }}>
-        <div className="mx-auto grid max-w-6xl min-h-[480px] items-center gap-10 px-6 py-16 md:grid-cols-2 md:py-24 lg:gap-16">
-          {/* Left */}
-          <motion.div initial="hidden" animate="visible" variants={stagger}>
-            <motion.span
-              variants={fadeUp}
-              className="mb-5 inline-flex items-center rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white"
-              style={{ background: "#78257C" }}
-            >
-              Ginabo Partner Program
-            </motion.span>
-            <motion.h1
-              variants={fadeUp}
-              className="text-4xl font-extrabold leading-tight text-[#1a1a1a] md:text-5xl"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
-              Glowing Bareng.{" "}
-              <br />
-              <span style={{ color: "#78257C" }}>Growing Bareng.</span>
-            </motion.h1>
-            <motion.p
-              variants={fadeUp}
-              className="mt-4 max-w-md text-[15px] leading-relaxed"
-              style={{ color: "#595959" }}
-            >
-              Bangun bisnis skincare yang menguntungkan bersama Ginabo. Sistem sudah ada, kamu tinggal jalan.
-            </motion.p>
-            <motion.div variants={fadeUp} className="mt-7 flex flex-wrap gap-3">
-              <Link
-                href="/reseller/register"
-                className="inline-flex min-h-[44px] items-center justify-center rounded-xl px-7 py-3 text-[14px] font-extrabold text-white shadow-md transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78257C]"
-                style={{ background: "#78257C" }}
-              >
-                Bangga Bareng — Daftar Gratis
-              </Link>
-              <a
-                href={waLink()}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border px-7 py-3 text-[14px] font-bold transition hover:bg-[#f5eeff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78257C]"
-                style={{ borderColor: "#e0d0f0", color: "#78257C" }}
-              >
-                {icons.whatsapp}
-                Tanya via WA
-              </a>
-            </motion.div>
-          </motion.div>
+      <section aria-label="Hero" className="relative w-full overflow-hidden">
+        {/* Banner image — full width, preserves aspect ratio */}
+        <div className="relative w-full" style={{ aspectRatio: "1280/430" }}>
+          <Image
+            src="/hero/reseller.png"
+            alt="Gabung jadi Reseller Ginabo – Jualan Jadi Lebih Mudah, Bukan Sendirian"
+            fill
+            className="object-cover object-center"
+            priority
+            sizes="100vw"
+          />
 
-          {/* Right — product image */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.65, ease: EASE, delay: 0.15 }}
-            className="flex justify-center"
+          {/* CTA — bottom-left corner of banner */}
+          <motion.a
+            href={waLink()}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Daftar sekarang jadi partner Ginabo via WhatsApp"
+            className="absolute bottom-[6%] left-[3%] w-[30%] min-w-[140px] max-w-[420px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78257C]"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: EASE, delay: 0.35 }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.97 }}
           >
             <Image
-              src="/resellerprogram.png"
-              alt="Produk-produk Ginabo Partner Program"
-              width={520}
-              height={420}
-              className="object-contain drop-shadow-2xl"
-              priority
+              src="/hero/CTAreseller.png"
+              alt="Daftar Sekarang – Mulai Bisnismu Hari Ini"
+              width={420}
+              height={84}
+              className="h-auto w-full drop-shadow-lg"
             />
-          </motion.div>
+          </motion.a>
         </div>
       </section>
 
