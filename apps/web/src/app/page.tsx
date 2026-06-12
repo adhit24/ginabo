@@ -376,34 +376,19 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#f0f0f0]">
             {[
               {
-                icon: (
-                  <svg width="28" height="28" fill="none" stroke="#78257C" strokeWidth="1.8" viewBox="0 0 24 24">
-                    <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 7.5M17 13l1.5 7.5M9 21h6" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                ),
+                icon: <Image src="/order.png"    alt="Cara Order"    width={44} height={44} className="object-contain" />,
                 title: "Cara Order",
                 desc: "Mudah, cepat, dan aman. Belanja di website atau marketplace favorit kamu.",
                 href: "/shop",
               },
               {
-                icon: (
-                  <svg width="28" height="28" fill="none" stroke="#78257C" strokeWidth="1.8" viewBox="0 0 24 24">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                ),
+                icon: <Image src="/reseller.png" alt="Jadi Reseller" width={44} height={44} className="object-contain" />,
                 title: "Jadi Reseller",
                 desc: "Bergabung dan dapatkan keuntungan eksklusif bersama ribuan reseller Ginabo.",
                 href: "/reseller",
               },
               {
-                icon: (
-                  <svg width="28" height="28" fill="none" stroke="#78257C" strokeWidth="1.8" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 8v4M12 16h.01" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                ),
+                icon: <Image src="/faq.png"      alt="FAQ"           width={44} height={44} className="object-contain" />,
                 title: "FAQ",
                 desc: "Temukan jawaban atas pertanyaan seputar produk, pengiriman, dan pembayaran.",
                 href: "/contact",
@@ -414,7 +399,7 @@ export default function HomePage() {
                 href={item.href}
                 className="flex items-start gap-4 px-8 py-7 transition hover:bg-[#fdf5ff] group"
               >
-                <div className="flex-shrink-0 mt-0.5">{item.icon}</div>
+                <div className="flex-shrink-0">{item.icon}</div>
                 <div>
                   <p className="text-[14px] font-bold text-[#303030] group-hover:text-[#78257C] transition">{item.title}</p>
                   <p className="mt-1 text-[12px] text-[#808080] leading-relaxed">{item.desc}</p>
