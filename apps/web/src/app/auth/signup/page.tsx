@@ -8,14 +8,14 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function SignupPage() {
-  const { signup } = useAuth();
+  const { signup, signInWithGoogle } = useAuth();
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", phone: "", password: "", confirm: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleGoogle = () => {
-    window.location.href = "/api/auth/google";
+    signInWithGoogle();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
