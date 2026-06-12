@@ -225,7 +225,7 @@ function CTACard({ href, src, alt }: { href: string; src: string; alt: string })
         className="absolute inset-0 z-10 pointer-events-none"
         style={{ background: spotlight }}
       />
-      <div className="relative aspect-[4/3] md:aspect-[580/200]">
+      <div className="relative aspect-[3/2]">
         <Image
           src={src}
           alt={alt}
