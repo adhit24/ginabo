@@ -141,35 +141,25 @@ export function SiteFooter() {
         {/* ── Payment & Shipping ── */}
         <div className="border-t border-white/10 py-5 px-5 md:px-10">
           <div className="mx-auto max-w-7xl flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-[11px] text-white/40 mr-1 flex-shrink-0">Pembayaran:</span>
               {paymentLogos.map(p => (
                 <span key={p.name}
-                  className="flex items-center justify-center bg-white rounded-[4px] overflow-hidden"
-                  style={{ width: 44, height: 28 }}>
-                  <img
-                    src={p.src}
-                    alt={p.name}
-                    loading="lazy"
-                    className="object-contain"
-                    style={{ width: 36, height: 22 }}
-                  />
+                  className="flex items-center gap-1 px-2 rounded-[4px]"
+                  style={{ background: p.bg, height: 26 }}>
+                  <img src={p.src} alt="" loading="lazy" className="rounded-sm flex-shrink-0" style={{ width: 14, height: 14 }} />
+                  <span className="text-[9px] font-bold text-white whitespace-nowrap">{p.name}</span>
                 </span>
               ))}
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-[11px] text-white/40 mr-1 flex-shrink-0">Pengiriman:</span>
               {shippingLogos.map(s => (
                 <span key={s.name}
-                  className="flex items-center justify-center bg-white rounded-[4px] overflow-hidden"
-                  style={{ width: 52, height: 28 }}>
-                  <img
-                    src={s.src}
-                    alt={s.name}
-                    loading="lazy"
-                    className="object-contain"
-                    style={{ width: 44, height: 22 }}
-                  />
+                  className="flex items-center gap-1 px-2 rounded-[4px]"
+                  style={{ background: s.bg, height: 26 }}>
+                  <img src={s.src} alt="" loading="lazy" className="rounded-sm flex-shrink-0" style={{ width: 14, height: 14 }} />
+                  <span className="text-[9px] font-bold text-white whitespace-nowrap">{s.name}</span>
                 </span>
               ))}
             </div>
