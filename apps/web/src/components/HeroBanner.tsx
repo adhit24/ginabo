@@ -43,8 +43,9 @@ export function HeroBanner() {
   }
 
   return (
+    <div className="w-full md:px-5 lg:px-8 xl:px-10 md:pt-3">
     <section
-      className="relative w-full overflow-hidden select-none h-[56.25vw] md:h-[31.25vw]"
+      className="relative w-full overflow-hidden select-none h-[56.25vw] md:h-auto md:aspect-[2/1] md:rounded-2xl"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={onTouchStart}
@@ -61,9 +62,9 @@ export function HeroBanner() {
             src={b.src}
             alt={b.alt}
             fill
-            className="object-cover object-top"
+            className="object-cover object-top md:object-center"
             priority={i === 0}
-            sizes="100vw"
+            sizes="(max-width:768px) 100vw, (max-width:1280px) calc(100vw - 40px), 1240px"
           />
         </div>
       ))}
