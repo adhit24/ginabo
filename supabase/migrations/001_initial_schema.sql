@@ -1170,7 +1170,7 @@ CREATE POLICY "bookings: users can cancel own bookings"
     ON public.bookings FOR UPDATE
     TO authenticated
     USING (profile_id = auth.uid())
-    WITH CHECK (profile_id = auth.uid() AND NEW.status = 'cancelled');
+    WITH CHECK (profile_id = auth.uid() AND status = 'cancelled');
 
 CREATE POLICY "bookings: admins can manage all bookings"
     ON public.bookings FOR ALL
