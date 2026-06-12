@@ -271,11 +271,14 @@ export default function ResellerProgramPage() {
               variants={fadeUp}
               className="text-3xl font-extrabold leading-tight text-white md:text-[2.8rem]"
             >
-              Jualan jadi lebih mudah,{" "}
-              <span className="italic font-light opacity-90">bukan sendirian</span>.
+              Glowing Bareng.{" "}
+              <span className="italic font-light opacity-90">Growing Bareng.</span>{" "}✨
             </motion.h1>
-            <motion.p variants={fadeUp} className="mt-4 max-w-lg text-sm leading-relaxed text-white/80 md:text-base">
-              Sistem sudah disiapkan, produknya ada, tinggal jalan. Cocok untuk pemula dengan modal ringan dan margin yang jelas.
+            <motion.p variants={fadeUp} className="mt-3 text-base font-semibold tracking-wide text-white/75">
+              Ginabo → Stockist → Customer
+            </motion.p>
+            <motion.p variants={fadeUp} className="mt-3 max-w-lg text-sm leading-relaxed text-white/80 md:text-base">
+              Bangun bisnis skincare bersama Ginabo dan raih pelanggan pertamamu lebih cepat.
             </motion.p>
             <motion.div variants={fadeUp} className="mt-7 flex flex-wrap items-center justify-center gap-3 md:justify-start">
               <Link
