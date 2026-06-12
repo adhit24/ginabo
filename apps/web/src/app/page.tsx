@@ -264,50 +264,9 @@ export default function HomePage() {
       <div className="w-full px-2 md:px-5 lg:px-8 xl:px-10 pt-2 md:pt-3 pb-3 md:pb-5">
         <div className="grid grid-cols-3 gap-2 md:gap-3 lg:gap-4">
 
-          {/* Card 1 — Cek Kulitmu */}
-          <a href="/skincheck"
-            className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 group block"
-          >
-            <div className="relative aspect-[4/3] md:aspect-[580/200]">
-              <Image
-                src="/skin_analist.png"
-                alt="Cek Kulitmu — Analisis AI"
-                fill
-                className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]"
-                sizes="(max-width:640px) 33vw, (max-width:1280px) calc((100vw - 64px) / 3), 420px"
-              />
-            </div>
-          </a>
-
-          {/* Card 2 — Jadi Reseller */}
-          <a href="/reseller"
-            className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 group block"
-          >
-            <div className="relative aspect-[4/3] md:aspect-[580/200]">
-              <Image
-                src="/reseller_card.png"
-                alt="Jadi Reseller Ginabo"
-                fill
-                className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]"
-                sizes="(max-width:640px) 33vw, (max-width:1280px) calc((100vw - 64px) / 3), 420px"
-              />
-            </div>
-          </a>
-
-          {/* Card 3 — Halal & BPOM */}
-          <a href="/about"
-            className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 group block"
-          >
-            <div className="relative aspect-[4/3] md:aspect-[580/200]">
-              <Image
-                src="/halal_card.png"
-                alt="Halal & BPOM Terdaftar"
-                fill
-                className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]"
-                sizes="(max-width:640px) 33vw, (max-width:1280px) calc((100vw - 64px) / 3), 420px"
-              />
-            </div>
-          </a>
+          <CTACard href="/skincheck" src="/skin_analist.png"   alt="Cek Kulitmu — Analisis AI"  />
+          <CTACard href="/reseller"  src="/reseller_card.png" alt="Jadi Reseller Ginabo"       />
+          <CTACard href="/about"     src="/halal_card.png"    alt="Halal & BPOM Terdaftar"     />
 
         </div>
       </div>
