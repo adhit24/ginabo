@@ -34,9 +34,9 @@ export const ADMIN_CREDS = {
 };
 
 export const DEFAULT_PRODUCTS: GProduct[] = [
-  { id: "p1", name: "Hydra Moist\nGel Ultimate",      priceVal: " 120K", priceMinor: 120000, priceLabel: "IDR", img: "/gel.png",         rating: "5.0", reviews: "127", tag: "DNA Salmon · 30ml" },
-  { id: "p2", name: "Bright & Care\nMoisture Cream",  priceVal: " 75K",  priceMinor: 75000,  priceLabel: "IDR", img: "/bright_care.png", rating: "5.0", reviews: "127", tag: "Moisturizer · 10g"  },
-  { id: "p3", name: "GlowAge Multi-\nActive Serum",   priceVal: " 90K",  priceMinor: 90000,  priceLabel: "IDR", img: "/serum.png",       rating: "5.0", reviews: "127", tag: "Serum · 30ml"       },
+  { id: "p1", name: "Hydra Moist\nGel Ultimate",      priceVal: "Rp 120.000", priceMinor: 120000, img: "/salmonfix.png", rating: "5.0", reviews: "127", tag: "DNA Salmon · 30ml" },
+  { id: "p2", name: "Bright & Care\nMoisture Cream",  priceVal: "Rp 75.000",  priceMinor: 75000,  img: "/moistfix.png",  rating: "5.0", reviews: "127", tag: "Moisturizer · 10g"  },
+  { id: "p3", name: "GlowAge Multi-\nActive Serum",   priceVal: "Rp 90.000",  priceMinor: 90000,  img: "/serumfix.png",  rating: "5.0", reviews: "127", tag: "Serum · 30ml"       },
 ];
 
 export const DEFAULT_BUNDLES: GProduct[] = [
