@@ -286,7 +286,7 @@ export default function ResellerProgramPage() {
                 className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-7 py-3 text-sm font-extrabold shadow-lg transition hover:scale-105 hover:shadow-xl"
                 style={{ color: "#78257C" }}
               >
-                Daftar Sekarang
+                Gabung Menjadi Stockist
               </Link>
               <a
                 href={waLink()}
