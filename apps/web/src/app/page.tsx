@@ -207,85 +207,55 @@ export default function HomePage() {
       <HeroBanner />
 
       {/* ════════════════════════════════════════════
-          1b. FEATURE CARDS (SkinCheck / Reseller / Halal+BPOM)
-          Layout: 2:2:1 mirroring Somethinc-style feature card strip
+          1b. FEATURE CARDS — 3 standalone CTA cards
+          Somethinc-style: equal columns, gaps between cards,
+          each card is a promotional image with rounded corners
       ════════════════════════════════════════════ */}
-      <div className="w-full md:px-5 lg:px-8 xl:px-10 md:pb-4">
-        <div className="grid grid-cols-3 md:grid-cols-5 overflow-hidden md:rounded-b-2xl shadow-sm md:shadow-md">
+      <div className="w-full px-2 md:px-5 lg:px-8 xl:px-10 pt-2 md:pt-3 pb-3 md:pb-5">
+        <div className="grid grid-cols-3 gap-2 md:gap-3 lg:gap-4">
 
           {/* Card 1 — Cek Kulitmu */}
           <a href="/skincheck"
-            className="relative col-span-1 md:col-span-2 flex items-end overflow-hidden min-h-[100px] md:min-h-[152px] group"
+            className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 group block"
           >
-            {/* Background image */}
-            <Image
-              src="/skin_analist.png"
-              alt="Cek Kulitmu"
-              fill
-              className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width:768px) 33vw, (max-width:1280px) calc((100vw - 40px) * 2/5), 540px"
-            />
-            {/* Gradient overlay so text stays readable */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#5b1fa0]/80 via-[#7c3aed]/30 to-transparent pointer-events-none" />
-            <div className="relative z-10 p-3 md:p-6 pb-3 md:pb-6">
-              <p className="text-white/70 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5 md:mb-1 hidden sm:block">Gratis · AI Powered</p>
-              <p className="text-white font-bold text-[13px] md:text-[20px] leading-tight drop-shadow">Cek<br/>Kulitmu</p>
-              <div className="mt-1 md:mt-2 hidden md:flex items-center gap-1.5 text-white/80 text-[11px] font-semibold">
-                <span>Mulai Analisis</span>
-                <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-              </div>
+            <div className="relative aspect-[4/3] md:aspect-[580/200]">
+              <Image
+                src="/skin_analist.png"
+                alt="Cek Kulitmu — Analisis AI"
+                fill
+                className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]"
+                sizes="(max-width:640px) 33vw, (max-width:1280px) calc((100vw - 64px) / 3), 420px"
+              />
             </div>
           </a>
 
           {/* Card 2 — Jadi Reseller */}
           <a href="/reseller"
-            className="relative col-span-1 md:col-span-2 flex items-end overflow-hidden min-h-[100px] md:min-h-[152px] group border-l border-white/25"
-            style={{ background: "linear-gradient(135deg,#e879f9 0%,#be3ab4 100%)" }}
+            className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 group block"
           >
-            <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-white/10 pointer-events-none" />
-            <div className="absolute top-2 right-3 md:right-5 opacity-[0.15] group-hover:opacity-25 transition-opacity duration-300 pointer-events-none">
-              <svg width="70" height="70" fill="none" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-            </div>
-            <div className="relative z-10 p-3 md:p-6 pb-3 md:pb-6">
-              <p className="text-white/60 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5 md:mb-1 hidden sm:block">Komisi s/d 30%</p>
-              <p className="text-white font-bold text-[13px] md:text-[20px] leading-tight">Jadi<br/>Reseller</p>
-              <div className="mt-1 md:mt-2 hidden md:flex items-center gap-1.5 text-white/75 text-[11px] font-semibold">
-                <span>Daftar Gratis</span>
-                <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-              </div>
+            <div className="relative aspect-[4/3] md:aspect-[580/200]">
+              <Image
+                src="/reseller_card.png"
+                alt="Jadi Reseller Ginabo"
+                fill
+                className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]"
+                sizes="(max-width:640px) 33vw, (max-width:1280px) calc((100vw - 64px) / 3), 420px"
+              />
             </div>
           </a>
 
           {/* Card 3 — Halal & BPOM */}
           <a href="/about"
-            className="col-span-1 md:col-span-1 flex flex-col items-center justify-center gap-2 md:gap-3 py-3 px-2 bg-white border-l border-[#ede5f8] hover:bg-[#fdf5ff] transition-colors duration-200 min-h-[100px] md:min-h-[152px]"
+            className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 group block"
           >
-            <div className="flex flex-col items-center gap-0.5">
-              <svg width="18" height="18" fill="none" stroke="#78257C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>
-              </svg>
-              <span className="text-[8px] md:text-[10px] font-bold text-[#4a1466] tracking-wide">HALAL</span>
-            </div>
-            <div className="w-5 h-px bg-[#e8d5f5]" />
-            <div className="flex flex-col items-center gap-0.5">
-              <svg width="18" height="18" fill="none" stroke="#78257C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                <rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
-              </svg>
-              <span className="text-[8px] md:text-[10px] font-bold text-[#4a1466] tracking-wide">BPOM</span>
-            </div>
-            <div className="w-5 h-px bg-[#e8d5f5]" />
-            <div className="flex flex-col items-center gap-0.5">
-              <svg width="18" height="18" fill="none" stroke="#78257C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                <circle cx="12" cy="8" r="3"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-              </svg>
-              <span className="text-[8px] md:text-[10px] font-bold text-[#4a1466] tracking-wide text-center leading-tight">DERMA<br/>TESTED</span>
+            <div className="relative aspect-[4/3] md:aspect-[580/200]">
+              <Image
+                src="/halal_card.png"
+                alt="Halal & BPOM Terdaftar"
+                fill
+                className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]"
+                sizes="(max-width:640px) 33vw, (max-width:1280px) calc((100vw - 64px) / 3), 420px"
+              />
             </div>
           </a>
 
