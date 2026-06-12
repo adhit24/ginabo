@@ -33,8 +33,22 @@ const footerLinks = [
   },
 ];
 
-const paymentIcons = ["BCA", "Mandiri", "BRI", "GoPay", "OVO", "Dana", "ShopeePay"];
-const shippingIcons = ["JNE", "J&T", "SiCepat", "Anteraja"];
+const paymentLogos = [
+  { name: "BCA",       src: "https://logo.clearbit.com/bca.co.id" },
+  { name: "Mandiri",   src: "https://logo.clearbit.com/bankmandiri.co.id" },
+  { name: "BRI",       src: "https://logo.clearbit.com/bri.co.id" },
+  { name: "GoPay",     src: "https://logo.clearbit.com/gojek.com" },
+  { name: "OVO",       src: "https://logo.clearbit.com/ovo.id" },
+  { name: "Dana",      src: "https://logo.clearbit.com/dana.id" },
+  { name: "ShopeePay", src: "https://logo.clearbit.com/shopee.co.id" },
+];
+
+const shippingLogos = [
+  { name: "JNE",      src: "https://logo.clearbit.com/jne.co.id" },
+  { name: "J&T",      src: "https://logo.clearbit.com/jtexpress.co.id" },
+  { name: "SiCepat",  src: "https://logo.clearbit.com/sicepat.com" },
+  { name: "Anteraja", src: "https://logo.clearbit.com/anteraja.id" },
+];
 
 export function SiteFooter() {
   return (
