@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 const BASE_URL = "https://ginabo.id";
 
 const STATIC_PAGES = [
