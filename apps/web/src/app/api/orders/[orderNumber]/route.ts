@@ -4,117 +4,157 @@
 import { type NextRequest } from 'next/server'
 import { jsonError, jsonOk } from '@/lib/http'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server'
+import type { OrderRow, OrderItemRow, PaymentRow, AddressRow } from '@/types/database'
 
 interface RouteContext {
   params: { orderNumber: string }
 }
 
+// ─── Projected shapes from DB query ──────────────────────────────────────────
+
+type OrderProjection = Pick<
+  OrderRow,
+  | 'id'
+  | 'order_number'
+  | 'status'
+  | 'subtotal'
+  | 'shipping_cost'
+  | 'discount_amount'
+  | 'tax_amount'
+  | 'total_amount'
+  | 'shipping_provider'
+  | 'tracking_number'
+  | 'notes'
+  | 'created_at'
+  | 'updated_at'
+> & {
+  shipping_address: Pick<
+    AddressRow,
+    | 'recipient_name'
+    | 'phone'
+    | 'address_line1'
+    | 'address_line2'
+    | 'city'
+    | 'province'
+    | 'postal_code'
+  > | null
+  items: Pick<
+    OrderItemRow,
+    | 'id'
+    | 'product_id'
+    | 'variant_id'
+    | 'product_name'
+    | 'variant_name'
+    | 'quantity'
+    | 'unit_price'
+    | 'total_price'
+  >[]
+  payments: Pick<
+    PaymentRow,
+    | 'id'
+    | 'midtrans_order_id'
+    | 'midtrans_transaction_id'
+    | 'payment_type'
+    | 'status'
+    | 'gross_amount'
+    | 'snap_token'
+    | 'snap_redirect_url'
+    | 'fraud_status'
+    | 'settlement_time'
+    | 'created_at'
+  >[]
+}
+
+// ─── Route Handler ────────────────────────────────────────────────────────────
+
 export async function GET(_req: NextRequest, { params }: RouteContext) {
   const { orderNumber } = params
 
-  if (!orderNumber) {
-    return jsonError('Order number diperlukan', 400)
-  }
+  if (!orderNumber) return jsonError('Order number diperlukan', 400)
 
-  // Attempt authenticated request first (respects RLS)
   const supabase = await createServerSupabaseClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Check if admin (service role query to admin_users table)
-  let isAdmin = false
-  if (user) {
-    const admin = await createAdminClient()
-    const { data: adminRecord } = await admin
-      .from('admin_users')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('is_active', true)
-      .maybeSingle()
-    isAdmin = adminRecord !== null
-  }
+  if (!user) return jsonError('Silakan login terlebih dahulu', 401)
 
-  if (!user) {
-    return jsonError('Silakan login terlebih dahulu', 401)
-  }
+  // Determine if user has admin role
+  const adminDb = await createAdminClient()
+  const { data: adminRecord } = await adminDb
+    .from('admin_users')
+    .select('id')
+    .eq('user_id', user.id as never)
+    .eq('is_active', true as never)
+    .maybeSingle()
 
-  // Use admin client for admin users; RLS client for regular users
-  const db = isAdmin ? await createAdminClient() : supabase
+  const isAdmin = adminRecord !== null
 
-  const { data: order, error } = await db
-    .from('orders')
-    .select(
-      `
+  // Use the appropriate client
+  const db = isAdmin ? adminDb : supabase
+
+  const SELECT = `
+    id,
+    order_number,
+    status,
+    subtotal,
+    shipping_cost,
+    discount_amount,
+    tax_amount,
+    total_amount,
+    shipping_provider,
+    tracking_number,
+    notes,
+    created_at,
+    updated_at,
+    shipping_address:addresses(
+      recipient_name,
+      phone,
+      address_line1,
+      address_line2,
+      city,
+      province,
+      postal_code
+    ),
+    items:order_items(
       id,
-      order_number,
+      product_id,
+      variant_id,
+      product_name,
+      variant_name,
+      quantity,
+      unit_price,
+      total_price
+    ),
+    payments(
+      id,
+      midtrans_order_id,
+      midtrans_transaction_id,
+      payment_type,
       status,
-      subtotal,
-      shipping_cost,
-      discount_amount,
-      tax_amount,
-      total_amount,
-      shipping_provider,
-      tracking_number,
-      notes,
-      created_at,
-      updated_at,
-      shipping_address:addresses(
-        recipient_name,
-        phone,
-        address_line1,
-        address_line2,
-        city,
-        province,
-        postal_code
-      ),
-      items:order_items(
-        id,
-        product_id,
-        variant_id,
-        product_name,
-        variant_name,
-        quantity,
-        unit_price,
-        total_price
-      ),
-      payments(
-        id,
-        midtrans_order_id,
-        midtrans_transaction_id,
-        payment_type,
-        status,
-        gross_amount,
-        snap_token,
-        snap_redirect_url,
-        fraud_status,
-        settlement_time,
-        created_at
-      )
-    `,
+      gross_amount,
+      snap_token,
+      snap_redirect_url,
+      fraud_status,
+      settlement_time,
+      created_at
     )
-    .eq('order_number', orderNumber)
+  `
+
+  const { data: rawOrder, error } = await db
+    .from('orders')
+    .select(SELECT)
+    .eq('order_number', orderNumber as never)
     .single()
 
-  if (error || !order) {
-    return jsonError('Pesanan tidak ditemukan', 404)
-  }
+  if (error || !rawOrder) return jsonError('Pesanan tidak ditemukan', 404)
 
-  // For regular users, assert ownership (belt-and-suspenders on top of RLS)
-  if (!isAdmin && (order as unknown as { user_id?: string }).user_id !== user.id) {
-    return jsonError('Pesanan tidak ditemukan', 404)
-  }
+  const order = rawOrder as unknown as OrderProjection
 
-  // Sort payments newest first, surface the latest
-  const sortedPayments = Array.isArray(order.payments)
-    ? [...order.payments].sort(
-        (
-          a: { created_at: string },
-          b: { created_at: string },
-        ) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-      )
-    : []
-
+  // Sort payments newest first
+  const sortedPayments = [...order.payments].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  )
   const latestPayment = sortedPayments[0] ?? null
 
   return jsonOk({
@@ -131,27 +171,16 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
     created_at: order.created_at,
     updated_at: order.updated_at,
     shipping_address: order.shipping_address ?? null,
-    items: (order.items ?? []).map(
-      (i: {
-        id: string
-        product_id: string
-        variant_id: string | null
-        product_name: string
-        variant_name: string | null
-        quantity: number
-        unit_price: number
-        total_price: number
-      }) => ({
-        id: i.id,
-        product_id: i.product_id,
-        variant_id: i.variant_id,
-        product_name: i.product_name,
-        variant_name: i.variant_name,
-        quantity: i.quantity,
-        unit_price: i.unit_price,
-        total_price: i.total_price,
-      }),
-    ),
+    items: order.items.map((i) => ({
+      id: i.id,
+      product_id: i.product_id,
+      variant_id: i.variant_id,
+      product_name: i.product_name,
+      variant_name: i.variant_name,
+      quantity: i.quantity,
+      unit_price: i.unit_price,
+      total_price: i.total_price,
+    })),
     payment: latestPayment
       ? {
           id: latestPayment.id,
