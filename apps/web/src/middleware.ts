@@ -43,34 +43,11 @@ function redirectTo(req: NextRequest, pathname: string, preserveNext = true) {
 // ─── Supabase session detection (cookie-based, no @supabase/ssr required) ───
 
 /**
- * Returns true when a valid Supabase auth token cookie is present.
- * The browser client stores the session under `ginabo-auth` (see supabase/client.ts).
- * We also accept the default `sb-<project>-auth-token` name for flexibility.
+ * Returns true when the auth status flag cookie is present.
+ * Set by AuthProvider on login, cleared on logout.
  */
 function hasSupabaseSession(req: NextRequest): boolean {
-  // Explicit storage key used by the browser client
-  const customKey = "ginabo-auth";
-  // Default Supabase key derived from the project ref
-  const defaultKey = "sb-lvmyjtzfohlorocrjvcx-auth-token";
-
-  const raw =
-    req.cookies.get(customKey)?.value ??
-    req.cookies.get(defaultKey)?.value ??
-    null;
-
-  if (!raw) return false;
-
-  try {
-    const parsed: unknown = JSON.parse(decodeURIComponent(raw));
-    return (
-      parsed !== null &&
-      typeof parsed === "object" &&
-      "access_token" in parsed &&
-      typeof (parsed as Record<string, unknown>).access_token === "string"
-    );
-  } catch {
-    return false;
-  }
+  return !!req.cookies.get("ginabo-auth-status")?.value;
 }
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
