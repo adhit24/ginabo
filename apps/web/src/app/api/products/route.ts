@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const products = await listActiveProducts();
     return jsonOk(
-      products.map((p) => ({
+      products.map((p: CatalogProduct) => ({
         id: p.id,
         slug: p.slug,
         name: p.name,
