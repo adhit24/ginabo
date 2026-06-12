@@ -107,5 +107,6 @@ export function HeroBanner() {
         ))}
       </div>
     </section>
+    </div>
   );
 }
