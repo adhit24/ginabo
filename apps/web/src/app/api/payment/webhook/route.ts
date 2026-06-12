@@ -9,7 +9,7 @@ import {
 } from '@/lib/midtrans'
 import { createAdminClient } from '@/lib/supabase/server'
 import type { MidtransNotification } from '@/types/midtrans'
-import type { OrderStatus, PaymentStatus, OrderItemRow, ProductVariantRow, ProductRow } from '@/types/database'
+import type { OrderStatus, PaymentStatus, OrderRow, OrderItemRow, ProductVariantRow, ProductRow } from '@/types/database'
 
 // ─── Status mapping ───────────────────────────────────────────────────────────
 
