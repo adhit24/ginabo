@@ -15,7 +15,7 @@ interface PageProps {
 // ─── Status badge helpers ──────────────────────────────────────────────────────
 
 const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
-  pending_payment: 'Menunggu Pembayaran',
+  pending: 'Menunggu Pembayaran',
   paid: 'Dibayar',
   processing: 'Diproses',
   shipped: 'Dikirim',
@@ -24,7 +24,7 @@ const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
 }
 
 const ORDER_STATUS_CLASS: Record<OrderStatus, string> = {
-  pending_payment: 'bg-yellow-100 text-yellow-800',
+  pending: 'bg-yellow-100 text-yellow-800',
   paid: 'bg-blue-100 text-blue-800',
   processing: 'bg-indigo-100 text-indigo-800',
   shipped: 'bg-purple-100 text-purple-800',
