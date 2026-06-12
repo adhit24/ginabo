@@ -48,7 +48,7 @@ export function ProductDetailClient({ product }: Props) {
       slug:       product.slug,
       name:       product.name,
       priceMinor: product.priceMinor * qty,
-      currency:   product.currency,
+      currency:   (product.currency as "IDR" | "USD") ?? "IDR",
       imageUrl:   images[0]?.url ?? null,
     });
     setAdded(true);
