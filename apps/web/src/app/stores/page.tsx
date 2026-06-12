@@ -164,36 +164,28 @@ const offlineStores: Store[] = [
 
 const onlineStores: OnlineStore[] = [
   {
-    name: "Shopee",
-    logo: "/shopeepay.svg",
-    url: "https://shopee.co.id",
-    label: "ginabo.official",
-    bg: "#fff4f2",
-    color: "#EE4D2D",
-  },
-  {
     name: "Tokopedia",
-    logo: "/tokopedia.svg",
-    url: "https://tokopedia.com",
-    label: "ginabo.id",
+    logo: "/tokopedia-logo.png",
+    url: "https://www.tokopedia.com/ginabo-store",
+    label: "tokopedia.com/ginabo-store",
     bg: "#f0fcf4",
     color: "#03AC0E",
   },
   {
+    name: "Shopee",
+    logo: "/shopee-logo.svg",
+    url: "https://shopee.co.id/ginabostore",
+    label: "shopee.co.id/ginabostore",
+    bg: "#fff4f2",
+    color: "#EE4D2D",
+  },
+  {
     name: "TikTok Shop",
-    logo: "/tiktok.svg",
-    url: "https://tiktok.com",
+    logo: "/tiktok-shop-logo.svg",
+    url: "https://tr.ee/T-0SX7b-OK",
     label: "@ginabo.official",
     bg: "#f5f5f5",
     color: "#010101",
-  },
-  {
-    name: "Lazada",
-    logo: "/lazada.svg",
-    url: "https://lazada.co.id",
-    label: "Ginabo Official Store",
-    bg: "#f4f3ff",
-    color: "#0F146D",
   },
 ];
 
