@@ -277,10 +277,8 @@ export async function POST(req: NextRequest) {
       discount_applied: discountAmount,
       used_at: new Date().toISOString(),
     })
-    await admin
-      .from('coupons')
-      .update({ usage_count: admin.from('coupons').select() } as never)
-      .eq('id', couponId)
+    // Increment usage_count via rpc to avoid race conditions; fallback to client-side inc
+    await admin.rpc('increment_coupon_usage', { coupon_id: couponId }).maybeSingle()
   }
 
   return jsonOk({
