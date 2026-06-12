@@ -35,23 +35,19 @@ const footerLinks = [
   },
 ];
 
-const G = (domain: string) => `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-
 const paymentLogos = [
-  { name: "BCA",       bg: "#005BAA", src: G("bca.co.id") },
-  { name: "Mandiri",   bg: "#F7941D", src: G("bankmandiri.co.id") },
-  { name: "BRI",       bg: "#003087", src: G("bri.co.id") },
-  { name: "GoPay",     bg: "#00AED6", src: G("gopay.co.id") },
-  { name: "OVO",       bg: "#4C3494", src: G("ovo.id") },
-  { name: "Dana",      bg: "#118EEA", src: G("dana.id") },
-  { name: "ShopeePay", bg: "#EE4D2D", src: G("shopee.co.id") },
+  { name: "BCA",       src: "/BCA.svg" },
+  { name: "Mandiri",   src: "/mandiri.svg" },
+  { name: "BRI",       src: "/bri.svg" },
+  { name: "GoPay",     src: "/gopay.svg" },
+  { name: "Dana",      src: "/dana.svg" },
+  { name: "ShopeePay", src: "/shopeepay.svg" },
 ];
 
 const shippingLogos = [
-  { name: "JNE",      bg: "#CC1A22", src: G("jne.co.id") },
-  { name: "J&T",      bg: "#E31837", src: G("jtexpress.co.id") },
-  { name: "SiCepat",  bg: "#CC0000", src: G("sicepat.com") },
-  { name: "Anteraja", bg: "#6B2D8B", src: G("anteraja.id") },
+  { name: "JNE",      src: "/jne.svg" },
+  { name: "J&T",      src: "/j&t.png" },
+  { name: "Anteraja", src: "/anteraja.png" },
 ];
 
 export function SiteFooter() {
