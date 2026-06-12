@@ -207,6 +207,62 @@ export default function HomePage() {
       <HeroBanner />
 
       {/* ════════════════════════════════════════════
+          1b. FEATURE CARDS (SkinCheck / Reseller / Halal+BPOM)
+      ════════════════════════════════════════════ */}
+      <div className="w-full md:px-5 lg:px-8 xl:px-10 md:pb-4">
+        <div className="grid grid-cols-3 divide-x divide-[#f0e6f6] bg-white md:rounded-b-2xl shadow-sm md:shadow-md overflow-hidden">
+          {[
+            {
+              href: "/skincheck",
+              icon: (
+                <svg width="26" height="26" fill="none" stroke="#78257C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                  <path d="M11 8v6M8 11h6"/>
+                </svg>
+              ),
+              label: "Cek Kulitmu",
+              sub: "Analisis AI",
+            },
+            {
+              href: "/reseller",
+              icon: (
+                <svg width="26" height="26" fill="none" stroke="#78257C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              ),
+              label: "Jadi Reseller",
+              sub: "Keuntungan Eksklusif",
+            },
+            {
+              href: "/about",
+              icon: (
+                <svg width="26" height="26" fill="none" stroke="#78257C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <path d="m9 12 2 2 4-4"/>
+                </svg>
+              ),
+              label: "Halal & BPOM",
+              sub: "Sudah Tersertifikasi",
+            },
+          ].map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              className="flex flex-col items-center gap-1.5 px-3 py-4 md:flex-row md:gap-3 md:px-6 md:py-5 transition hover:bg-[#fdf5ff] group"
+            >
+              <div className="flex-shrink-0 opacity-80 group-hover:opacity-100 transition">{item.icon}</div>
+              <div className="text-center md:text-left">
+                <p className="text-[12px] md:text-[14px] font-bold text-[#303030] group-hover:text-[#78257C] transition leading-tight">{item.label}</p>
+                <p className="hidden md:block mt-0.5 text-[11px] text-[#999] leading-snug">{item.sub}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* ════════════════════════════════════════════
           2. MARQUEE (KEEP)
       ════════════════════════════════════════════ */}
       <div className="border-y border-[#f0d8eb] bg-white py-3.5">
