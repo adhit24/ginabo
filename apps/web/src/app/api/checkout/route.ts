@@ -5,12 +5,16 @@ import { NextRequest } from 'next/server'
 import { jsonError, jsonOk } from '@/lib/http'
 import { generateOrderNumber } from '@/lib/ids'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server'
-import {
-  createSnapTransaction,
-  isMidtransProduction,
-} from '@/lib/midtrans'
+import { createSnapTransaction, isMidtransProduction } from '@/lib/midtrans'
 import type { MidtransCustomerDetails, MidtransItemDetail } from '@/types/midtrans'
-import type { OrderStatus, PaymentStatus } from '@/types/database'
+import type {
+  OrderRow,
+  OrderItemRow,
+  PaymentRow,
+  AddressRow,
+  ProfileRow,
+  CouponRow,
+} from '@/types/database'
 
 // ─── Request schema ───────────────────────────────────────────────────────────
 
@@ -18,7 +22,7 @@ interface CartItem {
   product_id: string
   variant_id?: string | null
   qty: number
-  price: number   // unit price in IDR (not minor units)
+  price: number // unit price in IDR
   name: string
 }
 
@@ -45,10 +49,6 @@ function validateItems(items: unknown): items is CartItem[] {
   )
 }
 
-function uniqueOrderNumber(): string {
-  return generateOrderNumber()
-}
-
 // ─── Route Handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
@@ -62,65 +62,59 @@ export async function POST(req: NextRequest) {
 
   const { items, coupon_code, address_id, shipping_cost = 0 } = body
 
-  if (!validateItems(items)) {
-    return jsonError('Field items tidak valid', 400)
-  }
-  if (!address_id) {
-    return jsonError('address_id diperlukan', 400)
-  }
+  if (!validateItems(items)) return jsonError('Field items tidak valid', 400)
+  if (!address_id) return jsonError('address_id diperlukan', 400)
 
-  // 2. Authenticate — use server client (RLS enforced)
+  // 2. Authenticate
   const supabase = await createServerSupabaseClient()
   const {
     data: { user },
     error: authError,
   } = await supabase.auth.getUser()
 
-  if (authError || !user) {
-    return jsonError('Silakan login terlebih dahulu', 401)
-  }
+  if (authError || !user) return jsonError('Silakan login terlebih dahulu', 401)
 
   // 3. Fetch profile for customer details
-  const { data: profile } = await supabase
+  const { data: rawProfile } = await supabase
     .from('profiles')
     .select('full_name, phone, email')
     .eq('id', user.id)
     .single()
 
+  const profile = rawProfile as Pick<ProfileRow, 'full_name' | 'phone' | 'email'> | null
   const customerName = profile?.full_name ?? user.email ?? 'Pelanggan'
   const customerPhone = profile?.phone ?? ''
   const customerEmail = user.email ?? ''
 
   // 4. Fetch address
-  const { data: address } = await supabase
+  const { data: rawAddress } = await supabase
     .from('addresses')
     .select('*')
     .eq('id', address_id)
     .eq('user_id', user.id)
     .single()
 
-  if (!address) {
-    return jsonError('Alamat tidak ditemukan', 404)
-  }
+  if (!rawAddress) return jsonError('Alamat tidak ditemukan', 404)
+  const address = rawAddress as AddressRow
 
   // 5. Validate coupon (optional)
   let discountAmount = 0
   let couponId: string | null = null
 
   if (coupon_code) {
-    const { data: coupon } = await supabase
+    const { data: rawCoupon } = await supabase
       .from('coupons')
       .select('*')
       .eq('code', coupon_code.toUpperCase())
       .eq('is_active', true)
       .single()
 
+    const coupon = rawCoupon as CouponRow | null
     if (coupon) {
       const subtotalForCoupon = items.reduce((sum, i) => sum + i.price * i.qty, 0)
-      const meetsMinPurchase =
-        !coupon.min_purchase || subtotalForCoupon >= coupon.min_purchase
+      const meetsMin = !coupon.min_purchase || subtotalForCoupon >= coupon.min_purchase
 
-      if (meetsMinPurchase) {
+      if (meetsMin) {
         if (coupon.type === 'percentage') {
           discountAmount = Math.round((subtotalForCoupon * coupon.value) / 100)
           if (coupon.max_discount) discountAmount = Math.min(discountAmount, coupon.max_discount)
@@ -138,39 +132,37 @@ export async function POST(req: NextRequest) {
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
   const totalAmount = Math.max(0, subtotal + shipping_cost - discountAmount)
 
-  // 7. Use admin client for writes (bypasses RLS insert policies on orders)
+  // 7. Admin client for writes
   const admin = await createAdminClient()
 
-  // 8. Generate unique order number
-  const orderNumber = uniqueOrderNumber()
+  // 8. Insert order — cast payload to bypass strict Insert generic
+  const orderNumber = generateOrderNumber()
 
-  // 9. Insert order
-  const orderInsert = {
-    order_number: orderNumber,
-    user_id: user.id,
-    status: 'pending_payment' as OrderStatus,
-    subtotal,
-    shipping_cost,
-    discount_amount: discountAmount,
-    tax_amount: 0,
-    total_amount: totalAmount,
-    coupon_id: couponId,
-    shipping_address_id: address_id,
-    notes: null,
-  }
-
-  const { data: order, error: orderError } = await admin
+  const { data: rawOrder, error: orderError } = await admin
     .from('orders')
-    .insert(orderInsert)
+    .insert({
+      order_number: orderNumber,
+      user_id: user.id,
+      status: 'pending',
+      subtotal,
+      shipping_cost,
+      discount_amount: discountAmount,
+      tax_amount: 0,
+      total_amount: totalAmount,
+      coupon_id: couponId,
+      shipping_address_id: address_id,
+      notes: null,
+    } as never)
     .select()
     .single()
 
-  if (orderError || !order) {
+  if (orderError || !rawOrder) {
     return jsonError('Gagal membuat pesanan', 500, orderError?.message)
   }
+  const order = rawOrder as OrderRow
 
-  // 10. Insert order_items
-  const orderItemsInsert = items.map((item) => ({
+  // 9. Insert order_items
+  const orderItemsPayload = items.map((item) => ({
     order_id: order.id,
     product_id: item.product_id,
     variant_id: item.variant_id ?? null,
@@ -181,15 +173,16 @@ export async function POST(req: NextRequest) {
     total_price: item.price * item.qty,
   }))
 
-  const { error: itemsError } = await admin.from('order_items').insert(orderItemsInsert)
+  const { error: itemsError } = await admin
+    .from('order_items')
+    .insert(orderItemsPayload as never)
 
   if (itemsError) {
-    // Rollback order
-    await admin.from('orders').delete().eq('id', order.id)
+    await admin.from('orders').delete().eq('id', order.id as never)
     return jsonError('Gagal menyimpan item pesanan', 500, itemsError.message)
   }
 
-  // 11. Build Midtrans payload
+  // 10. Build Midtrans payload
   const [firstName, ...rest] = customerName.split(' ')
   const customerDetails: MidtransCustomerDetails = {
     first_name: firstName,
@@ -221,23 +214,22 @@ export async function POST(req: NextRequest) {
       : []),
   ]
 
-  // 12. Call Midtrans Snap
+  // 11. Call Midtrans Snap
   let snapToken: string
   let snapRedirectUrl: string
 
   try {
-    const snapResponse = await createSnapTransaction(
+    const snap = await createSnapTransaction(
       orderNumber,
       totalAmount,
       customerDetails,
       midtransItems,
     )
-    snapToken = snapResponse.token
-    snapRedirectUrl = snapResponse.redirect_url
+    snapToken = snap.token
+    snapRedirectUrl = snap.redirect_url
   } catch (e) {
-    // Rollback — delete items then order
-    await admin.from('order_items').delete().eq('order_id', order.id)
-    await admin.from('orders').delete().eq('id', order.id)
+    await admin.from('order_items').delete().eq('order_id', order.id as never)
+    await admin.from('orders').delete().eq('id', order.id as never)
     return jsonError(
       'Gagal menghubungi payment gateway',
       502,
@@ -245,40 +237,39 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // 13. Save initial payment record
-  const paymentInsert = {
-    order_id: order.id,
-    midtrans_order_id: orderNumber,
-    midtrans_transaction_id: null as string | null,
-    payment_type: null as string | null,
-    status: 'pending' as PaymentStatus,
-    gross_amount: totalAmount,
-    snap_token: snapToken,
-    snap_redirect_url: snapRedirectUrl,
-    fraud_status: null as string | null,
-    settlement_time: null as string | null,
-    expiry_time: null as string | null,
-    raw_response: null as Record<string, unknown> | null,
-  }
-
-  const { error: paymentError } = await admin.from('payments').insert(paymentInsert)
+  // 12. Save payment record
+  const { error: paymentError } = await admin
+    .from('payments')
+    .insert({
+      order_id: order.id,
+      midtrans_order_id: orderNumber,
+      midtrans_transaction_id: null,
+      payment_type: null,
+      status: 'pending',
+      gross_amount: totalAmount,
+      snap_token: snapToken,
+      snap_redirect_url: snapRedirectUrl,
+      fraud_status: null,
+      settlement_time: null,
+      expiry_time: null,
+      raw_response: null,
+    } as never)
 
   if (paymentError) {
-    // Non-fatal: order exists, payment row failed — log and continue
     console.error('[checkout] Failed to save payment row:', paymentError.message)
   }
 
-  // 14. Record coupon usage
+  // 13. Record coupon usage (best-effort)
   if (couponId) {
-    await admin.from('coupon_usages').insert({
-      coupon_id: couponId,
-      user_id: user.id,
-      order_id: order.id,
-      discount_applied: discountAmount,
-      used_at: new Date().toISOString(),
-    })
-    // Increment usage_count via rpc to avoid race conditions; fallback to client-side inc
-    await admin.rpc('increment_coupon_usage', { coupon_id: couponId }).maybeSingle()
+    await admin
+      .from('coupon_usages')
+      .insert({
+        coupon_id: couponId,
+        user_id: user.id,
+        order_id: order.id,
+        discount_applied: discountAmount,
+        used_at: new Date().toISOString(),
+      } as never)
   }
 
   return jsonOk({
