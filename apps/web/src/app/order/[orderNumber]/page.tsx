@@ -75,8 +75,56 @@ export default async function OrderDetailPage({ params }: PageProps) {
     )
   }
 
+  // ─── Local projection types ────────────────────────────────────────────────
+
+  type PaymentRecord = {
+    id: string
+    status: PaymentStatus
+    snap_token: string | null
+    snap_redirect_url: string | null
+    payment_type: string | null
+    settlement_time: string | null
+    fraud_status: string | null
+  }
+
+  type AddressRecord = {
+    recipient_name: string
+    phone: string
+    address_line1: string
+    address_line2: string | null
+    city: string
+    province: string
+    postal_code: string
+  }
+
+  type OrderItem = {
+    id: string
+    product_name: string
+    variant_name: string | null
+    quantity: number
+    unit_price: number
+    total_price: number
+  }
+
+  type OrderProjection = {
+    id: string
+    order_number: string
+    status: string
+    subtotal: number
+    shipping_cost: number
+    discount_amount: number
+    tax_amount: number
+    total_amount: number
+    shipping_provider: string | null
+    tracking_number: string | null
+    created_at: string
+    shipping_address: AddressRecord | null
+    items: OrderItem[]
+    payments: PaymentRecord[]
+  }
+
   // Fetch order — RLS ensures ownership
-  const { data: order, error } = await supabase
+  const { data: rawOrder, error } = await supabase
     .from('orders')
     .select(
       `
@@ -119,53 +167,23 @@ export default async function OrderDetailPage({ params }: PageProps) {
       )
     `,
     )
-    .eq('order_number', orderNumber)
+    .eq('order_number', orderNumber as never)
     .single()
 
-  if (error || !order) {
+  if (error || !rawOrder) {
     notFound()
   }
 
-  // Resolve latest payment
-  type PaymentRecord = {
-    id: string
-    status: PaymentStatus
-    snap_token: string | null
-    snap_redirect_url: string | null
-    payment_type: string | null
-    settlement_time: string | null
-    fraud_status: string | null
-  }
+  const order = rawOrder as unknown as OrderProjection
 
-  const payments = Array.isArray(order.payments)
-    ? (order.payments as PaymentRecord[])
-    : []
+  const payments = order.payments ?? []
   const latestPayment = payments[0] ?? null
 
   const isPendingPayment = order.status === 'pending'
   const isShipped = order.status === 'shipped'
 
-  // Resolve address
-  type AddressRecord = {
-    recipient_name: string
-    phone: string
-    address_line1: string
-    address_line2: string | null
-    city: string
-    province: string
-    postal_code: string
-  }
-  const addr = order.shipping_address as AddressRecord | null
-
-  type OrderItem = {
-    id: string
-    product_name: string
-    variant_name: string | null
-    quantity: number
-    unit_price: number
-    total_price: number
-  }
-  const items = (order.items ?? []) as OrderItem[]
+  const addr = order.shipping_address
+  const items = order.items ?? []
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
