@@ -61,7 +61,7 @@ export function HeroBanner() {
             src={b.src}
             alt={b.alt}
             fill
-            className="object-cover object-center"
+            className="object-cover object-top md:object-[center_15%]"
             priority={i === 0}
             sizes="100vw"
           />
