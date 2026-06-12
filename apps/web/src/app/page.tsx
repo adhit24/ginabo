@@ -188,6 +188,56 @@ function ProductCard({
   );
 }
 
+// ── CTA Card — 3D tilt + spotlight glow + spring physics ─────────────────────
+function CTACard({ href, src, alt }: { href: string; src: string; alt: string }) {
+  const cardRef = useRef<HTMLAnchorElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const rotX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), { stiffness: 350, damping: 30 });
+  const rotY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), { stiffness: 350, damping: 30 });
+  const glowX = useTransform(mouseX, [-0.5, 0.5], [0, 100]);
+  const glowY = useTransform(mouseY, [-0.5, 0.5], [0, 100]);
+  const spotlight = useMotionTemplate`radial-gradient(circle at ${glowX}% ${glowY}%, rgba(255,255,255,0.22) 0%, transparent 55%)`;
+
+  function onMove(e: React.MouseEvent<HTMLAnchorElement>) {
+    const r = cardRef.current?.getBoundingClientRect();
+    if (!r) return;
+    mouseX.set((e.clientX - r.left) / r.width - 0.5);
+    mouseY.set((e.clientY - r.top) / r.height - 0.5);
+  }
+  function onLeave() { mouseX.set(0); mouseY.set(0); }
+
+  return (
+    <motion.a
+      ref={cardRef}
+      href={href}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      initial={{ boxShadow: "0 2px 12px rgba(120,37,124,0.10)" }}
+      whileHover={{ scale: 1.03, boxShadow: "0 16px 48px rgba(120,37,124,0.40), 0 0 0 2px rgba(190,58,180,0.50)" }}
+      whileTap={{ scale: 0.97, boxShadow: "0 0 0 3px rgba(190,58,180,0.90), 0 4px 28px rgba(120,37,124,0.60)" }}
+      transition={{ type: "spring", stiffness: 400, damping: 28 }}
+      style={{ rotateX: rotX, rotateY: rotY, transformPerspective: 900 }}
+      className="relative overflow-hidden rounded-xl md:rounded-2xl block cursor-pointer"
+    >
+      {/* Mouse-tracked spotlight overlay */}
+      <motion.div
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{ background: spotlight }}
+      />
+      <div className="relative aspect-[4/3] md:aspect-[580/200]">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-cover object-center"
+          sizes="(max-width:640px) 33vw, (max-width:1280px) calc((100vw - 64px) / 3), 420px"
+        />
+      </div>
+    </motion.a>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [products, setProducts] = useState<GProduct[]>([]);
