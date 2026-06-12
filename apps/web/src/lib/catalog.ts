@@ -1,7 +1,6 @@
 import { supabase } from "@/lib/supabase";
-import { getD1Db, d1ListActiveProducts, d1GetProductBySlug } from "@/lib/d1";
 
-type CatalogProduct = {
+export type CatalogProduct = {
   id: string;
   slug: string;
   name: string;
@@ -24,44 +23,50 @@ const demoProducts: CatalogProduct[] = [
   { id: "demo_prod_dna_2", slug: "repair-glow-set", name: "Hydration + Glow Duo", description: "Kombinasi serum + gel hydration untuk bantu kulit terasa lebih lembap.", priceMinor: 360000, currency: "IDR", stockQty: 35, isActive: true, images: [{ url: "/product-dna-1.png", alt: "Repair Glow Set", sortOrder: 0 }] },
 ];
 
-export async function listActiveProducts() {
-  // Runtime: try D1 first (edge-local, ~1ms)
-  const db = getD1Db();
-  if (db) {
-    try {
-      const rows = await d1ListActiveProducts(db);
-      if (rows.length > 0) return rows;
-    } catch { /* fall through */ }
-  }
+function toProduct(row: Record<string, unknown>): CatalogProduct {
+  const rawImages = (row.product_images ?? []) as Array<{ url: string; alt: string | null; sort_order: number }>;
+  const images = rawImages
+    .map((img) => ({ url: img.url, alt: img.alt, sortOrder: img.sort_order }))
+    .sort((a, b) => a.sortOrder - b.sortOrder);
 
-  // Build time / fallback: Supabase
-  const { data, error } = await supabase
-    .from("Product")
-    .select(`*, images:ProductImage(url, alt, sortOrder)`)
-    .eq("isActive", true)
-    .order("createdAt", { ascending: false });
-
-  if (error || !data || data.length === 0) return demoProducts.filter((p) => p.isActive);
-  return data;
+  return {
+    id: row.id as string,
+    slug: row.slug as string,
+    name: row.name as string,
+    description: (row.description as string | null) ?? "",
+    priceMinor: row.price as number,
+    currency: "IDR",
+    stockQty: (row.stock_quantity as number) ?? 0,
+    isActive: (row.is_active as boolean) ?? true,
+    images,
+  };
 }
 
-export async function getProductBySlug(slug: string) {
-  // Runtime: try D1 first
-  const db = getD1Db();
-  if (db) {
-    try {
-      const product = await d1GetProductBySlug(db, slug);
-      if (product) return product;
-    } catch { /* fall through */ }
+export async function listActiveProducts(): Promise<CatalogProduct[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select(`*, product_images(url, alt, sort_order)`)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
+
+  if (error || !data || data.length === 0) {
+    return demoProducts.filter((p) => p.isActive);
   }
 
-  // Build time / fallback: Supabase
+  return (data as Record<string, unknown>[]).map(toProduct);
+}
+
+export async function getProductBySlug(slug: string): Promise<CatalogProduct | null> {
   const { data, error } = await supabase
-    .from("Product")
-    .select(`*, images:ProductImage(url, alt, sortOrder)`)
+    .from("products")
+    .select(`*, product_images(url, alt, sort_order)`)
     .eq("slug", slug)
+    .eq("is_active", true)
     .single();
 
-  if (error) return demoProducts.find((p) => p.slug === slug) ?? null;
-  return data;
+  if (error || !data) {
+    return demoProducts.find((p) => p.slug === slug) ?? null;
+  }
+
+  return toProduct(data as Record<string, unknown>);
 }
