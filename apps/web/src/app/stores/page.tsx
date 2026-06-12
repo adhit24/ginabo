@@ -351,11 +351,10 @@ export default function StoresPage() {
               {onlineStores.map(store => (
                 <a key={store.name} href={store.url} target="_blank" rel="noopener noreferrer"
                   className="bg-white rounded-[12px] border border-[#f0e6f6] p-6 flex items-center gap-5 hover:border-[#c89bd4] hover:shadow-md transition-all group">
-                  <div className="w-14 h-14 rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
+                  <div className="w-16 h-14 rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden p-2"
                     style={{ background: store.bg }}>
                     <img src={store.logo} alt={store.name}
-                      className="object-contain"
-                      style={{ width: 40, height: 40 }} />
+                      className="w-full h-full object-contain" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[15px] font-bold text-[#303030] group-hover:text-[#78257C] transition">{store.name}</p>
