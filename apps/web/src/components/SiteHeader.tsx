@@ -157,22 +157,15 @@ export function SiteHeader() {
 
           {/* Center: Logo */}
           <Link href="/" className="flex items-center justify-center">
-            <div style={{ width: 120, height: 30, overflow: "hidden", position: "relative" }}>
-              <Image
-                src="/logo.png"
-                alt="Ginabo"
-                width={400}
-                height={160}
-                style={{
-                  position: "absolute",
-                  top: "-42%",
-                  left: "-2%",
-                  width: "104%",
-                  height: "auto",
-                  filter: "invert(29%) sepia(60%) saturate(500%) hue-rotate(240deg) brightness(80%)",
-                }}
-              />
-            </div>
+            <Image
+              src="/logo_diamond.png"
+              alt="Ginabo"
+              width={160}
+              height={56}
+              className="object-contain"
+              style={{ height: 56, width: "auto" }}
+              priority
+            />
           </Link>
 
           {/* Right: Konsultasi + User + Cart */}
