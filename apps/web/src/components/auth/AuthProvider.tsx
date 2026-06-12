@@ -66,10 +66,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
+        // Set flag cookie so middleware can detect auth server-side
+        document.cookie = `ginabo-auth-status=1; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
         fetchAndSetUser(session.user).catch(() => {
           setUser(toAppUser(session.user));
         });
       } else {
+        document.cookie = "ginabo-auth-status=; path=/; max-age=0";
         setUser(null);
       }
       setIsLoading(false);
