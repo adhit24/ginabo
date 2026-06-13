@@ -76,7 +76,7 @@ export default function ContactPage() {
                   ))}
                 </ul>
                 <Link
-                  href="https://wa.me/628xxxxxxxxxx"
+                  href="https://tr.ee/LFexnAKyhp"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-auto rounded-xl py-3 text-center text-sm font-bold text-white transition hover:opacity-90"
