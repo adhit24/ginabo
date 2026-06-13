@@ -233,7 +233,7 @@ export default function ResellerProgramPage() {
             target="_blank"
             rel="noreferrer"
             aria-label="Daftar sekarang jadi partner Ginabo via WhatsApp"
-            className="absolute bottom-[16%] left-[3%] w-[55%] max-w-[240px] md:bottom-[-16%] md:w-[40%] md:max-w-[500px] min-w-[120px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78257C]"
+            className="hidden md:absolute md:bottom-[-16%] md:left-[3%] md:w-[40%] md:max-w-[500px] md:min-w-[140px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78257C]"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: EASE, delay: 0.35 }}
