@@ -19,7 +19,7 @@ const onlineStores = [
   {
     name: "TikTok Shop",
     logo: "/tiktok-shop-logo.svg",
-    url: "https://tr.ee/T-0SX7b-OK",
+    url: "https://www.tiktok.com/@ginabo.official?is_from_webapp=1&sender_device=pc",
     label: "@ginabo.official",
     bg: "#f5f5f5",
   },
