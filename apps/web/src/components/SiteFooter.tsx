@@ -103,7 +103,7 @@ export function SiteFooter() {
                   style={{ background: "rgba(255,255,255,0.1)" }}>
                   <img src="/whatsapp.png" alt="WhatsApp" style={{ width: 18, height: 18 }} />
                 </Link>
-                <Link href="https://tr.ee/T-0SX7b-OK" target="_blank" rel="noopener noreferrer" aria-label="TikTok"
+                <Link href="https://www.tiktok.com/@ginabo.official?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener noreferrer" aria-label="TikTok"
                   className="flex h-8 w-8 items-center justify-center rounded-[5px]"
                   style={{ background: "rgba(255,255,255,0.1)" }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
