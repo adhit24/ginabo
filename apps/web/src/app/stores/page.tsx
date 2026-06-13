@@ -105,7 +105,7 @@ export default function StoresPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              href="https://wa.me/6281234567890"
+              href="https://wa.me/6285199264835"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-[8px] text-[13px] font-bold text-white transition hover:opacity-90"
