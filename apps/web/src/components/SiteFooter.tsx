@@ -28,7 +28,7 @@ const footerLinks = [
     heading: "Layanan Pengaduan",
     items: [
       { label: "PT Ginabo Nusantara",     href: "#" },
-      { label: "WA: 0812-3456-7890",      href: "https://wa.me/6281234567890" },
+      { label: "Chat WhatsApp",             href: "https://tr.ee/LFexnAKyhp" },
       { label: "Email: cs@ginabo.id",     href: "mailto:cs@ginabo.id" },
       { label: "Senin–Jumat, 09.00–17.00", href: "#" },
     ],
