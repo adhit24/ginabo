@@ -21,13 +21,6 @@ const marqueeItems = [
   "Barrier-First", "Gentle Formula", "AM & PM Routine", "2 Years Research",
 ];
 
-const characters = [
-  { title: "Warm",        desc: "Terasa hangat dan mudah didekati, bukan brand yang menghakimi kondisi kulitmu." },
-  { title: "Reliable",    desc: "Riset bertahun-tahun untuk formula yang seimbang antara performa dan kenyamanan." },
-  { title: "Trustworthy", desc: "Kami serius di kualitas, karena kulit kamu bukan tempat coba-coba." },
-  { title: "Clear",       desc: "Komunikasi jujur & realistis. Tidak ada klaim berlebihan seperti \"putih instan\" atau \"1 malam langsung\"." },
-];
-
 // ── Animation Variants ────────────────────────────────────────────────────────
 const EASE = [0.25, 1, 0.5, 1] as const;
 
