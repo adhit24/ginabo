@@ -98,7 +98,7 @@ export function SiteFooter() {
                   style={{ background: "rgba(255,255,255,0.1)" }}>
                   <img src="/instagram.png" alt="Instagram" style={{ width: 18, height: 18 }} />
                 </Link>
-                <Link href="https://tr.ee/LFexnAKyhp" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
+                <Link href="https://wa.me/6285199264835" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
                   className="flex h-8 w-8 items-center justify-center rounded-[5px]"
                   style={{ background: "rgba(255,255,255,0.1)" }}>
                   <img src="/whatsapp.png" alt="WhatsApp" style={{ width: 18, height: 18 }} />
