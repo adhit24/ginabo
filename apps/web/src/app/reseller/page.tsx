@@ -41,7 +41,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function waLink() {
   const text = "Halo Ginabo, saya tertarik bergabung sebagai partner reseller. Boleh info lebih lanjut?";
-  return `https://wa.me/6281234567890?text=${encodeURIComponent(text)}`;
+  return `https://wa.me/6285199264835?text=${encodeURIComponent(text)}`;
 }
 
 // ─── SVG ICON COMPONENTS ─────────────────────────────────────────────────────
