@@ -13,7 +13,6 @@ import { useCart } from "@/components/cart/CartProvider";
 import { store, type GProduct } from "@/lib/adminStore";
 
 // ── Figma Assets ──────────────────────────────────────────────────────────────
-const IMG_STORE     = "/store_ginabo.png";
 const IMG_SPRITE    = "https://www.figma.com/api/mcp/asset/71dedf14-7a07-4680-8fde-41aadfebedf7"; // 3-product sprite
 
 // ── Static Data ───────────────────────────────────────────────────────────────
