@@ -42,25 +42,7 @@ const cardSlideUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.58, ease: EASE } },
 };
 
-const fadeInLeft = {
-  hidden: { opacity: 0, x: -48 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.65, ease: EASE } },
-};
-
-const fadeInRight = {
-  hidden: { opacity: 0, x: 48 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.65, ease: EASE } },
-};
-
 // ── Sub-components ────────────────────────────────────────────────────────────
-
-function Badge({ children, center }: { children: ReactNode; center?: boolean }) {
-  return (
-    <div className={`badge-bg ${center ? "self-center" : "self-start"} rounded-[10px] px-4 sm:px-8 py-2 mb-6`}>
-      <span className="font-bold text-white text-[13px] tracking-wider whitespace-nowrap">{children}</span>
-    </div>
-  );
-}
 
 function SectionLabel({ children, center }: { children: ReactNode; center?: boolean }) {
   return (
