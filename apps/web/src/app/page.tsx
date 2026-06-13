@@ -22,32 +22,11 @@ const marqueeItems = [
   "Barrier-First", "Gentle Formula", "AM & PM Routine", "2 Years Research",
 ];
 
-const singleProducts = [
-  { name: "Hydra Moist\nGel Ultimate",       rating: "5.0", reviews: "127", priceVal: "Rp 120.000", img: "/salmonfix.png" },
-  { name: "Bright & Care\nMoisture Cream",   rating: "5.0", reviews: "127", priceVal: "Rp 75.000",  img: "/moistfix.png"  },
-  { name: "GlowAge Multi-\nActive Serum",    rating: "5.0", reviews: "127", priceVal: "Rp 90.000",  img: "/serumfix.png"  },
-];
-
-const bundleProducts = [
-  { name: "Ginabo Complete\nSkin Nutrition Set", rating: "5.0", reviews: "127", originalPrice: "Rp 575.999", priceVal: "Rp 287.999", img: "/essential.png"    },
-  { name: "Repair &\nGlow Set",                 rating: "5.0", reviews: "127", originalPrice: "Rp 415.999", priceVal: "Rp 207.999", img: "/repair_glow.png"  },
-  { name: "Daily Skin\nBarrier Set",            rating: "5.0", reviews: "127", originalPrice: "Rp 395.999", priceVal: "Rp 197.999", img: "/skin_barrier.png" },
-  { name: "Bright\nRenewal Set",               rating: "5.0", reviews: "127", originalPrice: "Rp 339.999", priceVal: "Rp 169.999", img: "/bright_renewal.png" },
-];
-
-
 const characters = [
   { title: "Warm",        desc: "Terasa hangat dan mudah didekati, bukan brand yang menghakimi kondisi kulitmu." },
   { title: "Reliable",    desc: "Riset bertahun-tahun untuk formula yang seimbang antara performa dan kenyamanan." },
   { title: "Trustworthy", desc: "Kami serius di kualitas, karena kulit kamu bukan tempat coba-coba." },
   { title: "Clear",       desc: "Komunikasi jujur & realistis. Tidak ada klaim berlebihan seperti \"putih instan\" atau \"1 malam langsung\"." },
-];
-
-const blogPosts = [
-  { title: "Kenali Tanda-tanda Skin Barrier Kamu Rusak",     date: "12 Apr 2024", tag: "Skin Barrier", read: "4 min", img: "/product-serum-3.png" },
-  { title: "Urutan Skincare yang Benar untuk Pemula",        date: "5 Apr 2024",  tag: "Beginner",     read: "6 min", img: "/product-cream-2.png" },
-  { title: "Serum vs Essence: Mana yang Kamu Butuhkan?",    date: "28 Mar 2024", tag: "Tips",         read: "5 min", img: "/product-serum-4.png" },
-  { title: "Cara Pakai Sunscreen yang Efektif Setiap Hari", date: "20 Mar 2024", tag: "Sunscreen",    read: "3 min", img: "/product-dna-3.png" },
 ];
 
 // ── Animation Variants ────────────────────────────────────────────────────────
