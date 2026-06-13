@@ -13,18 +13,8 @@ import { useCart } from "@/components/cart/CartProvider";
 import { store, type GProduct } from "@/lib/adminStore";
 
 // ── Figma Assets ──────────────────────────────────────────────────────────────
-const IMG_TEXTURE   = "https://www.figma.com/api/mcp/asset/28c8f53f-937f-4a2b-930b-d14c3e2fd172"; // purple texture (badge bg)
 const IMG_STORE     = "/store_ginabo.png";
-const IMG_PERSON    = "https://www.figma.com/api/mcp/asset/3b32a890-5932-43ff-a576-41fc59926f60"; // model photo
 const IMG_SPRITE    = "https://www.figma.com/api/mcp/asset/71dedf14-7a07-4680-8fde-41aadfebedf7"; // 3-product sprite
-const IMG_CREAM     = "https://www.figma.com/api/mcp/asset/4db5c30d-969e-4093-aa64-026dd52a7f47"; // bright & care
-const IMG_HYDRA     = "https://www.figma.com/api/mcp/asset/691267df-2c74-42aa-9b09-e48cddcf41de"; // hydra moist gel
-const IMG_SERUM     = "https://www.figma.com/api/mcp/asset/42847e4c-7e8e-4690-a5d1-19adaf062ceb"; // glowage serum
-
-const IMG_CART1     = "https://www.figma.com/api/mcp/asset/4fa1de69-1da2-4be4-ae0d-59309b68e713"; // shopping cart (product card)
-const IMG_STAR      = "https://www.figma.com/api/mcp/asset/dd951a0c-532e-4daf-bd8f-5c5956a5da93"; // star
-const IMG_PROFILE   = "https://www.figma.com/api/mcp/asset/0df780a8-167c-4ae1-aca9-410075054133"; // profile/user icon
-const IMG_BOTTLE    = "https://www.figma.com/api/mcp/asset/be1d4cf7-e0dc-4442-b74b-959148b85f0f"; // squeeze bottle icon
 
 // ── Static Data ───────────────────────────────────────────────────────────────
 const marqueeItems = [
