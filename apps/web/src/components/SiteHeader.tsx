@@ -153,6 +153,14 @@ export function SiteHeader() {
               )}
             </div>
 
+            {/* JOURNEY direct link */}
+            <Link
+              href="/21days"
+              className={`px-4 py-2 text-[13px] font-semibold transition hover:text-[#78257C] ${pathname === "/21days" ? "text-[#78257C]" : "text-[#303030]"}`}
+            >
+              JOURNEY
+            </Link>
+
           </div>
 
           {/* Center: Logo */}
