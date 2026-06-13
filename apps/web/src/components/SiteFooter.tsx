@@ -93,17 +93,17 @@ export function SiteFooter() {
                 Skincare Friendly Expert — seperti teman yang paling paham kulitmu.
               </p>
               <div className="flex gap-2">
-                <Link href="#" aria-label="Instagram"
+                <Link href="https://www.instagram.com/ginabo.official?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram"
                   className="flex h-8 w-8 items-center justify-center rounded-[5px]"
                   style={{ background: "rgba(255,255,255,0.1)" }}>
                   <img src="/instagram.png" alt="Instagram" style={{ width: 18, height: 18 }} />
                 </Link>
-                <Link href="#" aria-label="WhatsApp"
+                <Link href="https://tr.ee/LFexnAKyhp" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
                   className="flex h-8 w-8 items-center justify-center rounded-[5px]"
                   style={{ background: "rgba(255,255,255,0.1)" }}>
                   <img src="/whatsapp.png" alt="WhatsApp" style={{ width: 18, height: 18 }} />
                 </Link>
-                <Link href="#" aria-label="TikTok"
+                <Link href="https://tr.ee/T-0SX7b-OK" target="_blank" rel="noopener noreferrer" aria-label="TikTok"
                   className="flex h-8 w-8 items-center justify-center rounded-[5px]"
                   style={{ background: "rgba(255,255,255,0.1)" }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
