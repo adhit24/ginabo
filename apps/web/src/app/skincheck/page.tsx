@@ -235,7 +235,7 @@ export default function SkinCheckPage() {
   function handleSubmitBiodata() {
     const productNames = results.map((k) => PRODUCTS[k].name).join(" & ");
     const msg = `Halo Ginabo! 😊\n\nNama saya *${name}*.\n\nSaya sudah mengisi Ginabo Skin Check dan mendapat rekomendasi produk:\n*${productNames}*\n\nBoleh bantu saya untuk info lebih lanjut dan cara pemesanan?`;
-    const url = `https://wa.me/6281234567890?text=${encodeURIComponent(msg)}`;
+    const url = `https://wa.me/6285199264835?text=${encodeURIComponent(msg)}`;
     window.open(url, "_blank");
   }
 
