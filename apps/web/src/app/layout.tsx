@@ -1,7 +1,7 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Montserrat, Outfit, Poppins, Staatliches } from "next/font/google";
+import { Fraunces, Montserrat, Outfit, Poppins, Staatliches } from "next/font/google";
 
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
