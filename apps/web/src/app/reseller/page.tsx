@@ -180,7 +180,7 @@ const problems = [
 ];
 
 const benefits = [
-  { icon: icons.margin,     title: "Margin Lebar",      desc: "Harga khusus partner sampai 40% per produk. Untung jelas di setiap penjualan." },
+  { icon: icons.margin,     title: "Untung Jelas",      desc: "Harga khusus partner — untung Rp 15.000–20.000 di setiap produk yang kamu jual." },
   { icon: icons.star,       title: "Reward Penjualan",  desc: "Bonus & challenge tiap bulan, kuartal, dan tahun untuk performa terbaikmu." },
   { icon: icons.graduation, title: "Training Gratis",   desc: "Product knowledge & teknik closing — bahkan kalau kamu belum pernah jualan." },
   { icon: icons.gift,       title: "Materi Siap Pakai", desc: "Foto produk, caption, dan konten promosi siap posting. Kamu tinggal jual." },
