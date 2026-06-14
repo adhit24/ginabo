@@ -17,7 +17,7 @@ const footerLinks = [
   {
     heading: "Akun",
     items: [
-      { label: "FAQ & Bantuan",           href: "#" },
+      { label: "FAQ & Bantuan",           href: "/contact" },
       { label: "Kebijakan Pengiriman",    href: "#" },
       { label: "Syarat & Ketentuan",      href: "#" },
       { label: "Kebijakan Privasi",       href: "#" },
