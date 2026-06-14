@@ -388,8 +388,8 @@ export default function ResellerProgramPage() {
               </motion.div>
               {/* badge margin mengambang */}
               <div className="absolute bottom-4 left-4 rounded-2xl bg-white/85 px-4 py-2.5 shadow-lg backdrop-blur">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A2D8C]">Margin partner</p>
-                <p className="font-display text-[22px] font-semibold leading-none text-[#1C1A17]">hingga 40%</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A2D8C]">Untung partner</p>
+                <p className="font-display text-[20px] font-semibold leading-none text-[#1C1A17]">Rp 15–20rb<span className="text-[12px] font-medium text-[#8a7d92]"> /produk</span></p>
               </div>
             </div>
           </motion.div>
