@@ -51,7 +51,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`${montserrat.variable} ${poppins.variable} ${staatliches.variable} ${outfit.variable}`}>
+    <html lang="id" className={`${montserrat.variable} ${poppins.variable} ${staatliches.variable} ${outfit.variable} ${fraunces.variable}`}>
       <body className="font-poppins">
         <AuthProvider>
           <CartProvider>
