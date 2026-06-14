@@ -46,22 +46,22 @@ export default function ResellerRegisterPage() {
   };
 
   return (
-    <div className="bg-[#FDFAFF] text-[#2a2a2a]">
+    <div className="bg-[#FBF8F4] text-[#2a2a2a]">
       <section className="py-10 md:py-14">
         <div className="mx-auto grid max-w-3xl gap-6 px-5 md:px-8">
-          <div className="rounded-2xl border border-gray-100 bg-white px-4 py-3">
+          <div className="rounded-2xl border border-[#1C1A17]/[0.06] bg-white px-4 py-3">
             <div className="flex items-center gap-2 text-xs text-gray-500">
-              <Link href="/" className="hover:text-brand-700">Home</Link>
+              <Link href="/" className="hover:text-[#78257C]">Home</Link>
               <span>›</span>
-              <Link href="/reseller" className="hover:text-brand-700">Reseller Program</Link>
+              <Link href="/reseller" className="hover:text-[#78257C]">Reseller Program</Link>
               <span>›</span>
               <span className="font-semibold text-gray-700">Pendaftaran</span>
             </div>
           </div>
 
           <div className="grid gap-2">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#2a7c78]">Pendaftaran Reseller</div>
-            <h1 className="text-2xl font-extrabold text-[#2a2a2a] md:text-3xl">Gabung sebagai reseller Ginabo</h1>
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#9A2D8C]">Pendaftaran Reseller</div>
+            <h1 className="font-display text-3xl font-semibold tracking-tight text-[#1C1A17] md:text-[40px]">Gabung sebagai reseller Ginabo</h1>
             <p className="max-w-2xl text-sm leading-relaxed text-[#5a516f]">
               Isi form singkat ini. Tim Ginabo akan follow up untuk verifikasi dan onboarding.
             </p>
