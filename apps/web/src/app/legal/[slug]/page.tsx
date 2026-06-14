@@ -76,9 +76,8 @@ export function generateStaticParams() {
   return SLUGS.map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
-  const policy = POLICIES[slug];
+export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
+  const policy = POLICIES[params.slug];
   if (!policy) return { title: "Halaman tidak ditemukan — Ginabo" };
   return {
     title: `${policy.title} — Ginabo`,
@@ -86,9 +85,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function LegalPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const policy = POLICIES[slug];
+export default function LegalPage({ params }: { params: { slug: string } }) {
+  const policy = POLICIES[params.slug];
   if (!policy) notFound();
 
   return (
