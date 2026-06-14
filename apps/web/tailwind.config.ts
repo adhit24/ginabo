@@ -45,6 +45,7 @@ export default {
       fontFamily: {
         sans:        ["var(--font-poppins)", "Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
         serif:       ["Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        display:     ["var(--font-fraunces)", "Georgia", "serif"],
         mono:        ["ui-monospace", "monospace"],
         poppins:     ["var(--font-poppins)", "sans-serif"],
         outfit:      ["var(--font-outfit)", "sans-serif"],
