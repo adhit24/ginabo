@@ -166,7 +166,7 @@ const icons = {
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 
 const stats: { num?: number; suffix?: string; value?: string; label: string }[] = [
-  { num: 40, suffix: "%", label: "Margin per produk" },
+  { value: "Rp 15–20rb", label: "Untung per produk" },
   { num: 500, suffix: "+", label: "Partner aktif" },
   { value: "1×24 jam", label: "Approval pendaftaran" },
   { value: "Gratis", label: "Biaya bergabung" },
