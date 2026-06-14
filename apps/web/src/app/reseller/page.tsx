@@ -585,7 +585,7 @@ export default function ResellerProgramPage() {
                 <div className="p-5">
                   <h3 className="text-[14px] font-bold text-[#1C1A17]">{p.name}</h3>
                   <p className="mt-1.5 flex items-center gap-1.5 text-[12px] font-semibold text-[#9A2D8C]">
-                    {icons.check} Margin partner sampai 40%
+                    {icons.check} Untung Rp 15–20rb / produk
                   </p>
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {["BPOM RI", "Halal", "Cruelty Free"].map((b) => (
