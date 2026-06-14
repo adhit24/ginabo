@@ -68,9 +68,9 @@ export default function ResellerRegisterPage() {
           </div>
 
           {state.status === "success" ? (
-            <div className="rounded-3xl bg-white p-7 text-center shadow-sm" style={{ border: "1.5px solid #e9fbfa" }}>
+            <div className="rounded-3xl bg-white p-7 text-center shadow-sm" style={{ border: "1px solid rgba(28,26,23,0.06)" }}>
               <div className="mx-auto grid max-w-md gap-3">
-                <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#2a7c78]">Berhasil</div>
+                <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#78257C]">Berhasil</div>
                 <div className="text-xl font-extrabold text-[#2a2a2a]">Pendaftaran kamu sudah terkirim</div>
                 <p className="text-sm leading-relaxed text-[#5a516f]">
                   Tim Ginabo akan menghubungi kamu melalui WhatsApp atau email untuk langkah berikutnya.
@@ -78,13 +78,13 @@ export default function ResellerRegisterPage() {
                 <div className="mt-2 flex flex-wrap justify-center gap-3">
                   <Link
                     href="/shop"
-                    className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2a7c78] px-7 py-3 text-sm font-extrabold text-white transition hover:opacity-95"
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#78257C] px-7 py-3 text-sm font-extrabold text-white transition hover:opacity-95"
                   >
                     Lihat Produk
                   </Link>
                   <Link
                     href="/reseller"
-                    className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#2a7c78] px-7 py-3 text-sm font-bold text-[#2a7c78] transition hover:bg-emerald-50"
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#78257C] px-7 py-3 text-sm font-bold text-[#78257C] transition hover:bg-[#FBF6FB]"
                   >
                     Kembali ke Info Program
                   </Link>
@@ -92,7 +92,7 @@ export default function ResellerRegisterPage() {
               </div>
             </div>
           ) : (
-            <form onSubmit={submit} className="rounded-3xl bg-white p-7 shadow-sm" style={{ border: "1.5px solid #e9fbfa" }}>
+            <form onSubmit={submit} className="rounded-3xl bg-white p-7 shadow-sm" style={{ border: "1px solid rgba(28,26,23,0.06)" }}>
               <div className="grid gap-5">
                 {state.status === "error" ? (
                   <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
@@ -106,7 +106,7 @@ export default function ResellerRegisterPage() {
                     <input
                       value={form.name}
                       onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                      className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#1e6b68] focus:ring-2 focus:ring-[#1e6b68]/15"
+                      className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#78257C] focus:ring-2 focus:ring-[#78257C]/15"
                       placeholder="Contoh: Nadia Putri"
                       autoComplete="name"
                       required
@@ -118,7 +118,7 @@ export default function ResellerRegisterPage() {
                     <input
                       value={form.phone}
                       onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                      className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#1e6b68] focus:ring-2 focus:ring-[#1e6b68]/15"
+                      className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#78257C] focus:ring-2 focus:ring-[#78257C]/15"
                       placeholder="Contoh: 08xxxxxxxxxx"
                       inputMode="tel"
                       autoComplete="tel"
@@ -133,7 +133,7 @@ export default function ResellerRegisterPage() {
                     <input
                       value={form.email}
                       onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                      className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#1e6b68] focus:ring-2 focus:ring-[#1e6b68]/15"
+                      className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#78257C] focus:ring-2 focus:ring-[#78257C]/15"
                       placeholder="Contoh: nama@email.com"
                       inputMode="email"
                       autoComplete="email"
@@ -146,7 +146,7 @@ export default function ResellerRegisterPage() {
                     <input
                       value={form.city}
                       onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-                      className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#1e6b68] focus:ring-2 focus:ring-[#1e6b68]/15"
+                      className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#78257C] focus:ring-2 focus:ring-[#78257C]/15"
                       placeholder="Contoh: Bandung"
                       autoComplete="address-level2"
                     />
@@ -159,7 +159,7 @@ export default function ResellerRegisterPage() {
                     <input
                       value={form.instagram}
                       onChange={(e) => setForm((f) => ({ ...f, instagram: e.target.value }))}
-                      className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#1e6b68] focus:ring-2 focus:ring-[#1e6b68]/15"
+                      className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#78257C] focus:ring-2 focus:ring-[#78257C]/15"
                       placeholder="Contoh: @namakamu"
                     />
                   </label>
@@ -169,7 +169,7 @@ export default function ResellerRegisterPage() {
                     <select
                       value={form.experience}
                       onChange={(e) => setForm((f) => ({ ...f, experience: e.target.value }))}
-                      className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#1e6b68] focus:ring-2 focus:ring-[#1e6b68]/15"
+                      className="min-h-11 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#78257C] focus:ring-2 focus:ring-[#78257C]/15"
                     >
                       <option value="NEW">Baru mulai</option>
                       <option value="SELLER">Sudah pernah jualan online</option>
@@ -183,20 +183,20 @@ export default function ResellerRegisterPage() {
                   <textarea
                     value={form.message}
                     onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-                    className="min-h-[110px] resize-none rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#1e6b68] focus:ring-2 focus:ring-[#1e6b68]/15"
+                    className="min-h-[110px] resize-none rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-[#78257C] focus:ring-2 focus:ring-[#78257C]/15"
                     placeholder="Contoh: Aku mau fokus jualan di komunitas olahraga / kantor."
                   />
                   <span className="text-xs text-gray-500">Maks 500 karakter.</span>
                 </label>
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <Link href="/reseller" className="text-sm font-semibold text-[#1e6b68] hover:underline">
+                  <Link href="/reseller" className="text-sm font-semibold text-[#78257C] hover:underline">
                     Kembali ke info program
                   </Link>
                   <button
                     type="submit"
                     disabled={!canSubmit}
-                    className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2a7c78] px-8 py-3 text-sm font-extrabold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#78257C] px-8 py-3 text-sm font-extrabold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {state.status === "submitting" ? "Mengirim..." : "Gabung Sekarang"}
                   </button>

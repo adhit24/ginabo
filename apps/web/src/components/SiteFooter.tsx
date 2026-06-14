@@ -11,7 +11,7 @@ const footerLinks = [
       { label: "Hubungi Kami",       href: "/contact" },
       { label: "Jadi Reseller",      href: "/reseller" },
       { label: "Booking Konsultasi", href: "/booking" },
-      { label: "Karir",              href: "#" },
+      { label: "Karir",              href: "/contact" },
     ],
   },
   {
