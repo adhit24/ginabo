@@ -34,6 +34,13 @@ export default {
           400: "#B8A8D8",
           500: "#9A88C4",
         },
+        // warm neutral untuk memecah monoton ungu di halaman partner
+        bone: {
+          50:  "#FBF8F4",
+          100: "#F4EEE6",
+          200: "#E9DFD2",
+        },
+        ink: "#1C1A17",
       },
       fontFamily: {
         sans:        ["var(--font-poppins)", "Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
