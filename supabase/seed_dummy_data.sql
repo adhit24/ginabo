@@ -472,78 +472,78 @@ INSERT INTO public.payments (
     midtrans_order_id, midtrans_transaction_id,
     midtrans_gross_amount, midtrans_currency,
     midtrans_status_code, midtrans_transaction_status, midtrans_fraud_status,
-    payment_type,
+    payment_type, status,
     created_at, updated_at
 ) VALUES
 
 ('g100000000000000000000000000000001', 'e100000000000000000000000000000001',
  'GNB-20260601-0001', 'TXN-20260601-A001001', 230000, 'IDR',
- '200', 'settlement', 'accept', 'bank_transfer',
+ '200', 'settlement', 'accept', 'bank_transfer', 'success',
  now()-INTERVAL '30 days', now()-INTERVAL '30 days'),
 
 ('g100000000000000000000000000000002', 'e100000000000000000000000000000002',
  'GNB-20260603-0001', 'TXN-20260603-A001002', 333000, 'IDR',
- '200', 'settlement', 'accept', 'gopay',
+ '200', 'settlement', 'accept', 'gopay', 'success',
  now()-INTERVAL '28 days', now()-INTERVAL '28 days'),
 
 ('g100000000000000000000000000000003', 'e100000000000000000000000000000003',
  'GNB-20260605-0001', 'TXN-20260605-A001003', 237000, 'IDR',
- '200', 'settlement', 'accept', 'qris',
+ '200', 'settlement', 'accept', 'qris', 'success',
  now()-INTERVAL '26 days', now()-INTERVAL '26 days'),
 
 ('g100000000000000000000000000000004', 'e100000000000000000000000000000004',
  'GNB-20260607-0001', 'TXN-20260607-A001004', 322000, 'IDR',
- '200', 'settlement', 'accept', 'bank_transfer',
+ '200', 'settlement', 'accept', 'bank_transfer', 'success',
  now()-INTERVAL '24 days', now()-INTERVAL '24 days'),
 
 ('g100000000000000000000000000000005', 'e100000000000000000000000000000005',
  'GNB-20260609-0001', 'TXN-20260609-A001005', 171000, 'IDR',
- '200', 'settlement', 'accept', 'shopeepay',
+ '200', 'settlement', 'accept', 'shopeepay', 'success',
  now()-INTERVAL '22 days', now()-INTERVAL '22 days'),
 
 ('g100000000000000000000000000000006', 'e100000000000000000000000000000006',
  'GNB-20260611-0001', 'TXN-20260611-A001006', 324000, 'IDR',
- '200', 'settlement', 'accept', 'qris',
+ '200', 'settlement', 'accept', 'qris', 'success',
  now()-INTERVAL '14 days', now()-INTERVAL '14 days'),
 
 ('g100000000000000000000000000000007', 'e100000000000000000000000000000007',
  'GNB-20260612-0001', 'TXN-20260612-A001007', 157000, 'IDR',
- '200', 'settlement', 'accept', 'bank_transfer',
+ '200', 'settlement', 'accept', 'bank_transfer', 'success',
  now()-INTERVAL '12 days', now()-INTERVAL '12 days'),
 
 ('g100000000000000000000000000000008', 'e100000000000000000000000000000008',
  'GNB-20260613-0001', 'TXN-20260613-A001008', 489000, 'IDR',
- '200', 'settlement', 'accept', 'gopay',
+ '200', 'settlement', 'accept', 'gopay', 'success',
  now()-INTERVAL '10 days', now()-INTERVAL '10 days'),
 
 ('g100000000000000000000000000000009', 'e100000000000000000000000000000009',
  'GNB-20260614-0001', 'TXN-20260614-A001009', 239000, 'IDR',
- '200', 'settlement', 'accept', 'bank_transfer',
+ '200', 'settlement', 'accept', 'bank_transfer', 'success',
  now()-INTERVAL '5 days', now()-INTERVAL '5 days'),
 
 ('g100000000000000000000000000000010', 'e100000000000000000000000000000010',
  'GNB-20260614-0002', 'TXN-20260614-A001010', 320000, 'IDR',
- '200', 'settlement', 'accept', 'qris',
+ '200', 'settlement', 'accept', 'qris', 'success',
  now()-INTERVAL '4 days', now()-INTERVAL '4 days'),
 
 ('g100000000000000000000000000000011', 'e100000000000000000000000000000011',
  'GNB-20260615-0001', 'TXN-20260615-A001011', 520000, 'IDR',
- '200', 'settlement', 'accept', 'gopay',
+ '200', 'settlement', 'accept', 'gopay', 'success',
  now()-INTERVAL '32 hours', now()-INTERVAL '32 hours'),
 
 ('g100000000000000000000000000000012', 'e100000000000000000000000000000012',
  'GNB-20260615-0002', 'TXN-20260615-A001012', 107000, 'IDR',
- '200', 'settlement', 'accept', 'shopeepay',
+ '200', 'settlement', 'accept', 'shopeepay', 'success',
  now()-INTERVAL '20 hours', now()-INTERVAL '20 hours'),
 
 ('g100000000000000000000000000000013', 'e100000000000000000000000000000013',
  'GNB-20260616-0001', 'TXN-20260616-A001013', 224000, 'IDR',
- '200', 'settlement', 'accept', 'qris',
+ '200', 'settlement', 'accept', 'qris', 'success',
  now()-INTERVAL '6 hours', now()-INTERVAL '6 hours'),
 
 ('g100000000000000000000000000000014', 'e100000000000000000000000000000014',
  'GNB-20260616-0002', 'TXN-20260616-A001014', 327000, 'IDR',
- '200', 'settlement', 'accept', 'bank_transfer',
+ '200', 'settlement', 'accept', 'bank_transfer', 'success',
  now()-INTERVAL '3 hours', now()-INTERVAL '3 hours')
 
 ON CONFLICT (id) DO NOTHING;
