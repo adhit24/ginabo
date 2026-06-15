@@ -624,40 +624,39 @@ INSERT INTO public.return_items (
     id, return_id, order_item_id,
     product_id, variant_id,
     product_name, variant_name, sku,
-    quantity_returned,
-    return_reason_detail,
-    condition_on_receipt,
+    quantity, unit_price, line_refund_amount,
+    item_reason,
     created_at
 ) VALUES
 
--- RET-1 items: Hydra Moist Gel 30ml yang salah kirim
+-- RET-1: Hydra Moist Gel 30ml yang salah kirim
 ('j100000000000000000000000000000001',
  'i100000000000000000000000000000001',
  'f100000000000000000000000000000001',
  'c100000000000000000000000000000001', 'd100000000000000000000000000000001',
  'Hydra Moist Gel', '30ml', 'GNB-HMG-030',
- 1, 'Salah kirim produk — diterima Bright & Care Cream bukan Hydra Moist Gel',
- 'unopened',
+ 1, 89000, 89000,
+ 'Salah kirim produk — diterima Bright & Care Cream bukan Hydra Moist Gel',
  now()-INTERVAL '23 days'),
 
--- RET-2 items: GlowAge Serum 15ml cacat
+-- RET-2: GlowAge Serum 15ml cacat/bocor
 ('j100000000000000000000000000000002',
  'i100000000000000000000000000000002',
  'f100000000000000000000000000000004',
  'c100000000000000000000000000000003', 'd100000000000000000000000000000005',
  'GlowAge Serum', '15ml', 'GNB-GAS-015',
- 1, 'Kemasan bocor, isi serum keluar sekitar 30%. Foto sudah diupload.',
- 'damaged',
+ 1, 219000, 219000,
+ 'Kemasan bocor, isi serum keluar sekitar 30%. Foto sudah diupload.',
  now()-INTERVAL '18 days'),
 
--- RET-3 items: GlowAge Serum 30ml reaksi alergi
+-- RET-3: GlowAge Serum 30ml reaksi alergi
 ('j100000000000000000000000000000003',
  'i100000000000000000000000000000003',
  'f100000000000000000000000000000008',
  'c100000000000000000000000000000003', 'd100000000000000000000000000000006',
  'GlowAge Serum', '30ml', 'GNB-GAS-030',
- 1, 'Reaksi alergi: kulit kemerahan dan gatal setelah pemakaian hari ke-3.',
- 'opened',
+ 1, 299000, 299000,
+ 'Reaksi alergi: kulit kemerahan dan gatal setelah pemakaian hari ke-3.',
  now()-INTERVAL '7 days')
 
 ON CONFLICT (id) DO NOTHING;
