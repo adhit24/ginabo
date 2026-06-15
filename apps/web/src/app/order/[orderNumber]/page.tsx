@@ -373,6 +373,14 @@ export default async function OrderDetailPage({ params }: PageProps) {
           >
             Riwayat Pesanan
           </Link>
+          {(order.status === 'delivered' || order.status === 'completed') && (
+            <Link
+              href={`/returns/new?order=${order.order_number}`}
+              className="inline-flex rounded-full bg-gray-900 px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
+            >
+              Ajukan Retur
+            </Link>
+          )}
         </div>
       </div>
     </div>
