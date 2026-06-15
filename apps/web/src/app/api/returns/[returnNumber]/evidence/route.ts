@@ -23,6 +23,8 @@ interface Ctx {
 export async function POST(req: NextRequest, { params }: Ctx) {
   const auth = await resolveReturnAuth()
   if (!auth) return jsonError('Silakan login terlebih dahulu', 401)
+  if (!auth.userId) return jsonError('Khusus akun pelanggan', 403)
+  const userId = auth.userId
 
   let body: unknown
   try {

@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
   const { data: blocked } = await auth.adminDb
     .from('return_blacklist')
     .select('id')
-    .eq('profile_id', auth.userId)
+    .eq('profile_id', userId)
     .eq('is_active', true)
     .maybeSingle()
   if (blocked) {
@@ -163,7 +163,7 @@ export async function POST(req: NextRequest) {
   let riskScore = 0
   let riskFlags: string[] = []
   const { data: risk } = await auth.adminDb.rpc('compute_return_risk', {
-    p_profile_id: auth.userId,
+    p_profile_id: userId,
     p_order_id: o.id,
     p_amount: amount,
   })
@@ -180,7 +180,7 @@ export async function POST(req: NextRequest) {
     .from('returns')
     .insert({
       order_id: o.id,
-      profile_id: auth.userId,
+      profile_id: userId,
       policy_id: policy.id !== '00000000-0000-0000-0000-000000000000' ? policy.id : null,
       return_type: input.return_type,
       preferred_resolution: input.preferred_resolution,
@@ -207,7 +207,7 @@ export async function POST(req: NextRequest) {
   if (input.return_type === 'allergic_reaction' && input.usage_history) {
     await auth.adminDb.from('return_notes').insert({
       return_id: ret.id,
-      author_id: auth.userId,
+      author_id: userId,
       author_type: 'customer',
       visibility: 'internal',
       body: `Riwayat pemakaian: ${input.usage_history}`,
@@ -219,7 +219,7 @@ export async function POST(req: NextRequest) {
     returnId: ret.id,
     from: null,
     to: 'submitted',
-    changedBy: auth.userId,
+    changedBy: userId,
     actorType: 'customer',
     reason: 'Permintaan retur diajukan',
     metadata: { risk_score: riskScore, risk_flags: riskFlags },
@@ -241,7 +241,7 @@ export async function POST(req: NextRequest) {
 
   // Notify customer
   await enqueueReturnNotification(auth.adminDb, {
-    profileId: auth.userId,
+    profileId: userId,
     recipientEmail: auth.email,
     returnId: ret.id,
     returnNumber: ret.return_number,
