@@ -579,7 +579,7 @@ INSERT INTO public.returns (
     order_id, profile_id, policy_id,
     return_type, preferred_resolution,
     status,
-    customer_notes,
+    customer_note,
     risk_score,
     created_at, updated_at
 ) VALUES
