@@ -130,21 +130,27 @@ export async function POST(req: NextRequest) {
 
   // Validate requested items against the order + clamp quantity
   const orderItemMap = new Map(o.items.map((it) => [it.id, it]))
+  for (const reqItem of input.items) {
+    if (!orderItemMap.has(reqItem.order_item_id)) {
+      return jsonError('Salah satu item bukan bagian dari pesanan ini', 422, {
+        order_item_id: reqItem.order_item_id,
+      })
+    }
+  }
   const resolvedItems = input.items.map((reqItem) => {
-    const src = orderItemMap.get(reqItem.order_item_id)
-    if (!src) throw0(`Item ${reqItem.order_item_id} bukan bagian dari pesanan ini`)
-    const qty = Math.min(reqItem.quantity, src!.quantity)
+    const src = orderItemMap.get(reqItem.order_item_id)!
+    const qty = Math.min(reqItem.quantity, src.quantity)
     return {
-      order_item_id: src!.id,
-      product_id: src!.product_id,
-      variant_id: src!.variant_id,
-      product_name: src!.product_name,
-      variant_name: src!.variant_name,
-      sku: src!.sku,
-      image_url: src!.image_url,
+      order_item_id: src.id,
+      product_id: src.product_id,
+      variant_id: src.variant_id,
+      product_name: src.product_name,
+      variant_name: src.variant_name,
+      sku: src.sku,
+      image_url: src.image_url,
       quantity: qty,
-      unit_price: src!.unit_price,
-      line_refund_amount: src!.unit_price * qty,
+      unit_price: src.unit_price,
+      line_refund_amount: src.unit_price * qty,
       item_reason: reqItem.item_reason ?? null,
     }
   })
