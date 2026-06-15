@@ -66,6 +66,8 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const auth = await resolveReturnAuth()
   if (!auth) return jsonError('Silakan login terlebih dahulu', 401)
+  if (!auth.userId) return jsonError('Retur hanya dapat diajukan oleh akun pelanggan', 403)
+  const userId = auth.userId
 
   let body: unknown
   try {
