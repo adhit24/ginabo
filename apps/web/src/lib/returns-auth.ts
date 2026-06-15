@@ -49,7 +49,8 @@ export async function resolveReturnAuth(): Promise<ReturnAuthContext | null> {
   }
 
   // ── 2. Legacy admin JWT cookie (existing /admin panel) ──────────────────────
-  const token = (await cookies()).get(getAdminSessionCookieName())?.value
+  const cookieStore = await cookies()
+  const token = cookieStore.get(getAdminSessionCookieName())?.value
   if (token) {
     try {
       const session = await verifyAdminSessionToken(token)
