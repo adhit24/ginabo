@@ -259,8 +259,3 @@ export async function POST(req: NextRequest) {
     { status: 201 },
   )
 }
-
-// Tiny helper so we can throw inside .map with a typed message (kept local).
-function throw0(msg: string): never {
-  throw new Error(msg)
-}
