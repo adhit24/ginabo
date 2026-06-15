@@ -50,7 +50,7 @@ export async function POST(req: NextRequest, { params }: Ctx) {
   }
 
   // Enforce the uploader owns the folder (defence-in-depth on top of storage RLS).
-  if (!parsed.data.storage_path.startsWith(`${auth.userId}/`)) {
+  if (!parsed.data.storage_path.startsWith(`${userId}/`)) {
     return jsonError('Path penyimpanan tidak valid', 403)
   }
 
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest, { params }: Ctx) {
     .from('return_evidence')
     .insert({
       return_id: r.id,
-      uploaded_by: auth.userId,
+      uploaded_by: userId,
       media_type: parsed.data.media_type,
       storage_path: parsed.data.storage_path,
       caption: parsed.data.caption ?? null,
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest, { params }: Ctx) {
       return_id: r.id,
       from_status: 'more_evidence_required',
       to_status: 'under_review',
-      changed_by: auth.userId,
+      changed_by: userId,
       actor_type: 'customer',
       reason: 'Bukti tambahan diunggah',
     })
