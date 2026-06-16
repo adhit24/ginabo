@@ -9,7 +9,7 @@ const footerLinks = [
     items: [
       { label: "Contact Us",        href: "/contact" },
       { label: "Become Our Reseller", href: "/reseller" },
-      { label: "Market Place",      href: "/shop" },
+      { label: "Market Place",      href: "/stores" },
       { label: "Join Us",           href: "/about" },
     ],
   },
