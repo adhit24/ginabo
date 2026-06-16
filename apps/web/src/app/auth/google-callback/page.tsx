@@ -3,38 +3,40 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 function GoogleCallbackInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const email = searchParams.get("email");
-    const name = searchParams.get("name");
+    const idToken = searchParams.get("id_token");
 
-    if (!email) {
+    if (!idToken) {
       router.replace("/auth/login?error=google_failed");
       return;
     }
 
-    const displayName = name ?? email.split("@")[0];
-    const user = {
-      id: `usr_${Math.random().toString(36).slice(2, 10)}`,
-      name: displayName.charAt(0).toUpperCase() + displayName.slice(1),
-      email,
-      tier: "Regular" as const,
-      points: 100,
-      joinedAt: new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric" }).format(new Date()),
+    const supabase = createClient();
+
+    supabase.auth.signInWithIdToken({
       provider: "google",
-    };
+      token: idToken,
+    }).then(async ({ data, error }) => {
+      if (error || !data.user) {
+        router.replace("/auth/login?error=google_failed");
+        return;
+      }
 
-    try {
-      localStorage.setItem("ginabo_user", JSON.stringify(user));
-    } catch {
-      // ignore
-    }
+      await supabase.from("profiles").upsert({
+        id: data.user.id,
+        email: data.user.email,
+        full_name: data.user.user_metadata?.full_name ?? data.user.email?.split("@")[0] ?? "User",
+        loyalty_points: 100,
+      });
 
-    router.replace("/member");
+      router.replace("/member");
+    });
   }, [searchParams, router]);
 
   return (
