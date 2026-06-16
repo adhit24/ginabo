@@ -7,25 +7,30 @@ import { adminProductSchema } from "@/lib/validation";
 export async function GET() {
   try {
     const { data: products, error } = await supabase
-      .from("Product")
-      .select("*, images:ProductImage(*)")
-      .order("createdAt", { ascending: false });
+      .from("products")
+      .select("id, slug, name, description, base_price, stock_quantity, is_active, created_at, product_images(url, sort_order)")
+      .order("sort_order", { ascending: true });
 
     if (error) return jsonError("Server error", 500, error.message);
 
     return jsonOk(
-      (products ?? []).map((p) => ({
-        id: p.id,
-        slug: p.slug,
-        name: p.name,
-        description: p.description,
-        priceMinor: p.priceMinor,
-        currency: p.currency,
-        stockQty: p.stockQty,
-        isActive: p.isActive,
-        imageUrl: (p.images as { url: string }[] | null)?.[0]?.url ?? null,
-        createdAt: p.createdAt
-      }))
+      (products ?? []).map((p) => {
+        const images = (
+          (p.product_images as Array<{ url: string; sort_order: number }>) ?? []
+        ).sort((a, b) => a.sort_order - b.sort_order);
+        return {
+          id: p.id,
+          slug: p.slug,
+          name: p.name,
+          description: p.description,
+          priceMinor: p.base_price,
+          currency: "IDR",
+          stockQty: p.stock_quantity,
+          isActive: p.is_active,
+          imageUrl: images[0]?.url ?? null,
+          createdAt: p.created_at,
+        };
+      })
     );
   } catch (e) {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
@@ -44,15 +49,14 @@ export async function POST(req: Request) {
         : null;
 
     const { data: created, error: insertError } = await supabase
-      .from("Product")
+      .from("products")
       .insert({
         slug: parsed.data.slug,
         name: parsed.data.name,
         description: parsed.data.description,
-        priceMinor: parsed.data.priceMinor,
-        currency: parsed.data.currency,
-        stockQty: parsed.data.stockQty,
-        isActive: parsed.data.isActive
+        base_price: parsed.data.priceMinor,
+        stock_quantity: parsed.data.stockQty,
+        is_active: parsed.data.isActive,
       })
       .select()
       .single();
@@ -61,8 +65,8 @@ export async function POST(req: Request) {
 
     if (imageUrl) {
       const { error: imgError } = await supabase
-        .from("ProductImage")
-        .insert({ productId: created.id, url: imageUrl, sortOrder: 0 });
+        .from("product_images")
+        .insert({ product_id: created.id, url: imageUrl, sort_order: 0 });
 
       if (imgError) return jsonError("Server error", 500, imgError.message);
     }
