@@ -5,32 +5,28 @@ import { ScrollTopButton } from "@/components/ui/ScrollTopButton";
 
 const footerLinks = [
   {
-    heading: "Informasi",
+    heading: "INFO",
     items: [
-      { label: "Tentang Kami",       href: "/about" },
-      { label: "Hubungi Kami",       href: "/contact" },
-      { label: "Jadi Reseller",      href: "/reseller" },
-      { label: "Booking Konsultasi", href: "/booking" },
-      { label: "Karir",              href: "/contact" },
+      { label: "Contact Us",        href: "/contact" },
+      { label: "Become Our Reseller", href: "/reseller" },
+      { label: "Market Place",      href: "/shop" },
+      { label: "Join Us",           href: "/about" },
     ],
   },
   {
-    heading: "Akun",
+    heading: "ACCOUNT",
     items: [
-      { label: "FAQ & Bantuan",           href: "/contact" },
-      { label: "Kebijakan Pengiriman",    href: "/legal/pengiriman" },
-      { label: "Syarat & Ketentuan",      href: "/legal/syarat-ketentuan" },
-      { label: "Kebijakan Privasi",       href: "/legal/privasi" },
-      { label: "Kebijakan Pengembalian",  href: "/legal/pengembalian" },
+      { label: "FAQ, Shipping, & Delivery", href: "/faq" },
+      { label: "Terms & Conditions",        href: "/terms" },
+      { label: "Privacy Policy",            href: "/privacy" },
     ],
   },
   {
-    heading: "Layanan Pengaduan",
+    heading: "LAYANAN PENGADUAN KONSUMEN",
     items: [
-      { label: "PT Ginabo Nusantara",     href: "#" },
-      { label: "WA: 0851-9926-4835",        href: "https://wa.me/6285199264835" },
-      { label: "Email: cs@ginabo.id",     href: "mailto:cs@ginabo.id" },
-      { label: "Senin–Jumat, 09.00–17.00", href: "#" },
+      { label: "PT Tiga Sas Berlian",       href: "#" },
+      { label: "Green Galunggung Residence B2 No 10, RT.008 RW.016, Kecapi, Harjamukti, Kota Cirebon, Jawa Barat, Indonesia 45143", href: "#" },
+      { label: "0851-9926-4835",            href: "https://wa.me/6285199264835" },
     ],
   },
 ];
