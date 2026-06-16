@@ -5,15 +5,58 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { store } from "@/lib/adminStore";
 
-const navItems = [
-  { href: "/admin",           label: "Dashboard"  },
-  { href: "/admin/orders",    label: "Order"      },
-  { href: "/admin/products",  label: "Produk"     },
-  { href: "/admin/customers", label: "Pelanggan"  },
-  { href: "/admin/bookings",  label: "Booking"    },
-  { href: "/admin/returns",   label: "Retur"      },
-  { href: "/admin/bundles",   label: "Bundle"     },
-  { href: "/admin/flashsale", label: "Flash Sale" },
+type NavGroup = {
+  label: string;
+  items: { href: string; label: string; icon: string; badge?: string }[];
+};
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Ikhtisar",
+    items: [
+      { href: "/admin", label: "Command Center", icon: "⚡" },
+      { href: "/admin/executive", label: "CEO Dashboard", icon: "👑" },
+      { href: "/admin/alerts", label: "Alert Center", icon: "🔔", badge: "!" },
+    ],
+  },
+  {
+    label: "Pelanggan",
+    items: [
+      { href: "/admin/intelligence", label: "Customer Intelligence", icon: "🧠" },
+      { href: "/admin/customers", label: "Daftar Pelanggan", icon: "👥" },
+    ],
+  },
+  {
+    label: "Operasional",
+    items: [
+      { href: "/admin/orders", label: "Order", icon: "📦" },
+      { href: "/admin/logistics", label: "Logistics Center", icon: "🚚" },
+      { href: "/admin/returns", label: "Retur", icon: "↩️" },
+      { href: "/admin/returns/intelligence", label: "Return Intelligence", icon: "🔍" },
+    ],
+  },
+  {
+    label: "Inventori",
+    items: [
+      { href: "/admin/inventory", label: "Inventory Intelligence", icon: "📊" },
+      { href: "/admin/products", label: "Produk", icon: "🧴" },
+    ],
+  },
+  {
+    label: "Marketing & Bisnis",
+    items: [
+      { href: "/admin/marketing", label: "Marketing Intelligence", icon: "📣" },
+      { href: "/admin/skincare", label: "Skincare Intelligence", icon: "✨" },
+    ],
+  },
+  {
+    label: "Lainnya",
+    items: [
+      { href: "/admin/bookings", label: "Booking", icon: "📅" },
+      { href: "/admin/bundles", label: "Bundle", icon: "🎁" },
+      { href: "/admin/flashsale", label: "Flash Sale", icon: "⚡" },
+    ],
+  },
 ];
 
 function isActive(pathname: string, href: string): boolean {
@@ -21,14 +64,18 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function NavLink({
+function NavItem({
   href,
   label,
+  icon,
+  badge,
   active,
   onClick,
 }: {
   href: string;
   label: string;
+  icon: string;
+  badge?: string;
   active: boolean;
   onClick?: () => void;
 }) {
@@ -36,12 +83,20 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-all ${
-        active ? "text-white" : "text-white/40 hover:bg-white/5 hover:text-white/70"
+      className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium transition-all ${
+        active
+          ? "text-white shadow-sm"
+          : "text-white/40 hover:bg-white/5 hover:text-white/70"
       }`}
       style={active ? { background: "linear-gradient(135deg,#8b5cf6,#e879f9)" } : {}}
     >
-      {label}
+      <span className="text-base leading-none">{icon}</span>
+      <span className="flex-1 truncate">{label}</span>
+      {badge && !active && (
+        <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] font-bold text-white">
+          {badge}
+        </span>
+      )}
     </Link>
   );
 }
@@ -51,6 +106,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const backdropRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -61,7 +117,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     }
   }, [router]);
 
-  // Close on Escape
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") setMobileOpen(false);
@@ -77,40 +132,118 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   if (!ready) return null;
 
+  const sidebarWidth = collapsed ? "w-16" : "w-60";
+
   const sidebar = (
-    <div className="flex h-full flex-col" style={{ background: "linear-gradient(180deg,#1a0a38,#0f0a1e)" }}>
+    <div
+      className="flex h-full flex-col"
+      style={{ background: "linear-gradient(180deg,#1a0a38,#0f0a1e)" }}
+    >
       {/* Logo */}
-      <div className="flex h-16 items-center gap-2 border-b px-5" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-        <span className="font-staatliches text-[22px] tracking-wider text-white">GINABO</span>
-        <span
-          className="rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white"
-          style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}
-        >
-          ADMIN
-        </span>
+      <div
+        className={`flex h-14 items-center gap-2 border-b px-4 ${collapsed ? "justify-center" : ""}`}
+        style={{ borderColor: "rgba(255,255,255,0.08)" }}
+      >
+        {!collapsed && (
+          <>
+            <span className="font-staatliches text-[20px] tracking-wider text-white">GINABO</span>
+            <span
+              className="rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white"
+              style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}
+            >
+              BOS
+            </span>
+          </>
+        )}
+        {collapsed && (
+          <span className="text-lg font-bold text-white">G</span>
+        )}
+        {!collapsed && (
+          <button
+            onClick={() => setCollapsed(true)}
+            className="ml-auto rounded p-1 text-white/30 hover:text-white/60"
+            aria-label="Collapse sidebar"
+          >
+            ◀
+          </button>
+        )}
       </div>
 
+      {/* Expand button when collapsed */}
+      {collapsed && (
+        <button
+          onClick={() => setCollapsed(false)}
+          className="flex items-center justify-center py-2 text-white/30 hover:text-white/60"
+          aria-label="Expand sidebar"
+        >
+          ▶
+        </button>
+      )}
+
       {/* Nav */}
-      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            active={isActive(pathname, item.href)}
-            onClick={() => setMobileOpen(false)}
-          />
+      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2 pb-4">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.label} className="mb-1">
+            {!collapsed && (
+              <p className="mb-1 mt-2 px-3 text-[10px] font-bold uppercase tracking-widest text-white/20">
+                {group.label}
+              </p>
+            )}
+            {group.items.map((item) => {
+              const active = isActive(pathname, item.href);
+              if (collapsed) {
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    title={item.label}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center justify-center rounded-xl py-2.5 text-base transition-all ${
+                      active
+                        ? "text-white"
+                        : "text-white/40 hover:bg-white/5 hover:text-white/70"
+                    }`}
+                    style={active ? { background: "linear-gradient(135deg,#8b5cf6,#e879f9)" } : {}}
+                  >
+                    {item.icon}
+                  </Link>
+                );
+              }
+              return (
+                <NavItem
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  icon={item.icon}
+                  badge={item.badge}
+                  active={active}
+                  onClick={() => setMobileOpen(false)}
+                />
+              );
+            })}
+          </div>
         ))}
       </nav>
 
       {/* Logout */}
-      <div className="border-t p-3" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-        <button
-          onClick={handleLogout}
-          className="w-full rounded-xl px-3 py-2.5 text-left text-[13px] font-semibold text-red-400 transition hover:bg-red-500/10"
-        >
-          Keluar
-        </button>
+      <div className="border-t p-2" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+        {collapsed ? (
+          <button
+            onClick={handleLogout}
+            title="Keluar"
+            className="flex w-full items-center justify-center rounded-xl py-2.5 text-base text-red-400/60 transition hover:bg-red-500/10"
+          >
+            🚪
+          </button>
+        ) : (
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-[13px] font-medium text-red-400 transition hover:bg-red-500/10"
+          >
+            <span>🚪</span>
+            <span>Keluar</span>
+          </button>
+        )}
       </div>
     </div>
   );
@@ -118,7 +251,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 z-50 flex overflow-hidden" style={{ background: "#0f0a1e" }}>
       {/* Desktop sidebar */}
-      <aside className="hidden w-56 flex-shrink-0 border-r lg:flex lg:flex-col" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+      <aside
+        className={`hidden flex-shrink-0 border-r transition-all duration-200 lg:flex lg:flex-col ${sidebarWidth}`}
+        style={{ borderColor: "rgba(255,255,255,0.08)" }}
+      >
         {sidebar}
       </aside>
 
@@ -131,7 +267,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             onClick={() => setMobileOpen(false)}
             className="fixed inset-0 z-40 bg-black/60 lg:hidden"
           />
-          <aside className="fixed inset-y-0 left-0 z-50 w-56 flex-shrink-0 lg:hidden">
+          <aside className="fixed inset-y-0 left-0 z-50 w-60 flex-shrink-0 lg:hidden">
             {sidebar}
           </aside>
         </>
@@ -140,8 +276,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Main */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile top bar */}
-        <div className="flex h-14 items-center justify-between border-b px-4 lg:hidden" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-          <span className="font-staatliches text-[20px] tracking-wider text-white">GINABO</span>
+        <div
+          className="flex h-14 items-center justify-between border-b px-4 lg:hidden"
+          style={{ borderColor: "rgba(255,255,255,0.08)" }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="font-staatliches text-[20px] tracking-wider text-white">GINABO</span>
+            <span
+              className="rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white"
+              style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}
+            >
+              BOS
+            </span>
+          </div>
           <button
             onClick={() => setMobileOpen((o) => !o)}
             aria-expanded={mobileOpen}
