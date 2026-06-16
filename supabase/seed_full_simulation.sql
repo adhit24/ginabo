@@ -612,7 +612,7 @@ INSERT INTO public.return_policies (
     notes, created_at, updated_at
 ) VALUES (
     '20000000-0000-0000-0000-000000000001',
-    'Kebijakan Retur Standar Ginabo', TRUE,
+    'Kebijakan Retur Standar Ginabo', FALSE,
     7, 7, 14,
     ARRAY['missing_item','wrong_item'],
     ARRAY['allergic_reaction','defective'],
