@@ -35,32 +35,12 @@ export async function GET(req: NextRequest) {
       }),
     });
 
-    const tokenData = await tokenRes.json() as { access_token?: string; error?: string };
-    if (!tokenData.access_token) {
+    const tokenData = await tokenRes.json() as { access_token?: string; id_token?: string; error?: string };
+    if (!tokenData.access_token || !tokenData.id_token) {
       return NextResponse.redirect(`${baseUrl}/auth/login?error=token_failed`);
     }
 
-    const profileRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-      headers: { Authorization: `Bearer ${tokenData.access_token}` },
-    });
-
-    const profile = await profileRes.json() as {
-      id: string;
-      email: string;
-      name: string;
-      picture: string;
-    };
-
-    if (!profile.email) {
-      return NextResponse.redirect(`${baseUrl}/auth/login?error=no_email`);
-    }
-
-    const params = new URLSearchParams({
-      email: profile.email,
-      name: profile.name ?? profile.email.split("@")[0],
-      picture: profile.picture ?? "",
-    });
-
+    const params = new URLSearchParams({ id_token: tokenData.id_token });
     return NextResponse.redirect(`${baseUrl}/auth/google-callback?${params.toString()}`);
   } catch {
     return NextResponse.redirect(`${baseUrl}/auth/login?error=server_error`);
