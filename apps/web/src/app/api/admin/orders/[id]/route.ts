@@ -10,40 +10,42 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     const paymentStatus = typeof body.paymentStatus === "string" ? body.paymentStatus : undefined;
 
     const { data: order, error: findError } = await supabase
-      .from("Order")
+      .from("orders")
       .select("id")
       .eq("id", params.id)
       .single();
 
     if (findError || !order) return jsonError("Not found", 404);
 
-    const { data: updatedOrder, error: updateError } = await supabase
-      .from("Order")
-      .update(status ? { status } : {})
-      .eq("id", order.id)
-      .select()
-      .single();
+    if (status) {
+      const { data: updatedOrder, error: updateError } = await supabase
+        .from("orders")
+        .update({ status })
+        .eq("id", order.id)
+        .select()
+        .single();
 
-    if (updateError || !updatedOrder) throw new Error(updateError?.message ?? "Failed to update order");
+      if (updateError || !updatedOrder) throw new Error(updateError?.message ?? "Failed to update order");
+    }
 
     if (paymentStatus) {
       const { data: payment } = await supabase
-        .from("Payment")
+        .from("payments")
         .select("id")
-        .eq("orderId", order.id)
-        .order("createdAt", { ascending: false })
+        .eq("order_id", order.id)
+        .order("created_at", { ascending: false })
         .limit(1)
         .single();
 
       if (payment) {
         await supabase
-          .from("Payment")
+          .from("payments")
           .update({ status: paymentStatus })
           .eq("id", payment.id);
       }
     }
 
-    return jsonOk({ id: updatedOrder.id, status: updatedOrder.status });
+    return jsonOk({ id: order.id, status });
   } catch (e) {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
   }
