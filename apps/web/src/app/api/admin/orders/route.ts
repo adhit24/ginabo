@@ -11,7 +11,7 @@ export async function GET(req: Request) {
 
     let query = supabase
       .from("orders")
-      .select("id, order_number, status, total_amount, created_at, profile_id, customer:profiles(id, full_name, email, phone_number), payments(status, payment_type, created_at)")
+      .select("id, order_number, status, total_amount, created_at, profile_id, customer:profiles!profile_id(id, full_name, email, phone_number), payments(status, payment_type, created_at)")
       .order("created_at", { ascending: false })
       .limit(200);
 
