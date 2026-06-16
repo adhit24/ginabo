@@ -9,14 +9,14 @@ export async function GET(req: Request) {
     const q = url.searchParams.get("q")?.trim();
 
     let query = supabase
-      .from("Customer")
-      .select("*")
-      .order("createdAt", { ascending: false })
+      .from("profiles")
+      .select("id, email, full_name, phone_number, created_at")
+      .order("created_at", { ascending: false })
       .limit(200);
 
     if (q) {
       query = query.or(
-        `name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`
+        `full_name.ilike.%${q}%,email.ilike.%${q}%,phone_number.ilike.%${q}%`
       );
     }
 
@@ -27,10 +27,10 @@ export async function GET(req: Request) {
     return jsonOk(
       (customers ?? []).map((c) => ({
         id: c.id,
-        name: c.name,
+        name: c.full_name ?? c.email ?? "—",
         email: c.email,
-        phone: c.phone,
-        createdAt: c.createdAt
+        phone: c.phone_number,
+        createdAt: c.created_at,
       }))
     );
   } catch (e) {
