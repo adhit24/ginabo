@@ -49,9 +49,10 @@ export const metadata: Metadata = {
   description: "Daily Skincare Solution: Brightening, Hydration, Soothing & Barrier Support. Cerah yang tetap nyaman.",
   icons: {
     icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.ico" },
     ],
     apple: [{ url: "/apple-touch-icon.png" }],
     other: [{ rel: "manifest", url: "/site.webmanifest" }],
