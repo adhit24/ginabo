@@ -1,32 +1,42 @@
 export const runtime = 'edge';
 
-import { addDays, endOfDay, parseISO, startOfDay } from "date-fns";
-
 import { jsonError, jsonOk } from "@/lib/http";
 import { supabase } from "@/lib/supabase";
-import { bookingSlotSchema } from "@/lib/validation";
-import { generateSlotsForDay } from "@/lib/slots";
 
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const start = url.searchParams.get("start");
     const end = url.searchParams.get("end");
-    if (!start || !end) return jsonError("Missing start/end", 400);
 
-    const startAt = startOfDay(parseISO(start));
-    const endAt = endOfDay(parseISO(end));
-    if (Number.isNaN(startAt.getTime()) || Number.isNaN(endAt.getTime())) return jsonError("Invalid date", 400);
-
-    const { data: slots, error } = await supabase
-      .from("BookingSlot")
+    let query = supabase
+      .from("booking_slots")
       .select("*")
-      .gte("startAt", startAt.toISOString())
-      .lte("startAt", endAt.toISOString())
-      .order("startAt", { ascending: true });
+      .order("slot_date", { ascending: true })
+      .order("start_time", { ascending: true });
 
+    if (start) query = query.gte("slot_date", start);
+    if (end) query = query.lte("slot_date", end);
+
+    const { data: slots, error } = await query;
     if (error) throw error;
-    return jsonOk(slots ?? []);
+
+    // Return in a format compatible with existing UI (startAt/endAt as ISO strings)
+    return jsonOk(
+      (slots ?? []).map((s) => ({
+        id: s.id,
+        startAt: `${s.slot_date}T${s.start_time}+07:00`,
+        endAt: `${s.slot_date}T${s.end_time}+07:00`,
+        slotDate: s.slot_date,
+        startTime: s.start_time,
+        endTime: s.end_time,
+        capacity: s.capacity,
+        bookedCount: s.booked_count,
+        isActive: s.is_available,
+        slotType: s.slot_type,
+        createdAt: s.created_at,
+      }))
+    );
   } catch (e) {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
   }
@@ -34,82 +44,33 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const url = new URL(req.url);
-    const generateFromRuleId = url.searchParams.get("generateFromRuleId");
-    const generateStart = url.searchParams.get("generateStart");
-    const generateDays = Number(url.searchParams.get("generateDays") ?? "14");
+    const body = await req.json() as {
+      slotDate: string;
+      startTime: string;
+      endTime: string;
+      capacity?: number;
+      slotType?: string;
+    };
 
-    if (generateFromRuleId && generateStart) {
-      const { data: rule, error: ruleError } = await supabase
-        .from("BookingAvailabilityRule")
-        .select("*")
-        .eq("id", generateFromRuleId)
-        .single();
-
-      if (ruleError || !rule) return jsonError("Rule not found", 404);
-
-      const startDate = startOfDay(parseISO(generateStart));
-      if (Number.isNaN(startDate.getTime())) return jsonError("Invalid generateStart", 400);
-
-      const days = Math.min(60, Math.max(1, Math.floor(generateDays)));
-
-      let createdCount = 0;
-      for (let i = 0; i < days; i++) {
-        const date = addDays(startDate, i);
-        if (date.getDay() !== rule.weekday) continue;
-
-        const candidates = generateSlotsForDay({
-          date,
-          startTime: rule.startTime,
-          endTime: rule.endTime,
-          slotDurationMinutes: rule.slotDurationMinutes
-        });
-
-        for (const c of candidates) {
-          // Check for existing slot with same startAt + endAt
-          const { data: existing } = await supabase
-            .from("BookingSlot")
-            .select("id")
-            .eq("startAt", c.startAt.toISOString())
-            .eq("endAt", c.endAt.toISOString())
-            .maybeSingle();
-
-          if (existing) continue;
-
-          const { error: insertError } = await supabase
-            .from("BookingSlot")
-            .insert({
-              ruleId: rule.id,
-              startAt: c.startAt.toISOString(),
-              endAt: c.endAt.toISOString(),
-              capacity: rule.capacity,
-              isActive: true
-            });
-
-          if (!insertError) createdCount++;
-        }
-      }
-
-      return jsonOk({ created: createdCount });
+    if (!body.slotDate || !body.startTime || !body.endTime) {
+      return jsonError("slotDate, startTime, dan endTime wajib diisi", 400);
     }
 
-    const body = await req.json();
-    const parsed = bookingSlotSchema.safeParse(body);
-    if (!parsed.success) return jsonError("Invalid input", 400, parsed.error.flatten());
-
     const { data: created, error } = await supabase
-      .from("BookingSlot")
+      .from("booking_slots")
       .insert({
-        startAt: new Date(parsed.data.startAt).toISOString(),
-        endAt: new Date(parsed.data.endAt).toISOString(),
-        capacity: parsed.data.capacity,
-        isActive: parsed.data.isActive
+        slot_date: body.slotDate,
+        start_time: body.startTime,
+        end_time: body.endTime,
+        capacity: body.capacity ?? 1,
+        slot_type: body.slotType ?? "online",
+        is_available: true,
       })
       .select()
       .single();
 
     if (error) throw error;
-    return jsonOk({ id: created!.id });
+    return jsonOk({ id: created.id });
   } catch (e) {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
   }
