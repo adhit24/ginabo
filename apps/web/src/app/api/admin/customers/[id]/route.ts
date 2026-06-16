@@ -49,7 +49,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
         })),
       })),
       bookings: (bookings ?? []).map((b) => {
-        const slot = b.slot as { slot_date: string; start_time: string; end_time: string } | null;
+        const slot = b.slot as unknown as { slot_date: string; start_time: string; end_time: string } | null;
         const startAt = slot ? `${slot.slot_date}T${slot.start_time}+07:00` : "";
         const endAt = slot ? `${slot.slot_date}T${slot.end_time}+07:00` : "";
         return {
