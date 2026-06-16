@@ -133,11 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   function signInWithGoogle() {
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://ginabo.id";
-    createClient().auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${origin}/auth/callback` },
-    });
+    window.location.href = "/api/auth/google";
   }
 
   return (
