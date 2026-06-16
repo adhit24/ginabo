@@ -38,7 +38,7 @@ export async function GET(req: Request) {
 
     return jsonOk(
       filteredOrders.map((o) => {
-        const customer = o.customer as { id: string; full_name?: string; email?: string; phone_number?: string } | null;
+        const customer = o.customer as unknown as { id: string; full_name?: string; email?: string; phone_number?: string } | null;
         const payments = Array.isArray(o.payments) ? [...o.payments] : [];
         const sortedPayments = payments.sort(
           (a: { created_at: string }, b: { created_at: string }) =>
