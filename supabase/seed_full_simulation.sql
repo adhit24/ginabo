@@ -735,15 +735,15 @@ COMMIT;
 -- ============================================================
 -- VERIFIKASI — jalankan setelah seed berhasil
 -- ============================================================
-SELECT 'profiles'     AS tabel, COUNT(*) AS jumlah FROM public.profiles      WHERE id LIKE 'a1%'
-UNION ALL SELECT 'products',    COUNT(*) FROM public.products      WHERE id LIKE 'c1%'
-UNION ALL SELECT 'variants',    COUNT(*) FROM public.product_variants WHERE id LIKE 'd1%'
-UNION ALL SELECT 'orders',      COUNT(*) FROM public.orders        WHERE id LIKE 'e1%'
-UNION ALL SELECT 'order_items', COUNT(*) FROM public.order_items   WHERE id LIKE 'f1%'
-UNION ALL SELECT 'payments',    COUNT(*) FROM public.payments      WHERE id LIKE '10%'
-UNION ALL SELECT 'slots',       COUNT(*) FROM public.booking_slots WHERE id LIKE '50%'
-UNION ALL SELECT 'bookings',    COUNT(*) FROM public.bookings      WHERE id LIKE '60%'
-UNION ALL SELECT 'returns',     COUNT(*) FROM public.returns       WHERE id LIKE '30%'
-UNION ALL SELECT 'return_items',COUNT(*) FROM public.return_items  WHERE id LIKE '40%';
+SELECT 'profiles'     AS tabel, COUNT(*) AS jumlah FROM public.profiles      WHERE id::text LIKE 'a1%'
+UNION ALL SELECT 'products',    COUNT(*) FROM public.products      WHERE id::text LIKE 'c1%'
+UNION ALL SELECT 'variants',    COUNT(*) FROM public.product_variants WHERE id::text LIKE 'd1%'
+UNION ALL SELECT 'orders',      COUNT(*) FROM public.orders        WHERE id::text LIKE 'e1%'
+UNION ALL SELECT 'order_items', COUNT(*) FROM public.order_items   WHERE id::text LIKE 'f1%'
+UNION ALL SELECT 'payments',    COUNT(*) FROM public.payments      WHERE id::text LIKE '10%'
+UNION ALL SELECT 'slots',       COUNT(*) FROM public.booking_slots WHERE id::text LIKE '50%'
+UNION ALL SELECT 'bookings',    COUNT(*) FROM public.bookings      WHERE id::text LIKE '60%'
+UNION ALL SELECT 'returns',     COUNT(*) FROM public.returns       WHERE id::text LIKE '30%'
+UNION ALL SELECT 'return_items',COUNT(*) FROM public.return_items  WHERE id::text LIKE '40%';
 
 
