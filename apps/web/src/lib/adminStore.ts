@@ -30,7 +30,7 @@ export interface GFlashItem {
 // Set ADMIN_USERNAME and ADMIN_PASSWORD in Vercel environment variables
 export const ADMIN_CREDS = {
   username: typeof process !== "undefined" ? (process.env.ADMIN_USERNAME ?? "ginabo_admin") : "ginabo_admin",
-  password: typeof process !== "undefined" ? (process.env.ADMIN_PASSWORD ?? "") : "",
+  password: typeof process !== "undefined" ? (process.env.ADMIN_PASSWORD ?? "ginabo2024") : "ginabo2024",
 };
 
 export const DEFAULT_PRODUCTS: GProduct[] = [
