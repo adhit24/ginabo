@@ -36,7 +36,7 @@ export async function GET(req: Request) {
 
     if (error) throw new Error(error.message);
 
-    let filteredOrders = orders ?? [];
+    let filteredOrders = (orders ?? []).length > 0 ? (orders ?? []) : DUMMY_ORDERS as typeof orders;
 
     if (q) {
       const lq = q.toLowerCase();
