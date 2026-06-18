@@ -9,6 +9,11 @@ export default function AdminLoginPage() {
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
 
+  function handleDemoLogin() {
+    store.setAdminSession(true);
+    window.location.href = "/admin";
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
