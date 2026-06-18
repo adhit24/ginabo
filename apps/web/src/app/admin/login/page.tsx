@@ -96,7 +96,22 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-xs text-white/30">
+        {/* Demo credentials hint */}
+        <div className="mt-5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-amber-400 mb-1">Demo Credentials</p>
+          <p className="text-xs text-white/50">Username: <span className="font-mono text-white/70">ginabo_admin</span></p>
+          <p className="text-xs text-white/50">Password: <span className="font-mono text-white/70">ginabo2024</span></p>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleDemoLogin}
+          className="mt-3 w-full rounded-xl border border-white/10 py-2.5 text-sm font-medium text-white/60 transition hover:border-white/20 hover:text-white/80"
+        >
+          Masuk Demo (Bypass Login)
+        </button>
+
+        <p className="mt-4 text-center text-xs text-white/30">
           Akses admin hanya untuk tim internal Ginabo.
         </p>
 
