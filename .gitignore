@@ -53,7 +53,6 @@ brand_asset/
 node_modules/
 .next/
 .turbo/
-.worktrees/
 *.tsbuildinfo
 
 # Git worktrees
