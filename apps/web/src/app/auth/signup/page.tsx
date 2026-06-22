@@ -130,7 +130,7 @@ export default function SignupPage() {
             <div className="mt-4 flex flex-col gap-2">
               {["Poin reward setiap pembelian", "Diskon eksklusif member", "Akses flash sale lebih awal"].map(t => (
                 <div key={t} className="flex items-center gap-2 text-xs text-white/50">
-                  <span style={{ color: "#a855f7" }}>✦</span> {t}
+                  <svg className="h-3 w-3 shrink-0" fill="none" stroke="#a855f7" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg> {t}
                 </div>
               ))}
             </div>

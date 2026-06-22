@@ -9,16 +9,9 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 
 const announcements = [
-  "Gratis ongkir untuk pembelian di atas Rp 200.000 ✦ Belanja Sekarang",
-  "Member baru dapat 100 poin selamat datang! ✦ Daftar Gratis",
-  "Konsultasi kulit gratis bersama skin expert kami ✦ Booking",
-];
-
-const shopMenu = [
-  { label: "Semua Produk",  href: "/shop" },
-  { label: "New Arrival",   href: "/shop?col=new" },
-  { label: "Best Sellers",  href: "/shop?col=bestseller" },
-  { label: "Bundling",      href: "/shop?col=bundling" },
+  "Gratis ongkir untuk pembelian di atas Rp 200.000 · Belanja Sekarang",
+  "Member baru dapat 100 poin selamat datang! · Daftar Gratis",
+  "Konsultasi kulit gratis bersama skin expert kami · Booking",
 ];
 
 const infoMenu = [
@@ -34,14 +27,12 @@ export function SiteHeader() {
   const router               = useRouter();
   const { user, logout }     = useAuth();
   const [annIdx, setAnnIdx]  = useState(0);
-  const [shopOpen, setShopOpen]   = useState(false);
   const [infoOpen, setInfoOpen]   = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerTab, setDrawerTab] = useState<"produk" | "info">("produk");
+  const [drawerTab, setDrawerTab] = useState<"menu" | "info">("menu");
   const [userOpen, setUserOpen]   = useState(false);
   const [scrolled, setScrolled]   = useState(false);
 
-  const shopRef = useRef<HTMLDivElement>(null);
   const infoRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
 
@@ -58,7 +49,6 @@ export function SiteHeader() {
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (shopRef.current && !shopRef.current.contains(e.target as Node)) setShopOpen(false);
       if (infoRef.current && !infoRef.current.contains(e.target as Node)) setInfoOpen(false);
       if (userRef.current && !userRef.current.contains(e.target as Node)) setUserOpen(false);
     };
@@ -72,167 +62,198 @@ export function SiteHeader() {
     router.push("/");
   }
 
+  const isHomeActive = pathname === "/";
+  const isInfoActive = ["/faq", "/contact", "/reseller", "/terms", "/privacy"].some(p => pathname.startsWith(p));
+  const isJourneyActive = pathname === "/21days";
+  const isKonsultasiActive = pathname === "/booking";
+
   return (
-    <header className={`sticky top-0 z-40 bg-white transition-shadow duration-300 ${scrolled ? "shadow-[0_2px_12px_rgba(0,0,0,0.08)]" : ""}`}>
+    <header className="sticky top-0 z-40" suppressHydrationWarning>
 
       {/* ── Announcement Bar ── */}
-      <div className="bg-[#78257C] py-2 overflow-hidden">
+      <div className="bg-gradient-to-r from-[#9333EA] via-[#78257C] to-[#7C3AED] py-2 overflow-hidden">
         <div className="mx-auto flex max-w-7xl items-center justify-center px-4">
-          <p className="text-[11px] font-medium text-white text-center transition-all duration-500 line-clamp-1">
+          <p className="text-[11px] font-medium text-white/90 text-center transition-all duration-500 line-clamp-1">
             {announcements[annIdx]}
           </p>
         </div>
       </div>
 
-      {/* ── Desktop Navbar ── */}
-      <div className="hidden md:block border-b border-[#f0f0f0]">
-        <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-6" style={{ height: 64 }}>
+      {/* ── Desktop Navbar — Glassmorphic ── */}
+      <div className={`hidden md:block transition-all duration-500 ${
+        scrolled
+          ? "bg-white/75 backdrop-blur-2xl shadow-[0_8px_32px_rgba(120,37,124,0.08)] border-b border-white/50"
+          : "bg-white/60 backdrop-blur-xl border-b border-white/30"
+      }`}>
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6" style={{ height: 68 }}>
 
-          {/* Left: PRODUK + INFO */}
-          <div className="flex items-center gap-1">
-
-            {/* PRODUK mega menu */}
-            <div className="relative" ref={shopRef}>
-              <button
-                onClick={() => { setShopOpen(v => !v); setInfoOpen(false); }}
-                className={`flex items-center gap-1 px-4 py-2 text-[13px] font-semibold transition hover:text-[#78257C] ${shopOpen ? "text-[#78257C]" : "text-[#303030]"}`}
-              >
-                PRODUK
-                <svg className={`w-3.5 h-3.5 transition-transform ${shopOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-
-              {shopOpen && (
-                <div className="absolute left-0 top-full z-50 mt-0 w-48 rounded-b-[5px] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-[#f0f0f0] border-t-0">
-                  <ul className="flex flex-col py-2">
-                    {shopMenu.map((item) => (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          onClick={() => setShopOpen(false)}
-                          className="block px-5 py-2.5 text-[13px] text-[#808080] transition hover:bg-[#fdf5ff] hover:text-[#78257C]"
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            {/* INFO mega menu */}
-            <div className="relative" ref={infoRef}>
-              <button
-                onClick={() => { setInfoOpen(v => !v); setShopOpen(false); }}
-                className={`flex items-center gap-1 px-4 py-2 text-[13px] font-semibold transition hover:text-[#78257C] ${infoOpen ? "text-[#78257C]" : "text-[#303030]"}`}
-              >
-                INFO
-                <svg className={`w-3.5 h-3.5 transition-transform ${infoOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-
-              {infoOpen && (
-                <div className="absolute left-0 top-full z-50 mt-0 w-52 rounded-b-[5px] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-[#f0f0f0] border-t-0">
-                  <ul className="flex flex-col py-2">
-                    {infoMenu.map((item) => (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          onClick={() => setInfoOpen(false)}
-                          className="block px-5 py-2.5 text-[13px] text-[#808080] transition hover:bg-[#fdf5ff] hover:text-[#78257C]"
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            {/* JOURNEY direct link */}
-            <Link
-              href="/21days"
-              className={`px-4 py-2 text-[13px] font-semibold transition hover:text-[#78257C] ${pathname === "/21days" ? "text-[#78257C]" : "text-[#303030]"}`}
-            >
-              JOURNEY
-            </Link>
-
-          </div>
-
-          {/* Center: Logo */}
-          <Link href="/" className="flex items-center justify-center">
+          {/* Left: Logo */}
+          <Link href="/" className="flex items-center shrink-0">
             <Image
-              src="/logo_diamond.png"
+              src="/LOGO_GINABO.png"
               alt="Ginabo"
-              width={160}
-              height={56}
+              width={130}
+              height={44}
               className="object-contain"
-              style={{ height: 56, width: "auto" }}
+              style={{ height: 44, width: "auto" }}
               priority
             />
           </Link>
 
-          {/* Right: Konsultasi + User + Cart */}
-          <div className="flex items-center justify-end gap-1">
+          {/* Right: Nav Links + Konsultasi + User + Cart */}
+          <div className="flex items-center gap-1">
 
-            <Link href="/booking" className="px-4 py-2 text-[13px] font-semibold text-[#303030] transition hover:text-[#78257C]">
-              Konsultasi
-            </Link>
+            {/* Nav Links */}
+            <nav className="flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+
+              {/* HOME link */}
+              <Link
+                href="/"
+                className={`relative px-4 py-1.5 text-[13px] font-semibold tracking-wide rounded-full transition-all duration-300
+                  ${isHomeActive ? "text-white" : "text-[#4A1A5E] hover:text-[#78257C]"}`}
+              >
+                {isHomeActive && (
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#9333EA] via-[#7C3AED] to-[#6D28D9] shadow-[0_2px_8px_rgba(120,37,124,0.3)]" />
+                )}
+                <span className="relative">HOME</span>
+              </Link>
+
+              {/* INFO dropdown */}
+              <div className="relative" ref={infoRef}>
+                <button
+                  onClick={() => { setInfoOpen(v => !v); }}
+                  className={`relative flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-semibold tracking-wide rounded-full transition-all duration-300
+                    ${infoOpen || isInfoActive ? "text-white" : "text-[#4A1A5E] hover:text-[#78257C]"}`}
+                >
+                  {(infoOpen || isInfoActive) && (
+                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#9333EA] via-[#7C3AED] to-[#6D28D9] shadow-[0_2px_8px_rgba(120,37,124,0.3)] transition-opacity duration-300" />
+                  )}
+                  <span className="relative">INFO</span>
+                  <svg className={`relative w-3.5 h-3.5 transition-transform duration-300 ease-out ${infoOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+
+                <div className={`absolute left-0 top-full z-50 pt-3 transition-all duration-300 ease-out ${
+                  infoOpen
+                    ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+                    : "opacity-0 -translate-y-2 scale-[0.97] pointer-events-none"
+                }`}>
+                  <div className="w-56 rounded-2xl bg-white backdrop-blur-2xl shadow-[0_16px_48px_rgba(120,37,124,0.14)] border border-white/60 ring-1 ring-black/[0.03] overflow-hidden">
+                    <ul className="flex flex-col py-2">
+                      {infoMenu.map((item, idx) => (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            onClick={() => setInfoOpen(false)}
+                            className="group flex items-center gap-3 px-5 py-3 text-[13px] text-[#606060] transition-all duration-200 hover:bg-gradient-to-r hover:from-[#F3E8FF]/60 hover:to-transparent hover:text-[#78257C]"
+                            style={{ transitionDelay: infoOpen ? `${idx * 30}ms` : "0ms" }}
+                          >
+                            <span className="h-1 w-1 rounded-full bg-gradient-to-r from-[#C084FC] to-[#A855F7] opacity-0 scale-0 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100" />
+                            {item.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* JOURNEY direct link */}
+              <Link
+                href="/21days"
+                className={`relative px-4 py-1.5 text-[13px] font-semibold tracking-wide rounded-full transition-all duration-300
+                  ${isJourneyActive ? "text-white" : "text-[#4A1A5E] hover:text-[#78257C]"}`}
+              >
+                {isJourneyActive && (
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#9333EA] via-[#7C3AED] to-[#6D28D9] shadow-[0_2px_8px_rgba(120,37,124,0.3)]" />
+                )}
+                <span className="relative">JOURNEY</span>
+              </Link>
+
+              {/* Konsultasi */}
+              <Link
+                href="/booking"
+                className={`relative px-4 py-1.5 text-[13px] font-semibold tracking-wide rounded-full transition-all duration-300
+                  ${isKonsultasiActive ? "text-white" : "text-[#4A1A5E] hover:text-[#78257C]"}`}
+              >
+                {isKonsultasiActive && (
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#9333EA] via-[#7C3AED] to-[#6D28D9] shadow-[0_2px_8px_rgba(120,37,124,0.3)]" />
+                )}
+                <span className="relative">Konsultasi</span>
+              </Link>
+
+            </nav>
+
+            <div className="w-px h-5 bg-[#E9D5FF]/60 mx-2" />
 
             {/* User */}
-            <div className="relative ml-2" ref={userRef}>
+            <div className="relative" ref={userRef}>
               <button
                 onClick={() => setUserOpen(v => !v)}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E2E2E2] bg-white transition hover:border-[#78257C]"
+                className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300 ${
+                  userOpen
+                    ? "bg-gradient-to-br from-[#A855F7] to-[#7C3AED] text-white shadow-[0_4px_16px_rgba(120,37,124,0.3)]"
+                    : "border border-white/60 bg-white/50 backdrop-blur-sm hover:border-[#D8B4FE] hover:shadow-[0_2px_12px_rgba(120,37,124,0.1)]"
+                }`}
                 aria-label="Akun"
               >
                 {user ? (
-                  <span className="text-[13px] font-bold text-[#78257C]">
+                  <span className={`text-[13px] font-bold transition-colors duration-300 ${userOpen ? "text-white" : "text-[#78257C]"}`}>
                     {user.name.charAt(0).toUpperCase()}
                   </span>
                 ) : (
-                  <svg className="h-4 w-4 text-[#808080]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <svg className={`h-4 w-4 transition-colors duration-300 ${userOpen ? "text-white" : "text-[#808080]"}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <circle cx="12" cy="8" r="4" />
                     <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round" />
                   </svg>
                 )}
               </button>
 
-              {userOpen && (
-                <div className="absolute right-0 top-12 z-50 w-56 rounded-[5px] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-[#E2E2E2] overflow-hidden">
+              <div className={`absolute right-0 top-full z-50 pt-3 transition-all duration-300 ease-out ${
+                userOpen
+                  ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+                  : "opacity-0 -translate-y-2 scale-[0.97] pointer-events-none"
+              }`}>
+                <div className="w-60 rounded-2xl bg-white/80 backdrop-blur-2xl shadow-[0_16px_48px_rgba(120,37,124,0.14)] border border-white/60 ring-1 ring-black/[0.03] overflow-hidden">
                   {user ? (
                     <>
-                      <div className="px-4 py-3 border-b border-[#f5f5f5]">
+                      <div className="px-5 py-4 bg-gradient-to-r from-[#F3E8FF]/40 to-transparent border-b border-[#F3E8FF]/50">
                         <p className="text-[13px] font-semibold text-[#303030] truncate">{user.name}</p>
-                        <p className="text-[11px] text-[#808080] truncate">{user.email}</p>
+                        <p className="text-[11px] text-[#808080] truncate mt-0.5">{user.email}</p>
                       </div>
                       <ul className="flex flex-col py-1">
-                        <li><Link href="/member" onClick={() => setUserOpen(false)} className="block px-4 py-2.5 text-[13px] text-[#808080] hover:bg-[#fdf5ff] hover:text-[#78257C]">Profil Saya</Link></li>
-                        <li><Link href="/member" onClick={() => setUserOpen(false)} className="block px-4 py-2.5 text-[13px] text-[#808080] hover:bg-[#fdf5ff] hover:text-[#78257C]">Pesanan Saya</Link></li>
+                        <li>
+                          <Link href="/member" onClick={() => setUserOpen(false)} className="group flex items-center gap-3 px-5 py-3 text-[13px] text-[#606060] transition-all duration-200 hover:bg-gradient-to-r hover:from-[#F3E8FF]/60 hover:to-transparent hover:text-[#78257C]">
+                            <span className="h-1 w-1 rounded-full bg-gradient-to-r from-[#C084FC] to-[#A855F7] opacity-0 scale-0 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100" />
+                            Profil Saya
+                          </Link>
+                        </li>
+                        <li>
+                          <Link href="/member" onClick={() => setUserOpen(false)} className="group flex items-center gap-3 px-5 py-3 text-[13px] text-[#606060] transition-all duration-200 hover:bg-gradient-to-r hover:from-[#F3E8FF]/60 hover:to-transparent hover:text-[#78257C]">
+                            <span className="h-1 w-1 rounded-full bg-gradient-to-r from-[#C084FC] to-[#A855F7] opacity-0 scale-0 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100" />
+                            Pesanan Saya
+                          </Link>
+                        </li>
                       </ul>
-                      <div className="border-t border-[#f5f5f5] py-1">
-                        <button onClick={handleLogout} className="block w-full px-4 py-2.5 text-left text-[13px] text-red-500 hover:bg-red-50">Keluar</button>
+                      <div className="border-t border-[#F3E8FF]/50 py-1">
+                        <button onClick={handleLogout} className="block w-full px-5 py-3 text-left text-[13px] text-red-400 hover:bg-red-50/40 transition-colors duration-200">Keluar</button>
                       </div>
                     </>
                   ) : (
-                    <div className="p-4 flex flex-col gap-2">
+                    <div className="p-4 flex flex-col gap-2.5">
                       <Link href="/auth/login" onClick={() => setUserOpen(false)}
-                        className="block w-full rounded-[5px] border border-[#78257C] py-2 text-center text-[13px] font-semibold text-[#78257C] transition hover:bg-[#fdf5ff]">
+                        className="block w-full rounded-xl border border-[#D8B4FE]/50 py-2.5 text-center text-[13px] font-semibold text-[#78257C] transition-all duration-200 hover:bg-[#F3E8FF]/40 hover:border-[#C084FC]/60">
                         Masuk
                       </Link>
                       <Link href="/auth/signup" onClick={() => setUserOpen(false)}
-                        className="block w-full rounded-[5px] py-2 text-center text-[13px] font-bold text-white transition hover:opacity-90"
-                        style={{ background: "#78257C" }}>
+                        className="block w-full rounded-xl py-2.5 text-center text-[13px] font-bold text-white transition-all duration-300 bg-gradient-to-r from-[#9333EA] to-[#7C3AED] hover:shadow-[0_6px_20px_rgba(120,37,124,0.35)]">
                         Daftar Gratis
                       </Link>
                     </div>
                   )}
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Cart */}
@@ -241,36 +262,46 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* ── Mobile Navbar ── */}
-      <div className="flex md:hidden items-center justify-between px-4 border-b border-[#f0f0f0]" style={{ height: 52 }}>
+      {/* ── Mobile Navbar — Glassmorphic ── */}
+      <div className={`flex md:hidden items-center justify-between px-4 transition-all duration-500 ${
+        scrolled
+          ? "bg-white/75 backdrop-blur-2xl shadow-[0_8px_32px_rgba(120,37,124,0.08)] border-b border-white/50"
+          : "bg-white/60 backdrop-blur-xl border-b border-white/30"
+      }`} style={{ height: 56 }}>
 
-        {/* Hamburger */}
+        {/* Hamburger — matches cart pill style */}
         <button
           onClick={() => setDrawerOpen(true)}
-          className="flex flex-col gap-[5px] p-2"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-lg transition hover:opacity-90 hover:-translate-y-0.5"
+          style={{
+            background: "linear-gradient(135deg, #1e1b3a, #2d2556)",
+            boxShadow: "0 4px 12px rgba(20,15,50,0.25)",
+          }}
           aria-label="Menu"
         >
-          <span className="block h-0.5 w-5 bg-[#303030] rounded-full" />
-          <span className="block h-0.5 w-4 bg-[#303030] rounded-full" />
-          <span className="block h-0.5 w-5 bg-[#303030] rounded-full" />
+          <div className="flex flex-col gap-[4.5px]">
+            <span className="block h-[1.5px] w-[16px] bg-white rounded-full" />
+            <span className="block h-[1.5px] w-[12px] bg-white rounded-full" />
+            <span className="block h-[1.5px] w-[16px] bg-white rounded-full" />
+          </div>
         </button>
 
-        {/* Logo center */}
-        <Link href="/" className="absolute left-1/2 -translate-x-1/2">
+        {/* Logo — left-aligned (after hamburger) */}
+        <Link href="/" className="absolute left-[4.5rem]">
           <Image
-            src="/logo_diamond.png"
+            src="/LOGO_GINABO.png"
             alt="Ginabo"
-            width={124}
-            height={44}
+            width={100}
+            height={34}
             className="object-contain"
-            style={{ height: 44, width: "auto" }}
+            style={{ height: 34, width: "auto" }}
             priority
           />
         </Link>
 
         {/* Right: user + cart */}
         <div className="flex items-center gap-1">
-          <Link href={user ? "/member" : "/auth/login"} className="flex h-9 w-9 items-center justify-center">
+          <Link href={user ? "/member" : "/auth/login"} className="flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-[#F3E8FF]/40">
             <svg className="h-5 w-5 text-[#808080]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <circle cx="12" cy="8" r="4" />
               <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round" />
@@ -280,126 +311,185 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* ── Mobile Full-Screen Menu ── */}
-      {drawerOpen && (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-white md:hidden">
+      {/* ── Mobile Full-Screen Menu — Glassmorphic ── */}
+      <div
+        className={`fixed inset-0 z-[60] flex flex-col md:hidden transition-all duration-400 ${
+          drawerOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+      >
+        {/* Backdrop */}
+        <div
+          className={`absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity duration-400 ${drawerOpen ? "opacity-100" : "opacity-0"}`}
+          onClick={() => setDrawerOpen(false)}
+        />
+
+        {/* Panel */}
+        <div className={`relative flex flex-col h-full backdrop-blur-2xl transition-transform duration-400 ease-out ${
+          drawerOpen ? "translate-x-0" : "-translate-x-full"
+        }`} style={{ maxWidth: "85vw", background: "linear-gradient(160deg, rgba(15,10,30,0.92) 0%, rgba(30,11,56,0.95) 50%, rgba(42,16,64,0.92) 100%)" }}>
 
           {/* Tab bar header */}
           <div className="flex items-end justify-between px-5 pt-5 pb-0">
             <div className="flex gap-6">
               <button
-                onClick={() => setDrawerTab("produk")}
-                className={`pb-3 text-[14px] font-bold border-b-2 transition-colors ${
-                  drawerTab === "produk"
-                    ? "border-[#78257C] text-[#78257C]"
-                    : "border-transparent text-[#aaaaaa]"
+                onClick={() => setDrawerTab("menu")}
+                className={`relative pb-3 text-[14px] font-bold transition-colors duration-300 ${
+                  drawerTab === "menu"
+                    ? "text-[#c084fc]"
+                    : "text-white/40"
                 }`}
               >
-                PRODUK
+                MENU
+                <span className={`absolute bottom-0 left-0 right-0 h-[2.5px] rounded-full bg-gradient-to-r from-[#C084FC] via-[#A855F7] to-[#7C3AED] transition-all duration-300 ${
+                  drawerTab === "menu" ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
+                }`} />
               </button>
               <button
                 onClick={() => setDrawerTab("info")}
-                className={`pb-3 text-[14px] font-bold border-b-2 transition-colors ${
+                className={`relative pb-3 text-[14px] font-bold transition-colors duration-300 ${
                   drawerTab === "info"
-                    ? "border-[#78257C] text-[#78257C]"
-                    : "border-transparent text-[#aaaaaa]"
+                    ? "text-[#c084fc]"
+                    : "text-white/40"
                 }`}
               >
                 INFO
+                <span className={`absolute bottom-0 left-0 right-0 h-[2.5px] rounded-full bg-gradient-to-r from-[#C084FC] via-[#A855F7] to-[#7C3AED] transition-all duration-300 ${
+                  drawerTab === "info" ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
+                }`} />
               </button>
             </div>
             <button
               onClick={() => setDrawerOpen(false)}
-              className="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-[#f5f5f5]"
+              className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 transition-colors duration-200 hover:bg-white/20"
               aria-label="Tutup menu"
             >
-              <svg width="14" height="14" fill="none" stroke="#808080" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24">
+              <svg width="14" height="14" fill="none" stroke="#c084fc" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24">
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          <div className="h-px bg-[#f0f0f0]" />
+          <div className="h-px bg-gradient-to-r from-[#c084fc]/30 via-[#8b5cf6]/15 to-transparent" />
 
           {/* Tab content */}
-          <nav className="flex-1 overflow-y-auto">
-            {drawerTab === "produk" && shopMenu.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setDrawerOpen(false)}
-                className="flex items-center justify-between px-5 py-4 text-[16px] font-medium text-[#303030] border-b border-[#f5f5f5] hover:text-[#78257C]"
+          <nav className="flex-1 overflow-y-auto px-4 pt-5">
+            {drawerTab === "menu" && (
+              <div
+                className="rounded-[20px] p-5"
+                style={{
+                  background: "linear-gradient(135deg, #1e1b3a 0%, #2d2556 100%)",
+                  border: "1px solid rgba(139,92,246,0.15)",
+                  boxShadow: "0 8px 32px rgba(20,15,50,0.25)",
+                }}
               >
-                {item.label}
-                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                  <path d="M9 18l6-6-6-6" />
-                </svg>
-              </Link>
-            ))}
+                <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: "#c4b5fd" }}>
+                  Navigasi
+                </h3>
+                <ul className="flex flex-col gap-1">
+                  {[
+                    { label: "Home", href: "/" },
+                    { label: "Journey — 21 Days", href: "/21days" },
+                    { label: "Konsultasi", href: "/booking" },
+                  ].map(item => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setDrawerOpen(false)}
+                          className={`block w-full text-left px-3.5 py-2.5 rounded-lg text-[14px] font-medium transition-all duration-200 ${
+                            isActive
+                              ? "text-white font-semibold shadow-md"
+                              : "text-[#a5a0c8] hover:text-white hover:bg-white/10"
+                          }`}
+                          style={isActive ? {
+                            background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                            boxShadow: "0 4px 14px rgba(139,92,246,0.3)",
+                          } : {}}
+                        >
+                          {item.label}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
 
             {drawerTab === "info" && (
-              <>
-                <Link
-                  href="/21days"
-                  onClick={() => setDrawerOpen(false)}
-                  className="flex items-center justify-between px-5 py-4 text-[16px] font-bold border-b border-[#f5f5f5]"
-                  style={{ color: "#78257C" }}
-                >
-                  Journey — 21 Days
-                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                    <path d="M9 18l6-6-6-6" />
-                  </svg>
-                </Link>
-                {infoMenu.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setDrawerOpen(false)}
-                    className="flex items-center px-5 py-4 text-[16px] font-medium text-[#303030] border-b border-[#f5f5f5] hover:text-[#78257C]"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                <Link
-                  href="/booking"
-                  onClick={() => setDrawerOpen(false)}
-                  className="flex items-center px-5 py-4 text-[16px] font-medium text-[#303030] border-b border-[#f5f5f5] hover:text-[#78257C]"
-                >
-                  Konsultasi
-                </Link>
-              </>
+              <div
+                className="rounded-[20px] p-5"
+                style={{
+                  background: "linear-gradient(135deg, #1e1b3a 0%, #2d2556 100%)",
+                  border: "1px solid rgba(139,92,246,0.15)",
+                  boxShadow: "0 8px 32px rgba(20,15,50,0.25)",
+                }}
+              >
+                <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: "#c4b5fd" }}>
+                  Informasi
+                </h3>
+                <ul className="flex flex-col gap-1">
+                  {[
+                    { label: "Journey — 21 Days", href: "/21days" },
+                    ...infoMenu.map(i => ({ label: i.label, href: i.href })),
+                    { label: "Konsultasi", href: "/booking" },
+                  ].map(item => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setDrawerOpen(false)}
+                          className={`block w-full text-left px-3.5 py-2.5 rounded-lg text-[14px] font-medium transition-all duration-200 ${
+                            isActive
+                              ? "text-white font-semibold shadow-md"
+                              : "text-[#a5a0c8] hover:text-white hover:bg-white/10"
+                          }`}
+                          style={isActive ? {
+                            background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                            boxShadow: "0 4px 14px rgba(139,92,246,0.3)",
+                          } : {}}
+                        >
+                          {item.label}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             )}
           </nav>
 
           {/* Bottom CTA */}
-          <div className="border-t border-[#f0f0f0] p-4">
+          <div className="border-t border-white/[0.08] p-4" style={{ background: "rgba(15,10,30,0.5)" }}>
             {user ? (
               <div className="flex items-center justify-between py-1">
                 <div>
-                  <p className="text-[13px] font-semibold text-[#303030]">{user.name}</p>
-                  <p className="text-[11px] text-[#808080]">{user.email}</p>
+                  <p className="text-[13px] font-semibold text-white">{user.name}</p>
+                  <p className="text-[11px] text-white/50">{user.email}</p>
                 </div>
                 <button
                   onClick={() => { handleLogout(); setDrawerOpen(false); }}
-                  className="text-[12px] text-red-500"
+                  className="text-[12px] text-red-400 hover:text-red-300 transition-colors duration-200"
                 >
                   Keluar
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2.5">
                 <Link
                   href="/auth/login"
                   onClick={() => setDrawerOpen(false)}
-                  className="block w-full rounded-[5px] border border-[#78257C] py-3 text-center text-[13px] font-semibold text-[#78257C] hover:bg-[#fdf5ff]"
+                  className="block w-full rounded-lg border border-[#c084fc]/30 py-3 text-center text-[13px] font-semibold text-[#c084fc] transition-all duration-200 hover:bg-white/[0.06]"
                 >
                   Masuk
                 </Link>
                 <Link
                   href="/auth/signup"
                   onClick={() => setDrawerOpen(false)}
-                  className="block w-full rounded-[5px] py-3 text-center text-[13px] font-bold text-white hover:opacity-90"
-                  style={{ background: "#78257C" }}
+                  className="block w-full rounded-lg py-3 text-center text-[13px] font-bold text-white transition-all duration-300 bg-gradient-to-r from-[#8b5cf6] to-[#e879f9] hover:shadow-[0_6px_20px_rgba(139,92,246,0.35)]"
                 >
                   Daftar Gratis
                 </Link>
@@ -407,7 +497,7 @@ export function SiteHeader() {
             )}
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }

@@ -4,11 +4,9 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 
 const banners = [
-  { src: "/Banner/banner1.png", alt: "Banner Ginabo 1" },
-  { src: "/Banner/banner2.png", alt: "Banner Ginabo 2" },
-  { src: "/Banner/banner3.png", alt: "Banner Ginabo 3" },
-  { src: "/Banner/banner4.png", alt: "Banner Ginabo 4" },
-  { src: "/Banner/banner5.png", alt: "Banner Ginabo 5" },
+  { src: "/Banner/Banner_Serum.png", alt: "Banner Serum" },
+  { src: "/Banner/Banner_DNA_Salmon.png", alt: "Banner DNA Salmon Gel" },
+  { src: "/Banner/Banner_Cream.png", alt: "Banner Cream" },
 ];
 
 const SLIDE_DURATION = 5000;
@@ -64,7 +62,9 @@ export function HeroBanner() {
             fill
             className="object-cover object-top md:object-center"
             priority={i === 0}
-            sizes="(max-width:768px) 100vw, (max-width:1280px) calc(100vw - 40px), 1240px"
+            quality={100}
+            sizes="100vw"
+            unoptimized
           />
         </div>
       ))}

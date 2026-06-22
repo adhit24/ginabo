@@ -1,10 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useMotionValue, useMotionTemplate, useSpring, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { HeroBanner } from "@/components/HeroBanner";
 import { Reveal } from "@/components/ui/Reveal";
 import { Marquee } from "@/components/ui/Marquee";
@@ -17,7 +17,7 @@ const IMG_SPRITE    = "https://www.figma.com/api/mcp/asset/71dedf14-7a07-4680-8f
 
 // ── Static Data ───────────────────────────────────────────────────────────────
 const marqueeItems = [
-  "BPOM ✓", "Halal ✓", "Dermatologist Tested", "No Parabens",
+  "BPOM", "Halal", "Dermatologist Tested", "No Parabens",
   "Barrier-First", "Gentle Formula", "AM & PM Routine", "2 Years Research",
 ];
 
@@ -63,17 +63,44 @@ function ProductCard({
       imageUrl:  img ?? null,
     });
   }
+  // Calculate discount percentage for promo items
+  const discountPct = originalPrice && priceMinor
+    ? Math.round((1 - priceMinor / parseInt(originalPrice.replace(/\D/g, ""))) * 100)
+    : 0;
+
   return (
     <motion.div
       variants={cardSlideUp}
-      whileHover={{ y: -10, boxShadow: "0 28px 56px rgba(42,35,86,0.18)" }}
-      className="w-full overflow-hidden rounded-[20px] bg-white flex flex-col cursor-pointer"
-      style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.10)" }}
+      whileHover={{ y: -8, scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 300, damping: 24 }}
+      className="group relative w-full flex flex-col cursor-pointer rounded-2xl overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.4) 100%)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        border: "1px solid rgba(255,255,255,0.6)",
+        boxShadow: "0 8px 32px rgba(82,69,178,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
+      }}
     >
+      {/* Glassmorphic glow orb - decorative */}
+      <div
+        className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%)" }}
+      />
+      <div
+        className="absolute -bottom-6 -left-6 w-20 h-20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(232,121,249,0.15) 0%, transparent 70%)" }}
+      />
+
       {/* Product image */}
-      <div className="relative overflow-hidden aspect-[4/5]">
+      <div className="relative overflow-hidden aspect-square rounded-t-2xl">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/30 z-[1]" />
         {img ? (
-          <img src={img} alt={name} className="w-full h-full object-cover" />
+          <img
+            src={img}
+            alt={name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
         ) : (
           <img
             src={IMG_SPRITE}
@@ -84,45 +111,68 @@ function ProductCard({
         )}
       </div>
 
-      {/* Info row */}
-      <div className="flex flex-col gap-1 px-4 py-3 bg-white flex-1">
-        <p className="text-[#aaa] font-semibold text-[12px] md:text-[14px]">Ginabo</p>
-        <p className="font-semibold text-[#2a2356] text-[13px] md:text-[16px] leading-snug whitespace-pre-line">{name}</p>
-        <div className="flex items-center gap-2 mt-0.5">
-          <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="#F59E0B">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-          </svg>
-          <span className="text-[#737373] font-semibold text-[12px]">{rating}</span>
-          <span className="text-[#656565] text-base font-light">|</span>
-          <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="8" r="4"/>
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-          </svg>
-          <span className="text-[#737373] font-semibold text-[12px]">{reviews}</span>
+      {/* Info section - glassmorphic bottom */}
+      <div
+        className="flex flex-col gap-1 px-3 py-3 flex-1 relative"
+        style={{
+          background: "linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(253,250,255,0.95) 100%)",
+          backdropFilter: "blur(12px)",
+        }}
+      >
+        <p className="font-semibold text-[#2a2356] text-[12px] md:text-[13px] leading-snug whitespace-pre-line line-clamp-2">
+          {name}
+        </p>
+
+        {/* Rating badge + sold count */}
+        <div className="flex items-center gap-1.5">
+          <div
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm"
+            style={{ background: "linear-gradient(135deg, #fbbf24, #f59e0b)" }}
+          >
+            <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="white">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <span className="text-white font-bold text-[10px]">{rating}</span>
+          </div>
+          <span className="text-[#7A7A7A] text-[10px] font-semibold">{reviews} terjual</span>
         </div>
-        <div className="flex items-center justify-between mt-auto pt-1">
-          <div className="flex flex-col">
+
+        {/* Price + Discount badge + Cart button */}
+        <div className="flex items-end justify-between mt-auto pt-1">
+          
+          <div>
             {originalPrice && (
-              <p className="text-[11px] md:text-[13px] font-medium line-through" style={{ color: "#bbb" }}>
+              <p className="text-[10px] md:text-[11px] font-medium line-through text-gray-400">
                 {originalPrice}
               </p>
             )}
-            <p className="font-bold text-[13px] md:text-[16px]" style={{ color: "#be3ab4" }}>
-              {priceLabel && <span style={{ color: "#be3ab4" }}>{priceLabel} </span>}
-              {priceVal}
-            </p>
+            <div className="flex items-center gap-1.5">
+              <p className={`font-semibold ${originalPrice ? "text-[13px] md:text-[14px]" : "text-[14px] md:text-[15px]"}`} style={{ color: "#78257C" }}>
+                {priceLabel && <span>{priceLabel} </span>}
+                {priceVal}
+              </p>
+              {discountPct > 0 && (
+                <span className="px-1.5 py-0.5 rounded-sm text-[9px] md:text-[10px] font-bold text-white bg-red-500">
+                  {discountPct}%
+                </span>
+              )}
+            </div>
           </div>
           <motion.button
             whileHover={{ scale: 1.12 }}
-            whileTap={{ scale: 0.92 }}
+            whileTap={{ scale: 0.9 }}
             onClick={handleAddToCart}
-            className="flex items-center justify-center rounded-[14px] overflow-hidden flex-shrink-0"
-            style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", width: 44, height: 44 }}
+            className="flex items-center justify-center rounded-lg flex-shrink-0"
+            style={{
+              background: "linear-gradient(135deg, #8b5cf6, #c084fc)",
+              width: 40,
+              height: 40,
+              boxShadow: "0 4px 12px rgba(139,92,246,0.3)",
+            }}
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-              <line x1="3" y1="6" x2="21" y2="6"/>
-              <path d="M16 10a4 4 0 0 1-8 0"/>
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M12 5v14"/>
+              <path d="M5 12h14"/>
             </svg>
           </motion.button>
         </div>
@@ -131,43 +181,13 @@ function ProductCard({
   );
 }
 
-// ── CTA Card — 3D tilt + spotlight glow + spring physics ─────────────────────
+// ── CTA Card — simple hover scale ───────────────────────────────────────────
 function CTACard({ href, src, alt }: { href: string; src: string; alt: string }) {
-  const cardRef = useRef<HTMLAnchorElement>(null);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const rotX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), { stiffness: 350, damping: 30 });
-  const rotY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), { stiffness: 350, damping: 30 });
-  const glowX = useTransform(mouseX, [-0.5, 0.5], [0, 100]);
-  const glowY = useTransform(mouseY, [-0.5, 0.5], [0, 100]);
-  const spotlight = useMotionTemplate`radial-gradient(circle at ${glowX}% ${glowY}%, rgba(255,255,255,0.22) 0%, transparent 55%)`;
-
-  function onMove(e: React.MouseEvent<HTMLAnchorElement>) {
-    const r = cardRef.current?.getBoundingClientRect();
-    if (!r) return;
-    mouseX.set((e.clientX - r.left) / r.width - 0.5);
-    mouseY.set((e.clientY - r.top) / r.height - 0.5);
-  }
-  function onLeave() { mouseX.set(0); mouseY.set(0); }
-
   return (
-    <motion.a
-      ref={cardRef}
+    <Link
       href={href}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      initial={{ boxShadow: "0 2px 12px rgba(120,37,124,0.10)" }}
-      whileHover={{ scale: 1.03, boxShadow: "0 16px 48px rgba(120,37,124,0.40), 0 0 0 2px rgba(190,58,180,0.50)" }}
-      whileTap={{ scale: 0.97, boxShadow: "0 0 0 3px rgba(190,58,180,0.90), 0 4px 28px rgba(120,37,124,0.60)" }}
-      transition={{ type: "spring", stiffness: 400, damping: 28 }}
-      style={{ rotateX: rotX, rotateY: rotY, transformPerspective: 900 }}
-      className="relative overflow-hidden rounded-xl md:rounded-2xl block cursor-pointer"
+      className="relative overflow-hidden rounded-xl md:rounded-2xl block cursor-pointer transition-transform duration-300 hover:scale-[1.03] shadow-[0_2px_12px_rgba(120,37,124,0.10)] hover:shadow-[0_12px_36px_rgba(120,37,124,0.25)]"
     >
-      {/* Mouse-tracked spotlight overlay */}
-      <motion.div
-        className="absolute inset-0 z-10 pointer-events-none"
-        style={{ background: spotlight }}
-      />
       <div className="relative aspect-[3/2]">
         <Image
           src={src}
@@ -177,19 +197,81 @@ function CTACard({ href, src, alt }: { href: string; src: string; alt: string })
           sizes="(max-width:640px) 33vw, (max-width:1280px) calc((100vw - 64px) / 3), 420px"
         />
       </div>
-    </motion.a>
+    </Link>
   );
 }
+
+// ── Catalog filter data ──────────────────────────────────────────────────────
+const HOME_CATEGORIES = [
+  { key: "all",    label: "Semua" },
+  { key: "single", label: "Single" },
+  { key: "bundle", label: "Bundle" },
+];
+
+const HOME_SORT_OPTIONS = [
+  { key: "newest",   label: "Terbaru" },
+  { key: "popular",  label: "Terpopuler" },
+  { key: "price-lo", label: "Harga Terendah" },
+  { key: "price-hi", label: "Harga Tertinggi" },
+];
+
+type CatalogItem = {
+  id: string; name: string; priceVal: string; priceMinor: number;
+  priceLabel?: string; originalPrice?: string; img: string;
+  rating: string; reviews: string; type: "single" | "bundle";
+};
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [products, setProducts] = useState<GProduct[]>([]);
   const [bundles,  setBundles]  = useState<GProduct[]>([]);
+  const [catFilter, setCatFilter] = useState("all");
+  const [catSort, setCatSort]     = useState("newest");
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setProducts(store.getProducts());
     setBundles(store.getBundles());
   }, []);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) setSortOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const catalogItems = useMemo<CatalogItem[]>(() => {
+    const singles: CatalogItem[] = products.map(p => ({
+      id: p.id, name: p.name, priceVal: p.priceVal, priceMinor: p.priceMinor,
+      priceLabel: p.priceLabel, img: p.img, rating: p.rating, reviews: p.reviews,
+      type: "single",
+    }));
+    const bundleItems: CatalogItem[] = bundles.map(p => ({
+      id: p.id, name: p.name, priceVal: p.priceVal, priceMinor: p.priceMinor,
+      originalPrice: p.originalPrice, img: p.img, rating: p.rating, reviews: p.reviews,
+      type: "bundle",
+    }));
+    return [...singles, ...bundleItems];
+  }, [products, bundles]);
+
+  const filteredCatalog = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const filtered = catalogItems.filter(p =>
+      (catFilter === "all" || p.type === catFilter) &&
+      (!q || p.name.toLowerCase().includes(q))
+    );
+    return filtered.sort((a, b) => {
+      if (catSort === "price-lo") return a.priceMinor - b.priceMinor;
+      if (catSort === "price-hi") return b.priceMinor - a.priceMinor;
+      if (catSort === "popular")  return parseInt(b.reviews) - parseInt(a.reviews);
+      return 0;
+    });
+  }, [catalogItems, catFilter, catSort, searchQuery]);
 
   return (
     <div className="bg-[#fffafa] overflow-x-hidden">
@@ -207,9 +289,9 @@ export default function HomePage() {
       <div className="w-full px-2 md:px-5 lg:px-8 xl:px-10 pt-2 md:pt-3 pb-3 md:pb-5">
         <div className="grid grid-cols-3 gap-2 md:gap-3 lg:gap-4">
 
-          <CTACard href="/skincheck" src="/skin_analist.png"   alt="Cek Kulitmu — Analisis AI"  />
-          <CTACard href="/reseller"  src="/reseller_card.png" alt="Jadi Reseller Ginabo"       />
-          <CTACard href="/about"     src="/halal_card.png"    alt="Halal & BPOM Terdaftar"     />
+          <CTACard href="/skincheck" src="/coba_facescan.png"   alt="Cek Kulitmu — Analisis AI"  />
+          <CTACard href="/reseller"  src="/jadi_reseller.png" alt="Jadi Reseller Ginabo"       />
+          <CTACard href="/about"     src="/belanja_tenang.png"    alt="Halal & BPOM Terdaftar"     />
 
         </div>
       </div>
@@ -222,94 +304,279 @@ export default function HomePage() {
           items={marqueeItems}
           speed={28}
           itemClassName="font-bold text-[13px] tracking-wide text-[#78257C]"
-          separator="✦"
+          separator="·"
         />
       </div>
 
       {/* ════════════════════════════════════════════
-          5. PRODUK KAMI
+          5. KATALOG PRODUK (unified with filtering)
       ════════════════════════════════════════════ */}
-      <section className="bg-[#fffafa] pt-14 pb-4 md:pt-20 md:pb-4">
-        <div className="mx-auto w-full max-w-5xl px-5 md:px-10">
+      <section className="relative pt-14 pb-14 md:pt-20 md:pb-20 overflow-hidden" style={{ background: "linear-gradient(180deg, #fffafa 0%, #f8f4ff 40%, #fdf4ff 70%, #FDFAFF 100%)" }}>
+        {/* Decorative blurred orbs for glassmorphism context */}
+        <div className="absolute top-20 left-[10%] w-64 h-64 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%)" }} />
+        <div className="absolute top-40 right-[5%] w-80 h-80 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(232,121,249,0.05) 0%, transparent 70%)" }} />
+        <div className="absolute bottom-20 right-[10%] w-72 h-72 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)" }} />
+
+        <div className="relative mx-auto w-full max-w-7xl px-5 md:px-8">
           <Reveal>
-            <SectionLabel center>Katalog</SectionLabel>
-            <h2 className="text-center font-staatliches leading-[1] text-[clamp(2.5rem,6vw,64px)] mb-8" style={{ color: "#5245b2" }}>
-              Produk Kami
-            </h2>
-          </Reveal>
-
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            className="grid grid-cols-2 gap-3 lg:grid-cols-3"
-          >
-            {products.map((p) => (
-              <ProductCard
-                key={p.id}
-                productId={p.id}
-                name={p.name}
-                rating={p.rating}
-                reviews={p.reviews}
-                priceLabel={p.priceLabel}
-                priceVal={p.priceVal}
-                priceMinor={p.priceMinor}
-                img={p.img}
-              />
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════
-          6. PAKET BUNDLING
-      ════════════════════════════════════════════ */}
-      
-      <section className="bg-[#FDFAFF] pt-4 pb-14 md:pt-6 md:pb-20">
-        <div className="mx-auto w-full max-w-5xl px-5 md:px-10">
-          <Reveal>
-            <SectionLabel center>Katalog</SectionLabel>
-            <h2 className="text-center font-staatliches leading-[1] text-[clamp(2.5rem,6vw,64px)] mb-8" style={{ color: "#5245b2" }}>
-              Paket Bundling
-            </h2>
-          </Reveal>
-
-
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            className="grid grid-cols-2 gap-3 lg:grid-cols-3"
-          >
-            {bundles.map((p) => (
-              <ProductCard
-                key={p.id}
-                productId={p.id}
-                name={p.name}
-                rating={p.rating}
-                reviews={p.reviews}
-                originalPrice={p.originalPrice}
-                priceVal={p.priceVal}
-                priceMinor={p.priceMinor}
-                img={p.img}
-              />
-            ))}
-          </motion.div>
-
-          <Reveal delay={0.3}>
-            <div className="mt-8 text-center">
-              <Link
-                href="/shop"
-                className="inline-flex items-center gap-2 rounded-[10px] badge-bg px-8 py-3 text-sm font-bold text-white transition hover:opacity-90"
+            <div className="flex flex-col items-center mb-12">
+              <span
+                className="inline-block text-[11px] font-semibold uppercase tracking-[0.25em] px-4 py-1.5 rounded-lg mb-4 text-white"
+                style={{
+                  background: "linear-gradient(135deg, #9333EA, #7C3AED)",
+                  boxShadow: "0 2px 8px rgba(120,37,124,0.25)",
+                }}
               >
-                Lihat Semua Produk
-              </Link>
+                Katalog
+              </span>
+              <h2
+                className="text-center font-poppins font-extrabold leading-[1.1] text-[clamp(2rem,5vw,3.2rem)]"
+                style={{
+                  background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 40%, #A855F7 70%, #C084FC 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                Produk Kami
+              </h2>
             </div>
           </Reveal>
+
+          <div className="flex gap-6 md:gap-10">
+            {/* ── Sidebar (desktop) ── */}
+            <aside className="hidden md:block w-[200px] flex-shrink-0">
+              <div className="sticky top-24">
+                <div
+                  className="rounded-[20px] p-5"
+                  style={{
+                    background: "linear-gradient(135deg, #1e1b3a 0%, #2d2556 100%)",
+                    border: "1px solid rgba(139,92,246,0.15)",
+                    boxShadow: "0 8px 32px rgba(20,15,50,0.25)",
+                  }}
+                >
+                  <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: "#c4b5fd" }}>
+                    Kategori
+                  </h3>
+                  <ul className="flex flex-col gap-1">
+                    {HOME_CATEGORIES.map(cat => (
+                      <li key={cat.key}>
+                        <button
+                          onClick={() => setCatFilter(cat.key)}
+                          className={`w-full text-left px-3.5 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 ${
+                            catFilter === cat.key
+                              ? "text-white font-semibold shadow-md"
+                              : "text-[#a5a0c8] hover:text-white hover:bg-white/10"
+                          }`}
+                          style={catFilter === cat.key ? {
+                            background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                            boxShadow: "0 4px 14px rgba(139,92,246,0.3)",
+                          } : {}}
+                        >
+                          {cat.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </aside>
+
+            {/* ── Main Content ── */}
+            <div className="flex-1 min-w-0">
+              {/* Top bar: sort (left) + search (right) */}
+              <div className="mb-6 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  {/* Mobile filter button */}
+                  <button
+                    onClick={() => setMobileFilterOpen(true)}
+                    className="md:hidden flex items-center gap-1.5 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-white transition hover:opacity-90"
+                    style={{
+                      background: "linear-gradient(135deg, #1e1b3a, #2d2556)",
+                      boxShadow: "0 4px 12px rgba(20,15,50,0.25)",
+                    }}
+                  >
+                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="16" y2="12"/><line x1="4" y1="18" x2="12" y2="18"/>
+                    </svg>
+                    Filter
+                  </button>
+
+                  {/* Sort dropdown */}
+                  <div className="relative" ref={sortRef}>
+                    <button
+                      onClick={() => setSortOpen(v => !v)}
+                      className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-[13px] font-semibold text-white transition-all duration-300 hover:opacity-90"
+                      style={{
+                        background: "linear-gradient(135deg, #1e1b3a, #2d2556)",
+                        boxShadow: "0 4px 12px rgba(20,15,50,0.25)",
+                      }}
+                    >
+                      {HOME_SORT_OPTIONS.find(o => o.key === catSort)?.label ?? "Terbaru"}
+                      <svg className={`w-3.5 h-3.5 transition-transform duration-300 ${sortOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+
+                    <div className={`absolute left-0 top-full z-50 pt-2 transition-all duration-300 ease-out ${
+                      sortOpen
+                        ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+                        : "opacity-0 -translate-y-2 scale-[0.95] pointer-events-none"
+                    }`}>
+                      <div
+                        className="w-44 rounded-2xl overflow-hidden py-1.5"
+                        style={{
+                          background: "linear-gradient(135deg, #1e1b3a 0%, #2d2556 100%)",
+                          border: "1px solid rgba(139,92,246,0.15)",
+                          boxShadow: "0 12px 40px rgba(20,15,50,0.4)",
+                        }}
+                      >
+                        {HOME_SORT_OPTIONS.map((o) => (
+                          <button
+                            key={o.key}
+                            onClick={() => { setCatSort(o.key); setSortOpen(false); }}
+                            className={`w-full text-left px-4 py-2.5 text-[13px] font-medium transition-all duration-200 ${
+                              catSort === o.key
+                                ? "text-white bg-gradient-to-r from-[#9333EA]/30 to-transparent"
+                                : "text-white/70 hover:text-white hover:bg-white/5"
+                            }`}
+                          >
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Search bar */}
+                <div className="relative max-w-[240px] flex-1">
+                  <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a5a0c8]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" strokeLinecap="round" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Cari produk..."
+                    className="w-full rounded-xl py-2.5 pl-10 pr-4 text-[13px] font-medium text-white placeholder-[#a5a0c8]/60 outline-none transition-all duration-300 focus:ring-2 focus:ring-[#8b5cf6]/40"
+                    style={{
+                      background: "linear-gradient(135deg, #1e1b3a, #2d2556)",
+                      boxShadow: "0 4px 12px rgba(20,15,50,0.25)",
+                      border: "1px solid rgba(139,92,246,0.1)",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Product Grid */}
+              <motion.div
+                key={`${catFilter}-${catSort}-${searchQuery}`}
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+                className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4"
+              >
+                {filteredCatalog.map((p) => (
+                  <ProductCard
+                    key={p.id}
+                    productId={p.id}
+                    name={p.name}
+                    rating={p.rating}
+                    reviews={p.reviews}
+                    priceLabel={p.priceLabel}
+                    originalPrice={p.originalPrice}
+                    priceVal={p.priceVal}
+                    priceMinor={p.priceMinor}
+                    img={p.img}
+                  />
+                ))}
+              </motion.div>
+
+              {filteredCatalog.length === 0 && (
+                <div className="py-16 text-center">
+                  <p className="text-[15px] text-[#9ca3af]">Tidak ada produk dalam kategori ini.</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </section>
+
+      {/* ── Mobile Filter Drawer ── */}
+      {mobileFilterOpen && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm" onClick={() => setMobileFilterOpen(false)} />
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", stiffness: 350, damping: 30 }}
+            className="fixed bottom-0 left-0 right-0 z-[60] rounded-t-[28px] p-6 shadow-2xl"
+            style={{
+              background: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(253,250,255,0.98) 100%)",
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
+              border: "1px solid rgba(255,255,255,0.6)",
+            }}
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="text-[16px] font-bold" style={{ color: "#5245b2" }}>Filter Kategori</h3>
+              <button
+                onClick={() => setMobileFilterOpen(false)}
+                className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 transition"
+              >
+                <svg width="18" height="18" fill="none" stroke="#9ca3af" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {HOME_CATEGORIES.map(cat => (
+                <button
+                  key={cat.key}
+                  onClick={() => { setCatFilter(cat.key); setMobileFilterOpen(false); }}
+                  className={`rounded-2xl py-3 text-[13px] font-semibold transition-all duration-200 ${
+                    catFilter === cat.key
+                      ? "text-white shadow-md"
+                      : "text-[#6b7280] hover:bg-white/80"
+                  }`}
+                  style={catFilter === cat.key
+                    ? { background: "linear-gradient(135deg, #8b5cf6, #a855f7)", boxShadow: "0 4px 14px rgba(139,92,246,0.3)" }
+                    : { background: "rgba(255,255,255,0.6)", border: "1px solid rgba(0,0,0,0.06)" }
+                  }
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <h4 className="text-[12px] font-semibold text-[#9ca3af] uppercase tracking-wider mb-3">Urutkan</h4>
+              <div className="grid grid-cols-2 gap-2">
+                {HOME_SORT_OPTIONS.map(o => (
+                  <button
+                    key={o.key}
+                    onClick={() => { setCatSort(o.key); setMobileFilterOpen(false); }}
+                    className={`rounded-2xl py-2.5 text-[12px] font-medium transition-all duration-200 ${
+                      catSort === o.key
+                        ? "text-white shadow-md"
+                        : "text-[#6b7280]"
+                    }`}
+                    style={catSort === o.key
+                      ? { background: "linear-gradient(135deg, #8b5cf6, #a855f7)", boxShadow: "0 4px 14px rgba(139,92,246,0.3)" }
+                      : { background: "rgba(255,255,255,0.6)", border: "1px solid rgba(0,0,0,0.06)" }
+                    }
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
 
       {/* ════════════════════════════════════════════
           7. INFO STRIP (3 blok)

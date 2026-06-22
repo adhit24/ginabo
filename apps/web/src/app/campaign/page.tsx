@@ -128,7 +128,7 @@ export default function CampaignPage() {
       {/* ── HEADER ── */}
       <div className="relative z-10 mx-auto max-w-5xl px-5 pt-20 pb-10 text-center md:pt-28 md:pb-14">
         <span
-          className="mb-4 inline-block rounded-full px-4 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
+          className="mb-4 inline-block rounded-lg px-4 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
           style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}
         >
           Program & Campaign
@@ -169,7 +169,7 @@ export default function CampaignPage() {
                     {c.icon}
                   </div>
                   {/* Badge */}
-                  <span className="rounded-full border border-white/30 bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur">
+                  <span className="rounded-lg border border-white/30 bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur">
                     {c.badge}
                   </span>
                 </div>
@@ -200,9 +200,7 @@ export default function CampaignPage() {
                 >
                   {c.perks.map((perk) => (
                     <li key={perk} className="flex items-start gap-2 text-xs text-white/70">
-                      <span className="mt-px shrink-0 text-base leading-none" style={{ color: "#c084fc" }}>
-                        ✦
-                      </span>
+                      <svg className="mt-px h-3.5 w-3.5 shrink-0" fill="none" stroke="#c084fc" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                       {perk}
                     </li>
                   ))}

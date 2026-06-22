@@ -27,7 +27,7 @@ export default function TrackingResult({ result }: { result: WaybillResult }) {
           </p>
         </div>
         <span
-          className="rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white"
+          className="rounded-lg px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white"
           style={{ background: statusInfo.color + "33", color: statusInfo.color, border: `1px solid ${statusInfo.color}55` }}
         >
           {statusInfo.label}

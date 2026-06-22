@@ -104,7 +104,7 @@ export default function BookingPage() {
         {/* Header */}
         <div className="relative mx-auto flex max-w-4xl flex-col items-center justify-center px-6 pt-14 pb-10 text-center">
           <span
-            className="mb-4 inline-block rounded-full px-4 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
+            className="mb-4 inline-block rounded-lg px-4 py-1 text-[11px] font-bold uppercase tracking-widest text-white"
             style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}
           >
             Konsultasi Kulit
@@ -210,7 +210,7 @@ export default function BookingPage() {
                     "Dipandu skin expert berpengalaman",
                   ].map(b => (
                     <li key={b} className="flex items-center gap-2 text-xs text-white/60">
-                      <span style={{ color: "#c084fc" }}>✦</span> {b}
+                      <svg className="h-3 w-3 shrink-0" fill="none" stroke="#c084fc" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg> {b}
                     </li>
                   ))}
                 </ul>
@@ -281,7 +281,7 @@ export default function BookingPage() {
                 )}
                 {state.status === "success" && (
                   <div className="mt-4 rounded-xl p-4 text-sm" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", color: "#86efac" }}>
-                    ✅ Booking berhasil! ID: <span className="font-bold">{state.bookingNumber}</span>
+                    Booking berhasil! ID: <span className="font-bold">{state.bookingNumber}</span>
                   </div>
                 )}
 

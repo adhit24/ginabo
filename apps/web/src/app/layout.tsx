@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { ClientShell } from "@/components/ClientShell";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -61,15 +62,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`${montserrat.variable} ${poppins.variable} ${staatliches.variable} ${outfit.variable} ${fraunces.variable}`}>
-      <body className="font-poppins">
+    <html lang="id" className={`${montserrat.variable} ${poppins.variable} ${staatliches.variable} ${outfit.variable} ${fraunces.variable}`} suppressHydrationWarning>
+      <body className="font-poppins" suppressHydrationWarning>
         <AuthProvider>
           <CartProvider>
-            <div className="min-h-dvh bg-[#fffafa]">
+            <ClientShell>
               <SiteHeader />
               <main className="w-full">{children}</main>
               <SiteFooter />
-            </div>
+            </ClientShell>
           </CartProvider>
         </AuthProvider>
       </body>

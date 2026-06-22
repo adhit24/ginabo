@@ -62,7 +62,17 @@ interface Ctx {
   params: { id: string }
 }
 
+const DUMMY_IDS = new Set(['dr1','dr2','dr3','dr4','dr5','dr6','dr7','dr8'])
+
 export async function POST(req: NextRequest, { params }: Ctx) {
+  // Demo mode: return success for dummy return IDs
+  if (DUMMY_IDS.has(params.id)) {
+    const body = await req.json().catch(() => ({}))
+    const p = schema.safeParse(body)
+    if (!p.success) return jsonError('Input tidak valid', 422, p.error.flatten())
+    return jsonOk({ ok: true, action: p.data.action, demo: true })
+  }
+
   const auth = await resolveReturnAuth()
   if (!auth) return jsonError('Silakan login terlebih dahulu', 401)
   if (!auth.isAdmin) return jsonError('Akses ditolak', 403)

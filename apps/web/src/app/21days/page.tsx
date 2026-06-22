@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 function IconCheck() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 flex-shrink-0">
       <path
         fill="currentColor"
         d="M9.0 16.2 4.8 12l-1.4 1.4 5.6 5.6L20.6 7.4 19.2 6z"
@@ -28,40 +28,50 @@ function waLink() {
 
 export default function Journey21Page() {
   return (
-    <div className="bg-[#FDFAFF] text-[#2a2a2a]">
+    <div className="font-poppins bg-[#FDFAFF] text-[#2a2a2a]">
+
+      {/* ══ HERO — Dark Glassmorphic ══ */}
       <section
         className="relative overflow-hidden"
-        style={{
-          background: "linear-gradient(135deg, #2a1635 0%, #78257C 45%, #CF99B4 100%)",
-          minHeight: 360
-        }}
+        style={{ background: "linear-gradient(160deg, #0f0a1e 0%, #1a0930 30%, #2a1040 60%, #1e0a38 100%)" }}
       >
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 25% 55%, white 1px, transparent 1px), radial-gradient(circle at 75% 25%, white 1px, transparent 1px)",
-            backgroundSize: "56px 56px"
-          }}
-        />
+        {/* Ambient glow blobs */}
+        <div className="pointer-events-none absolute -top-20 left-[15%] h-[600px] w-[600px] rounded-full opacity-25" style={{ background: "radial-gradient(circle, #8b5cf6, transparent 65%)" }} />
+        <div className="pointer-events-none absolute bottom-[-10%] right-[10%] h-[500px] w-[500px] rounded-full opacity-15" style={{ background: "radial-gradient(circle, #e879f9, transparent 65%)" }} />
+        <div className="pointer-events-none absolute top-[40%] left-[60%] h-[350px] w-[350px] rounded-full opacity-[0.08]" style={{ background: "radial-gradient(circle, #f0abfc, transparent 70%)" }} />
 
-        <div className="relative mx-auto grid min-h-[360px] max-w-5xl items-center gap-10 px-6 py-16 md:grid-cols-2 md:py-20">
-          <div className="text-center md:text-left">
-            <span className="mb-4 inline-flex items-center rounded-full border border-white/30 bg-white/15 px-5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-white backdrop-blur">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-6 py-16 md:grid-cols-[1fr_1.1fr] md:gap-4 md:py-20 lg:py-24">
+          {/* Left — Text content */}
+          <div className="relative z-10 text-center md:text-left md:py-12">
+            <span
+              className="mb-5 inline-block rounded-lg px-5 py-2 text-[11px] font-bold uppercase tracking-widest text-white"
+              style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}
+            >
               Ginabo 21 Days Journey
             </span>
-            <h1 className="text-3xl font-extrabold leading-tight text-white md:text-5xl">
+            <h1 className="text-4xl font-normal leading-[1.1] text-white pr-1 md:text-5xl lg:text-6xl" style={{ fontFamily: "var(--font-staatliches)" }}>
               21 hari untuk kulit yang{" "}
-              <span className="italic font-light">lebih sehat dan ternutrisi</span>.
+              <span
+                className="italic font-bold"
+                style={{
+                  background: "linear-gradient(135deg, #c084fc, #f0abfc)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                lebih sehat dan ternutrisi
+              </span>.
             </h1>
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/85 md:text-base">
+            <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-white/55">
               Perjalanan sederhana untuk membangun rutinitas yang konsisten. Bukan program instan, bukan gimmick, dan tidak hard selling.
             </p>
 
-            <div className="mt-7 flex flex-wrap items-center justify-center gap-3 md:justify-start">
+            <div className="mt-8 flex flex-wrap items-center justify-start gap-4">
               <Link
                 href="#join"
-                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-7 py-3 text-sm font-extrabold text-[#78257C] shadow-sm transition hover:bg-purple-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#78257C]"
+                className="inline-flex items-center justify-center rounded-xl px-7 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-xl"
+                style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 6px 24px rgba(139,92,246,0.4)" }}
               >
                 Ikuti Program
               </Link>
@@ -69,139 +79,207 @@ export default function Journey21Page() {
                 href={waLink()}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/35 bg-white/10 px-7 py-3 text-sm font-bold text-white backdrop-blur transition hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#78257C]"
+                className="inline-flex items-center justify-center rounded-xl px-7 py-3.5 text-sm font-bold text-white/80 backdrop-blur transition-all duration-300 hover:bg-white/10 hover:text-white"
+                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}
               >
                 Tanya via WhatsApp
               </a>
             </div>
 
-            <div className="mt-7 grid max-w-xl gap-2 text-sm text-white/85">
+            <div className="mt-8 grid max-w-lg gap-3 text-sm text-white/55">
               {[
                 "Rutinitas sederhana, selesai dalam beberapa menit",
                 "Fokus nutrisi kulit dan kenyamanan harian",
                 "Ada panduan dan komunitas untuk bantu konsisten"
               ].map((t) => (
-                <div key={t} className="flex items-start gap-2">
-                  <span className="mt-0.5 text-white"><IconCheck /></span>
+                <div key={t} className="flex items-start gap-2.5">
+                  <span className="mt-0.5 text-[#c084fc]"><IconCheck /></span>
                   <span>{t}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-md">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-sm backdrop-blur">
-              <Image
-                src="/product-serum-bg.png"
-                alt="Ginabo 21 Days Journey"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 90vw, 420px"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#2a1635]/70 via-transparent to-transparent" />
-              <div className="absolute bottom-5 left-5 right-5 rounded-2xl bg-white/15 p-4 text-white backdrop-blur" style={{ border: "1.5px solid rgba(255,255,255,0.22)" }}>
-                <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/80">Program ringkas</div>
-                <div className="mt-1 text-base font-extrabold">AM & PM Routine</div>
-                <div className="mt-1 text-sm text-white/85">GlowAge Serum + Bright & Care Cream</div>
+          {/* Right — Hero Image (expressive, no card wrapper) */}
+          <div className="relative flex items-center justify-end">
+            {/* Soft glow behind image */}
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <div className="h-[85%] w-[85%] rounded-full opacity-30" style={{ background: "radial-gradient(circle, #c084fc 0%, #8b5cf6 30%, transparent 70%)" }} />
+            </div>
+            <div className="relative w-full max-w-[420px] md:max-w-[480px] lg:max-w-[520px]">
+              <div className="relative" style={{ aspectRatio: "1/1" }}>
+                <Image
+                  src="/gnb21.png"
+                  alt="Ginabo 21 Days Journey — GlowAge Serum + Bright & Care Cream"
+                  fill
+                  className="object-contain drop-shadow-2xl"
+                  sizes="(max-width: 768px) 90vw, (max-width: 1024px) 45vw, 520px"
+                  quality={100}
+                  priority
+                  unoptimized
+                />
+              </div>
+              {/* Floating product label */}
+              <div
+                className="absolute bottom-3 left-1/2 -translate-x-1/2 flex w-fit items-center gap-3 rounded-lg px-5 py-2 text-white backdrop-blur-md md:bottom-5"
+                style={{ background: "rgba(15,10,30,0.55)", border: "1px solid rgba(192,132,252,0.15)" }}
+              >
+                <div className="text-xs font-extrabold leading-tight">AM & PM Routine</div>
+                <div className="h-3 w-px bg-white/20" />
+                <div className="text-[11px] text-white/55">GlowAge Serum + Bright & Care Cream</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-14 md:py-20">
-        <div className="mx-auto grid max-w-5xl gap-10 px-5 md:px-8">
-          <div className="grid gap-2 text-center">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Tentang Program</div>
-            <h2 className="text-2xl font-extrabold text-brand-900 md:text-3xl">Rutinitas yang membantu kulit tetap nyaman</h2>
-            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-brand-600">
-              Ginabo percaya kulit bukan butuh diubah secara cepat, tapi dirawat dan dinutrisi secara konsisten. Program ini membantu kamu membangun kebiasaan yang lebih rapi, tanpa ribet.
+      {/* ══ TENTANG PROGRAM ══ */}
+      <section className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #FDFAFF 0%, #ffffff 100%)" }}>
+        <div className="mx-auto grid max-w-6xl gap-12 px-6">
+          <div className="flex flex-col items-center text-center">
+            <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
+              Tentang Program
+            </span>
+            <h2 className="text-2xl font-extrabold md:text-[2rem]" style={{ color: "#4A1A5E" }}>
+              Rutinitas yang membantu kulit tetap nyaman
+            </h2>
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[#5a4a6a]">
+              Ginabo percaya kulit bukan butuh diubah secara cepat, tapi dirawat dan dinutrisi secara konsisten.
             </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            {[
-              { title: "Nutrition-first", desc: "Fokus pada nutrisi kulit, bukan hasil instan." },
-              { title: "Barrier-first", desc: "Bantu menjaga skin barrier agar kulit terasa stabil." },
-              { title: "Comfortable daily use", desc: "Tekstur nyaman, cocok untuk aktivitas dan sebelum makeup." }
-            ].map((c) => (
-              <div key={c.title} className="rounded-3xl bg-white p-6 shadow-sm" style={{ border: "1.5px solid #f0e8f8" }}>
-                <div className="text-base font-extrabold text-brand-900">{c.title}</div>
-                <div className="mt-2 text-sm leading-relaxed text-brand-600">{c.desc}</div>
-              </div>
-            ))}
+          <div className="grid grid-cols-[1fr_1fr] grid-rows-2 gap-3" style={{ aspectRatio: "2/1" }}>
+            {/* Left — tall card */}
+            <div className="abt-card group relative overflow-hidden rounded-lg md:rounded-2xl row-span-2 border-[1.5px] border-purple-500/30 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-purple-400/70 hover:shadow-[0_0_20px_rgba(139,92,246,0.4),0_0_40px_rgba(168,85,247,0.2)]" style={{ background: "#27214A" }}>
+              <Image src="/abt1.png" alt="Nutrition first" fill className="object-contain transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 768px) 50vw, 50vw" quality={100} priority unoptimized />
+            </div>
+            {/* Top right */}
+            <div className="abt-card group relative overflow-hidden rounded-lg md:rounded-2xl border-[1.5px] border-purple-500/30 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-purple-400/70 hover:shadow-[0_0_20px_rgba(139,92,246,0.4),0_0_40px_rgba(168,85,247,0.2)]" style={{ background: "#27214A" }}>
+              <Image src="/abt2.png" alt="Barrier first" fill className="object-contain scale-110 translate-x-2 md:scale-100 md:translate-x-0 transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 768px) 50vw, 50vw" quality={100} priority unoptimized />
+            </div>
+            {/* Bottom right */}
+            <div className="abt-card group relative overflow-hidden rounded-lg md:rounded-2xl border-[1.5px] border-purple-500/30 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-purple-400/70 hover:shadow-[0_0_20px_rgba(139,92,246,0.4),0_0_40px_rgba(168,85,247,0.2)]" style={{ background: "#27214A" }}>
+              <Image src="/abt3.png" alt="Comfortable for daily use" fill className="object-contain scale-110 translate-x-2 md:scale-100 md:translate-x-0 transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 768px) 50vw, 50vw" quality={100} priority unoptimized />
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-brand-50 py-14 md:py-20">
-        <div className="mx-auto grid max-w-5xl gap-10 px-5 md:px-8">
-          <div className="grid gap-2 text-center">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">How It Works</div>
-            <h2 className="text-2xl font-extrabold text-brand-900 md:text-3xl">Programnya sederhana, langkahnya jelas</h2>
+      {/* ══ HOW IT WORKS ══ */}
+      <section className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #f8f4ff 0%, #FDFAFF 100%)" }}>
+        <div className="mx-auto grid max-w-6xl gap-12 px-6">
+          <div className="flex flex-col items-center text-center">
+            <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
+              How It Works
+            </span>
+            <h2 className="text-2xl font-extrabold md:text-[2rem]" style={{ color: "#4A1A5E" }}>
+              Programnya sederhana, langkahnya jelas
+            </h2>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
             {[
               { step: "01", title: "Daftar program", desc: "Isi form singkat, tim Ginabo akan follow up." },
               { step: "02", title: "Gunakan produk 21 hari", desc: "Ikuti panduan AM dan PM yang simpel." },
               { step: "03", title: "Dokumentasikan progres", desc: "Update progress sesuai guideline yang diberikan." },
               { step: "04", title: "Bagikan pengalaman", desc: "Cerita real, fokus pada feel dan rutinitas." }
             ].map((s) => (
-              <div key={s.step} className="rounded-3xl bg-white p-6 shadow-sm" style={{ border: "1.5px solid #f0e8f8" }}>
-                <div className="text-xs font-black tracking-[0.2em] text-brand-400">{s.step}</div>
-                <div className="mt-2 text-base font-extrabold text-brand-900">{s.title}</div>
-                <div className="mt-2 text-sm leading-relaxed text-brand-600">{s.desc}</div>
+              <div key={s.step} className="rounded-2xl p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1" style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}>
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-bold text-white" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
+                  {s.step}
+                </span>
+                <div className="mt-4 text-base font-bold" style={{ color: "#4A1A5E" }}>{s.title}</div>
+                <div className="mt-2 text-sm leading-relaxed text-[#5a4a6a]">{s.desc}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-14 md:py-20">
-        <div className="mx-auto grid max-w-5xl gap-10 px-5 md:px-8">
-          <div className="grid gap-2 text-center">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Produk Utama</div>
-            <h2 className="text-2xl font-extrabold text-brand-900 md:text-3xl">Dua produk, satu rutinitas</h2>
-            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-brand-600">
-              Kamu tidak perlu layering yang ribet. Program ini fokus pada rutinitas yang bisa kamu ulang setiap hari, dengan feel yang nyaman.
+      {/* ══ PRODUK UTAMA ══ */}
+      <section className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #FDFAFF 0%, #f8f4ff 100%)" }}>
+        <div className="mx-auto grid max-w-6xl gap-12 px-6">
+          <div className="flex flex-col items-center text-center">
+            <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
+              Produk Utama
+            </span>
+            <h2 className="text-2xl font-extrabold md:text-[2rem]" style={{ color: "#4A1A5E" }}>
+              Dua produk, satu rutinitas
+            </h2>
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[#5a4a6a]">
+              Program ini fokus pada rutinitas yang bisa kamu ulang setiap hari, dengan feel yang nyaman.
             </p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2">
             {[
               {
                 name: "GlowAge Multi-Active Serum",
+                subtitle: "Serum · 30ml",
                 desc: "Serum ringan yang membantu kulit tampak lebih cerah alami, terasa lebih halus, dan tetap nyaman dipakai harian.",
-                img: "/product-serum-bg.png",
-                tags: ["Tekstur ringan", "Cepat meresap", "Nyaman sebelum makeup"]
+                usage: "Pagi & malam, setelah toner, sebelum pelembab",
+                keyIngredients: ["Niacinamide", "Hyaluronic Acid", "Centella Asiatica"],
+                benefits: ["Membantu mencerahkan warna kulit", "Melembapkan tanpa lengket", "Tekstur ringan, cepat meresap", "Nyaman dipakai sebelum makeup"],
+                tags: ["Tekstur ringan", "Cepat meresap", "Nyaman sebelum makeup"],
               },
               {
                 name: "Bright & Care Moisture Cream",
+                subtitle: "Moisturizer · 10g",
                 desc: "Moisture cream yang membantu menjaga kelembapan dan skin barrier. Cocok dipakai pagi dan malam, tanpa rasa berat.",
-                img: "/product-cream-bg.png",
-                tags: ["Barrier support", "Hidrasi nyaman", "AM & PM friendly"]
+                usage: "Pagi & malam, sebagai step terakhir skincare",
+                keyIngredients: ["Ceramide Complex", "Squalane", "Vitamin E"],
+                benefits: ["Menjaga kelembapan sepanjang hari", "Mendukung skin barrier", "Tidak menyumbat pori", "Cocok untuk semua jenis kulit"],
+                tags: ["Barrier support", "Hidrasi nyaman", "AM & PM friendly"],
               }
             ].map((p) => (
-              <div key={p.name} className="overflow-hidden rounded-3xl bg-white shadow-sm" style={{ border: "1.5px solid #f0e8f8" }}>
-                <div className="relative aspect-[16/10] bg-brand-50">
-                  <Image src={p.img} alt={p.name} fill className="object-cover" sizes="(max-width:768px) 100vw, 520px" />
-                </div>
-                <div className="grid gap-3 p-6">
-                  <div className="text-base font-extrabold text-brand-900">{p.name}</div>
-                  <div className="text-sm leading-relaxed text-brand-600">{p.desc}</div>
-                  <div className="flex flex-wrap gap-2">
-                    {p.tags.map((t) => (
-                      <span key={t} className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700" style={{ border: "1.5px solid #f0e8f8" }}>
-                        {t}
+              <div key={p.name} className="rounded-2xl p-7 transition-all duration-300 hover:-translate-y-1" style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.15)", boxShadow: "0 8px 32px rgba(20,15,50,0.25)" }}>
+                <div className="grid gap-5">
+                  {/* Header */}
+                  <div>
+                    <div className="text-xl font-bold text-white">{p.name}</div>
+                    <div className="mt-1 text-[12px] font-medium text-[#c084fc]">{p.subtitle}</div>
+                    <p className="mt-3 text-sm leading-relaxed text-white/55">{p.desc}</p>
+                  </div>
+
+                  {/* Usage */}
+                  <div className="rounded-xl p-4" style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.12)" }}>
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A855F7] mb-2">Cara Pakai</div>
+                    <div className="text-sm text-white/70">{p.usage}</div>
+                  </div>
+
+                  {/* Key Ingredients */}
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c084fc] mb-3">Key Ingredients</div>
+                    <div className="flex flex-wrap gap-2">
+                      {p.keyIngredients.map((ing) => (
+                        <span key={ing} className="rounded-md px-3 py-1.5 text-[12px] font-semibold text-white" style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.25), rgba(168,85,247,0.15))", border: "1px solid rgba(139,92,246,0.3)" }}>
+                          {ing}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Benefits */}
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c084fc] mb-3">Manfaat</div>
+                    <div className="grid gap-2">
+                      {p.benefits.map((b) => (
+                        <div key={b} className="flex items-start gap-2.5">
+                          <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-[#C084FC]" />
+                          <span className="text-sm text-white/70">{b}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2 pt-2" style={{ borderTop: "1px solid rgba(139,92,246,0.1)" }}>
+                    {p.tags.map((tag) => (
+                      <span key={tag} className="rounded-md px-3 py-1 text-[11px] font-semibold text-white/80" style={{ background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.25)" }}>
+                        {tag}
                       </span>
                     ))}
                   </div>
-                  <div className="pt-1">
-                    <Link href="/shop" className="text-sm font-semibold text-brand-700 hover:text-brand-800 hover:underline">
-                      Lihat detail produk
-                    </Link>
-                  </div>
                 </div>
               </div>
             ))}
@@ -209,77 +287,162 @@ export default function Journey21Page() {
         </div>
       </section>
 
-      <section className="bg-white py-14 md:py-20">
-        <div className="mx-auto grid max-w-5xl gap-10 px-5 md:px-8">
-          <div className="grid gap-2 text-center">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Journey Timeline</div>
-            <h2 className="text-2xl font-extrabold text-brand-900 md:text-3xl">Progress yang terasa bertahap</h2>
-            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-brand-600">
-              Tiap orang bisa berbeda. Timeline ini dibuat untuk membantu kamu memahami ritme program dan menjaga ekspektasi tetap realistis.
+      {/* ══ TIMELINE ══ */}
+      <section className="py-16 md:py-24" style={{ background: "linear-gradient(160deg, #0f0a1e 0%, #1a0930 50%, #2a1040 100%)" }}>
+        <div className="mx-auto grid max-w-6xl gap-12 px-6">
+          <div className="flex flex-col items-center text-center">
+            <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
+              Journey Timeline
+            </span>
+            <h2 className="text-2xl font-extrabold text-white md:text-[2rem]">
+              Progress yang terasa bertahap
+            </h2>
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-white/55">
+              Tiap orang bisa berbeda. Timeline ini dibuat untuk membantu kamu memahami ritme program.
             </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            {[
-              { w: "Week 1", t: "First impression", d: "Mulai kenal tekstur dan feel. Fokus pada rutinitas yang konsisten." },
-              { w: "Week 2", t: "Progress", d: "Kulit terasa lebih stabil. Perhatikan kenyamanan dan hidrasi harian." },
-              { w: "Week 3", t: "Result", d: "Kulit terasa lebih ternutrisi dan terlihat lebih rapi. Dokumentasikan perubahan dengan natural." }
-            ].map((x) => (
-              <div key={x.w} className="rounded-3xl bg-white p-6 shadow-sm" style={{ border: "1.5px solid #f0e8f8" }}>
-                <div className="text-xs font-black uppercase tracking-[0.2em] text-brand-400">{x.w}</div>
-                <div className="mt-2 text-base font-extrabold text-brand-900">{x.t}</div>
-                <div className="mt-2 text-sm leading-relaxed text-brand-600">{x.d}</div>
+          {/* Progress Bar with Checkpoints */}
+          <div className="relative">
+            {/* Desktop: horizontal bar */}
+            <div className="hidden md:block">
+              {/* Progress line */}
+              <div className="relative mx-12 h-1 rounded-full" style={{ background: "rgba(139,92,246,0.2)" }}>
+                <div className="absolute inset-y-0 left-0 w-full rounded-full" style={{ background: "linear-gradient(90deg, #8b5cf6, #c084fc, #e879f9)" }} />
               </div>
-            ))}
+              {/* Checkpoints */}
+              <div className="relative -mt-4 grid grid-cols-3 gap-6">
+                {[
+                  { week: "Week 1", day: "Hari 1–7", title: "First Impression", desc: "Mulai kenal tekstur dan feel. Fokus pada rutinitas yang konsisten.", details: ["Kenali produk dan teksturnya", "Bangun kebiasaan AM & PM", "Perhatikan kenyamanan awal"] },
+                  { week: "Week 2", day: "Hari 8–14", title: "Progress", desc: "Kulit terasa lebih stabil. Perhatikan kenyamanan dan hidrasi harian.", details: ["Kulit mulai terasa lebih lembap", "Rutinitas semakin natural", "Dokumentasi perubahan awal"] },
+                  { week: "Week 3", day: "Hari 15–21", title: "Result", desc: "Kulit terasa lebih ternutrisi dan terlihat lebih rapi. Dokumentasikan perubahan.", details: ["Kulit terasa lebih ternutrisi", "Rutinitas sudah menjadi kebiasaan", "Siap bagikan pengalaman"] }
+                ].map((x, i) => (
+                  <div key={x.week} className="flex flex-col items-center">
+                    {/* Checkpoint dot */}
+                    <div className="relative flex items-center justify-center">
+                      <div className="h-8 w-8 rounded-full flex items-center justify-center text-[11px] font-bold text-white" style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 0 16px rgba(139,92,246,0.5)" }}>
+                        {i + 1}
+                      </div>
+                    </div>
+                    {/* Card */}
+                    <div className="mt-6 w-full rounded-xl p-5 transition-all duration-300 hover:-translate-y-1" style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.15)", boxShadow: "0 8px 32px rgba(20,15,50,0.25)" }}>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: "linear-gradient(135deg, #8b5cf6, #a855f7)" }}>{x.week}</span>
+                        <span className="text-[10px] text-white/40">{x.day}</span>
+                      </div>
+                      <div className="text-base font-bold text-white">{x.title}</div>
+                      <div className="mt-2 text-sm leading-relaxed text-white/55">{x.desc}</div>
+                      <div className="mt-4 grid gap-2">
+                        {x.details.map((d) => (
+                          <div key={d} className="flex items-start gap-2">
+                            <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#c084fc]" />
+                            <span className="text-[13px] text-white/65">{d}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Mobile: vertical progress */}
+            <div className="md:hidden">
+              <div className="relative pl-8">
+                {/* Vertical line */}
+                <div className="absolute left-[14px] top-0 bottom-0 w-0.5 rounded-full" style={{ background: "linear-gradient(180deg, #8b5cf6, #c084fc, #e879f9)" }} />
+
+                <div className="grid gap-6">
+                  {[
+                    { week: "Week 1", day: "Hari 1–7", title: "First Impression", desc: "Mulai kenal tekstur dan feel. Fokus pada rutinitas yang konsisten.", details: ["Kenali produk dan teksturnya", "Bangun kebiasaan AM & PM", "Perhatikan kenyamanan awal"] },
+                    { week: "Week 2", day: "Hari 8–14", title: "Progress", desc: "Kulit terasa lebih stabil. Perhatikan kenyamanan dan hidrasi harian.", details: ["Kulit mulai terasa lebih lembap", "Rutinitas semakin natural", "Dokumentasi perubahan awal"] },
+                    { week: "Week 3", day: "Hari 15–21", title: "Result", desc: "Kulit terasa lebih ternutrisi dan terlihat lebih rapi. Dokumentasikan perubahan.", details: ["Kulit terasa lebih ternutrisi", "Rutinitas sudah menjadi kebiasaan", "Siap bagikan pengalaman"] }
+                  ].map((x, i) => (
+                    <div key={x.week} className="relative">
+                      {/* Dot on line */}
+                      <div className="absolute -left-8 top-0 flex items-center justify-center">
+                        <div className="h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 0 12px rgba(139,92,246,0.5)" }}>
+                          {i + 1}
+                        </div>
+                      </div>
+                      {/* Card */}
+                      <div className="rounded-xl p-5" style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.15)", boxShadow: "0 8px 32px rgba(20,15,50,0.25)" }}>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: "linear-gradient(135deg, #8b5cf6, #a855f7)" }}>{x.week}</span>
+                          <span className="text-[10px] text-white/40">{x.day}</span>
+                        </div>
+                        <div className="text-base font-bold text-white">{x.title}</div>
+                        <div className="mt-2 text-sm leading-relaxed text-white/55">{x.desc}</div>
+                        <div className="mt-4 grid gap-2">
+                          {x.details.map((d) => (
+                            <div key={d} className="flex items-start gap-2">
+                              <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#c084fc]" />
+                              <span className="text-[13px] text-white/65">{d}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-brand-50 py-14 md:py-20">
-        <div className="mx-auto grid max-w-5xl gap-10 px-5 md:px-8">
-          <div className="grid gap-2 text-center">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Rules & Guidelines</div>
-            <h2 className="text-2xl font-extrabold text-brand-900 md:text-3xl">Aturan yang menjaga trust</h2>
+      {/* ══ RULES & GUIDELINES ══ */}
+      <section className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #FDFAFF 0%, #f8f4ff 100%)" }}>
+        <div className="mx-auto grid max-w-6xl gap-12 px-6">
+          <div className="flex flex-col items-center text-center">
+            <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
+              Rules & Guidelines
+            </span>
+            <h2 className="text-2xl font-extrabold md:text-[2rem]" style={{ color: "#4A1A5E" }}>
+              Aturan yang menjaga trust
+            </h2>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-3xl bg-white p-7 shadow-sm" style={{ border: "1.5px solid #f0e8f8" }}>
-              <div className="text-base font-extrabold text-brand-900">Program rules</div>
-              <div className="mt-4 grid gap-2 text-sm text-brand-700">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl p-7" style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.15)", boxShadow: "0 8px 32px rgba(20,15,50,0.25)" }}>
+              <div className="text-base font-bold text-white">Program Rules</div>
+              <div className="mt-5 grid gap-3 text-sm text-white/70">
                 {[
                   "Wajib ikut selama 21 hari",
                   "Ikuti panduan AM dan PM",
                   "Update progress sesuai jadwal program",
                   "Gunakan pencahayaan yang konsisten saat dokumentasi"
                 ].map((t) => (
-                  <div key={t} className="flex items-start gap-2">
-                    <span className="mt-0.5 text-brand-700"><IconCheck /></span>
+                  <div key={t} className="flex items-start gap-2.5">
+                    <span className="mt-0.5 text-[#C084FC]"><IconCheck /></span>
                     <span>{t}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-3xl bg-white p-7 shadow-sm" style={{ border: "1.5px solid #f0e8f8" }}>
-              <div className="text-base font-extrabold text-brand-900">Content guideline</div>
-              <div className="mt-4 grid gap-4 text-sm">
-                <div className="rounded-2xl bg-brand-50 p-4" style={{ border: "1.5px solid #f0e8f8" }}>
-                  <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Do</div>
-                  <div className="mt-2 grid gap-1 text-brand-700">
+            <div className="rounded-2xl p-7" style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.15)", boxShadow: "0 8px 32px rgba(20,15,50,0.25)" }}>
+              <div className="text-base font-bold text-white">Content Guideline</div>
+              <div className="mt-5 grid gap-4 text-sm">
+                <div className="rounded-xl p-4" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.15)" }}>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A855F7]">Do</div>
+                  <div className="mt-2.5 grid gap-2 text-white/70">
                     {["Pakai kata membantu, menutrisi, menjaga, merawat", "Fokus pada pengalaman real", "Tunjukkan tekstur dan feel produk"].map((t) => (
-                      <div key={t} className="flex items-start gap-2">
-                        <span className="mt-0.5 text-brand-700"><IconCheck /></span>
+                      <div key={t} className="flex items-start gap-2.5">
+                        <span className="mt-0.5 text-[#C084FC]"><IconCheck /></span>
                         <span>{t}</span>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="rounded-2xl bg-white p-4" style={{ border: "1.5px solid #f0e8f8" }}>
-                  <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Don’t</div>
-                  <div className="mt-2 grid gap-1 text-brand-700">
+                <div className="rounded-xl p-4" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)" }}>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">Don&apos;t</div>
+                  <div className="mt-2.5 grid gap-2 text-white/70">
                     {["Klaim instan atau overpromise", "Edit berlebihan", "Hard selling"].map((t) => (
-                      <div key={t} className="flex items-start gap-2">
-                        <span className="mt-0.5 text-brand-700"><IconCheck /></span>
+                      <div key={t} className="flex items-start gap-2.5">
+                        <span className="mt-0.5 text-red-400">
+                          <svg viewBox="0 0 24 24" className="h-5 w-5 flex-shrink-0"><path fill="currentColor" d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" /></svg>
+                        </span>
                         <span>{t}</span>
                       </div>
                     ))}
@@ -291,73 +454,93 @@ export default function Journey21Page() {
         </div>
       </section>
 
-      <section className="py-14 md:py-20">
-        <div className="mx-auto grid max-w-5xl gap-10 px-5 md:px-8">
-          <div className="grid gap-2 text-center">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Benefit</div>
-            <h2 className="text-2xl font-extrabold text-brand-900 md:text-3xl">Alasan banyak yang tertarik ikut</h2>
+      {/* ══ BENEFITS ══ */}
+      <section className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #f8f4ff 0%, #FDFAFF 100%)" }}>
+        <div className="mx-auto grid max-w-6xl gap-12 px-6">
+          <div className="flex flex-col items-center text-center">
+            <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
+              Benefit
+            </span>
+            <h2 className="text-2xl font-extrabold md:text-[2rem]" style={{ color: "#4A1A5E" }}>
+              Alasan banyak yang tertarik ikut
+            </h2>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
             {[
-              { t: "Produk & panduan", d: "Ada arahan supaya rutinitas terasa lebih mudah." },
-              { t: "Komunitas", d: "Bantu konsisten lewat check-in dan progress." },
-              { t: "Exposure", d: "Kesempatan tampil di konten campaign (sesuai kurasi)." },
-              { t: "Opportunity partnership", d: "Peluang kolaborasi untuk peserta dengan performa terbaik." }
+              { icon: <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg>, t: "Produk & panduan", d: "Ada arahan supaya rutinitas terasa lebih mudah." },
+              { icon: <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" /></svg>, t: "Komunitas", d: "Bantu konsisten lewat check-in dan progress." },
+              { icon: <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>, t: "Exposure", d: "Kesempatan tampil di konten campaign." },
+              { icon: <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg>, t: "Partnership", d: "Peluang kolaborasi untuk peserta terbaik." }
             ].map((b) => (
-              <div key={b.t} className="rounded-3xl bg-white p-6 shadow-sm" style={{ border: "1.5px solid #f0e8f8" }}>
-                <div className="text-sm font-extrabold text-brand-900">{b.t}</div>
-                <div className="mt-2 text-sm leading-relaxed text-brand-600">{b.d}</div>
+              <div key={b.t} className="rounded-2xl p-6 text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1" style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}>
+                <div className="mb-3 mx-auto inline-flex h-10 w-10 items-center justify-center rounded-xl text-[#9333EA]" style={{ background: "rgba(147,51,234,0.08)" }}>{b.icon}</div>
+                <div className="text-sm font-bold" style={{ color: "#4A1A5E" }}>{b.t}</div>
+                <div className="mt-2 text-[13px] leading-relaxed text-[#5a4a6a]">{b.d}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-white py-14 md:py-20">
-        <div className="mx-auto grid max-w-5xl gap-10 px-5 md:px-8">
-          <div className="grid gap-2 text-center">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Social Proof</div>
-            <h2 className="text-2xl font-extrabold text-brand-900 md:text-3xl">Progress yang bisa kamu lihat</h2>
-            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-brand-600">
-              Konten before-after, testimoni, dan UGC akan dibagikan sesuai guideline supaya tetap natural dan terpercaya.
-            </p>
+      {/* ══ TESTIMONIALS ══ */}
+      <section className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #FDFAFF 0%, #f8f4ff 100%)" }}>
+        <div className="mx-auto grid max-w-6xl gap-12 px-6">
+          <div className="flex flex-col items-center text-center">
+            <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
+              Social Proof
+            </span>
+            <h2 className="text-2xl font-extrabold md:text-[2rem]" style={{ color: "#4A1A5E" }}>
+              Progress yang bisa kamu lihat
+            </h2>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-3">
             {[
               { name: "Amira", meta: "Kulit kering, daily makeup", text: "Rutinitasnya simpel. Yang paling aku rasain itu kulit lebih nyaman dipakai seharian." },
               { name: "Nadya", meta: "Kulit kombinasi, sering outdoor", text: "Aku jadi lebih rapi soal urutan dan konsistensi. Progress-nya terasa pelan tapi jelas." },
               { name: "Dina", meta: "Kulit sensitif, sering di AC", text: "Teksturnya ringan dan enak. Aku jadi lebih berani pakai rutin karena feel-nya nyaman." }
             ].map((t) => (
-              <div key={t.name} className="rounded-3xl bg-white p-7 shadow-sm" style={{ border: "1.5px solid #f0e8f8" }}>
-                <div className="text-sm font-extrabold text-brand-900">{t.name}</div>
-                <div className="mt-1 text-xs font-semibold text-brand-400">{t.meta}</div>
-                <p className="mt-4 text-sm leading-relaxed text-brand-600">"{t.text}"</p>
+              <div key={t.name} className="rounded-2xl p-7 transition-all duration-300 hover:shadow-lg hover:-translate-y-1" style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ background: "linear-gradient(135deg, #9333EA, #C084FC)" }}>
+                    {t.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold" style={{ color: "#4A1A5E" }}>{t.name}</div>
+                    <div className="text-[11px] text-[#9333EA] font-medium">{t.meta}</div>
+                  </div>
+                </div>
+                <p className="text-sm leading-relaxed text-[#5a4a6a] italic">&ldquo;{t.text}&rdquo;</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="join" className="py-14 md:py-20">
-        <div className="mx-auto grid max-w-5xl gap-10 px-5 md:px-8 md:grid-cols-2">
-          <div className="grid content-start gap-3">
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-brand-400">Registration</div>
-            <h2 className="text-2xl font-extrabold text-brand-900 md:text-3xl">Mulai journey kamu hari ini</h2>
-            <p className="text-sm leading-relaxed text-brand-600">
+      {/* ══ REGISTRATION ══ */}
+      <section id="join" className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #f8f4ff 0%, #FDFAFF 100%)" }}>
+        <div className="mx-auto grid max-w-6xl gap-10 px-6 md:grid-cols-2">
+          <div className="grid content-start gap-4">
+            <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white w-fit" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
+              Registration
+            </span>
+            <h2 className="text-2xl font-extrabold md:text-[2rem]" style={{ color: "#4A1A5E" }}>
+              Mulai journey kamu hari ini
+            </h2>
+            <p className="text-[15px] leading-relaxed text-[#5a4a6a]">
               Isi form singkat ini untuk ikut program. Setelah itu tim Ginabo akan menghubungi kamu untuk detail langkah dan jadwal.
             </p>
-            <div className="mt-4 rounded-3xl bg-brand-50 p-6" style={{ border: "1.5px solid #f0e8f8" }}>
-              <div className="text-sm font-extrabold text-brand-900">Butuh tanya cepat?</div>
-              <p className="mt-2 text-sm leading-relaxed text-brand-600">
-                Kalau kamu mau tanya dulu sebelum daftar, kamu bisa chat WhatsApp. Tim Ginabo akan bantu jelasin programnya.
+            <div className="mt-4 rounded-2xl p-6" style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}>
+              <div className="text-sm font-bold" style={{ color: "#4A1A5E" }}>Butuh tanya cepat?</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#5a4a6a]">
+                Kalau kamu mau tanya dulu sebelum daftar, kamu bisa chat WhatsApp.
               </p>
               <a
                 href={waLink()}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[#25D366] px-6 py-3 text-sm font-extrabold text-white transition hover:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/40 focus-visible:ring-offset-2"
+                className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-[#25D366] px-6 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg"
               >
                 Chat WhatsApp
               </a>
@@ -368,23 +551,25 @@ export default function Journey21Page() {
         </div>
       </section>
 
-      <section className="py-14 text-center" style={{ background: "linear-gradient(135deg, #78257C, #CF99B4)" }}>
-        <div className="mx-auto max-w-xl px-5">
-          <h2 className="mb-3 text-2xl font-extrabold text-white md:text-3xl">
+      {/* ══ CTA FOOTER ══ */}
+      <section className="py-16 text-center" style={{ background: "linear-gradient(135deg, #7C3AED, #9333EA, #A855F7)" }}>
+        <div className="mx-auto max-w-xl px-6">
+          <h2 className="mb-4 text-2xl font-extrabold text-white md:text-3xl">
             21 hari, satu rutinitas yang rapi
           </h2>
-          <p className="mb-7 text-sm text-white/85">
+          <p className="mb-8 text-[15px] text-white/90 leading-relaxed">
             Mulai dari langkah kecil yang bisa kamu ulang. Fokus pada konsistensi, kenyamanan, dan progress yang realistis.
           </p>
           <Link
             href="#join"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-3.5 text-sm font-extrabold transition hover:bg-purple-50"
-            style={{ color: "#78257C" }}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-3.5 text-sm font-bold transition-all duration-300 hover:scale-[1.03] hover:shadow-xl"
+            style={{ color: "#7C3AED" }}
           >
             Gabung Sekarang
           </Link>
         </div>
       </section>
+
     </div>
   );
 }

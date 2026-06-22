@@ -71,7 +71,7 @@ export default function AdminFlashSalePage() {
           <p className="text-sm text-white/40">Pilih maksimal 3 produk/bundle untuk Flash Sale</p>
         </div>
         <div className="flex items-center gap-3">
-          {saved && <span className="text-sm font-semibold text-green-400">✓ Tersimpan</span>}
+          {saved && <span className="flex items-center gap-1 text-sm font-semibold text-green-400"><svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg> Tersimpan</span>}
           <button onClick={save} className="rounded-xl px-5 py-2 text-sm font-bold text-white transition hover:opacity-90"
             style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}>
             Simpan Flash Sale

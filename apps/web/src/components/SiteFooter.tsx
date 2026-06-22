@@ -164,6 +164,10 @@ export function SiteFooter() {
             <p className="text-[11px] text-white/40">
               © 2026 PT Ginabo Nusantara. All rights reserved.
             </p>
+            <div className="flex items-center gap-1.5 text-[11px] text-white/30">
+              <span>Powered by</span>
+              <img src="/logo_kinarya.png" alt="Kinarya" className="inline-block opacity-50" style={{ height: 16 }} />
+            </div>
             <p className="text-[11px] text-white/30">
               BPOM Terdaftar · Halal MUI · Dermatologist Tested
             </p>

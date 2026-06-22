@@ -15,7 +15,7 @@ export function Marquee({
   reverse = false,
   className,
   itemClassName,
-  separator = "✦",
+  separator = "\u00b7",
 }: MarqueeProps) {
   // Duplicate so the loop is seamless — CSS animates translateX(-50%)
   const doubled = [...items, ...items];

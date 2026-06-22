@@ -91,11 +91,9 @@ const nextConfig = {
   webpack: (config, { dev, isServer }) => {
     // Disable cache + minification in dev for faster rebuilds
     if (dev) {
-      config.cache = false;
       config.optimization = {
         ...config.optimization,
         minimize: false,
-        splitChunks: false,
       };
     }
 

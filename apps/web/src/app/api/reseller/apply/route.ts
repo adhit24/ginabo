@@ -49,7 +49,7 @@ function applicantEmailHtml(name: string) {
   return `<!doctype html><html><body style="margin:0;background:#FDFAFF;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif">
   <div style="max-width:560px;margin:0 auto;padding:24px">
     <div style="background:linear-gradient(135deg,#2d0a5e,${BRAND});border-radius:16px 16px 0 0;padding:28px 24px">
-      <h1 style="margin:0;color:#fff;font-size:24px">Terima kasih, ${name}! 🎉</h1>
+      <h1 style="margin:0;color:#fff;font-size:24px">Terima kasih, ${name}!</h1>
       <p style="margin:8px 0 0;color:rgba(255,255,255,.8);font-size:14px">Pendaftaranmu sebagai partner Ginabo sudah kami terima.</p>
     </div>
     <div style="background:#fff;border:1px solid #ede0f8;border-top:0;border-radius:0 0 16px 16px;padding:24px">
@@ -81,7 +81,7 @@ export async function POST(req: Request) {
           from: `Ginabo Partner <${from}>`,
           to: notifyTo,
           replyTo: d.email || undefined,
-          subject: `🤝 Reseller baru: ${d.name} — ${d.phone}`,
+          subject: `Reseller baru: ${d.name} — ${d.phone}`,
           html: adminEmailHtml(d),
         });
         emailSent = true;
@@ -90,7 +90,7 @@ export async function POST(req: Request) {
           await resend.emails.send({
             from: `Ginabo <${from}>`,
             to: d.email,
-            subject: "Pendaftaran Partner Ginabo diterima ✅",
+            subject: "Pendaftaran Partner Ginabo diterima",
             html: applicantEmailHtml(d.name),
           });
         }

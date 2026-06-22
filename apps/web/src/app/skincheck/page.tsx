@@ -186,7 +186,7 @@ function NextBtn({
         cursor: disabled ? "not-allowed" : "pointer",
       }}
     >
-      ✓ {label}
+      <svg className="inline h-3 w-3 mr-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>{label}
     </button>
   );
 }
@@ -234,7 +234,7 @@ export default function SkinCheckPage() {
 
   function handleSubmitBiodata() {
     const productNames = results.map((k) => PRODUCTS[k].name).join(" & ");
-    const msg = `Halo Ginabo! 😊\n\nNama saya *${name}*.\n\nSaya sudah mengisi Ginabo Skin Check dan mendapat rekomendasi produk:\n*${productNames}*\n\nBoleh bantu saya untuk info lebih lanjut dan cara pemesanan?`;
+    const msg = `Halo Ginabo!\n\nNama saya *${name}*.\n\nSaya sudah mengisi Ginabo Skin Check dan mendapat rekomendasi produk:\n*${productNames}*\n\nBoleh bantu saya untuk info lebih lanjut dan cara pemesanan?`;
     const url = `https://wa.me/6285199264835?text=${encodeURIComponent(msg)}`;
     window.open(url, "_blank");
   }
@@ -628,7 +628,7 @@ export default function SkinCheckPage() {
                         </div>
                         <div className="flex-1">
                           <span
-                            className="mb-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
+                            className="mb-1 inline-block rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
                             style={{ background: p.accent }}
                           >
                             {p.tagline}
@@ -645,7 +645,7 @@ export default function SkinCheckPage() {
                           <ul className="mt-2 flex flex-col gap-0.5">
                             {p.benefits.map((b) => (
                               <li key={b} className="flex items-center gap-1 text-[11px] text-gray-500">
-                                <span style={{ color: "#78257C" }}>✓</span> {b}
+                                <svg className="h-3 w-3 shrink-0" fill="none" stroke="#78257C" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg> {b}
                               </li>
                             ))}
                           </ul>
