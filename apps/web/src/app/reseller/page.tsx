@@ -704,11 +704,6 @@ export default function ResellerProgramPage() {
         <div className="pointer-events-none absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
         <div className="relative mx-auto max-w-xl px-5 text-center">
           <Reveal>
-<<<<<<< HEAD
-            <span className="mb-5 inline-block rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur">Slot Partner Terbuka</span>
-            <h2 id="cta-heading" className="mb-4 font-display text-[30px] font-semibold leading-[1.1] tracking-tight text-white md:text-[42px]">Mulai bisnismu hari ini, bukan nanti</h2>
-            <p className="mb-8 text-[14px] leading-relaxed text-white/80 md:text-[15px]">Gratis daftar, sistemnya sudah ada, dan tim kami bantu dari awal sampai kamu bisa jalan sendiri.</p>
-=======
             <span className="mb-4 inline-block rounded-lg border border-white/25 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur">
               Slot Partner Terbuka
             </span>
@@ -718,7 +713,6 @@ export default function ResellerProgramPage() {
             <p className="mb-7 text-[14px] leading-relaxed text-white/80">
               Gratis daftar, sistemnya sudah ada, dan tim kami bantu dari awal sampai kamu bisa jalan sendiri.
             </p>
->>>>>>> 34a39ce (auto: .gitignore GINABO-Privacy-Policy.md GINABO-Terms-and-Conditions.md)
             <div className="flex flex-wrap items-center justify-center gap-3">
               <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
                 <Link href="/reseller/register" className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-white px-7 py-3.5 text-[14px] font-bold text-[#78257C] shadow-lg transition hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
