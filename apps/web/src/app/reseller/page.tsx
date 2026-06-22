@@ -605,10 +605,6 @@ export default function ResellerProgramPage() {
           <SectionHeading id="rewards-heading" label="Reward & Dukungan" title="Semakin aktif, semakin banyak reward" />
           <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
             <Reveal>
-<<<<<<< HEAD
-              <div className="flex h-full flex-col gap-4 rounded-2xl p-7 text-white" style={{ background: "linear-gradient(135deg, #2d0a5e 0%, #78257C 100%)", boxShadow: "0 14px 40px rgba(120,37,124,0.28)" }}>
-                <span className="self-start rounded-full border border-white/25 bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">Reward Teratas</span>
-=======
               <div
                 className="flex h-full flex-col gap-4 rounded-2xl p-6 text-white"
                 style={{ background: "linear-gradient(135deg, #2d0a5e 0%, #78257C 100%)", boxShadow: "0 14px 40px rgba(120,37,124,0.28)" }}
@@ -616,7 +612,6 @@ export default function ResellerProgramPage() {
                 <span className="self-start rounded-lg border border-white/25 bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
                   Reward Teratas
                 </span>
->>>>>>> 34a39ce (auto: .gitignore GINABO-Privacy-Policy.md GINABO-Terms-and-Conditions.md)
                 <div>
                   <h3 className="font-display text-[22px] font-semibold leading-snug">Top Partner Rewards</h3>
                   <p className="mt-1.5 text-[13px] leading-relaxed text-white/75">Reward eksklusif dari performa terbaikmu — bulanan, kuartal, dan tahunan.</p>
