@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Contact – Ginabo Beauty",
+  title: "Contact | Ginabo Beauty",
   description: "Hubungi tim Ginabo untuk pertanyaan produk, konsultasi kulit, atau informasi program mitra.",
 };
 
@@ -70,7 +70,7 @@ export default function ContactPage() {
                 <ul className="flex flex-col gap-2 rounded-2xl bg-[#f0fdf4] p-4">
                   {["Pertanyaan produk & rutinitas", "Status pesanan & pengiriman", "Info program & promo", "Konsultasi kulit awal"].map(item => (
                     <li key={item} className="flex items-start gap-2 text-xs text-[#444]">
-                      <span className="mt-px flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-white text-[8px]" style={{ background: "#25D366" }}><svg className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg></span>
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: "#25D366" }} />
                       {item}
                     </li>
                   ))}
@@ -112,7 +112,7 @@ export default function ContactPage() {
                 <ul className="flex flex-col gap-2 rounded-2xl p-4" style={{ background: "#F0EBFA" }}>
                   {["Kerja sama & kemitraan bisnis", "Media & press inquiry", "Feedback & saran produk", "Pertanyaan detail formulasi"].map(item => (
                     <li key={item} className="flex items-start gap-2 text-xs text-[#444]">
-                      <span className="mt-px flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-white text-[8px]" style={{ background: "#665dac" }}><svg className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg></span>
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: "#665dac" }} />
                       {item}
                     </li>
                   ))}

@@ -21,6 +21,26 @@ const marqueeItems = [
   "Barrier-First", "Gentle Formula", "AM & PM Routine", "2 Years Research",
 ];
 
+const productDescriptions: Record<string, string> = {
+  "Hydra Moist Gel Ultimate": "Gel 3-in-1: moisturizer, makeup prep & sleeping mask.",
+  "Bright & Care Moisture Cream": "Cream harian untuk kelembapan dan skin barrier.",
+  "GlowAge Multi- Active Serum": "Serum pencerah, pelembap & anti-aging harian.",
+  "Ginabo Complete Skin Nutrition Set": "Gel + Cream + Serum dalam satu paket lengkap.",
+  "Repair & Glow Set": "Paket Gel + Serum untuk hidrasi & pencerahan.",
+  "Daily Skin Barrier Set": "Paket Cream + Gel untuk barrier & kelembapan.",
+  "Bright Renewal Set": "Paket Cream + Serum untuk cerah & perawatan kulit.",
+};
+
+const productFullDescriptions: Record<string, string> = {
+  "Hydra Moist Gel Ultimate": "Moisturizer gel 30ml dengan fungsi 3-in-1 yang dapat digunakan sebagai moisturizer harian, makeup preparation, dan sleeping mask.",
+  "Bright & Care Moisture Cream": "Moisture cream untuk perawatan harian yang membantu melembapkan kulit, menjaga skin barrier, dan merawat tampilan kulit kusam.",
+  "GlowAge Multi- Active Serum": "Serum wajah 20ml untuk perawatan harian yang membantu mencerahkan kulit, meratakan warna kulit, menjaga kelembapan, dan membantu merawat tampilan tanda penuaan.",
+  "Ginabo Complete Skin Nutrition Set": "Dapatkan Hydra Moist Gel Ultimate, Bright & Care Moisture Cream, dan GlowAge Multi-Active Serum dalam satu paket lengkap untuk rutinitas perawatan kulit harian.",
+  "Repair & Glow Set": "Paket berisi Hydra Moist Gel Ultimate dan GlowAge Multi-Active Serum untuk hidrasi optimal dan pencerahan kulit secara alami.",
+  "Daily Skin Barrier Set": "Paket berisi Bright & Care Moisture Cream dan Hydra Moist Gel Ultimate untuk menjaga kelembapan dan memperkuat skin barrier setiap hari.",
+  "Bright Renewal Set": "Paket berisi Bright & Care Moisture Cream dan GlowAge Multi-Active Serum untuk mencerahkan dan merawat kulit secara menyeluruh.",
+};
+
 // ── Animation Variants ────────────────────────────────────────────────────────
 const EASE = [0.25, 1, 0.5, 1] as const;
 
@@ -46,13 +66,16 @@ function SectionLabel({ children, center }: { children: ReactNode; center?: bool
 
 function ProductCard({
   name, rating, reviews, priceLabel, priceVal, originalPrice,
-  imgLeft, imgTop, img, priceMinor, productId,
+  imgLeft, imgTop, img, priceMinor, productId, onInfoClick,
 }: {
   name: string; rating: string; reviews: string; priceLabel?: string; priceVal: string;
   originalPrice?: string; imgLeft?: string; imgTop?: string; img?: string;
-  priceMinor?: number; productId?: string;
+  priceMinor?: number; productId?: string; onInfoClick?: (name: string) => void;
 }) {
   const { addItem } = useCart();
+  const discountPct = originalPrice && priceMinor
+    ? Math.round((1 - priceMinor / parseInt(originalPrice.replace(/\D/g, ""))) * 100)
+    : 0;
   function handleAddToCart() {
     addItem({
       productId: productId ?? name,
@@ -63,43 +86,36 @@ function ProductCard({
       imageUrl:  img ?? null,
     });
   }
-  // Calculate discount percentage for promo items
-  const discountPct = originalPrice && priceMinor
-    ? Math.round((1 - priceMinor / parseInt(originalPrice.replace(/\D/g, ""))) * 100)
-    : 0;
 
   return (
     <motion.div
       variants={cardSlideUp}
-      whileHover={{ y: -8, scale: 1.02 }}
+      whileHover={{ y: -6, scale: 1.01 }}
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
-      className="group relative w-full flex flex-col cursor-pointer rounded-2xl overflow-hidden"
+      className="group relative w-full flex flex-col cursor-pointer rounded-xl overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.4) 100%)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        border: "1px solid rgba(255,255,255,0.6)",
-        boxShadow: "0 8px 32px rgba(82,69,178,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
+        background: "#ffffff",
+        border: "1px solid rgba(147,51,234,0.08)",
+        boxShadow: "0 4px 20px rgba(82,69,178,0.06)",
       }}
     >
-      {/* Glassmorphic glow orb - decorative */}
-      <div
-        className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%)" }}
-      />
-      <div
-        className="absolute -bottom-6 -left-6 w-20 h-20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(232,121,249,0.15) 0%, transparent 70%)" }}
-      />
 
       {/* Product image */}
-      <div className="relative overflow-hidden aspect-square rounded-t-2xl">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/30 z-[1]" />
+      <div className="relative overflow-hidden rounded-lg mx-2.5 mt-2.5" style={{ aspectRatio: "4/3", background: "#faf5ff" }}>
+        {/* Info button */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onInfoClick?.(name.replace(/\n/g, " ")); }}
+          className="absolute top-2 left-2 z-10 flex items-center gap-1.5 rounded-sm px-3 py-1 text-[10px] font-bold text-white backdrop-blur-sm transition-all hover:opacity-90"
+          style={{ background: "#4A1A5E" }}
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+          Info
+        </button>
         {img ? (
           <img
             src={img}
             alt={name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <img
@@ -111,20 +127,27 @@ function ProductCard({
         )}
       </div>
 
-      {/* Info section - glassmorphic bottom */}
-      <div
-        className="flex flex-col gap-1 px-3 py-3 flex-1 relative"
-        style={{
-          background: "linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(253,250,255,0.95) 100%)",
-          backdropFilter: "blur(12px)",
-        }}
-      >
-        <p className="font-semibold text-[#2a2356] text-[12px] md:text-[13px] leading-snug whitespace-pre-line line-clamp-2">
-          {name}
+      {/* Info section */}
+      <div className="flex flex-col gap-2 px-3 pt-3 pb-3 flex-1">
+        {/* Name + Discount badge */}
+        <div className="flex items-start justify-between gap-1.5">
+          <p className="font-bold text-[#4A1A5E] text-[13px] md:text-[14px] leading-snug whitespace-pre-line line-clamp-2">
+            {name}
+          </p>
+          {discountPct > 0 && (
+            <span className="flex-shrink-0 rounded-sm px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: "#ef4444" }}>
+              -{discountPct}%
+            </span>
+          )}
+        </div>
+
+        {/* Description */}
+        <p className="text-[11px] md:text-[12px] leading-relaxed text-[#5a4a6a] line-clamp-2">
+          {productDescriptions[name.replace(/\n/g, " ")] ?? "Skincare ringan untuk rutinitas harian."}
         </p>
 
         {/* Rating badge + sold count */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 mt-auto">
           <div
             className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm"
             style={{ background: "linear-gradient(135deg, #fbbf24, #f59e0b)" }}
@@ -134,48 +157,35 @@ function ProductCard({
             </svg>
             <span className="text-white font-bold text-[10px]">{rating}</span>
           </div>
-          <span className="text-[#7A7A7A] text-[10px] font-semibold">{reviews} terjual</span>
+          <div
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm"
+            style={{ background: "#4A1A5E" }}
+          >
+            <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="white">
+              <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
+            </svg>
+            <span className="text-white font-bold text-[10px]">{reviews} terjual</span>
+          </div>
         </div>
 
-        {/* Price + Discount badge + Cart button */}
-        <div className="flex items-end justify-between mt-auto pt-1">
-          
-          <div>
-            {originalPrice && (
-              <p className="text-[10px] md:text-[11px] font-medium line-through text-gray-400">
-                {originalPrice}
-              </p>
-            )}
-            <div className="flex items-center gap-1.5">
-              <p className={`font-semibold ${originalPrice ? "text-[13px] md:text-[14px]" : "text-[14px] md:text-[15px]"}`} style={{ color: "#78257C" }}>
-                {priceLabel && <span>{priceLabel} </span>}
-                {priceVal}
-              </p>
-              {discountPct > 0 && (
-                <span className="px-1.5 py-0.5 rounded-sm text-[9px] md:text-[10px] font-bold text-white bg-red-500">
-                  {discountPct}%
-                </span>
-              )}
-            </div>
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.12 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={handleAddToCart}
-            className="flex items-center justify-center rounded-lg flex-shrink-0"
-            style={{
-              background: "linear-gradient(135deg, #8b5cf6, #c084fc)",
-              width: 40,
-              height: 40,
-              boxShadow: "0 4px 12px rgba(139,92,246,0.3)",
-            }}
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M12 5v14"/>
-              <path d="M5 12h14"/>
-            </svg>
-          </motion.button>
-        </div>
+        {/* Add to Cart button */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={handleAddToCart}
+          className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-[12px] font-bold text-white transition-all duration-300"
+          style={{
+            background: "linear-gradient(135deg, #9333EA, #7C3AED)",
+            boxShadow: "0 4px 14px rgba(147,51,234,0.25)",
+          }}
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+          {originalPrice && <span className="line-through text-white/50 text-[10px]">{originalPrice}</span>}
+          {priceLabel && <span>{priceLabel} </span>}{priceVal}
+        </motion.button>
       </div>
     </motion.div>
   );
@@ -230,6 +240,7 @@ export default function HomePage() {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [detailProduct, setDetailProduct] = useState<string | null>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -289,7 +300,7 @@ export default function HomePage() {
       <div className="w-full px-2 md:px-5 lg:px-8 xl:px-10 pt-2 md:pt-3 pb-3 md:pb-5">
         <div className="grid grid-cols-3 gap-2 md:gap-3 lg:gap-4">
 
-          <CTACard href="/skincheck" src="/coba_facescan.png"   alt="Cek Kulitmu — Analisis AI"  />
+          <CTACard href="/skincheck" src="/coba_facescan.png"   alt="Cek Kulitmu Analisis AI"  />
           <CTACard href="/reseller"  src="/jadi_reseller.png" alt="Jadi Reseller Ginabo"       />
           <CTACard href="/about"     src="/belanja_tenang.png"    alt="Halal & BPOM Terdaftar"     />
 
@@ -490,6 +501,7 @@ export default function HomePage() {
                     priceVal={p.priceVal}
                     priceMinor={p.priceMinor}
                     img={p.img}
+                    onInfoClick={setDetailProduct}
                   />
                 ))}
               </motion.div>
@@ -588,7 +600,7 @@ export default function HomePage() {
               {
                 icon: <Image src="/storeloc.png" alt="Store Locator" width={44} height={44} className="object-contain" />,
                 title: "Store Locator",
-                desc: "Temukan toko Ginabo terdekat — fisik di mall atau official store di marketplace.",
+                desc: "Temukan toko Ginabo terdekat, fisik di mall atau official store di marketplace.",
                 href: "/stores",
               },
               {
@@ -620,6 +632,33 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Product Detail Popup ── */}
+      {detailProduct && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" onClick={() => setDetailProduct(null)} />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="fixed inset-0 z-50 m-auto h-fit w-[85vw] max-w-sm rounded-2xl p-5 sm:p-6"
+            style={{
+              background: "#ffffff",
+              border: "1px solid rgba(147,51,234,0.12)",
+              boxShadow: "0 24px 64px rgba(20,15,50,0.15)",
+            }}
+          >
+            <button
+              onClick={() => setDetailProduct(null)}
+              className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full text-[#4A1A5E]/50 transition hover:bg-[#faf5ff] hover:text-[#4A1A5E]"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+            </button>
+            <h3 className="text-lg font-bold" style={{ color: "#1e1b3a" }}>{detailProduct}</h3>
+            <p className="mt-3 text-[14px] leading-relaxed" style={{ color: "#2d2556" }}>
+              {productFullDescriptions[detailProduct] ?? "Informasi produk belum tersedia."}
+            </p>
+          </motion.div>
+        </>
+      )}
 
     </div>
   );

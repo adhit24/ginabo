@@ -35,9 +35,9 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   const rating = product.rating ?? 0;
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md">
+    <div className="group flex flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md">
       {/* Image */}
-      <Link href={`/shop/${product.slug}`} className="relative block aspect-square overflow-hidden bg-gray-50">
+      <Link href={`/shop/${product.slug}`} className="relative block overflow-hidden rounded-lg bg-gray-50" style={{ aspectRatio: "4/5" }}>
         {discount > 0 && (
           <span className="absolute left-2 top-2 z-10 rounded-md bg-amber-400 px-1.5 py-0.5 text-[11px] font-extrabold text-white">
             {discount}%
@@ -48,7 +48,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             src={product.imageUrl}
             alt={product.name}
             fill
-            className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+            className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
           />
         ) : (

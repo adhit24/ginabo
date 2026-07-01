@@ -59,27 +59,15 @@ export default function SignupPage() {
 
 
   const inputStyle = {
-    background: "rgba(255,255,255,0.07)",
-    border: "1px solid rgba(255,255,255,0.12)",
-  };
-  const inputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.currentTarget.style.border = "1px solid rgba(168,85,247,0.7)";
-  };
-  const inputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.currentTarget.style.border = "1px solid rgba(255,255,255,0.12)";
+    background: "rgba(255,255,255,0.06)",
+    borderColor: "rgba(139,92,246,0.2)",
   };
 
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 py-10"
-      style={{ background: "linear-gradient(135deg,#0f0a1e 0%,#1e0a38 50%,#2a1040 100%)" }}
+      style={{ background: "#ffffff" }}
     >
-      {/* Glow blobs */}
-      <div className="pointer-events-none fixed top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20"
-        style={{ background: "radial-gradient(circle,#8b5cf6,transparent 70%)" }} />
-      <div className="pointer-events-none fixed bottom-0 right-1/4 h-[400px] w-[400px] translate-x-1/2 translate-y-1/2 rounded-full opacity-15"
-        style={{ background: "radial-gradient(circle,#e879f9,transparent 70%)" }} />
-
       <div className="relative z-10 flex w-full max-w-5xl items-center gap-12">
 
         {/* Left — kartu member floating */}
@@ -105,8 +93,8 @@ export default function SignupPage() {
                 left: glowX,
                 top: glowY,
                 background: isHovered
-                  ? "radial-gradient(ellipse at center, rgba(168,85,247,0.85) 0%, rgba(232,121,249,0.50) 45%, transparent 72%)"
-                  : "radial-gradient(ellipse at center, rgba(168,85,247,0.45) 0%, rgba(232,121,249,0.20) 45%, transparent 75%)",
+                  ? "radial-gradient(ellipse at center, rgba(147,51,234,0.35) 0%, rgba(147,51,234,0.15) 45%, transparent 72%)"
+                  : "radial-gradient(ellipse at center, rgba(147,51,234,0.15) 0%, rgba(147,51,234,0.05) 45%, transparent 75%)",
                 filter: isHovered ? "blur(24px)" : "blur(36px)",
                 transition: "background 0.25s ease, filter 0.25s ease",
                 zIndex: 0,
@@ -125,33 +113,29 @@ export default function SignupPage() {
 
           {/* Info below card */}
           <div className="text-center">
-            <p className="text-xs font-bold uppercase tracking-widest text-white/40">Member Card</p>
-            <p className="mt-1 text-sm font-medium text-white/60">Dapatkan kartu member eksklusif</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#c084fc]">Member Card</p>
+            <p className="mt-1 text-sm font-medium text-[#4A1A5E]">Dapatkan kartu member eksklusif</p>
             <div className="mt-4 flex flex-col gap-2">
               {["Poin reward setiap pembelian", "Diskon eksklusif member", "Akses flash sale lebih awal"].map(t => (
-                <div key={t} className="flex items-center gap-2 text-xs text-white/50">
-                  <svg className="h-3 w-3 shrink-0" fill="none" stroke="#a855f7" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg> {t}
+                <div key={t} className="flex items-center gap-2 text-xs text-[#5a4a6a]">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#8b5cf6]" /> {t}
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Right — glass form card */}
+        {/* Right — form card */}
         <div
-          className="w-full max-w-md rounded-3xl p-8"
-          style={{
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            backdropFilter: "blur(24px)",
-          }}
+          className="w-full max-w-md rounded-2xl p-7"
+          style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.15)", boxShadow: "0 8px 32px rgba(20,15,50,0.25)" }}
         >
           {/* Header */}
           <div className="mb-6 text-center">
             <span className="text-3xl font-extrabold tracking-widest text-white">GINABO</span>
             <span
               className="ml-2 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white align-middle"
-              style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)" }}
+              style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}
             >
               MEMBER
             </span>
@@ -159,7 +143,7 @@ export default function SignupPage() {
           </div>
 
           {error && (
-            <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">
+            <div className="mb-4 rounded-lg px-4 py-3 text-sm font-medium text-red-300" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)" }}>
               {error}
             </div>
           )}
@@ -168,8 +152,8 @@ export default function SignupPage() {
           <button
             type="button"
             onClick={handleGoogle}
-            className="mb-5 flex w-full items-center justify-center gap-3 rounded-xl py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10"
-            style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)" }}
+            className="mb-5 flex w-full items-center justify-center gap-3 rounded-lg border py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10"
+            style={{ background: "rgba(255,255,255,0.07)", borderColor: "rgba(139,92,246,0.2)" }}
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/>
@@ -182,76 +166,78 @@ export default function SignupPage() {
 
           {/* Divider */}
           <div className="mb-5 flex items-center gap-3">
-            <div className="h-px flex-1" style={{ background: "rgba(255,255,255,0.12)" }} />
+            <div className="h-px flex-1" style={{ background: "rgba(139,92,246,0.2)" }} />
             <span className="text-xs text-white/30">atau daftar dengan email</span>
-            <div className="h-px flex-1" style={{ background: "rgba(255,255,255,0.12)" }} />
+            <div className="h-px flex-1" style={{ background: "rgba(139,92,246,0.2)" }} />
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold uppercase tracking-widest text-white/50">Nama Lengkap</label>
-              <input type="text" required placeholder="Nama kamu"
-                value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition"
-                style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} />
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="grid gap-1.5 text-sm">
+                <span className="font-semibold text-white">Nama</span>
+                <input type="text" required placeholder="Contoh: Nadia Putri"
+                  value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  className="min-h-11 rounded-lg border px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:ring-2 focus:ring-[#8b5cf6]/40"
+                  style={inputStyle} />
+              </label>
+
+              <label className="grid gap-1.5 text-sm">
+                <span className="font-semibold text-white">Nomor WhatsApp</span>
+                <input type="tel" placeholder="Contoh: 08xxxxxxxxxx"
+                  value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                  className="min-h-11 rounded-lg border px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:ring-2 focus:ring-[#8b5cf6]/40"
+                  style={inputStyle} />
+              </label>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold uppercase tracking-widest text-white/50">Email</label>
-              <input type="email" required placeholder="email@kamu.com"
+            <label className="grid gap-1.5 text-sm">
+              <span className="font-semibold text-white">Email</span>
+              <input type="email" required placeholder="Contoh: nama@email.com"
                 value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition"
-                style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold uppercase tracking-widest text-white/50">No. WhatsApp</label>
-              <input type="tel" placeholder="08xx-xxxx-xxxx"
-                value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition"
-                style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} />
-            </div>
+                className="min-h-11 rounded-lg border px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:ring-2 focus:ring-[#8b5cf6]/40"
+                style={inputStyle} />
+            </label>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase tracking-widest text-white/50">Password</label>
+              <label className="grid gap-1.5 text-sm">
+                <span className="font-semibold text-white">Password</span>
                 <input type="password" required placeholder="Min. 8 karakter"
                   value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                  className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition"
-                  style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase tracking-widest text-white/50">Konfirmasi</label>
+                  className="min-h-11 rounded-lg border px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:ring-2 focus:ring-[#8b5cf6]/40"
+                  style={inputStyle} />
+              </label>
+              <label className="grid gap-1.5 text-sm">
+                <span className="font-semibold text-white">Konfirmasi</span>
                 <input type="password" required placeholder="Ulangi"
                   value={form.confirm} onChange={e => setForm(f => ({ ...f, confirm: e.target.value }))}
-                  className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition"
-                  style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} />
-              </div>
+                  className="min-h-11 rounded-lg border px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:ring-2 focus:ring-[#8b5cf6]/40"
+                  style={inputStyle} />
+              </label>
             </div>
-
-            <p className="text-[11px] text-white/25">
-              Dengan mendaftar, kamu menyetujui{" "}
-              <Link href="#" className="text-white/50 hover:text-white/70 underline">Syarat & Ketentuan</Link>{" "}
-              dan{" "}
-              <Link href="#" className="text-white/50 hover:text-white/70 underline">Kebijakan Privasi</Link> Ginabo.
-            </p>
 
             <button
               type="submit"
               disabled={loading}
-              className="mt-1 rounded-xl py-3.5 text-sm font-bold text-white transition disabled:opacity-60"
-              style={{ background: "linear-gradient(135deg,#8b5cf6,#e879f9)", boxShadow: "0 4px 20px rgba(139,92,246,0.35)" }}
+              className="mt-1 inline-flex min-h-11 items-center justify-center rounded-lg py-3 text-sm font-extrabold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
+              style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 4px 16px rgba(139,92,246,0.35)" }}
             >
               {loading ? "Memproses..." : "Daftar Sekarang"}
             </button>
+
+            <div className="text-center text-xs text-white/40">
+              Dengan mendaftar, kamu menyetujui{" "}
+              <Link href="#" className="text-[#c084fc] hover:text-[#e879f9] underline">Syarat & Ketentuan</Link>{" "}
+              dan{" "}
+              <Link href="#" className="text-[#c084fc] hover:text-[#e879f9] underline">Kebijakan Privasi</Link> Ginabo.
+            </div>
           </form>
 
-          <div className="mt-5 flex items-center justify-center gap-1 text-sm text-white/30">
+          <div className="mt-5 flex items-center justify-center gap-1 text-sm text-white/40">
             <span>Sudah punya akun?</span>
-            <Link href="/auth/login" className="font-semibold text-white/60 hover:text-white transition">Masuk di sini</Link>
+            <Link href="/auth/login" className="font-semibold text-[#c084fc] hover:text-[#e879f9] transition">Masuk di sini</Link>
           </div>
           <div className="mt-2 text-center">
-            <Link href="/" className="text-xs text-white/20 hover:text-white/40 transition">Kembali ke beranda</Link>
+            <Link href="/" className="text-xs text-white/30 hover:text-white/50 transition">Kembali ke beranda</Link>
           </div>
         </div>
       </div>

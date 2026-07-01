@@ -22,18 +22,26 @@ const infoMenu = [
   { label: "Kebijakan Privasi",    href: "/privacy" },
 ];
 
+const programMenu = [
+  { label: "21 Days", href: "/21days" },
+];
+
 export function SiteHeader() {
   const pathname             = usePathname();
   const router               = useRouter();
   const { user, logout }     = useAuth();
   const [annIdx, setAnnIdx]  = useState(0);
   const [infoOpen, setInfoOpen]   = useState(false);
+  const [programOpen, setProgramOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerTab, setDrawerTab] = useState<"menu" | "info">("menu");
+  const [mobileInfoOpen, setMobileInfoOpen] = useState(false);
+  const [mobileProgramOpen, setMobileProgramOpen] = useState(false);
   const [userOpen, setUserOpen]   = useState(false);
   const [scrolled, setScrolled]   = useState(false);
 
   const infoRef = useRef<HTMLDivElement>(null);
+  const programRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -50,6 +58,7 @@ export function SiteHeader() {
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (infoRef.current && !infoRef.current.contains(e.target as Node)) setInfoOpen(false);
+      if (programRef.current && !programRef.current.contains(e.target as Node)) setProgramOpen(false);
       if (userRef.current && !userRef.current.contains(e.target as Node)) setUserOpen(false);
     };
     document.addEventListener("mousedown", handler);
@@ -64,14 +73,14 @@ export function SiteHeader() {
 
   const isHomeActive = pathname === "/";
   const isInfoActive = ["/faq", "/contact", "/reseller", "/terms", "/privacy"].some(p => pathname.startsWith(p));
-  const isJourneyActive = pathname === "/21days";
+  const isProgramActive = pathname === "/21days";
   const isKonsultasiActive = pathname === "/booking";
 
   return (
     <header className="sticky top-0 z-40" suppressHydrationWarning>
 
       {/* ── Announcement Bar ── */}
-      <div className="bg-gradient-to-r from-[#9333EA] via-[#78257C] to-[#7C3AED] py-2 overflow-hidden">
+      <div className="bg-gradient-to-r from-[#A855F7] via-[#9333EA] to-[#C084FC] py-2 overflow-hidden">
         <div className="mx-auto flex max-w-7xl items-center justify-center px-4">
           <p className="text-[11px] font-medium text-white/90 text-center transition-all duration-500 line-clamp-1">
             {announcements[annIdx]}
@@ -159,17 +168,46 @@ export function SiteHeader() {
                 </div>
               </div>
 
-              {/* JOURNEY direct link */}
-              <Link
-                href="/21days"
-                className={`relative px-4 py-1.5 text-[13px] font-semibold tracking-wide rounded-full transition-all duration-300
-                  ${isJourneyActive ? "text-white" : "text-[#4A1A5E] hover:text-[#78257C]"}`}
-              >
-                {isJourneyActive && (
-                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#9333EA] via-[#7C3AED] to-[#6D28D9] shadow-[0_2px_8px_rgba(120,37,124,0.3)]" />
-                )}
-                <span className="relative">JOURNEY</span>
-              </Link>
+              {/* PROGRAM dropdown */}
+              <div className="relative" ref={programRef}>
+                <button
+                  onClick={() => { setProgramOpen(v => !v); }}
+                  className={`relative flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-semibold tracking-wide rounded-full transition-all duration-300
+                    ${programOpen || isProgramActive ? "text-white" : "text-[#4A1A5E] hover:text-[#78257C]"}`}
+                >
+                  {(programOpen || isProgramActive) && (
+                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#9333EA] via-[#7C3AED] to-[#6D28D9] shadow-[0_2px_8px_rgba(120,37,124,0.3)] transition-opacity duration-300" />
+                  )}
+                  <span className="relative">PROGRAM</span>
+                  <svg className={`relative w-3.5 h-3.5 transition-transform duration-300 ease-out ${programOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+
+                <div className={`absolute left-0 top-full z-50 pt-3 transition-all duration-300 ease-out ${
+                  programOpen
+                    ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+                    : "opacity-0 -translate-y-2 scale-[0.97] pointer-events-none"
+                }`}>
+                  <div className="w-48 rounded-2xl bg-white backdrop-blur-2xl shadow-[0_16px_48px_rgba(120,37,124,0.14)] border border-white/60 ring-1 ring-black/[0.03] overflow-hidden">
+                    <ul className="flex flex-col py-2">
+                      {programMenu.map((item, idx) => (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            onClick={() => setProgramOpen(false)}
+                            className="group flex items-center gap-3 px-5 py-3 text-[13px] text-[#606060] transition-all duration-200 hover:bg-gradient-to-r hover:from-[#F3E8FF]/60 hover:to-transparent hover:text-[#78257C]"
+                            style={{ transitionDelay: programOpen ? `${idx * 30}ms` : "0ms" }}
+                          >
+                            <span className="h-1 w-1 rounded-full bg-gradient-to-r from-[#C084FC] to-[#A855F7] opacity-0 scale-0 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100" />
+                            {item.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
 
               {/* Konsultasi */}
               <Link
@@ -330,39 +368,19 @@ export function SiteHeader() {
           drawerOpen ? "translate-x-0" : "-translate-x-full"
         }`} style={{ maxWidth: "85vw", background: "linear-gradient(160deg, rgba(15,10,30,0.92) 0%, rgba(30,11,56,0.95) 50%, rgba(42,16,64,0.92) 100%)" }}>
 
-          {/* Tab bar header */}
-          <div className="flex items-end justify-between px-5 pt-5 pb-0">
-            <div className="flex gap-6">
-              <button
-                onClick={() => setDrawerTab("menu")}
-                className={`relative pb-3 text-[14px] font-bold transition-colors duration-300 ${
-                  drawerTab === "menu"
-                    ? "text-[#c084fc]"
-                    : "text-white/40"
-                }`}
-              >
-                MENU
-                <span className={`absolute bottom-0 left-0 right-0 h-[2.5px] rounded-full bg-gradient-to-r from-[#C084FC] via-[#A855F7] to-[#7C3AED] transition-all duration-300 ${
-                  drawerTab === "menu" ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
-                }`} />
-              </button>
-              <button
-                onClick={() => setDrawerTab("info")}
-                className={`relative pb-3 text-[14px] font-bold transition-colors duration-300 ${
-                  drawerTab === "info"
-                    ? "text-[#c084fc]"
-                    : "text-white/40"
-                }`}
-              >
-                INFO
-                <span className={`absolute bottom-0 left-0 right-0 h-[2.5px] rounded-full bg-gradient-to-r from-[#C084FC] via-[#A855F7] to-[#7C3AED] transition-all duration-300 ${
-                  drawerTab === "info" ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
-                }`} />
-              </button>
-            </div>
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 pt-5 pb-4">
+            <Image
+              src="/LOGO_GINABO.png"
+              alt="Ginabo"
+              width={100}
+              height={34}
+              className="object-contain brightness-0 invert opacity-80"
+              style={{ height: 30, width: "auto" }}
+            />
             <button
               onClick={() => setDrawerOpen(false)}
-              className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 transition-colors duration-200 hover:bg-white/20"
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 transition-colors duration-200 hover:bg-white/20"
               aria-label="Tutup menu"
             >
               <svg width="14" height="14" fill="none" stroke="#c084fc" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24">
@@ -373,93 +391,130 @@ export function SiteHeader() {
 
           <div className="h-px bg-gradient-to-r from-[#c084fc]/30 via-[#8b5cf6]/15 to-transparent" />
 
-          {/* Tab content */}
+          {/* Navigation — same structure as desktop */}
           <nav className="flex-1 overflow-y-auto px-4 pt-5">
-            {drawerTab === "menu" && (
-              <div
-                className="rounded-[20px] p-5"
-                style={{
-                  background: "linear-gradient(135deg, #1e1b3a 0%, #2d2556 100%)",
-                  border: "1px solid rgba(139,92,246,0.15)",
-                  boxShadow: "0 8px 32px rgba(20,15,50,0.25)",
-                }}
-              >
-                <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: "#c4b5fd" }}>
-                  Navigasi
-                </h3>
-                <ul className="flex flex-col gap-1">
-                  {[
-                    { label: "Home", href: "/" },
-                    { label: "Journey — 21 Days", href: "/21days" },
-                    { label: "Konsultasi", href: "/booking" },
-                  ].map(item => {
-                    const isActive = pathname === item.href;
-                    return (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          onClick={() => setDrawerOpen(false)}
-                          className={`block w-full text-left px-3.5 py-2.5 rounded-lg text-[14px] font-medium transition-all duration-200 ${
-                            isActive
-                              ? "text-white font-semibold shadow-md"
-                              : "text-[#a5a0c8] hover:text-white hover:bg-white/10"
-                          }`}
-                          style={isActive ? {
-                            background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
-                            boxShadow: "0 4px 14px rgba(139,92,246,0.3)",
-                          } : {}}
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
+            <div
+              className="rounded-[20px] p-5"
+              style={{
+                background: "linear-gradient(135deg, #1e1b3a 0%, #2d2556 100%)",
+                border: "1px solid rgba(139,92,246,0.15)",
+                boxShadow: "0 8px 32px rgba(20,15,50,0.25)",
+              }}
+            >
+              <ul className="flex flex-col gap-1">
+                {/* HOME */}
+                <li>
+                  <Link
+                    href="/"
+                    onClick={() => setDrawerOpen(false)}
+                    className={`block w-full text-left px-3.5 py-2.5 rounded-lg text-[14px] font-semibold transition-all duration-200 ${
+                      isHomeActive
+                        ? "text-white shadow-md"
+                        : "text-[#a5a0c8] hover:text-white hover:bg-white/10"
+                    }`}
+                    style={isHomeActive ? {
+                      background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                      boxShadow: "0 4px 14px rgba(139,92,246,0.3)",
+                    } : {}}
+                  >
+                    HOME
+                  </Link>
+                </li>
 
-            {drawerTab === "info" && (
-              <div
-                className="rounded-[20px] p-5"
-                style={{
-                  background: "linear-gradient(135deg, #1e1b3a 0%, #2d2556 100%)",
-                  border: "1px solid rgba(139,92,246,0.15)",
-                  boxShadow: "0 8px 32px rgba(20,15,50,0.25)",
-                }}
-              >
-                <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: "#c4b5fd" }}>
-                  Informasi
-                </h3>
-                <ul className="flex flex-col gap-1">
-                  {[
-                    { label: "Journey — 21 Days", href: "/21days" },
-                    ...infoMenu.map(i => ({ label: i.label, href: i.href })),
-                    { label: "Konsultasi", href: "/booking" },
-                  ].map(item => {
-                    const isActive = pathname === item.href;
-                    return (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          onClick={() => setDrawerOpen(false)}
-                          className={`block w-full text-left px-3.5 py-2.5 rounded-lg text-[14px] font-medium transition-all duration-200 ${
-                            isActive
-                              ? "text-white font-semibold shadow-md"
-                              : "text-[#a5a0c8] hover:text-white hover:bg-white/10"
-                          }`}
-                          style={isActive ? {
-                            background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
-                            boxShadow: "0 4px 14px rgba(139,92,246,0.3)",
-                          } : {}}
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
+                {/* INFO — expandable dropdown */}
+                <li>
+                  <button
+                    onClick={() => setMobileInfoOpen(v => !v)}
+                    className={`flex w-full items-center justify-between px-3.5 py-2.5 rounded-lg text-[14px] font-semibold transition-all duration-200 ${
+                      mobileInfoOpen || isInfoActive
+                        ? "text-white bg-white/10"
+                        : "text-[#a5a0c8] hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <span>INFO</span>
+                    <svg className={`w-4 h-4 transition-transform duration-300 ${mobileInfoOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  <ul className={`overflow-hidden transition-all duration-300 ${mobileInfoOpen ? "max-h-[400px] opacity-100 mt-1" : "max-h-0 opacity-0"}`}>
+                    {infoMenu.map(item => {
+                      const isActive = pathname === item.href;
+                      return (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            onClick={() => setDrawerOpen(false)}
+                            className={`block w-full text-left pl-7 pr-3.5 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 ${
+                              isActive
+                                ? "text-[#c084fc]"
+                                : "text-[#a5a0c8]/70 hover:text-white hover:bg-white/5"
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </li>
+
+                {/* PROGRAM — expandable dropdown */}
+                <li>
+                  <button
+                    onClick={() => setMobileProgramOpen(v => !v)}
+                    className={`flex w-full items-center justify-between px-3.5 py-2.5 rounded-lg text-[14px] font-semibold transition-all duration-200 ${
+                      mobileProgramOpen || isProgramActive
+                        ? "text-white bg-white/10"
+                        : "text-[#a5a0c8] hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <span>PROGRAM</span>
+                    <svg className={`w-4 h-4 transition-transform duration-300 ${mobileProgramOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  <ul className={`overflow-hidden transition-all duration-300 ${mobileProgramOpen ? "max-h-[200px] opacity-100 mt-1" : "max-h-0 opacity-0"}`}>
+                    {programMenu.map(item => {
+                      const isActive = pathname === item.href;
+                      return (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            onClick={() => setDrawerOpen(false)}
+                            className={`block w-full text-left pl-7 pr-3.5 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 ${
+                              isActive
+                                ? "text-[#c084fc]"
+                                : "text-[#a5a0c8]/70 hover:text-white hover:bg-white/5"
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </li>
+
+                {/* Konsultasi */}
+                <li>
+                  <Link
+                    href="/booking"
+                    onClick={() => setDrawerOpen(false)}
+                    className={`block w-full text-left px-3.5 py-2.5 rounded-lg text-[14px] font-semibold transition-all duration-200 ${
+                      isKonsultasiActive
+                        ? "text-white shadow-md"
+                        : "text-[#a5a0c8] hover:text-white hover:bg-white/10"
+                    }`}
+                    style={isKonsultasiActive ? {
+                      background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                      boxShadow: "0 4px 14px rgba(139,92,246,0.3)",
+                    } : {}}
+                  >
+                    Konsultasi
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </nav>
 
           {/* Bottom CTA */}

@@ -86,7 +86,7 @@ export function SiteFooter() {
             <div className="col-span-2 md:col-span-1">
               <img src="/l0go.png" alt="Ginabo" className="object-contain mb-4" style={{ height: 48 }} />
               <p className="text-[13px] leading-relaxed text-white/60 mb-5">
-                Skincare Friendly Expert — seperti teman yang paling paham kulitmu.
+                Skincare Friendly Expert, seperti teman yang paling paham kulitmu.
               </p>
               <div className="flex gap-2">
                 <Link href="https://www.instagram.com/ginabo.official?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram"

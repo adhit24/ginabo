@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Campaign – Ginabo Beauty",
+  title: "Campaign | Ginabo Beauty",
   description: "Ikuti program eksklusif Ginabo: Partner Program, Loyalty Program, dan 21 Days Challenge.",
 };
 
@@ -200,7 +200,7 @@ export default function CampaignPage() {
                 >
                   {c.perks.map((perk) => (
                     <li key={perk} className="flex items-start gap-2 text-xs text-white/70">
-                      <svg className="mt-px h-3.5 w-3.5 shrink-0" fill="none" stroke="#c084fc" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#c084fc]" />
                       {perk}
                     </li>
                   ))}

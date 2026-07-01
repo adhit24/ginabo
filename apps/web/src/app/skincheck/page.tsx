@@ -27,7 +27,7 @@ const PRODUCTS = {
     tagline: "Anti-Aging & Brightening",
     desc: "Serum multi-aktif dengan peptida & vitamin C untuk melawan tanda penuaan, mencerahkan, dan meratakan warna kulit.",
     benefits: ["Menyamarkan kerutan & garis halus", "Mencerahkan kulit kusam", "Meratakan warna kulit"],
-    img: "/product-serum-1.png",
+    img: "/serumfix.png",
     href: "/shop",
     accent: "#78257C",
   },
@@ -36,7 +36,7 @@ const PRODUCTS = {
     tagline: "Deep Hydration · DHA Salmon",
     desc: "Gel pelembab dengan DHA Salmon yang mengunci kelembaban mendalam, memperkuat skin barrier, cocok untuk kulit kering & sensitif.",
     benefits: ["Hidrasi mendalam 24 jam", "Memperkuat skin barrier", "Cocok untuk kulit sensitif"],
-    img: "/product-dna-1.png",
+    img: "/salmonfix.png",
     href: "/shop",
     accent: "#0369A1",
   },
@@ -45,7 +45,7 @@ const PRODUCTS = {
     tagline: "Daily Moisture · Brightening",
     desc: "Krim harian yang mencerahkan, melembabkan sepanjang hari, dan cocok untuk semua jenis kulit termasuk kombinasi.",
     benefits: ["Melembabkan sepanjang hari", "Mencerahkan secara bertahap", "Cocok semua jenis kulit"],
-    img: "/product-cream-1.png",
+    img: "/moistfix.png",
     href: "/shop",
     accent: "#B45309",
   },
@@ -107,16 +107,6 @@ function computeResults(
   return [top[0]];
 }
 
-// ─── LEFT PANEL IMAGE PER STEP ────────────────────────────────────────────────
-const STEP_IMAGES: Record<number, string> = {
-  0: "/skin_analist.png",
-  1: "/product-serum-bg.png",
-  2: "/product-cream-bg.png",
-  3: "/product-dna-bg.png",
-  4: "/product-serum-2.png",
-  5: "/product-bestseller.png",
-  6: "/mulai_journey.png",
-};
 
 // ─── PROGRESS DOTS ────────────────────────────────────────────────────────────
 function ProgressDots({ total, current }: { total: number; current: number }) {
@@ -129,7 +119,7 @@ function ProgressDots({ total, current }: { total: number; current: number }) {
           style={{
             width: i === current ? 20 : 8,
             height: 8,
-            background: i === current ? "#78257C" : i < current ? "#be3ab4" : "#e5d0e8",
+            background: i === current ? "#9333EA" : i < current ? "#7C3AED" : "#E9D5FF",
           }}
         />
       ))}
@@ -151,11 +141,12 @@ function Choice({
     <button
       type="button"
       onClick={onClick}
-      className="w-full rounded-lg border px-4 py-3 text-left text-sm font-medium transition-all duration-150"
+      className="w-full rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-all duration-200 hover:-translate-y-0.5"
       style={{
-        borderColor: selected ? "#78257C" : "#e5e7eb",
-        background: selected ? "#f5eaf8" : "#fff",
-        color: selected ? "#78257C" : "#374151",
+        borderColor: selected ? "#9333EA" : "rgba(147,51,234,0.1)",
+        background: selected ? "linear-gradient(135deg, #F3E8FF, #faf5ff)" : "linear-gradient(135deg, #ffffff, #faf5ff)",
+        color: selected ? "#4A1A5E" : "#5a4a6a",
+        boxShadow: selected ? "0 4px 20px rgba(147,51,234,0.15)" : "0 2px 8px rgba(120,37,124,0.04)",
       }}
     >
       {label}
@@ -178,15 +169,16 @@ function NextBtn({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="w-full rounded-xl py-3.5 text-sm font-semibold text-white transition-all duration-200"
+      className="w-full rounded-xl py-3.5 text-sm font-bold text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
       style={{
         background: disabled
-          ? "#d1b8d8"
-          : "linear-gradient(135deg, #78257C 0%, #be3ab4 100%)",
+          ? "#E9D5FF"
+          : "linear-gradient(135deg, #9333EA 0%, #7C3AED 50%, #8b5cf6 100%)",
         cursor: disabled ? "not-allowed" : "pointer",
+        boxShadow: disabled ? "none" : "0 6px 24px rgba(147,51,234,0.3)",
       }}
     >
-      <svg className="inline h-3 w-3 mr-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>{label}
+      {label}
     </button>
   );
 }
@@ -239,53 +231,13 @@ export default function SkinCheckPage() {
     window.open(url, "_blank");
   }
 
-  const leftImg = STEP_IMAGES[step] ?? STEP_IMAGES[0];
-
   return (
     <div
-      className="relative flex min-h-dvh w-full flex-col md:flex-row"
-      style={{ background: "#fdf6ff" }}
+      className="relative flex min-h-dvh w-full flex-col items-center justify-start"
+      style={{ background: "#ffffff" }}
     >
-      {/* ── LEFT PANEL (desktop) / TOP BANNER (mobile) ── */}
-      <div
-        className="relative h-48 w-full shrink-0 overflow-hidden md:sticky md:top-0 md:h-dvh md:w-[52%]"
-        style={{
-          background: "linear-gradient(160deg, #f9eefe 0%, #ecdff5 50%, #f0e4fa 100%)",
-        }}
-      >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={leftImg}
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1, transition: { duration: 0.6, ease: EASE } }}
-            exit={{ opacity: 0, transition: { duration: 0.3 } }}
-            className="absolute inset-0"
-          >
-            <Image
-              src={leftImg}
-              alt="Ginabo Skin Check"
-              fill
-              className="object-cover object-center"
-              priority={step === 0}
-              sizes="(max-width:768px) 100vw, 52vw"
-            />
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Brand overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-        <div className="absolute bottom-4 left-5 right-5">
-          <p className="text-xs font-semibold uppercase tracking-widest text-white/80">
-            Ginabo Skin Check
-          </p>
-          <p className="text-sm font-bold text-white">
-            Rekomendasi Personal untuk Kulitmu
-          </p>
-        </div>
-      </div>
-
-      {/* ── RIGHT PANEL ── */}
-      <div className="flex flex-1 flex-col items-center justify-start px-4 py-6 md:overflow-y-auto md:px-8 md:py-10">
+      {/* ── MAIN PANEL ── */}
+      <div className="flex flex-1 flex-col items-center justify-start px-4 py-10 md:py-16">
         <div className="w-full max-w-md">
           {/* Progress dots */}
           {step > 0 && step < TOTAL_STEPS - 1 && (
@@ -307,48 +259,55 @@ export default function SkinCheckPage() {
                 className="flex flex-col gap-5"
               >
                 <div>
-                  <p
-                    className="mb-2 text-xs font-bold uppercase tracking-[0.2em]"
-                    style={{ color: "#be3ab4" }}
+                  <span
+                    className="mb-4 inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white"
+                    style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
                   >
                     Ginabo Skin Check
-                  </p>
+                  </span>
                   <h1
-                    className="text-2xl font-bold leading-snug md:text-3xl"
-                    style={{ color: "#2d0a30" }}
+                    className="text-2xl font-extrabold leading-snug md:text-3xl"
+                    style={{ color: "#4A1A5E" }}
                   >
                     Temukan Produk Ginabo yang Tepat untuk Kulitmu
                   </h1>
-                  <p className="mt-3 text-sm leading-relaxed text-gray-500">
-                    Dapatkan rekomendasi skincare yang dipersonalisasi sesuai kondisi kulitmu — hanya dalam beberapa langkah mudah.
+                  <p className="mt-3 text-[15px] leading-relaxed text-[#5a4a6a]">
+                    Dapatkan rekomendasi skincare yang dipersonalisasi sesuai kondisi kulitmu, hanya dalam beberapa langkah mudah.
                   </p>
                 </div>
 
-                <div
-                  className="rounded-2xl border p-4"
-                  style={{ borderColor: "#e8d5f0", background: "#fdf4ff" }}
-                >
-                  <p className="mb-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    3 Produk Ginabo
+                <div className="flex flex-col gap-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9333EA]">
+                    Kami bantu pilihkan dari 3 produk ini
                   </p>
-                  <div className="flex gap-3">
-                    {(["serum", "salmon", "cream"] as ProductKey[]).map((k) => (
-                      <div key={k} className="flex flex-1 flex-col items-center gap-1">
-                        <div className="relative h-16 w-16 overflow-hidden rounded-xl">
-                          <Image
-                            src={PRODUCTS[k].img}
-                            alt={PRODUCTS[k].name}
-                            fill
-                            className="object-cover"
-                            sizes="64px"
-                          />
-                        </div>
-                        <p className="text-center text-[10px] font-medium leading-tight text-gray-600">
+                  {(["serum", "salmon", "cream"] as ProductKey[]).map((k) => (
+                    <div
+                      key={k}
+                      className="flex items-center gap-4 rounded-2xl p-4 transition-all duration-300 hover:-translate-y-0.5"
+                      style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
+                    >
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
+                        <Image
+                          src={PRODUCTS[k].img}
+                          alt={PRODUCTS[k].name}
+                          fill
+                          className="object-cover"
+                          sizes="64px"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-bold leading-tight" style={{ color: "#4A1A5E" }}>
+                          {PRODUCTS[k].name}
+                        </p>
+                        <p className="mt-0.5 text-[11px] font-medium text-[#9333EA]">
                           {PRODUCTS[k].tagline}
                         </p>
+                        <p className="mt-1 text-[11px] leading-relaxed text-[#5a4a6a] line-clamp-2">
+                          {PRODUCTS[k].desc}
+                        </p>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
 
                 <NextBtn label="Mulai Sekarang!" onClick={() => goTo(1)} />
@@ -371,7 +330,7 @@ export default function SkinCheckPage() {
                 <div>
                   <h2
                     className="text-xl font-bold leading-snug"
-                    style={{ color: "#2d0a30" }}
+                    style={{ color: "#4A1A5E" }}
                   >
                     Masalah kulit apa yang sedang kamu alami?
                   </h2>
@@ -423,7 +382,7 @@ export default function SkinCheckPage() {
               >
                 <h2
                   className="text-xl font-bold leading-snug"
-                  style={{ color: "#2d0a30" }}
+                  style={{ color: "#4A1A5E" }}
                 >
                   Apa jenis kulitmu?
                 </h2>
@@ -449,7 +408,8 @@ export default function SkinCheckPage() {
                   <button
                     type="button"
                     onClick={() => goTo(1)}
-                    className="rounded-xl border border-gray-200 px-5 py-3.5 text-sm font-medium text-gray-500 transition hover:bg-gray-50"
+                    className="rounded-xl px-5 py-3.5 text-sm font-medium text-[#5a4a6a] transition-all duration-200 hover:-translate-y-0.5"
+                    style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)" }}
                   >
                     ← Kembali
                   </button>
@@ -479,7 +439,7 @@ export default function SkinCheckPage() {
               >
                 <h2
                   className="text-xl font-bold leading-snug"
-                  style={{ color: "#2d0a30" }}
+                  style={{ color: "#4A1A5E" }}
                 >
                   Berapa usiamu tahun ini?
                 </h2>
@@ -499,7 +459,8 @@ export default function SkinCheckPage() {
                   <button
                     type="button"
                     onClick={() => goTo(2)}
-                    className="rounded-xl border border-gray-200 px-5 py-3.5 text-sm font-medium text-gray-500 transition hover:bg-gray-50"
+                    className="rounded-xl px-5 py-3.5 text-sm font-medium text-[#5a4a6a] transition-all duration-200 hover:-translate-y-0.5"
+                    style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)" }}
                   >
                     ← Kembali
                   </button>
@@ -529,7 +490,7 @@ export default function SkinCheckPage() {
               >
                 <h2
                   className="text-xl font-bold leading-snug"
-                  style={{ color: "#2d0a30" }}
+                  style={{ color: "#4A1A5E" }}
                 >
                   Saya seorang
                 </h2>
@@ -552,7 +513,8 @@ export default function SkinCheckPage() {
                   <button
                     type="button"
                     onClick={() => goTo(3)}
-                    className="rounded-xl border border-gray-200 px-5 py-3.5 text-sm font-medium text-gray-500 transition hover:bg-gray-50"
+                    className="rounded-xl px-5 py-3.5 text-sm font-medium text-[#5a4a6a] transition-all duration-200 hover:-translate-y-0.5"
+                    style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)" }}
                   >
                     ← Kembali
                   </button>
@@ -583,13 +545,13 @@ export default function SkinCheckPage() {
                 <div>
                   <p
                     className="mb-1 text-xs font-bold uppercase tracking-[0.2em]"
-                    style={{ color: "#be3ab4" }}
+                    style={{ color: "#9333EA" }}
                   >
                     Hasil Analisis Kulitmu
                   </p>
                   <h2
                     className="text-xl font-bold leading-snug"
-                    style={{ color: "#2d0a30" }}
+                    style={{ color: "#4A1A5E" }}
                   >
                     Produk Ginabo yang Cocok Untukmu
                   </h2>
@@ -610,11 +572,11 @@ export default function SkinCheckPage() {
                           y: 0,
                           transition: { duration: 0.4, delay: i * 0.12, ease: EASE },
                         }}
-                        className="flex items-center gap-4 rounded-2xl border p-4"
+                        className="flex items-center gap-4 rounded-2xl p-4 transition-all duration-300 hover:-translate-y-0.5"
                         style={{
-                          borderColor: "#e8d5f0",
-                          background: "#fff",
-                          boxShadow: "0 2px 12px rgba(120,37,124,0.07)",
+                          background: "linear-gradient(135deg, #ffffff, #faf5ff)",
+                          border: "1px solid rgba(147,51,234,0.1)",
+                          boxShadow: "0 4px 20px rgba(120,37,124,0.06)",
                         }}
                       >
                         <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl">
@@ -635,7 +597,7 @@ export default function SkinCheckPage() {
                           </span>
                           <p
                             className="text-sm font-bold leading-tight"
-                            style={{ color: "#2d0a30" }}
+                            style={{ color: "#4A1A5E" }}
                           >
                             {p.name}
                           </p>
@@ -644,8 +606,8 @@ export default function SkinCheckPage() {
                           </p>
                           <ul className="mt-2 flex flex-col gap-0.5">
                             {p.benefits.map((b) => (
-                              <li key={b} className="flex items-center gap-1 text-[11px] text-gray-500">
-                                <svg className="h-3 w-3 shrink-0" fill="none" stroke="#78257C" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg> {b}
+                              <li key={b} className="flex items-center gap-1.5 text-[11px] text-gray-500">
+                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#9333EA]" /> {b}
                               </li>
                             ))}
                           </ul>
@@ -686,13 +648,13 @@ export default function SkinCheckPage() {
                 <div>
                   <p
                     className="mb-1 text-xs font-bold uppercase tracking-[0.2em]"
-                    style={{ color: "#be3ab4" }}
+                    style={{ color: "#9333EA" }}
                   >
                     Sedikit lagi!
                   </p>
                   <h2
                     className="text-xl font-bold leading-snug"
-                    style={{ color: "#2d0a30" }}
+                    style={{ color: "#4A1A5E" }}
                   >
                     Isi data dirimu untuk mendapatkan rekomendasi langsung via WhatsApp
                   </h2>
@@ -703,8 +665,8 @@ export default function SkinCheckPage() {
 
                 {/* Result summary */}
                 <div
-                  className="rounded-xl border p-3"
-                  style={{ borderColor: "#e8d5f0", background: "#fdf4ff" }}
+                  className="rounded-xl p-4"
+                  style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
                 >
                   <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Rekomendasi kamu
@@ -713,7 +675,7 @@ export default function SkinCheckPage() {
                     <p
                       key={key}
                       className="text-sm font-semibold"
-                      style={{ color: "#78257C" }}
+                      style={{ color: "#4A1A5E" }}
                     >
                       • {PRODUCTS[key].name}
                     </p>
@@ -735,7 +697,8 @@ export default function SkinCheckPage() {
                       placeholder="Masukkan nama kamu"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#78257C] focus:ring-2 focus:ring-[#78257C]/20"
+                      className="w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:border-[#9333EA] focus:ring-2 focus:ring-[#9333EA]/20"
+                      style={{ borderColor: "rgba(147,51,234,0.15)" }}
                     />
                   </div>
 
@@ -746,7 +709,7 @@ export default function SkinCheckPage() {
                     >
                       Nomor WhatsApp <span className="text-pink-500">*</span>
                     </label>
-                    <div className="flex items-center overflow-hidden rounded-xl border border-gray-200 transition focus-within:border-[#78257C] focus-within:ring-2 focus-within:ring-[#78257C]/20">
+                    <div className="flex items-center overflow-hidden rounded-xl border transition focus-within:border-[#9333EA] focus-within:ring-2 focus-within:ring-[#9333EA]/20" style={{ borderColor: "rgba(147,51,234,0.15)" }}>
                       <span className="border-r border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-500">
                         +62
                       </span>
@@ -773,7 +736,7 @@ export default function SkinCheckPage() {
                   style={{
                     background:
                       !name.trim() || phone.length < 8
-                        ? "#d1b8d8"
+                        ? "#E9D5FF"
                         : "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
                     cursor:
                       !name.trim() || phone.length < 8

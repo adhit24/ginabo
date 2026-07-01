@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { JoinForm } from "./JoinForm";
 
 export const metadata: Metadata = {
-  title: "21 Days Journey – Ginabo Beauty",
+  title: "21 Days Journey | Ginabo Beauty",
   description: "Perjalanan 21 hari untuk membantu kulit terasa lebih sehat, nyaman, dan ternutrisi melalui rutinitas harian yang simpel."
 };
 
@@ -28,105 +28,94 @@ function waLink() {
 
 export default function Journey21Page() {
   return (
-    <div className="font-poppins bg-[#FDFAFF] text-[#2a2a2a]">
+    <div className="font-poppins bg-white text-[#2a2a2a]">
 
-      {/* ══ HERO — Dark Glassmorphic ══ */}
-      <section
-        className="relative overflow-hidden"
-        style={{ background: "linear-gradient(160deg, #0f0a1e 0%, #1a0930 30%, #2a1040 60%, #1e0a38 100%)" }}
-      >
-        {/* Ambient glow blobs */}
-        <div className="pointer-events-none absolute -top-20 left-[15%] h-[600px] w-[600px] rounded-full opacity-25" style={{ background: "radial-gradient(circle, #8b5cf6, transparent 65%)" }} />
-        <div className="pointer-events-none absolute bottom-[-10%] right-[10%] h-[500px] w-[500px] rounded-full opacity-15" style={{ background: "radial-gradient(circle, #e879f9, transparent 65%)" }} />
-        <div className="pointer-events-none absolute top-[40%] left-[60%] h-[350px] w-[350px] rounded-full opacity-[0.08]" style={{ background: "radial-gradient(circle, #f0abfc, transparent 70%)" }} />
-
-        <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-6 py-16 md:grid-cols-[1fr_1.1fr] md:gap-4 md:py-20 lg:py-24">
-          {/* Left — Text content */}
-          <div className="relative z-10 text-center md:text-left md:py-12">
-            <span
-              className="mb-5 inline-block rounded-lg px-5 py-2 text-[11px] font-bold uppercase tracking-widest text-white"
-              style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}
-            >
-              Ginabo 21 Days Journey
-            </span>
-            <h1 className="text-4xl font-normal leading-[1.1] text-white pr-1 md:text-5xl lg:text-6xl" style={{ fontFamily: "var(--font-staatliches)" }}>
-              21 hari untuk kulit yang{" "}
+      {/* ══ HERO ══ */}
+      <section className="py-16 md:py-24" style={{ background: "#ffffff" }}>
+        <div className="mx-auto max-w-6xl px-6 md:px-10 lg:px-16">
+          <div className="grid items-center gap-8 md:grid-cols-[0.85fr_1fr] md:gap-12">
+            {/* Left — Text content */}
+            <div className="order-2 md:order-1">
               <span
-                className="italic font-bold"
-                style={{
-                  background: "linear-gradient(135deg, #c084fc, #f0abfc)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
+                className="mb-4 inline-block rounded px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-white"
+                style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
               >
-                lebih sehat dan ternutrisi
-              </span>.
-            </h1>
-            <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-white/55">
-              Perjalanan sederhana untuk membangun rutinitas yang konsisten. Bukan program instan, bukan gimmick, dan tidak hard selling.
-            </p>
+                Ginabo 21 Days Journey
+              </span>
+              <h1 className="text-2xl font-extrabold leading-tight md:text-[2rem]" style={{ color: "#4A1A5E" }}>
+                21 hari untuk kulit yang{" "}
+                <span className="text-[#9333EA]">lebih sehat dan ternutrisi.</span>
+              </h1>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#5a4a6a] text-justify">
+                Perjalanan sederhana untuk membangun rutinitas yang konsisten. Bukan program instan, bukan gimmick, dan tidak hard selling.
+              </p>
 
-            <div className="mt-8 flex flex-wrap items-center justify-start gap-4">
-              <Link
-                href="#join"
-                className="inline-flex items-center justify-center rounded-xl px-7 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:scale-[1.03] hover:shadow-xl"
-                style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 6px 24px rgba(139,92,246,0.4)" }}
-              >
-                Ikuti Program
-              </Link>
-              <a
-                href={waLink()}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-xl px-7 py-3.5 text-sm font-bold text-white/80 backdrop-blur transition-all duration-300 hover:bg-white/10 hover:text-white"
-                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}
-              >
-                Tanya via WhatsApp
-              </a>
+              {/* Poin-poin */}
+              <ul className="mt-6 flex flex-col gap-2.5">
+                {[
+                  { icon: <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" /></svg>, text: "Rutinitas sederhana, selesai dalam beberapa menit" },
+                  { icon: <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 21c3.5 0 7-3.5 7-8.5S12 3 12 3s-7 5 -7 9.5S8.5 21 12 21Z" /></svg>, text: "Fokus nutrisi kulit dan kenyamanan harian" },
+                  { icon: <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>, text: "Ada panduan dan komunitas untuk bantu konsisten" },
+                ].map((p) => (
+                  <li
+                    key={p.text}
+                    className="flex items-center gap-3.5 rounded-xl px-4 py-3"
+                    style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 2px 12px rgba(120,37,124,0.04)" }}
+                  >
+                    <span
+                      className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-white"
+                      style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
+                    >
+                      {p.icon}
+                    </span>
+                    <span className="text-[13.5px] font-semibold text-[#4A1A5E]">{p.text}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            <div className="mt-8 grid max-w-lg gap-3 text-sm text-white/55">
-              {[
-                "Rutinitas sederhana, selesai dalam beberapa menit",
-                "Fokus nutrisi kulit dan kenyamanan harian",
-                "Ada panduan dan komunitas untuk bantu konsisten"
-              ].map((t) => (
-                <div key={t} className="flex items-start gap-2.5">
-                  <span className="mt-0.5 text-[#c084fc]"><IconCheck /></span>
-                  <span>{t}</span>
+            {/* Right — Hero Image */}
+            <div className="relative flex items-center justify-center order-1 md:order-2">
+              <div className="relative w-full max-w-[400px] md:max-w-[440px]">
+                <div className="relative overflow-hidden rounded-3xl" style={{ aspectRatio: "1/1", boxShadow: "0 25px 60px rgba(139,92,246,0.15), 0 0 40px rgba(168,85,247,0.08)" }}>
+                  <Image
+                    src="/ginabo_21.png"
+                    alt="Ginabo 21 Days Journey Products"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 90vw, (max-width: 1024px) 50vw, 440px"
+                    quality={100}
+                    priority
+                    unoptimized
+                  />
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right — Hero Image (expressive, no card wrapper) */}
-          <div className="relative flex items-center justify-end">
-            {/* Soft glow behind image */}
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <div className="h-[85%] w-[85%] rounded-full opacity-30" style={{ background: "radial-gradient(circle, #c084fc 0%, #8b5cf6 30%, transparent 70%)" }} />
-            </div>
-            <div className="relative w-full max-w-[420px] md:max-w-[480px] lg:max-w-[520px]">
-              <div className="relative" style={{ aspectRatio: "1/1" }}>
-                <Image
-                  src="/gnb21.png"
-                  alt="Ginabo 21 Days Journey — GlowAge Serum + Bright & Care Cream"
-                  fill
-                  className="object-contain drop-shadow-2xl"
-                  sizes="(max-width: 768px) 90vw, (max-width: 1024px) 45vw, 520px"
-                  quality={100}
-                  priority
-                  unoptimized
-                />
-              </div>
-              {/* Floating product label */}
-              <div
-                className="absolute bottom-3 left-1/2 -translate-x-1/2 flex w-fit items-center gap-3 rounded-lg px-5 py-2 text-white backdrop-blur-md md:bottom-5"
-                style={{ background: "rgba(15,10,30,0.55)", border: "1px solid rgba(192,132,252,0.15)" }}
-              >
-                <div className="text-xs font-extrabold leading-tight">AM & PM Routine</div>
-                <div className="h-3 w-px bg-white/20" />
-                <div className="text-[11px] text-white/55">GlowAge Serum + Bright & Care Cream</div>
+                {/* Floating badges */}
+                <div
+                  className="absolute -left-3 top-1/4 flex items-center gap-2 rounded-xl px-3.5 py-2 backdrop-blur-md md:-left-6"
+                  style={{ background: "rgba(255,255,255,0.85)", border: "1px solid rgba(147,51,234,0.15)", boxShadow: "0 4px 20px rgba(120,37,124,0.08)" }}
+                >
+                  <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-white" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714a2.25 2.25 0 0 0 .659 1.591L19 14.5M14.25 3.104c.251.023.501.05.75.082M19 14.5l-1.482 5.19a2.25 2.25 0 0 1-2.163 1.641h-6.71a2.25 2.25 0 0 1-2.163-1.641L5 14.5m14 0H5" /></svg>
+                  </span>
+                  <span className="text-[11px] font-semibold" style={{ color: "#4A1A5E" }}>2 Produk</span>
+                </div>
+                <div
+                  className="absolute -right-3 bottom-1/4 flex items-center gap-2 rounded-xl px-3.5 py-2 backdrop-blur-md md:-right-6"
+                  style={{ background: "rgba(255,255,255,0.85)", border: "1px solid rgba(147,51,234,0.15)", boxShadow: "0 4px 20px rgba(120,37,124,0.08)" }}
+                >
+                  <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-white" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                  </span>
+                  <span className="text-[11px] font-semibold" style={{ color: "#4A1A5E" }}>21 Hari</span>
+                </div>
+                <div
+                  className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex w-fit items-center gap-2.5 rounded-xl px-4 py-2.5 backdrop-blur-md"
+                  style={{ background: "rgba(255,255,255,0.85)", border: "1px solid rgba(147,51,234,0.15)", boxShadow: "0 4px 20px rgba(120,37,124,0.08)" }}
+                >
+                  <span className="text-[11px] font-extrabold" style={{ color: "#4A1A5E" }}>BPOM & Halal</span>
+                  <span className="h-3 w-px bg-[#E9D5FF]" />
+                  <span className="text-[10px] text-[#5a4a6a]">Niacinamide · Ceramide</span>
+                </div>
               </div>
             </div>
           </div>
@@ -134,7 +123,7 @@ export default function Journey21Page() {
       </section>
 
       {/* ══ TENTANG PROGRAM ══ */}
-      <section className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #FDFAFF 0%, #ffffff 100%)" }}>
+      <section className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto grid max-w-6xl gap-12 px-6">
           <div className="flex flex-col items-center text-center">
             <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
@@ -150,15 +139,15 @@ export default function Journey21Page() {
 
           <div className="grid grid-cols-[1fr_1fr] grid-rows-2 gap-3" style={{ aspectRatio: "2/1" }}>
             {/* Left — tall card */}
-            <div className="abt-card group relative overflow-hidden rounded-lg md:rounded-2xl row-span-2 border-[1.5px] border-purple-500/30 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-purple-400/70 hover:shadow-[0_0_20px_rgba(139,92,246,0.4),0_0_40px_rgba(168,85,247,0.2)]" style={{ background: "#27214A" }}>
+            <div className="abt-card group relative overflow-hidden rounded-lg md:rounded-2xl row-span-2 border-[1.5px] border-purple-500/30 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-purple-400/70 hover:shadow-[0_0_20px_rgba(139,92,246,0.4),0_0_40px_rgba(168,85,247,0.2)]" style={{ background: "#682785" }}>
               <Image src="/abt1.png" alt="Nutrition first" fill className="object-contain transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 768px) 50vw, 50vw" quality={100} priority unoptimized />
             </div>
             {/* Top right */}
-            <div className="abt-card group relative overflow-hidden rounded-lg md:rounded-2xl border-[1.5px] border-purple-500/30 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-purple-400/70 hover:shadow-[0_0_20px_rgba(139,92,246,0.4),0_0_40px_rgba(168,85,247,0.2)]" style={{ background: "#27214A" }}>
+            <div className="abt-card group relative overflow-hidden rounded-lg md:rounded-2xl border-[1.5px] border-purple-500/30 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-purple-400/70 hover:shadow-[0_0_20px_rgba(139,92,246,0.4),0_0_40px_rgba(168,85,247,0.2)]" style={{ background: "#682785" }}>
               <Image src="/abt2.png" alt="Barrier first" fill className="object-contain scale-110 translate-x-2 md:scale-100 md:translate-x-0 transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 768px) 50vw, 50vw" quality={100} priority unoptimized />
             </div>
             {/* Bottom right */}
-            <div className="abt-card group relative overflow-hidden rounded-lg md:rounded-2xl border-[1.5px] border-purple-500/30 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-purple-400/70 hover:shadow-[0_0_20px_rgba(139,92,246,0.4),0_0_40px_rgba(168,85,247,0.2)]" style={{ background: "#27214A" }}>
+            <div className="abt-card group relative overflow-hidden rounded-lg md:rounded-2xl border-[1.5px] border-purple-500/30 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-purple-400/70 hover:shadow-[0_0_20px_rgba(139,92,246,0.4),0_0_40px_rgba(168,85,247,0.2)]" style={{ background: "#682785" }}>
               <Image src="/abt3.png" alt="Comfortable for daily use" fill className="object-contain scale-110 translate-x-2 md:scale-100 md:translate-x-0 transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 768px) 50vw, 50vw" quality={100} priority unoptimized />
             </div>
           </div>
@@ -166,7 +155,7 @@ export default function Journey21Page() {
       </section>
 
       {/* ══ HOW IT WORKS ══ */}
-      <section className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #f8f4ff 0%, #FDFAFF 100%)" }}>
+      <section className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto grid max-w-6xl gap-12 px-6">
           <div className="flex flex-col items-center text-center">
             <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
@@ -197,7 +186,7 @@ export default function Journey21Page() {
       </section>
 
       {/* ══ PRODUK UTAMA ══ */}
-      <section className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #FDFAFF 0%, #f8f4ff 100%)" }}>
+      <section className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto grid max-w-6xl gap-12 px-6">
           <div className="flex flex-col items-center text-center">
             <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
@@ -288,16 +277,16 @@ export default function Journey21Page() {
       </section>
 
       {/* ══ TIMELINE ══ */}
-      <section className="py-16 md:py-24" style={{ background: "linear-gradient(160deg, #0f0a1e 0%, #1a0930 50%, #2a1040 100%)" }}>
+      <section className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto grid max-w-6xl gap-12 px-6">
           <div className="flex flex-col items-center text-center">
             <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
               Journey Timeline
             </span>
-            <h2 className="text-2xl font-extrabold text-white md:text-[2rem]">
+            <h2 className="text-2xl font-extrabold md:text-[2rem]" style={{ color: "#4A1A5E" }}>
               Progress yang terasa bertahap
             </h2>
-            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-white/55">
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[#5a4a6a]">
               Tiap orang bisa berbeda. Timeline ini dibuat untuk membantu kamu memahami ritme program.
             </p>
           </div>
@@ -325,18 +314,18 @@ export default function Journey21Page() {
                       </div>
                     </div>
                     {/* Card */}
-                    <div className="mt-6 w-full rounded-xl p-5 transition-all duration-300 hover:-translate-y-1" style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.15)", boxShadow: "0 8px 32px rgba(20,15,50,0.25)" }}>
+                    <div className="mt-6 w-full rounded-xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg" style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}>
                       <div className="flex items-center gap-2 mb-3">
                         <span className="rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: "linear-gradient(135deg, #8b5cf6, #a855f7)" }}>{x.week}</span>
-                        <span className="text-[10px] text-white/40">{x.day}</span>
+                        <span className="text-[10px] text-[#5a4a6a]">{x.day}</span>
                       </div>
-                      <div className="text-base font-bold text-white">{x.title}</div>
-                      <div className="mt-2 text-sm leading-relaxed text-white/55">{x.desc}</div>
+                      <div className="text-base font-bold" style={{ color: "#4A1A5E" }}>{x.title}</div>
+                      <div className="mt-2 text-sm leading-relaxed text-[#5a4a6a]">{x.desc}</div>
                       <div className="mt-4 grid gap-2">
                         {x.details.map((d) => (
                           <div key={d} className="flex items-start gap-2">
-                            <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#c084fc]" />
-                            <span className="text-[13px] text-white/65">{d}</span>
+                            <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#9333EA]" />
+                            <span className="text-[13px] text-[#5a4a6a]">{d}</span>
                           </div>
                         ))}
                       </div>
@@ -366,18 +355,18 @@ export default function Journey21Page() {
                         </div>
                       </div>
                       {/* Card */}
-                      <div className="rounded-xl p-5" style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.15)", boxShadow: "0 8px 32px rgba(20,15,50,0.25)" }}>
+                      <div className="rounded-xl p-5" style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}>
                         <div className="flex items-center gap-2 mb-3">
                           <span className="rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white" style={{ background: "linear-gradient(135deg, #8b5cf6, #a855f7)" }}>{x.week}</span>
-                          <span className="text-[10px] text-white/40">{x.day}</span>
+                          <span className="text-[10px] text-[#5a4a6a]">{x.day}</span>
                         </div>
-                        <div className="text-base font-bold text-white">{x.title}</div>
-                        <div className="mt-2 text-sm leading-relaxed text-white/55">{x.desc}</div>
+                        <div className="text-base font-bold" style={{ color: "#4A1A5E" }}>{x.title}</div>
+                        <div className="mt-2 text-sm leading-relaxed text-[#5a4a6a]">{x.desc}</div>
                         <div className="mt-4 grid gap-2">
                           {x.details.map((d) => (
                             <div key={d} className="flex items-start gap-2">
-                              <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#c084fc]" />
-                              <span className="text-[13px] text-white/65">{d}</span>
+                              <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#9333EA]" />
+                              <span className="text-[13px] text-[#5a4a6a]">{d}</span>
                             </div>
                           ))}
                         </div>
@@ -392,7 +381,7 @@ export default function Journey21Page() {
       </section>
 
       {/* ══ RULES & GUIDELINES ══ */}
-      <section className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #FDFAFF 0%, #f8f4ff 100%)" }}>
+      <section className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto grid max-w-6xl gap-12 px-6">
           <div className="flex flex-col items-center text-center">
             <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
@@ -414,7 +403,7 @@ export default function Journey21Page() {
                   "Gunakan pencahayaan yang konsisten saat dokumentasi"
                 ].map((t) => (
                   <div key={t} className="flex items-start gap-2.5">
-                    <span className="mt-0.5 text-[#C084FC]"><IconCheck /></span>
+                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#C084FC]" />
                     <span>{t}</span>
                   </div>
                 ))}
@@ -455,7 +444,7 @@ export default function Journey21Page() {
       </section>
 
       {/* ══ BENEFITS ══ */}
-      <section className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #f8f4ff 0%, #FDFAFF 100%)" }}>
+      <section className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto grid max-w-6xl gap-12 px-6">
           <div className="flex flex-col items-center text-center">
             <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
@@ -484,7 +473,7 @@ export default function Journey21Page() {
       </section>
 
       {/* ══ TESTIMONIALS ══ */}
-      <section className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #FDFAFF 0%, #f8f4ff 100%)" }}>
+      <section className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto grid max-w-6xl gap-12 px-6">
           <div className="flex flex-col items-center text-center">
             <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white mb-4" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
@@ -519,7 +508,7 @@ export default function Journey21Page() {
       </section>
 
       {/* ══ REGISTRATION ══ */}
-      <section id="join" className="py-16 md:py-24" style={{ background: "linear-gradient(180deg, #f8f4ff 0%, #FDFAFF 100%)" }}>
+      <section id="join" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto grid max-w-6xl gap-10 px-6 md:grid-cols-2">
           <div className="grid content-start gap-4">
             <span className="inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white w-fit" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>

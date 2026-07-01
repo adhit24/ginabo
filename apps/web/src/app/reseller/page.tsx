@@ -2,15 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  animate,
-  useInView,
-  useMotionValue,
-  useTransform,
-  useReducedMotion,
-} from "framer-motion";
+import { motion } from "framer-motion";
 
 // ─── MOTION TOKENS ────────────────────────────────────────────────────────────
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -40,33 +32,14 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
   );
 }
 
-// Count-up angka untuk statistik
-function Counter({ to, suffix = "", className = "" }: { to: number; suffix?: string; className?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
-  const reduce = useReducedMotion();
-  const mv = useMotionValue(0);
-  const rounded = useTransform(mv, (v) => Math.round(v).toLocaleString("id-ID"));
-  const [display, setDisplay] = useState("0");
-
-  useEffect(() => {
-    if (!inView) return;
-    if (reduce) { setDisplay(to.toLocaleString("id-ID")); return; }
-    const controls = animate(mv, to, { duration: 1.4, ease: EASE });
-    return () => controls.stop();
-  }, [inView, reduce, to, mv]);
-
-  useEffect(() => rounded.on("change", setDisplay), [rounded]);
-
-  return <span ref={ref} className={className}>{display}{suffix}</span>;
-}
-
 function SectionLabel({ children, center = false }: { children: React.ReactNode; center?: boolean }) {
   return (
-    <p className={`mb-2.5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#9A2D8C] ${center ? "justify-center" : ""}`}>
-      <span className="inline-block h-px w-5 bg-[#9A2D8C]" aria-hidden="true" />
+    <span
+      className={`mb-4 inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white ${center ? "" : ""}`}
+      style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
+    >
       {children}
-    </p>
+    </span>
   );
 }
 
@@ -74,14 +47,6 @@ function waLink() {
   const text = "Halo Ginabo, saya tertarik bergabung sebagai partner reseller. Boleh info lebih lanjut?";
   return `https://wa.me/6285199264835?text=${encodeURIComponent(text)}`;
 }
-
-// Kelas tombol — disentralisasi agar konsisten
-const BTN_PRIMARY =
-  "inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#78257C,#be3ab4)] px-7 text-[14px] font-bold text-white shadow-[0_8px_24px_rgba(120,37,124,0.28)] transition hover:shadow-[0_10px_30px_rgba(120,37,124,0.38)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78257C]";
-const BTN_GHOST =
-  "inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl border border-[#1C1A17]/12 bg-white px-7 text-[14px] font-bold text-[#1C1A17] transition hover:border-[#1C1A17]/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78257C]";
-// Kartu lembut — pengganti border lilac keras di mana-mana
-const CARD = "rounded-2xl bg-white border border-[#1C1A17]/[0.06] shadow-[0_1px_2px_rgba(28,26,23,0.04)]";
 
 // ─── SVG ICON COMPONENTS ─────────────────────────────────────────────────────
 const icons = {
@@ -165,11 +130,11 @@ const icons = {
 
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 
-const stats: { num?: number; suffix?: string; value?: string; label: string }[] = [
-  { value: "Rp 15–20rb", label: "Untung per produk" },
-  { num: 500, suffix: "+", label: "Partner aktif" },
-  { value: "1×24 jam", label: "Approval pendaftaran" },
-  { value: "Gratis", label: "Biaya bergabung" },
+const stats = [
+  { value: "40%", label: "Margin per produk" },
+  { value: "500+", label: "Partner aktif" },
+  { value: "1×24 jam", label: "Approval cepat" },
+  { value: "Rp 0", label: "Biaya pendaftaran" },
 ];
 
 const problems = [
@@ -180,19 +145,19 @@ const problems = [
 ];
 
 const benefits = [
-  { icon: icons.margin,     title: "Untung Jelas",      desc: "Harga khusus partner — untung Rp 15.000–20.000 di setiap produk yang kamu jual." },
-  { icon: icons.star,       title: "Reward Penjualan",  desc: "Bonus & challenge tiap bulan, kuartal, dan tahun untuk performa terbaikmu." },
-  { icon: icons.graduation, title: "Training Gratis",   desc: "Product knowledge & teknik closing — bahkan kalau kamu belum pernah jualan." },
-  { icon: icons.gift,       title: "Materi Siap Pakai", desc: "Foto produk, caption, dan konten promosi siap posting. Kamu tinggal jual." },
+  { icon: icons.margin,     title: "Margin Lebar",          desc: "Harga khusus partner sampai 40% per produk. Untung jelas di setiap penjualan." },
+  { icon: icons.star,       title: "Reward Penjualan",      desc: "Bonus & challenge tiap bulan, quartal, dan tahun untuk performa terbaikmu." },
+  { icon: icons.graduation, title: "Training Gratis",       desc: "Product knowledge & teknik closing, bahkan kalau kamu belum pernah jualan." },
+  { icon: icons.gift,       title: "Materi Siap Pakai",     desc: "Foto produk, caption, dan konten promosi siap posting. Kamu tinggal jual." },
 ];
 
 const tiers = [
   {
     level: "BRONZE",
     bg: "#ffffff",
-    borderColor: "#E9DFD2",
+    borderColor: "#e8d5c0",
     laba: "Rp 3,5 jt",
-    sub: "/bln",
+    sub: "/bulan",
     grad: "linear-gradient(135deg, #CD7F32, #e8a853)",
     perks: ["Harga partner Bronze", "Materi promosi digital", "Onboarding awal"],
     cta: "Mulai dari Bronze",
@@ -200,11 +165,11 @@ const tiers = [
   },
   {
     level: "SILVER",
-    bg: "linear-gradient(160deg, #2d0a5e 0%, #78257C 100%)",
+    bg: "linear-gradient(160deg, #7C3AED 0%, #9333EA 100%)",
     borderColor: "transparent",
     laba: "Rp 10 jt",
-    sub: "/bln",
-    grad: "linear-gradient(135deg, #be3ab4, #e879f9)",
+    sub: "/bulan",
+    grad: "linear-gradient(135deg, #9333EA, #8b5cf6)",
     perks: ["Semua benefit Bronze", "Training penjualan lanjutan", "Priority support & coaching"],
     cta: "Pilih Silver",
     featured: true,
@@ -214,7 +179,7 @@ const tiers = [
     bg: "#ffffff",
     borderColor: "#ead49a",
     laba: "Rp 25 jt",
-    sub: "/bln",
+    sub: "/bulan",
     grad: "linear-gradient(135deg, #B8860B, #f5c518)",
     perks: ["Semua benefit Silver", "Business coaching eksklusif", "Reward terbesar", "Early access produk baru"],
     cta: "Naik ke Gold",
@@ -230,203 +195,80 @@ const steps = [
 ];
 
 const products = [
-  { name: "GlowAge Multi-Active Serum",   img: "/serumfix.png",  tag: "BESTSELLER", badge: "#78257C" },
-  { name: "Bright & Care Moisture Cream", img: "/moistfix.png",  tag: "FAVORIT",    badge: "#be3ab4" },
-  { name: "Hydra Moist Gel Ultimate",     img: "/salmonfix.png", tag: "BARU",       badge: "#2d0a5e" },
+  { name: "GlowAge Multi-Active Serum",   img: "/serumfix.png",  tag: "BESTSELLER", badge: "#7C3AED" },
+  { name: "Bright & Care Moisture Cream", img: "/moistfix.png",  tag: "FAVORIT",    badge: "#9333EA" },
+  { name: "Hydra Moist Gel Ultimate",     img: "/salmonfix.png", tag: "BARU",       badge: "#8b5cf6" },
 ];
 
 const ecosystem = [
-  { icon: icons.sports, title: "Komunitas & Kampus",   desc: "Aktivasi komunitas kampus & olahraga sebagai jalur pembeli baru yang organik." },
-  { icon: icons.zap,    title: "Event Penjualan",      desc: "Event online & offline yang kami bantu jalankan untuk dorong omzetmu." },
-  { icon: icons.globe,  title: "Halaman Jualan",       desc: "Landing page & katalog digital biar kamu closing lebih meyakinkan." },
-  { icon: icons.chat,   title: "Grup Partner Aktif",   desc: "Konten siap pakai dan grup partner untuk sharing strategi tiap hari." },
+  { icon: icons.sports, title: "Sports & Campus Marketing", desc: "Aktivasi komunitas kampus & olahraga sebagai jalur distribusi organik." },
+  { icon: icons.zap,    title: "Energy Activation",         desc: "Event offline & online yang mendorong penjualanmu di berbagai kanal." },
+  { icon: icons.globe,  title: "Website & Landing Page",    desc: "Infrastruktur digital yang bantu kamu closing lebih profesional." },
+  { icon: icons.chat,   title: "Community & Content",       desc: "Konten siap pakai dan grup partner aktif untuk sharing strategi." },
 ];
 
 const testimonials = [
   {
     name: "Aisyah R.",
-    role: "Partner Ginabo · Surabaya",
+    role: "Partner Ginabo, Surabaya",
     stars: 5,
     text: "Dalam 2 bulan sudah balik modal dan mulai untung konsisten. Sistem partner-nya benar-benar membantu, support tim responsif banget.",
   },
   {
     name: "Rizky A.",
-    role: "Partner Ginabo · Bandung",
+    role: "Partner Ginabo, Bandung",
     stars: 5,
-    text: "Training dan materi promonya lengkap. Tidak perlu bingung cara jual — tinggal ikuti sistemnya, hasilnya langsung terasa.",
-  },
-];
-
-const faqs = [
-  {
-    q: "Apakah ini MLM atau skema member-get-member?",
-    a: "Bukan. Kamu untung dari selisih harga partner ke harga jual — bukan dari merekrut orang. Tidak ada downline, tidak ada paksaan rekrut.",
-  },
-  {
-    q: "Berapa biaya untuk bergabung?",
-    a: "Gratis. Tidak ada biaya pendaftaran dan tidak ada target stok wajib di awal. Kamu mulai sesuai kemampuanmu.",
-  },
-  {
-    q: "Saya belum pernah jualan online, bisa ikut?",
-    a: "Bisa. Kami beri training product knowledge & teknik closing, plus materi promosi siap pakai — kamu tinggal posting dan jual.",
-  },
-  {
-    q: "Produknya aman dan legal?",
-    a: "Semua produk terdaftar BPOM RI, bersertifikat Halal MUI, dan sudah dermatologist tested.",
-  },
-  {
-    q: "Berapa lama proses approval setelah daftar?",
-    a: "Maksimal 1×24 jam setelah form pendaftaranmu masuk. Setelah itu kamu langsung dapat harga partner.",
+    text: "Training dan materi promonya lengkap. Tidak perlu bingung cara jual, tinggal ikuti sistemnya, hasilnya langsung terasa.",
   },
 ];
 
 // ─── REUSABLE ─────────────────────────────────────────────────────────────────
 
 function SectionHeading({
-  label, title, desc, center = true, id,
+  label,
+  title,
+  desc,
+  center = true,
+  id,
 }: {
-  label: string; title: React.ReactNode; desc?: string; center?: boolean; id?: string;
+  label: string;
+  title: React.ReactNode;
+  desc?: string;
+  center?: boolean;
+  id?: string;
 }) {
   return (
-    <Reveal className={`mb-9 max-w-2xl ${center ? "mx-auto text-center" : ""}`}>
+    <Reveal className={`mb-8 max-w-2xl ${center ? "mx-auto text-center" : ""}`}>
       <SectionLabel center={center}>{label}</SectionLabel>
-      <h2 id={id} className="font-display text-[28px] font-semibold leading-[1.12] tracking-tight text-[#1C1A17] md:text-[38px]">
+      <h2 id={id} className="text-2xl font-extrabold leading-tight md:text-[2rem]" style={{ color: "#4A1A5E" }}>
         {title}
       </h2>
-      {desc && <p className="mt-3 text-[14px] leading-relaxed text-[#5a5560] md:text-[15px]">{desc}</p>}
+      {desc && (
+        <p className="mt-3 text-[15px] leading-relaxed text-[#5a4a6a]">
+          {desc}
+        </p>
+      )}
     </Reveal>
-  );
-}
-
-// Chip ikon lembut (default) — menggantikan gradient putih yang diulang di tiap section
-function IconChip({ children, size = "md" }: { children: React.ReactNode; size?: "sm" | "md" }) {
-  const s = size === "sm" ? "h-9 w-9 rounded-lg" : "h-11 w-11 rounded-xl";
-  return (
-    <span className={`flex flex-shrink-0 items-center justify-center bg-[#F6ECF6] text-[#9A2D8C] ${s}`}>
-      {children}
-    </span>
   );
 }
 
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
 
 export default function ResellerProgramPage() {
-  const reduce = useReducedMotion();
-
   return (
-    <div className="bg-[#FBF8F4] text-[#2a2a2a]">
+    <div className="bg-white text-[#2a2a2a]">
 
-      {/* ══ 1. HERO ─ DOM asli, mobile-first, CTA selalu tampil ══════════════════ */}
-      <section aria-label="Hero" className="relative isolate overflow-hidden bg-[linear-gradient(180deg,#F6ECF6_0%,#FBF8F4_70%)]">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.5]"
-          style={{ backgroundImage: "radial-gradient(60% 50% at 75% 18%, rgba(190,58,180,0.14), transparent 70%)" }}
-          aria-hidden="true"
-        />
-        <div className="relative mx-auto grid min-h-[88svh] max-w-6xl items-center gap-10 px-5 py-16 md:min-h-[80vh] md:grid-cols-[1.05fr_0.95fr] md:gap-8 md:py-0">
-          {/* Copy */}
-          <div className="order-2 md:order-1">
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}>
-              <SectionLabel>Ginabo Partner Program</SectionLabel>
-            </motion.div>
-            <motion.h1
-              initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: EASE, delay: 0.06 }}
-              className="font-display text-[40px] font-semibold leading-[1.04] tracking-tight text-[#1C1A17] md:text-[60px]"
-            >
-              Jualan skincare.
-              <br />
-              <span className="italic text-[#9A2D8C]">Tanpa mulai dari nol.</span>
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: EASE, delay: 0.14 }}
-              className="mt-5 max-w-md text-[15px] leading-relaxed text-[#5a5560] md:text-[17px]"
-            >
-              Produk BPOM, materi promosi siap pakai, dan tim yang bantu kamu sampai closing pertama. Sistemnya sudah ada — kamu tinggal jalan.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: EASE, delay: 0.22 }}
-              className="mt-8 flex flex-col gap-3 sm:flex-row"
-            >
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-                <Link href="/reseller/register" className={`${BTN_PRIMARY} w-full sm:w-auto`}>
-                  Daftar Gratis Sekarang {icons.arrowRight}
-                </Link>
-              </motion.div>
-              <a href={waLink()} target="_blank" rel="noreferrer" className={`${BTN_GHOST} w-full sm:w-auto`}>
-                {icons.whatsapp} Tanya via WhatsApp
-              </a>
-            </motion.div>
-            {/* Trust inline — bukan dikubur di footer */}
-            <motion.ul
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] font-semibold text-[#8a7d92]"
-            >
-              {["BPOM RI", "Halal MUI", "Dermatologist Tested"].map((t) => (
-                <li key={t} className="flex items-center gap-1.5">
-                  <span className="text-[#9A2D8C]">{icons.check}</span>{t}
-                </li>
-              ))}
-            </motion.ul>
-          </div>
-
-          {/* Visual produk — float lembut, tanpa teks/stiker yang di-bake */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}
-            className="relative order-1 mx-auto w-full max-w-[420px] md:order-2"
-          >
-            <div className="relative aspect-square overflow-hidden rounded-[28px] bg-[linear-gradient(150deg,#fff,#F6ECF6)] shadow-[0_30px_70px_-30px_rgba(120,37,124,0.45)] ring-1 ring-[#1C1A17]/[0.05]">
-              <motion.div
-                className="absolute inset-0"
-                animate={reduce ? undefined : { y: [0, -12, 0] }}
-                transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <Image src="/serumfix.png" alt="Produk skincare Ginabo" fill priority className="object-contain p-10" sizes="(min-width:768px) 42vw, 90vw" />
-              </motion.div>
-              {/* badge margin mengambang */}
-              <div className="absolute bottom-4 left-4 rounded-2xl bg-white/85 px-4 py-2.5 shadow-lg backdrop-blur">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A2D8C]">Untung partner</p>
-                <p className="font-display text-[20px] font-semibold leading-none text-[#1C1A17]">Rp 15–20rb<span className="text-[12px] font-medium text-[#8a7d92]"> /produk</span></p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ══ 2. STATS BAR ─ count-up ══════════════════════════════════════════════ */}
-      <section aria-label="Statistik program" style={{ background: "linear-gradient(135deg, #2d0a5e 0%, #78257C 100%)" }}>
+      {/* ══ 1. HERO / PROBLEM ════════════════════════════════════════════════ */}
+      <section aria-labelledby="problem-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
-          <motion.dl
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
-            className="grid grid-cols-2 divide-x divide-y divide-white/10 md:grid-cols-4 md:divide-y-0"
-          >
-            {stats.map((s) => (
-              <motion.div key={s.label} variants={fadeUp} className="flex flex-col items-center gap-1 px-3 py-6 text-center">
-                <dt className="sr-only">{s.label}</dt>
-                <dd className="font-display text-[26px] font-semibold leading-none text-white md:text-[32px]">
-                  {s.num != null ? <Counter to={s.num} suffix={s.suffix} /> : s.value}
-                </dd>
-                <p className="text-[11px] font-medium text-white/65 md:text-[12px]">{s.label}</p>
-              </motion.div>
-            ))}
-          </motion.dl>
-        </div>
-      </section>
-
-      {/* ══ 3. PROBLEM ══════════════════════════════════════════════════════════ */}
-      <section aria-labelledby="problem-heading" className="bg-white py-16 md:py-24">
-        <div className="mx-auto max-w-6xl px-5">
-          <div className="grid items-center gap-10 md:grid-cols-[0.85fr_1fr] md:gap-14">
+          <div className="grid items-center gap-8 md:grid-cols-[0.85fr_1fr] md:gap-12">
             <Reveal>
               <SectionLabel>Kamu Pernah Merasa Ini?</SectionLabel>
-              <h2 id="problem-heading" className="font-display text-[28px] font-semibold leading-[1.12] tracking-tight text-[#1C1A17] md:text-[38px]">
-                Bukan salahmu. <span className="italic text-[#9A2D8C]">Sistemnya yang belum ada.</span>
+              <h2 id="problem-heading" className="text-2xl font-extrabold leading-tight md:text-[2rem]" style={{ color: "#4A1A5E" }}>
+                Bukan salahmu. <span className="text-[#9333EA]">Sistemnya yang belum ada.</span>
               </h2>
-              <p className="mt-4 text-[14px] leading-relaxed text-[#5a5560] md:text-[15px]">
-                Kebanyakan orang gagal bisnis bukan karena malas — tapi karena tidak ada yang menunjukkan jalan dan sistemnya. Di sini, kamu tidak mulai sendirian.
+              <p className="mt-3 text-[15px] leading-relaxed text-[#5a4a6a]">
+                Kebanyakan orang gagal bisnis bukan karena malas, tapi karena tidak ada yang menunjukkan jalan dan sistemnya. Di sini, kamu tidak mulai sendirian.
               </p>
             </Reveal>
 
@@ -435,9 +277,19 @@ export default function ResellerProgramPage() {
               className="flex flex-col gap-2.5"
             >
               {problems.map((p) => (
-                <motion.li key={p.text} variants={fadeUp} className={`flex items-center gap-3.5 px-4 py-3.5 ${CARD}`}>
-                  <IconChip size="sm">{p.icon}</IconChip>
-                  <span className="text-[13.5px] font-semibold text-[#3d3550]">{p.text}</span>
+                <motion.li
+                  key={p.text}
+                  variants={fadeUp}
+                  className="flex items-center gap-3.5 rounded-xl px-4 py-3"
+                  style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 2px 12px rgba(120,37,124,0.04)" }}
+                >
+                  <span
+                    className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-white"
+                    style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
+                  >
+                    {p.icon}
+                  </span>
+                  <span className="text-[13.5px] font-semibold text-[#4A1A5E]">{p.text}</span>
                 </motion.li>
               ))}
             </motion.ul>
@@ -445,24 +297,56 @@ export default function ResellerProgramPage() {
         </div>
       </section>
 
-      {/* ══ 4. BENEFITS ═════════════════════════════════════════════════════════ */}
-      <section aria-labelledby="benefits-heading" className="bg-[#FBF8F4] py-16 md:py-24">
+      {/* ══ 2. STATS BAR ─ social proof ───────────────────────────────────────── */}
+      <section aria-label="Statistik program" style={{ background: "linear-gradient(135deg, #9333EA 0%, #7C3AED 100%)" }}>
         <div className="mx-auto max-w-6xl px-5">
-          <SectionHeading id="benefits-heading" label="Kenapa Ginabo Partner" title="Benefit nyata, bukan janji manis" />
+          <motion.dl
+            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
+            className="grid grid-cols-2 divide-x divide-y divide-white/10 md:grid-cols-4 md:divide-y-0"
+          >
+            {stats.map((s) => (
+              <motion.div key={s.label} variants={fadeUp} className="flex flex-col items-center gap-0.5 px-3 py-5 text-center">
+                <dt className="sr-only">{s.label}</dt>
+                <dd className="text-[22px] font-extrabold leading-none text-white md:text-[28px]">{s.value}</dd>
+                <p className="text-[11px] font-medium text-white/65 md:text-[12px]">{s.label}</p>
+              </motion.div>
+            ))}
+          </motion.dl>
+        </div>
+      </section>
+
+      {/* ══ 4. BENEFITS ─ bento rapat ────────────────────────────────────────── */}
+      <section aria-labelledby="benefits-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
+        <div className="mx-auto max-w-6xl px-5">
+          <SectionHeading
+            id="benefits-heading"
+            label="Kenapa Ginabo Partner"
+            title="Benefit nyata, bukan janji manis"
+          />
+
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
-            className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4" role="list"
+            className="grid grid-cols-2 gap-3 lg:grid-cols-4"
+            role="list"
           >
-            {benefits.map((b) => (
+            {benefits.map((b, i) => (
               <motion.div
-                key={b.title} variants={fadeUp} whileHover={{ y: -4 }}
-                className={`group flex flex-col gap-3.5 p-6 transition-shadow hover:shadow-[0_16px_36px_rgba(120,37,124,0.12)] ${CARD}`}
+                key={b.title}
+                variants={fadeUp}
+                whileHover={{ y: -4 }}
+                className="group flex flex-col gap-3 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
                 role="listitem"
               >
-                <IconChip>{b.icon}</IconChip>
+                <div
+                  className="flex h-11 w-11 items-center justify-center rounded-xl text-white transition-transform group-hover:scale-105"
+                  style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
+                >
+                  {b.icon}
+                </div>
                 <div>
-                  <h3 className="text-[15px] font-bold text-[#1C1A17]">{b.title}</h3>
-                  <p className="mt-1.5 text-[12.5px] leading-relaxed text-[#5a5560]">{b.desc}</p>
+                  <h3 className="text-[14px] font-extrabold" style={{ color: "#4A1A5E" }}>{b.title}</h3>
+                  <p className="mt-1.5 text-[12.5px] leading-relaxed text-[#5a4a6a]">{b.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -470,27 +354,30 @@ export default function ResellerProgramPage() {
         </div>
       </section>
 
-      {/* ══ 5. TIERS ─ margin-led ═══════════════════════════════════════════════ */}
-      <section aria-labelledby="tiers-heading" className="bg-white py-16 md:py-24">
+      {/* ══ 5. TIERS ─ kalkulasi profit ──────────────────────────────────────── */}
+      <section aria-labelledby="tiers-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading
             id="tiers-heading"
-            label="Margin & Potensi"
-            title="Untung dari selisih harga — bukan rekrut orang"
-            desc="Kamu beli di harga partner, jual di harga normal. Semakin aktif, semakin besar marginmu. Angka di bawah adalah potensi, bukan janji."
+            label="Potensi Penghasilan"
+            title="Berapa yang bisa kamu hasilkan?"
+            desc="Pilih tier sesuai targetmu. Semakin aktif, semakin besar yang kamu raih."
           />
+
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
             className="grid items-stretch gap-4 md:grid-cols-3"
           >
             {tiers.map((t) => (
               <motion.article
-                key={t.level} variants={fadeUp} whileHover={{ y: -6 }}
-                className={`relative flex flex-col gap-4 overflow-hidden rounded-2xl p-6 transition-shadow ${t.featured ? "md:-my-2 md:py-9" : ""}`}
+                key={t.level}
+                variants={fadeUp}
+                whileHover={{ y: -6 }}
+                className={`relative flex flex-col gap-4 overflow-hidden rounded-2xl p-5 transition-shadow md:p-6 ${t.featured ? "md:-my-2 md:py-8" : ""}`}
                 style={{
                   background: t.bg,
-                  border: t.featured ? "none" : `1px solid ${t.borderColor}`,
-                  boxShadow: t.featured ? "0 16px 44px rgba(120,37,124,0.32)" : "0 1px 2px rgba(28,26,23,0.04)",
+                  border: t.featured ? "none" : `1.5px solid ${t.borderColor}`,
+                  boxShadow: t.featured ? "0 16px 44px rgba(147,51,234,0.32)" : "0 4px 20px rgba(120,37,124,0.06)",
                 }}
               >
                 {t.featured && (
@@ -498,98 +385,109 @@ export default function ResellerProgramPage() {
                     TERPOPULER
                   </div>
                 )}
+
                 <div className="self-start rounded-lg px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white" style={{ background: t.grad }}>
                   {t.level} PARTNER
                 </div>
+
                 <div>
-                  <p className={`text-[11px] font-semibold uppercase tracking-wide ${t.featured ? "text-white/65" : "text-[#8a7d92]"}`}>Potensi laba</p>
-                  <p className={`mt-0.5 flex items-baseline gap-1 ${t.featured ? "text-white" : "text-[#1C1A17]"}`}>
-                    <span className="font-display text-[30px] font-semibold leading-none">{t.laba}</span>
-                    <span className={`text-[13px] font-medium ${t.featured ? "text-white/60" : "text-[#8a7d92]"}`}>{t.sub}</span>
+                  <p className={`text-[11px] font-semibold uppercase tracking-wide ${t.featured ? "text-white/65" : "text-[#5a4a6a]"}`}>
+                    Potensi laba
+                  </p>
+                  <p className={`mt-0.5 flex items-baseline gap-1 ${t.featured ? "text-white" : ""}`} style={!t.featured ? { color: "#4A1A5E" } : undefined}>
+                    <span className="text-[28px] font-extrabold leading-none">{t.laba}</span>
+                    <span className={`text-[13px] font-medium ${t.featured ? "text-white/60" : "text-[#5a4a6a]"}`}>{t.sub}</span>
                   </p>
                 </div>
+
                 <ul className="flex flex-col gap-2">
                   {t.perks.map((p) => (
-                    <li key={p} className={`flex items-start gap-2 text-[13px] font-medium ${t.featured ? "text-white/90" : "text-[#444]"}`}>
-                      <span style={{ color: t.featured ? "#fff" : "#9A2D8C" }}>{icons.check}</span>{p}
+                    <li key={p} className={`flex items-start gap-2 text-[13px] font-medium ${t.featured ? "text-white/90" : "text-[#5a4a6a]"}`}>
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: t.featured ? "#fff" : "#9333EA" }} />
+                      {p}
                     </li>
                   ))}
                 </ul>
+
                 <Link
                   href="/reseller/register"
-                  className="mt-auto block min-h-[44px] rounded-xl py-3 text-center text-[13px] font-bold transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78257C]"
-                  style={t.featured ? { background: "#fff", color: "#78257C" } : { background: t.grad, color: "#fff" }}
+                  className="mt-auto block min-h-[44px] rounded-xl py-3 text-center text-[13px] font-bold transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9333EA]"
+                  style={t.featured ? { background: "#fff", color: "#7C3AED" } : { background: t.grad, color: "#fff" }}
                 >
                   {t.cta}
                 </Link>
               </motion.article>
             ))}
           </motion.div>
-          <p className="mt-5 text-center text-[11.5px] text-[#8a7d92]">
+
+          <p className="mt-4 text-center text-[11.5px] text-[#5a4a6a]">
             *Estimasi berdasarkan rata-rata partner aktif. Hasil aktual bergantung pada usaha masing-masing.
           </p>
         </div>
       </section>
 
-      {/* ══ 6. HOW IT WORKS ─ dengan garis penghubung ════════════════════════════ */}
-      <section aria-labelledby="steps-heading" className="bg-[#FBF8F4] py-16 md:py-24">
+      {/* ══ 6. HOW IT WORKS ─ langkah rapat ──────────────────────────────────── */}
+      <section aria-labelledby="steps-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading id="steps-heading" label="Cara Gabung" title="4 langkah, mulai hari ini" />
-          <div className="relative">
-            {/* garis penghubung — gambar saat masuk viewport (desktop) */}
-            <motion.div
-              aria-hidden="true"
-              className="absolute left-[12%] right-[12%] top-9 hidden h-px origin-left bg-[linear-gradient(90deg,#be3ab4,#78257C)] lg:block"
-              initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }}
-              transition={{ duration: 1, ease: EASE }}
-            />
-            <motion.ol
-              initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
-              className="relative grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4"
-            >
-              {steps.map((s) => (
-                <motion.li key={s.n} variants={fadeUp} className={`flex items-start gap-3.5 p-6 lg:flex-col lg:items-center lg:text-center ${CARD}`}>
-                  <span className="flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#78257C,#be3ab4)] text-[15px] font-bold text-white ring-4 ring-[#FBF8F4]">
-                    {s.n}
-                  </span>
-                  <div>
-                    <h3 className="text-[15px] font-bold text-[#1C1A17]">{s.title}</h3>
-                    <p className="mt-1 text-[12.5px] leading-relaxed text-[#5a5560]">{s.desc}</p>
-                  </div>
-                </motion.li>
-              ))}
-            </motion.ol>
-          </div>
+
+          <motion.ol
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
+            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            {steps.map((s) => (
+              <motion.li
+                key={s.n}
+                variants={fadeUp}
+                className="flex items-start gap-3.5 rounded-2xl p-5"
+                style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
+              >
+                <span
+                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-[15px] font-extrabold text-white"
+                  style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)", boxShadow: "0 0 16px rgba(147,51,234,0.4)" }}
+                >
+                  {s.n}
+                </span>
+                <div>
+                  <h3 className="text-[14px] font-extrabold" style={{ color: "#4A1A5E" }}>{s.title}</h3>
+                  <p className="mt-1 text-[12.5px] leading-relaxed text-[#5a4a6a]">{s.desc}</p>
+                </div>
+              </motion.li>
+            ))}
+          </motion.ol>
         </div>
       </section>
 
-      {/* ══ 7. PRODUCTS ─ dengan sinyal margin ═══════════════════════════════════ */}
-      <section aria-labelledby="products-heading" className="bg-white py-16 md:py-24">
+      {/* ══ 7. PRODUCTS ─ row rapat ──────────────────────────────────────────── */}
+      <section aria-labelledby="products-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading id="products-heading" label="Yang Kamu Jual" title="Skincare berkualitas, mudah dijual" />
+
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
             className="grid gap-4 sm:grid-cols-3"
           >
             {products.map((p) => (
               <motion.article
-                key={p.name} variants={fadeUp} whileHover={{ y: -6 }}
-                className={`overflow-hidden transition-shadow hover:shadow-[0_20px_44px_rgba(120,37,124,0.14)] ${CARD}`}
+                key={p.name}
+                variants={fadeUp}
+                whileHover={{ y: -6 }}
+                className="overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
               >
-                <div className="relative aspect-square bg-[#FBF6FB]">
-                  <Image src={p.img} alt={p.name} fill className="object-contain p-6" sizes="(min-width: 640px) 33vw, 100vw" />
+                <div className="relative aspect-square" style={{ background: "#faf5ff" }}>
+                  <Image src={p.img} alt={p.name} fill className="object-cover" sizes="(min-width: 640px) 33vw, 100vw" />
                   <span className="absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-extrabold text-white" style={{ background: p.badge }}>
                     {p.tag}
                   </span>
                 </div>
-                <div className="p-5">
-                  <h3 className="text-[14px] font-bold text-[#1C1A17]">{p.name}</h3>
-                  <p className="mt-1.5 flex items-center gap-1.5 text-[12px] font-semibold text-[#9A2D8C]">
-                    {icons.check} Untung Rp 15–20rb / produk
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
+                <div className="p-4">
+                  <h3 className="text-[13px] font-extrabold" style={{ color: "#4A1A5E" }}>{p.name}</h3>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
                     {["BPOM RI", "Halal", "Cruelty Free"].map((b) => (
-                      <span key={b} className="rounded-full bg-[#FBF6FB] px-2 py-0.5 text-[10px] font-bold text-[#78257C] ring-1 ring-[#e9d5f0]">{b}</span>
+                      <span key={b} className="rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "#F3E8FF", color: "#7C3AED", border: "1px solid rgba(147,51,234,0.15)" }}>
+                        {b}
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -599,41 +497,65 @@ export default function ResellerProgramPage() {
         </div>
       </section>
 
-      {/* ══ 8. REWARDS + ECOSYSTEM ══════════════════════════════════════════════ */}
-      <section aria-labelledby="rewards-heading" className="bg-[#FBF8F4] py-16 md:py-24">
+      {/* ══ 8. REWARDS + ECOSYSTEM ─ digabung, rapat ─────────────────────────── */}
+      <section aria-labelledby="rewards-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
-          <SectionHeading id="rewards-heading" label="Reward & Dukungan" title="Semakin aktif, semakin banyak reward" />
+          <SectionHeading
+            id="rewards-heading"
+            label="Reward & Dukungan"
+            title="Semakin aktif, semakin banyak reward"
+          />
+
           <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
+            {/* Reward highlight */}
             <Reveal>
               <div
                 className="flex h-full flex-col gap-4 rounded-2xl p-6 text-white"
-                style={{ background: "linear-gradient(135deg, #2d0a5e 0%, #78257C 100%)", boxShadow: "0 14px 40px rgba(120,37,124,0.28)" }}
+                style={{ background: "linear-gradient(135deg, #9333EA 0%, #7C3AED 100%)", boxShadow: "0 14px 40px rgba(147,51,234,0.28)" }}
               >
                 <span className="self-start rounded-lg border border-white/25 bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
                   Reward Teratas
                 </span>
                 <div>
-                  <h3 className="font-display text-[22px] font-semibold leading-snug">Top Partner Rewards</h3>
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-white/75">Reward eksklusif dari performa terbaikmu — bulanan, kuartal, dan tahunan.</p>
+                  <h3 className="text-[19px] font-extrabold leading-snug">Top Partner Rewards</h3>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-white/75">
+                    Reward eksklusif dari performa terbaikmu. Bulanan, quartal, dan tahunan.
+                  </p>
                 </div>
                 <ul className="grid gap-2 sm:grid-cols-2">
                   {["Bonus tunai bulanan", "Liburan & experience", "Sertifikasi partner", "Komisi referral"].map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-[12.5px] font-medium text-white/90"><span className="text-white">{icons.check}</span>{item}</li>
+                    <li key={item} className="flex items-center gap-2 text-[12.5px] font-medium text-white/90">
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white" />
+                      {item}
+                    </li>
                   ))}
                 </ul>
-                <div className="mt-auto rounded-xl bg-white/10 p-3 text-[11.5px] leading-relaxed text-white/70">Reward diumumkan tiap awal bulan di grup komunitas partner resmi.</div>
+                <div className="mt-auto rounded-xl bg-white/10 p-3 text-[11.5px] leading-relaxed text-white/70">
+                  Reward diumumkan tiap awal bulan di grup komunitas partner resmi.
+                </div>
               </div>
             </Reveal>
 
+            {/* Ecosystem support */}
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
-              className="grid gap-3.5 sm:grid-cols-2"
+              className="grid grid-cols-2 gap-3"
             >
               {ecosystem.map((e) => (
-                <motion.div key={e.title} variants={fadeUp} className={`flex flex-col gap-2.5 p-6 ${CARD}`}>
-                  <IconChip size="sm">{e.icon}</IconChip>
-                  <h3 className="text-[14px] font-bold leading-snug text-[#1C1A17]">{e.title}</h3>
-                  <p className="text-[12px] leading-relaxed text-[#767083]">{e.desc}</p>
+                <motion.div
+                  key={e.title}
+                  variants={fadeUp}
+                  className="flex flex-col gap-2 rounded-2xl p-5"
+                  style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
+                >
+                  <span
+                    className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-white"
+                    style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
+                  >
+                    {e.icon}
+                  </span>
+                  <h3 className="text-[13px] font-extrabold leading-snug" style={{ color: "#4A1A5E" }}>{e.title}</h3>
+                  <p className="text-[12px] leading-relaxed text-[#5a4a6a]">{e.desc}</p>
                 </motion.div>
               ))}
             </motion.div>
@@ -641,33 +563,46 @@ export default function ResellerProgramPage() {
         </div>
       </section>
 
-      {/* ══ 9. TESTIMONIALS ═════════════════════════════════════════════════════ */}
-      <section aria-labelledby="testimonials-heading" className="bg-white py-16 md:py-24">
+      {/* ══ 9. TESTIMONIALS ──────────────────────────────────────────────────── */}
+      <section aria-labelledby="testimonials-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading
-            id="testimonials-heading" center={false}
+            id="testimonials-heading"
+            center={false}
             label="Cerita Partner"
-            title={<>Mereka sudah mulai, <span className="italic text-[#9A2D8C]">kamu kapan?</span></>}
+            title={<>Mereka sudah mulai, <span className="text-[#9333EA]">kamu kapan?</span></>}
           />
+
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
             className="grid gap-4 md:grid-cols-2"
           >
             {testimonials.map((t) => (
-              <motion.article key={t.name} variants={fadeUp} className={`flex flex-col gap-4 p-7 ${CARD}`}>
+              <motion.article
+                key={t.name}
+                variants={fadeUp}
+                className="flex flex-col gap-3.5 rounded-2xl p-6"
+                style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
+              >
                 <div className="flex gap-1" aria-label={`Rating ${t.stars} dari 5 bintang`}>
                   {[...Array(5)].map((_, si) => (
-                    <svg key={si} className="h-4 w-4" fill={si < t.stars ? "#be3ab4" : "#e0e0e0"} viewBox="0 0 24 24" aria-hidden="true">
+                    <svg key={si} className="h-4 w-4" fill={si < t.stars ? "#9333EA" : "#E9D5FF"} viewBox="0 0 24 24" aria-hidden="true">
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                     </svg>
                   ))}
                 </div>
-                <blockquote className="font-display text-[16px] italic leading-relaxed text-[#3d3550]">&ldquo;{t.text}&rdquo;</blockquote>
-                <footer className="mt-auto flex items-center gap-3 border-t border-[#1C1A17]/[0.06] pt-4">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#78257C,#be3ab4)] text-[13px] font-extrabold text-white" aria-hidden="true">{t.name[0]}</div>
+                <blockquote className="text-[13.5px] leading-relaxed text-[#5a4a6a]">&ldquo;{t.text}&rdquo;</blockquote>
+                <footer className="flex items-center gap-3 border-t pt-3.5" style={{ borderColor: "rgba(147,51,234,0.1)" }}>
+                  <div
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[13px] font-extrabold text-white"
+                    style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
+                    aria-hidden="true"
+                  >
+                    {t.name[0]}
+                  </div>
                   <div>
-                    <cite className="not-italic text-[13px] font-bold text-[#1C1A17]">{t.name}</cite>
-                    <p className="text-[11px] text-[#8a7d92]">{t.role}</p>
+                    <cite className="not-italic text-[13px] font-extrabold" style={{ color: "#4A1A5E" }}>{t.name}</cite>
+                    <p className="text-[11px] text-[#5a4a6a]">{t.role}</p>
                   </div>
                 </footer>
               </motion.article>
@@ -676,32 +611,17 @@ export default function ResellerProgramPage() {
         </div>
       </section>
 
-      {/* ══ 10. FAQ ─ bunuh keberatan "ini MLM?" ═════════════════════════════════ */}
-      <section aria-labelledby="faq-heading" className="bg-[#FBF8F4] py-16 md:py-24">
-        <div className="mx-auto max-w-3xl px-5">
-          <SectionHeading id="faq-heading" label="Sebelum Daftar" title="Pertanyaan yang sering ditanya" />
-          <motion.div
-            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
-            className="flex flex-col gap-2.5"
-          >
-            {faqs.map((f) => (
-              <motion.details key={f.q} variants={fadeUp} className={`group px-5 py-4 ${CARD} [&_summary::-webkit-details-marker]:hidden`}>
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[14px] font-bold text-[#1C1A17]">
-                  {f.q}
-                  <svg className="h-4 w-4 flex-shrink-0 text-[#9A2D8C] transition-transform duration-300 group-open:rotate-45" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 5v14M5 12h14" />
-                  </svg>
-                </summary>
-                <p className="mt-3 text-[13.5px] leading-relaxed text-[#5a5560]">{f.a}</p>
-              </motion.details>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ══ 11. FINAL CTA ════════════════════════════════════════════════════════ */}
-      <section aria-labelledby="cta-heading" className="relative overflow-hidden py-20 md:py-28" style={{ background: "linear-gradient(135deg, #1a0838 0%, #2d0a5e 45%, #78257C 100%)" }}>
-        <div className="pointer-events-none absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
+      {/* ══ 10. FINAL CTA ────────────────────────────────────────────────────── */}
+      <section
+        aria-labelledby="cta-heading"
+        className="relative overflow-hidden py-16 md:py-20"
+        style={{ background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 55%, #8b5cf6 100%)" }}
+      >
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "40px 40px" }}
+          aria-hidden="true"
+        />
         <div className="relative mx-auto max-w-xl px-5 text-center">
           <Reveal>
             <span className="mb-4 inline-block rounded-lg border border-white/25 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur">
@@ -715,43 +635,72 @@ export default function ResellerProgramPage() {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-                <Link href="/reseller/register" className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-white px-7 py-3.5 text-[14px] font-bold text-[#78257C] shadow-lg transition hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                  Daftar Sekarang — Gratis
+                <Link
+                  href="/reseller/register"
+                  className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-white px-7 py-3.5 text-[14px] font-extrabold shadow-lg transition hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  style={{ color: "#7C3AED" }}
+                >
+                  Daftar Sekarang
                 </Link>
               </motion.div>
-              <a href={waLink()} target="_blank" rel="noreferrer" className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-7 py-3.5 text-[14px] font-bold text-white backdrop-blur transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                {icons.whatsapp} Tanya via WhatsApp
-              </a>
+              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+                <a
+                  href={waLink()}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-7 py-3.5 text-[14px] font-bold text-white backdrop-blur transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                >
+                  {icons.whatsapp}
+                  Tanya via WhatsApp
+                </a>
+              </motion.div>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* ══ STICKY MOBILE CTA BAR ════════════════════════════════════════════════ */}
+      {/* ══ STICKY MOBILE CTA BAR ─ konversi ─────────────────────────────────── */}
       <motion.div
-        initial={{ y: 80 }} animate={{ y: 0 }} transition={{ delay: 1, type: "spring", stiffness: 200, damping: 24 }}
-        className="fixed inset-x-0 bottom-0 z-50 flex items-center gap-2 border-t border-[#1C1A17]/[0.08] bg-white/95 px-4 py-2.5 backdrop-blur md:hidden"
-        style={{ boxShadow: "0 -4px 20px rgba(120,37,124,0.12)" }}
+        initial={{ y: 80 }}
+        animate={{ y: 0 }}
+        transition={{ delay: 1, type: "spring", stiffness: 200, damping: 22 }}
+        className="fixed inset-x-0 bottom-0 z-50 flex items-center gap-2 border-t bg-white/95 px-4 py-2.5 backdrop-blur md:hidden"
+        style={{ borderColor: "rgba(147,51,234,0.1)", boxShadow: "0 -4px 20px rgba(147,51,234,0.1)" }}
       >
-        <a href={waLink()} target="_blank" rel="noreferrer" aria-label="Tanya via WhatsApp" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#1C1A17]/[0.08] text-[#25D366]">
+        <a
+          href={waLink()}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Tanya via WhatsApp"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border text-[#25D366]"
+          style={{ borderColor: "rgba(147,51,234,0.1)" }}
+        >
           {icons.whatsapp}
         </a>
-        <Link href="/reseller/register" className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[linear-gradient(135deg,#78257C,#be3ab4)] text-[14px] font-bold text-white">
-          Daftar Gratis Sekarang {icons.arrowRight}
+        <Link
+          href="/reseller/register"
+          className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-xl text-[14px] font-extrabold text-white"
+          style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
+        >
+          Daftar Gratis Sekarang
+          {icons.arrowRight}
         </Link>
       </motion.div>
 
-      {/* ══ FLOATING JOIN ─ desktop ══════════════════════════════════════════════ */}
+      {/* ══ FLOATING JOIN ─ desktop saja ─────────────────────────────────────── */}
       <motion.a
         href="/reseller/register"
-        initial={{ opacity: 0, scale: 0.75, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ delay: 1.4, type: "spring", stiffness: 160, damping: 22 }}
-        whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 z-50 hidden min-h-[44px] items-center gap-2 rounded-full px-5 py-3 text-[13px] font-bold text-white shadow-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78257C] md:inline-flex"
-        style={{ background: "linear-gradient(135deg, #78257C, #be3ab4)", boxShadow: "0 8px 32px rgba(120,37,124,0.45)" }}
+        initial={{ opacity: 0, scale: 0.75, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ delay: 1.4, type: "spring", stiffness: 180, damping: 18 }}
+        whileHover={{ scale: 1.06 }}
+        whileTap={{ scale: 0.95 }}
+        className="fixed bottom-6 right-6 z-50 hidden min-h-[44px] items-center gap-2 rounded-full px-5 py-3 text-[13px] font-extrabold text-white shadow-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9333EA] md:inline-flex"
+        style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)", boxShadow: "0 8px 32px rgba(147,51,234,0.45)" }}
         aria-label="Daftar sebagai partner Ginabo"
       >
-        {icons.arrowRight} Gabung Sekarang
+        {icons.arrowRight}
+        Gabung Sekarang
       </motion.a>
 
     </div>
