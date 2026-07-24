@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { useCart } from "@/components/cart/CartProvider";
 import { AddressPicker } from "@/components/checkout/AddressPicker";
-import { formatMoney } from "@/lib/money";
+import { useCurrency } from "@/components/currency/CurrencyProvider";
 
 type CheckoutState =
   | { status: "idle" }
@@ -16,8 +16,7 @@ type CheckoutState =
 export default function CheckoutPage() {
   const router = useRouter();
   const { state: cart, totals, clear } = useCart();
-
-  const currency = useMemo(() => cart.items[0]?.currency ?? "IDR", [cart.items]);
+  const { formatPrice } = useCurrency();
 
   const [addressId, setAddressId] = useState<string | null>(null);
   const [status, setStatus] = useState<CheckoutState>({ status: "idle" });
@@ -141,9 +140,9 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex-1">
                         <p className="line-clamp-1 text-sm font-semibold text-gray-900">{i.name}</p>
-                        <p className="text-[11px] text-gray-400">{i.quantity} × {formatMoney(i.priceMinor, i.currency)}</p>
+                        <p className="text-[11px] text-gray-400">{i.quantity} × {formatPrice(i.priceMinor)}</p>
                       </div>
-                      <span className="shrink-0 text-sm font-bold text-gray-900">{formatMoney(i.quantity * i.priceMinor, i.currency)}</span>
+                      <span className="shrink-0 text-sm font-bold text-gray-900">{formatPrice(i.quantity * i.priceMinor)}</span>
                     </div>
                   ))}
                 </div>
@@ -151,7 +150,7 @@ export default function CheckoutPage() {
                 <div className="mt-3 border-t border-gray-100 pt-4">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">Subtotal</span>
-                    <span className="text-xs font-semibold text-gray-700">{formatMoney(totals.subtotalMinor, currency)}</span>
+                    <span className="text-xs font-semibold text-gray-700">{formatPrice(totals.subtotalMinor)}</span>
                   </div>
                   <div className="mt-1 flex items-center justify-between">
                     <span className="text-xs text-gray-500">Ongkir</span>
@@ -159,7 +158,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
                     <span className="text-sm font-bold text-gray-900">Total</span>
-                    <span className="text-base font-extrabold text-brand-700">{formatMoney(totals.subtotalMinor, currency)}</span>
+                    <span className="text-base font-extrabold text-brand-700">{formatPrice(totals.subtotalMinor)}</span>
                   </div>
                 </div>
               </div>

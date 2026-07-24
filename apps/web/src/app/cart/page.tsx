@@ -4,10 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { useCart } from "@/components/cart/CartProvider";
-import { formatMoney } from "@/lib/money";
+import { useCurrency } from "@/components/currency/CurrencyProvider";
 
 export default function CartPage() {
   const { state, updateQuantity, removeItem, totals } = useCart();
+  const { formatPrice } = useCurrency();
 
   return (
     <div className="grid gap-6">
@@ -48,7 +49,7 @@ export default function CartPage() {
                     <Link href={`/shop/${item.slug}`} className="text-sm font-semibold text-gray-900">
                       {item.name}
                     </Link>
-                    <div className="mt-1 text-sm text-gray-600">{formatMoney(item.priceMinor, item.currency)}</div>
+                    <div className="mt-1 text-sm text-gray-600">{formatPrice(item.priceMinor)}</div>
                   </div>
                   <button
                     type="button"
@@ -77,7 +78,7 @@ export default function CartPage() {
                     </button>
                   </div>
                   <div className="text-sm font-semibold text-gray-900">
-                    {formatMoney(item.quantity * item.priceMinor, item.currency)}
+                    {formatPrice(item.quantity * item.priceMinor)}
                   </div>
                 </div>
               </div>
@@ -87,7 +88,7 @@ export default function CartPage() {
           <div className="rounded-3xl border border-gray-100 bg-white p-6">
             <div className="flex items-center justify-between text-sm">
               <div className="text-gray-600">Subtotal</div>
-              <div className="font-semibold text-gray-900">{formatMoney(totals.subtotalMinor, "IDR")}</div>
+              <div className="font-semibold text-gray-900">{formatPrice(totals.subtotalMinor)}</div>
             </div>
             <Link
               href="/checkout"

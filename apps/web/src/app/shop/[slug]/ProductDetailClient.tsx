@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
+import { useCurrency } from "@/components/currency/CurrencyProvider";
 
 type ProductImage = { url: string; alt: string | null; sortOrder: number };
 
@@ -20,17 +21,11 @@ type Props = {
   };
 };
 
-function formatPrice(minor: number, currency: string) {
-  if (currency === "IDR") {
-    return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(minor);
-  }
-  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(minor / 100);
-}
-
 const TABS = ["Detail", "Cara Pakai", "Kandungan", "Tanya Jawab"];
 
 export function ProductDetailClient({ product }: Props) {
   const { addItem } = useCart();
+  const { formatPrice } = useCurrency();
   const [activeImg, setActiveImg]   = useState(0);
   const [activeTab, setActiveTab]   = useState(0);
   const [qty, setQty]               = useState(1);
@@ -133,7 +128,7 @@ export function ProductDetailClient({ product }: Props) {
             {/* Price */}
             <div className="flex items-baseline gap-3">
               <span className="text-[22px] font-bold" style={{ color: "#78257C" }}>
-                {formatPrice(product.priceMinor, product.currency)}
+                {formatPrice(product.priceMinor)}
               </span>
             </div>
 
