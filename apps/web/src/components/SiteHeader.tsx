@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { CartMini } from "@/components/cart/CartMini";
+import { CurrencySwitcher } from "@/components/currency/CurrencySwitcher";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 
@@ -15,6 +16,7 @@ const announcements = [
 ];
 
 const infoMenu = [
+  { label: "Blog",                 href: "/blog" },
   { label: "FAQ",                  href: "/faq" },
   { label: "Kontak Kami",          href: "/contact" },
   { label: "Jadi Reseller",        href: "/reseller" },
@@ -223,6 +225,8 @@ export function SiteHeader() {
 
             </nav>
 
+            <CurrencySwitcher />
+
             <div className="w-px h-5 bg-[#E9D5FF]/60 mx-2" />
 
             {/* User */}
@@ -337,8 +341,9 @@ export function SiteHeader() {
           />
         </Link>
 
-        {/* Right: user + cart */}
-        <div className="flex items-center gap-1">
+        {/* Right: currency + user + cart */}
+        <div className="flex items-center gap-1.5">
+          <CurrencySwitcher />
           <Link href={user ? "/member" : "/auth/login"} className="flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-[#F3E8FF]/40">
             <svg className="h-5 w-5 text-[#808080]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <circle cx="12" cy="8" r="4" />
