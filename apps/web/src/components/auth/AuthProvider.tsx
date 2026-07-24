@@ -121,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         full_name: name.trim(),
         loyalty_points: 100,
-      });
+      } as never);
     }
 
     return { ok: true };
