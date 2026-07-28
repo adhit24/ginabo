@@ -26,12 +26,18 @@ export interface GFlashItem {
   img: string;
 }
 
-// Credentials live in env vars (server-side only — never exposed to browser bundle)
-// Set ADMIN_USERNAME and ADMIN_PASSWORD in Vercel environment variables
-export const ADMIN_CREDS = {
-  username: typeof process !== "undefined" ? (process.env.ADMIN_USERNAME ?? "ginabo_admin") : "ginabo_admin",
-  password: typeof process !== "undefined" ? (process.env.ADMIN_PASSWORD ?? "ginabo2024") : "ginabo2024",
-};
+// Credentials live in env vars only (server-side, never exposed to the browser
+// bundle or committed to source). Set ADMIN_USERNAME and ADMIN_PASSWORD in
+// Vercel environment variables — there is no fallback, so login fails closed
+// if they're unset rather than accepting a guessable default.
+export function getAdminCreds() {
+  const username = process.env.ADMIN_USERNAME;
+  const password = process.env.ADMIN_PASSWORD;
+  if (!username || !password) {
+    throw new Error("ADMIN_USERNAME and ADMIN_PASSWORD are required");
+  }
+  return { username, password };
+}
 
 export const DEFAULT_PRODUCTS: GProduct[] = [
   { id: "p1", name: "Hydra Moist\nGel Ultimate",      priceVal: "Rp 120.000", priceMinor: 120000, img: "/salmonfix.png", rating: "5.0", reviews: "127", tag: "DNA Salmon · 30ml" },

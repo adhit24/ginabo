@@ -8,11 +8,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
-
-  function handleDemoLogin() {
-    store.setAdminSession(true);
-    window.location.href = "/admin";
-  }
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -67,7 +63,7 @@ export default function AdminLoginPage() {
             <input
               type="text"
               required
-              placeholder="ginabo_admin"
+              placeholder="Masukkan username"
               value={username}
               onChange={e => setUsername(e.target.value)}
               className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none"
@@ -76,15 +72,35 @@ export default function AdminLoginPage() {
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-bold uppercase tracking-widest text-white/50">Password</label>
-            <input
-              type="password"
-              required
-              placeholder="••••••••"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none"
-              style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                placeholder="••••••••"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full rounded-xl px-4 py-3 pr-11 text-sm text-white placeholder-white/30 outline-none"
+                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(v => !v)}
+                aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 transition hover:text-white/70"
+              >
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
           <button
             type="submit"
@@ -95,21 +111,6 @@ export default function AdminLoginPage() {
             {loading ? "Memproses..." : "Masuk sebagai Admin"}
           </button>
         </form>
-
-        {/* Demo credentials hint */}
-        <div className="mt-5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-amber-400 mb-1">Demo Credentials</p>
-          <p className="text-xs text-white/50">Username: <span className="font-mono text-white/70">ginabo_admin</span></p>
-          <p className="text-xs text-white/50">Password: <span className="font-mono text-white/70">ginabo2024</span></p>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleDemoLogin}
-          className="mt-3 w-full rounded-xl border border-white/10 py-2.5 text-sm font-medium text-white/60 transition hover:border-white/20 hover:text-white/80"
-        >
-          Masuk Demo (Bypass Login)
-        </button>
 
         <p className="mt-4 text-center text-xs text-white/30">
           Akses admin hanya untuk tim internal Ginabo.
