@@ -10,7 +10,7 @@ import { MAINTENANCE_HTML } from "@/lib/maintenancePage";
  * a code constant (not an env var) so a single commit is enough to take the
  * site down or bring it back up, with no dashboard step required.
  */
-const MAINTENANCE_MODE = true;
+const MAINTENANCE_MODE = false;
 
 /** Paths that stay reachable even while the site is under maintenance. */
 const MAINTENANCE_ALLOWLIST = ["/admin", "/api/admin", "/api/payment/webhook"] as const;
