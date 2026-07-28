@@ -2,6 +2,9 @@
   "name": "ginabo",
   "private": true,
   "version": "0.1.0",
+  "workspaces": [
+    "apps/web"
+  ],
   "scripts": {
     "build": "npm --prefix apps/web run build",
     "dev": "npm --prefix apps/web run dev",
