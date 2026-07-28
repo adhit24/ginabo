@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
         window.location.href = "/admin";
       } else {
         const data = await res.json().catch(() => ({}));
-        setError((data as { error?: string }).error ?? "Username atau password salah.");
+        setError((data as { error?: { message?: string } }).error?.message ?? "Username atau password salah.");
         setLoading(false);
       }
     } catch {
