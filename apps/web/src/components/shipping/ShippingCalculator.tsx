@@ -20,20 +20,23 @@ export default function ShippingCalculator({ weightGrams, onSelect, selectedOpti
   const [citiesLoaded, setCitiesLoaded] = useState(false);
 
   useEffect(() => {
-    fetch("/api/shipping/cities")
+    if (citySearch.trim().length < 2) {
+      setCities([]);
+      setCitiesLoaded(true);
+      return;
+    }
+    setCitiesLoaded(false);
+    const timer = window.setTimeout(() => fetch(`/api/shipping/cities?search=${encodeURIComponent(citySearch.trim())}`)
       .then((r) => r.json())
       .then((d: { cities?: RajaOngkirCity[] }) => {
         if (d.cities) setCities(d.cities);
         setCitiesLoaded(true);
       })
-      .catch(() => setCitiesLoaded(true));
-  }, []);
+      .catch(() => setCitiesLoaded(true)), 300);
+    return () => window.clearTimeout(timer);
+  }, [citySearch]);
 
-  const filteredCities = citySearch.length >= 2
-    ? cities.filter((c) =>
-        `${c.city_name} ${c.type}`.toLowerCase().includes(citySearch.toLowerCase())
-      ).slice(0, 10)
-    : [];
+  const filteredCities = cities.slice(0, 10);
 
   async function handleCalculate() {
     if (!selectedCityId) return;
@@ -101,7 +104,7 @@ export default function ShippingCalculator({ weightGrams, onSelect, selectedOpti
                 className="w-full px-4 py-2.5 text-left text-sm text-white/80 transition hover:bg-white/10"
               >
                 {c.type} {c.city_name}
-                <span className="ml-2 text-xs text-white/40">{c.province}</span>
+                  <span className="ml-2 text-xs text-white/40">{c.label ?? `${c.city_name} ${c.postal_code ?? ""}`}</span>
               </button>
             ))}
           </div>

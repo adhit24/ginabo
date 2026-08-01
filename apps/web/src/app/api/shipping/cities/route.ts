@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCities, isRajaOngkirConfigured } from "@/lib/rajaongkir";
 
 /**
- * GET /api/shipping/cities?province_id=11
- * Cached 24 hours — city list rarely changes
+ * GET /api/shipping/cities?search=Cirebon
  */
 export async function GET(req: NextRequest) {
   if (!isRajaOngkirConfigured()) {
@@ -13,10 +12,13 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const provinceId = req.nextUrl.searchParams.get("province_id") ?? undefined;
+  const search = req.nextUrl.searchParams.get("search")?.trim() ?? "";
+  if (search.length < 2) {
+    return NextResponse.json({ cities: [] });
+  }
 
   try {
-    const cities = await getCities(provinceId);
+    const cities = await getCities(search);
     return NextResponse.json(
       { cities },
       {
