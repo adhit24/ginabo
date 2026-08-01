@@ -8,7 +8,7 @@ import { authFetch } from "@/lib/supabase/client";
 
 type Props = {
   selectedId: string | null;
-  onSelect: (id: string | null) => void;
+  onSelect: (id: string | null, address?: AddressRow) => void;
 };
 
 type FormState = {
@@ -68,7 +68,7 @@ export function AddressPicker({ selectedId, onSelect }: Props) {
         // picks another address, a refresh must not silently switch back.
         if (!selectedId) {
           const preselected = list.find((a) => a.is_default) ?? list[0];
-          onSelect(preselected.id);
+          onSelect(preselected.id, preselected);
         }
       }
     } finally {
@@ -107,7 +107,7 @@ export function AddressPicker({ selectedId, onSelect }: Props) {
         return;
       }
       setAddresses((prev) => [json.data as AddressRow, ...prev]);
-      onSelect(json.data.id);
+      onSelect(json.data.id, json.data as AddressRow);
       setForm(EMPTY_FORM);
       setShowForm(false);
     } finally {
@@ -134,7 +134,7 @@ export function AddressPicker({ selectedId, onSelect }: Props) {
                 type="radio"
                 name="address"
                 checked={selectedId === addr.id}
-                onChange={() => onSelect(addr.id)}
+                onChange={() => onSelect(addr.id, addr)}
                 className="mt-1 accent-brand-700"
               />
               <div className="flex-1">

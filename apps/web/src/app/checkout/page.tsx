@@ -1,15 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { useCart } from "@/components/cart/CartProvider";
 import { AddressPicker } from "@/components/checkout/AddressPicker";
+import JneShippingQuote from "@/components/shipping/JneShippingQuote";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { authFetch } from "@/lib/supabase/client";
-import ShippingCalculator from "@/components/shipping/ShippingCalculator";
 import type { ShippingOption } from "@/lib/rajaongkir";
+import type { AddressRow } from "@/types/database";
 
 type CheckoutState =
   | { status: "idle" }
@@ -22,12 +23,18 @@ export default function CheckoutPage() {
   const { formatPrice } = useCurrency();
 
   const [addressId, setAddressId] = useState<string | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<AddressRow | null>(null);
   const [shippingOption, setShippingOption] = useState<ShippingOption | null>(null);
   const [status, setStatus] = useState<CheckoutState>({ status: "idle" });
   const packageWeight = useMemo(
     () => Math.max(1000, cart.items.reduce((sum, item) => sum + (item.weightGrams ?? 100) * item.quantity, 0)),
     [cart.items],
   );
+  const handleAddressSelect = useCallback((id: string | null, address?: AddressRow) => {
+    setAddressId(id);
+    setSelectedAddress(address ?? null);
+    setShippingOption(null);
+  }, []);
 
   async function submit() {
     if (cart.items.length === 0) return;
@@ -107,16 +114,23 @@ export default function CheckoutPage() {
                 <h2 className="mb-5 text-sm font-bold text-gray-900">Alamat Pengiriman</h2>
                 <AddressPicker
                   selectedId={addressId}
-                  onSelect={(id) => {
-                    setAddressId(id);
-                    setShippingOption(null);
-                  }}
+                  onSelect={handleAddressSelect}
                 />
 
                 <div className="mt-6 border-t border-gray-100 pt-5">
-                  <h2 className="mb-1 text-sm font-bold text-gray-900">Pilihan Pengiriman</h2>
-                  <p className="mb-4 text-xs text-gray-500">Masukkan kota tujuan untuk melihat pilihan kurir dan ongkir.</p>
-                  <ShippingCalculator weightGrams={packageWeight} selectedOption={shippingOption} onSelect={setShippingOption} />
+                  <h2 className="mb-3 text-sm font-bold text-gray-900">Jasa Pengiriman</h2>
+                  {selectedAddress ? (
+                    <JneShippingQuote
+                      city={selectedAddress.city}
+                      province={selectedAddress.province}
+                      weightGrams={packageWeight}
+                      onSelect={setShippingOption}
+                    />
+                  ) : (
+                    <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs text-gray-500">
+                      Pilih alamat pengiriman untuk menghitung ongkir otomatis.
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-6 border-t border-gray-100 pt-5">
