@@ -61,6 +61,7 @@ export default function CheckoutPage() {
           shipping_courier: shippingOption?.courier_code ?? null,
           shipping_service: shippingOption?.service ?? null,
           payment_method: paymentMethod?.provider ?? null,
+          payment_fee: paymentMethod?.fee ?? 0,
         })
       });
       const json = (await res.json()) as {
@@ -192,9 +193,13 @@ export default function CheckoutPage() {
                     <span className="text-xs text-gray-500">Ongkir</span>
                     <span className="text-xs font-semibold text-gray-700">{shippingOption ? formatPrice(shippingOption.cost) : "Pilih kurir"}</span>
                   </div>
+                  <div className="mt-1 flex items-center justify-between">
+                    <span className="text-xs text-gray-500">Biaya pembayaran</span>
+                    <span className="text-xs font-semibold text-gray-700">{paymentMethod ? formatPrice(paymentMethod.fee) : "Pilih metode"}</span>
+                  </div>
                   <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
                     <span className="text-sm font-bold text-gray-900">Total</span>
-                    <span className="text-base font-extrabold text-brand-700">{formatPrice(totals.subtotalMinor + (shippingOption?.cost ?? 0))}</span>
+                    <span className="text-base font-extrabold text-brand-700">{formatPrice(totals.subtotalMinor + (shippingOption?.cost ?? 0) + (paymentMethod?.fee ?? 0))}</span>
                   </div>
                 </div>
               </div>

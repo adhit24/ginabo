@@ -31,6 +31,7 @@ interface CheckoutBody {
   shipping_cost: number
   shipping_courier?: string | null
   shipping_service?: string | null
+  payment_fee?: number
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
     return jsonError('Request body tidak valid', 400)
   }
 
-  const { items, coupon_code, address_id, shipping_cost = 0, shipping_courier, shipping_service } = body
+  const { items, coupon_code, address_id, shipping_cost = 0, shipping_courier, shipping_service, payment_fee = 0 } = body
 
   if (!validateItems(items)) return jsonError('Field items tidak valid', 400)
   if (!address_id) return jsonError('address_id diperlukan', 400)
@@ -136,7 +137,7 @@ export async function POST(req: NextRequest) {
 
   // 6. Calculate totals
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
-  const totalAmount = Math.max(0, subtotal + shipping_cost - discountAmount)
+  const totalAmount = Math.max(0, subtotal + shipping_cost + payment_fee - discountAmount)
 
   // 7. Admin client for writes
   const admin = await createAdminClient()
@@ -230,6 +231,9 @@ export async function POST(req: NextRequest) {
     })),
     ...(shipping_cost > 0
       ? [{ id: 'SHIPPING', price: shipping_cost, quantity: 1, name: 'Ongkos Kirim' }]
+      : []),
+    ...(payment_fee > 0
+      ? [{ id: 'PAYMENT_FEE', price: payment_fee, quantity: 1, name: 'Biaya layanan pembayaran' }]
       : []),
     ...(discountAmount > 0
       ? [{ id: 'DISCOUNT', price: -discountAmount, quantity: 1, name: 'Diskon' }]
