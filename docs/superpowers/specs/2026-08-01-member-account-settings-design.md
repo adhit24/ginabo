@@ -23,6 +23,26 @@ settings page), not independent subsystems:
 3. "Tambah Alamat" — Tokopedia-style search / current-location flow
 4. Profile photo upload, max 2MB
 
+## Responsiveness
+
+Mobile-first, fit-to-screen, fully responsive — this is the primary usage
+context, not an afterthought. Concretely:
+
+- `AddressModal` (section 3) follows the existing `pwModalOpen` password
+  modal's pattern of a centered card on desktop, but must not overflow the
+  viewport on small screens: full-height/full-width sheet on mobile
+  (`w-full`, scrollable body, safe-area padding), converting to a centered
+  max-width card at `md:` and up — matching how the mobile drawer in
+  `SiteHeader.tsx` already handles the same tradeoff.
+- The native `<input type="date">` and all new form fields use the same
+  `w-full` + responsive grid (`grid-cols-1 md:grid-cols-2`) already used
+  elsewhere on this page — single column on mobile, two columns from `md:`.
+- The avatar upload control (pencil icon) keeps its current tap target
+  size (no shrinking below ~40px) since it's a small hit-target already on
+  a small circle.
+- Verification includes checking the address modal and profile form at a
+  narrow mobile viewport (e.g. 375px), not just desktop.
+
 ## Existing infrastructure this builds on
 
 - `profiles` table already has `avatar_url`, `phone`, `date_of_birth`,
