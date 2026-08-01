@@ -13,6 +13,10 @@ export interface User {
   tier: MemberTier;
   points: number;
   joinedAt: string;
+  phone: string | null;
+  dateOfBirth: string | null;
+  gender: "male" | "female" | "other" | null;
+  avatarUrl: string | null;
 }
 
 interface AuthContextValue {
@@ -23,6 +27,7 @@ interface AuthContextValue {
   logout: () => void;
   signInWithGoogle: () => void;
   changePassword: (newPassword: string) => Promise<{ ok: boolean; error?: string }>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -38,6 +43,10 @@ function toAppUser(supabaseUser: SupabaseUser, profile?: Record<string, unknown>
     tier: "Regular",
     points: (profile?.loyalty_points as number) ?? 100,
     joinedAt: `${MONTHS[createdAt.getMonth()]} ${createdAt.getFullYear()}`,
+    phone: (profile?.phone as string) ?? null,
+    dateOfBirth: (profile?.date_of_birth as string) ?? null,
+    gender: (profile?.gender as User["gender"]) ?? null,
+    avatarUrl: (profile?.avatar_url as string) ?? null,
   };
 }
 
@@ -45,18 +54,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  async function fetchAndSetUser(supabaseUser: SupabaseUser) {
+    const supabase = createClient();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name, loyalty_points, phone, date_of_birth, gender, avatar_url")
+      .eq("id", supabaseUser.id)
+      .single();
+    setUser(toAppUser(supabaseUser, profile));
+  }
+
   useEffect(() => {
     const supabase = createClient();
-
-    async function fetchAndSetUser(supabaseUser: SupabaseUser) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("full_name, loyalty_points")
-        .eq("id", supabaseUser.id)
-        .single();
-      setUser(toAppUser(supabaseUser, profile));
-    }
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         fetchAndSetUser(session.user).finally(() => setIsLoading(false));
@@ -146,8 +155,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { ok: true };
   }
 
+  async function refreshProfile() {
+    const supabase = createClient();
+    const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+    if (supabaseUser) await fetchAndSetUser(supabaseUser);
+  }
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, signInWithGoogle, changePassword }}>
+    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, signInWithGoogle, changePassword, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
