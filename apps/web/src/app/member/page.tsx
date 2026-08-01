@@ -80,6 +80,19 @@ function IconLogout() {
     </svg>
   );
 }
+function EyeIcon({ open }: { open: boolean }) {
+  return open ? (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ) : (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.3 20.3 0 0 1 4.22-5.19M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a20.3 20.3 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+      <path d="M1 1l22 22" />
+    </svg>
+  );
+}
 
 const menuItems = [
   { id: "profile",   label: "Pengaturan Akun",   icon: <IconProfile /> },
@@ -92,10 +105,45 @@ const menuItems = [
 ];
 
 export default function MemberPage() {
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading, logout, changePassword } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");
   const [form, setForm] = useState({ name: "", phone: "", email: "", dob_d: "", dob_m: "", dob_y: "", gender: "" });
+
+  const [pwModalOpen, setPwModalOpen] = useState(false);
+  const [pwForm, setPwForm] = useState({ password: "", confirm: "" });
+  const [pwShow, setPwShow] = useState(false);
+  const [pwShowConfirm, setPwShowConfirm] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState(false);
+
+  function closePwModal() {
+    setPwModalOpen(false);
+    setPwForm({ password: "", confirm: "" });
+    setPwError("");
+    setPwSuccess(false);
+    setPwShow(false);
+    setPwShowConfirm(false);
+  }
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwError("");
+    if (pwForm.password !== pwForm.confirm) {
+      setPwError("Password dan konfirmasi tidak cocok.");
+      return;
+    }
+    setPwLoading(true);
+    const result = await changePassword(pwForm.password);
+    setPwLoading(false);
+    if (result.ok) {
+      setPwSuccess(true);
+      setPwForm({ password: "", confirm: "" });
+    } else {
+      setPwError(result.error ?? "Gagal mengubah password.");
+    }
+  }
 
   useEffect(() => {
     if (!isLoading && !user) router.replace("/auth/login");
@@ -316,7 +364,12 @@ export default function MemberPage() {
                     <label className={labelCls}>Password</label>
                     <div className="flex items-center justify-between rounded-lg px-3 py-2.5" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(139,92,246,0.2)" }}>
                       <p className="text-xs text-white/40">Jika ingin mengubah password demi keamanan privasi</p>
-                      <button className="ml-3 shrink-0 rounded-lg px-4 py-1.5 text-xs font-bold text-white transition hover:opacity-90" style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}>
+                      <button
+                        type="button"
+                        onClick={() => setPwModalOpen(true)}
+                        className="ml-3 shrink-0 rounded-lg px-4 py-1.5 text-xs font-bold text-white transition hover:opacity-90"
+                        style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}
+                      >
                         Ganti Password ›
                       </button>
                     </div>
@@ -436,6 +489,96 @@ export default function MemberPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Ganti Password Modal ── */}
+      {pwModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={closePwModal}>
+          <div
+            className="w-full max-w-sm rounded-2xl p-6"
+            style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.2)", boxShadow: "0 8px 32px rgba(20,15,50,0.4)" }}
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 className="mb-4 text-base font-bold text-white">Ganti Password</h3>
+
+            {pwSuccess ? (
+              <div>
+                <div className="mb-4 rounded-lg px-4 py-3 text-sm font-medium text-green-300" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}>
+                  Password berhasil diubah.
+                </div>
+                <button
+                  type="button"
+                  onClick={closePwModal}
+                  className="w-full rounded-lg py-2.5 text-sm font-bold text-white transition hover:opacity-90"
+                  style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}
+                >
+                  Tutup
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
+                {pwError && (
+                  <div className="rounded-lg px-4 py-3 text-sm font-medium text-red-300" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)" }}>
+                    {pwError}
+                  </div>
+                )}
+
+                <label className="grid gap-1.5 text-sm">
+                  <span className={labelCls}>Password Baru</span>
+                  <div className="relative">
+                    <input
+                      type={pwShow ? "text" : "password"} required minLength={6} placeholder="Min. 6 karakter"
+                      value={pwForm.password} onChange={e => setPwForm(f => ({ ...f, password: e.target.value }))}
+                      className={`${inputCls} pr-10`} style={inputStyle}
+                    />
+                    <button type="button" onClick={() => setPwShow(v => !v)} tabIndex={-1}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 transition hover:text-white/80"
+                      aria-label={pwShow ? "Sembunyikan password" : "Tampilkan password"}
+                    >
+                      <EyeIcon open={pwShow} />
+                    </button>
+                  </div>
+                </label>
+
+                <label className="grid gap-1.5 text-sm">
+                  <span className={labelCls}>Konfirmasi Password Baru</span>
+                  <div className="relative">
+                    <input
+                      type={pwShowConfirm ? "text" : "password"} required minLength={6} placeholder="Ulangi password baru"
+                      value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))}
+                      className={`${inputCls} pr-10`} style={inputStyle}
+                    />
+                    <button type="button" onClick={() => setPwShowConfirm(v => !v)} tabIndex={-1}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 transition hover:text-white/80"
+                      aria-label={pwShowConfirm ? "Sembunyikan konfirmasi password" : "Tampilkan konfirmasi password"}
+                    >
+                      <EyeIcon open={pwShowConfirm} />
+                    </button>
+                  </div>
+                </label>
+
+                <div className="mt-1 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={closePwModal}
+                    className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white/70 transition hover:text-white"
+                    style={{ border: "1px solid rgba(139,92,246,0.3)" }}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={pwLoading}
+                    className="flex-1 rounded-lg py-2.5 text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                    style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}
+                  >
+                    {pwLoading ? "Menyimpan..." : "Simpan"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -22,6 +22,7 @@ interface AuthContextValue {
   signup: (name: string, email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
   logout: () => void;
   signInWithGoogle: () => void;
+  changePassword: (newPassword: string) => Promise<{ ok: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -136,8 +137,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = "/api/auth/google";
   }
 
+  async function changePassword(newPassword: string) {
+    if (!newPassword || newPassword.length < 6) return { ok: false, error: "Password minimal 6 karakter." };
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  }
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, signInWithGoogle }}>
+    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, signInWithGoogle, changePassword }}>
       {children}
     </AuthContext.Provider>
   );
