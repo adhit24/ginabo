@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
 import { AddressPicker } from "@/components/checkout/AddressPicker";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
+import { authFetch } from "@/lib/supabase/client";
 
 type CheckoutState =
   | { status: "idle" }
@@ -29,7 +30,7 @@ export default function CheckoutPage() {
     }
     setStatus({ status: "submitting" });
     try {
-      const res = await fetch("/api/checkout", {
+      const res = await authFetch("/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -60,7 +61,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-5 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
       <div className="rounded-2xl border border-gray-100 bg-white px-4 py-3">
         <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">

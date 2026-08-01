@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { AddressRow } from "@/types/database";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { authFetch } from "@/lib/supabase/client";
 
 type Props = {
   selectedId: string | null;
@@ -36,6 +38,7 @@ const inputCls =
 const labelCls = "mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500";
 
 export function AddressPicker({ selectedId, onSelect }: Props) {
+  const { user } = useAuth();
   const [addresses, setAddresses] = useState<AddressRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -44,13 +47,17 @@ export function AddressPicker({ selectedId, onSelect }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    void loadAddresses();
-  }, []);
+    setForm((current) => ({
+      ...current,
+      recipient_name: current.recipient_name || user?.name || "",
+      phone: current.phone || user?.phone || "",
+    }));
+  }, [user]);
 
-  async function loadAddresses() {
+  const loadAddresses = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/addresses");
+      const res = await authFetch("/api/addresses");
       const json = (await res.json()) as { ok: boolean; data?: AddressRow[] };
       const list = json.ok && json.data ? json.data : [];
       setAddresses(list);
@@ -63,7 +70,11 @@ export function AddressPicker({ selectedId, onSelect }: Props) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [onSelect]);
+
+  useEffect(() => {
+    void loadAddresses();
+  }, [loadAddresses]);
 
   async function submitNewAddress() {
     setError(null);
@@ -81,7 +92,7 @@ export function AddressPicker({ selectedId, onSelect }: Props) {
 
     setSaving(true);
     try {
-      const res = await fetch("/api/addresses", {
+      const res = await authFetch("/api/addresses", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ ...form, is_default: addresses.length === 0 }),

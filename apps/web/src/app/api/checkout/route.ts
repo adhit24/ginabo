@@ -11,8 +11,6 @@ import type {
   OrderRow,
   OrderItemRow,
   PaymentRow,
-  AddressRow,
-  ProfileRow,
   CouponRow,
 } from '@/types/database'
 
@@ -75,27 +73,33 @@ export async function POST(req: NextRequest) {
   if (authError || !user) return jsonError('Silakan login terlebih dahulu', 401)
 
   // 3. Fetch profile for customer details
-  const { data: rawProfile } = await supabase
-    .from('profiles')
-    .select('full_name, phone, email')
+  const profiles = supabase.from('profiles') as any
+  const addresses = supabase.from('addresses') as any
+  const { data: rawProfile } = await profiles
+    .select('full_name, phone_number, email')
     .eq('id', user.id)
     .single()
 
-  const profile = rawProfile as Pick<ProfileRow, 'full_name' | 'phone' | 'email'> | null
+  const profile = rawProfile as { full_name: string | null; phone_number: string | null; email: string } | null
   const customerName = profile?.full_name ?? user.email ?? 'Pelanggan'
-  const customerPhone = profile?.phone ?? ''
+  const customerPhone = profile?.phone_number ?? ''
   const customerEmail = user.email ?? ''
 
   // 4. Fetch address
-  const { data: rawAddress } = await supabase
-    .from('addresses')
+  const { data: rawAddress } = await addresses
     .select('*')
     .eq('id', address_id)
-    .eq('user_id', user.id)
+    .eq('profile_id', user.id)
     .single()
 
   if (!rawAddress) return jsonError('Alamat tidak ditemukan', 404)
-  const address = rawAddress as AddressRow
+  const address = {
+    recipient_name: rawAddress.recipient_name,
+    phone: rawAddress.phone_number,
+    address_line1: rawAddress.address_line1,
+    city: rawAddress.kota_kabupaten,
+    postal_code: rawAddress.postal_code,
+  }
 
   // 5. Validate coupon (optional)
   let discountAmount = 0
