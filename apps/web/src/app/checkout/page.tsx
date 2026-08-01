@@ -13,6 +13,8 @@ import { authFetch } from "@/lib/supabase/client";
 import type { ShippingOption } from "@/lib/rajaongkir";
 import type { AddressRow } from "@/types/database";
 
+const DEMO_PAYMENT_MODE = true;
+
 type CheckoutState =
   | { status: "idle" }
   | { status: "submitting" }
@@ -46,6 +48,21 @@ export default function CheckoutPage() {
     }
     setStatus({ status: "submitting" });
     try {
+      if (DEMO_PAYMENT_MODE) {
+        const orderNumber = `GNB-DEMO-${Date.now().toString().slice(-8)}`;
+        sessionStorage.setItem("ginabo_demo_payment", JSON.stringify({
+          orderNumber,
+          items: cart.items,
+          subtotal: totals.subtotalMinor,
+          shippingOption,
+          paymentMethod,
+          address: selectedAddress,
+          total: totals.subtotalMinor + (shippingOption?.cost ?? 0) + (paymentMethod?.fee ?? 0),
+        }));
+        clear();
+        router.push(`/checkout/payment?order=${orderNumber}`);
+        return;
+      }
       const res = await authFetch("/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
