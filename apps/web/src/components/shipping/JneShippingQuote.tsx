@@ -38,8 +38,12 @@ export default function JneShippingQuote({ city, province, weightGrams, onSelect
       .then(async (response) => {
         const data = await response.json() as { options?: ShippingOption[]; error?: string };
         if (!response.ok) throw new Error(data.error ?? "Gagal menghitung ongkir JNE.");
-        return (data.options ?? [])
-          .filter((item) => ["REG", "YES"].includes(item.service.trim().toUpperCase()))
+        const available = data.options ?? [];
+        const regularServices = available.filter((item) => ["REG", "YES"].includes(item.service.trim().toUpperCase()));
+        // Same-city routes may not offer REG/YES. Use a normal parcel service
+        // such as CTC instead, while keeping trucking services out of checkout.
+        const parcelFallback = available.filter((item) => !item.service.trim().toUpperCase().startsWith("JTR"));
+        return (regularServices.length > 0 ? regularServices : parcelFallback)
           .sort((a, b) => (a.service.toUpperCase() === "REG" ? -1 : b.service.toUpperCase() === "REG" ? 1 : a.cost - b.cost));
       })
       .then((nextOptions) => {
@@ -48,7 +52,7 @@ export default function JneShippingQuote({ city, province, weightGrams, onSelect
         const defaultOption = nextOptions[0] ?? null;
         setSelectedService(defaultOption?.service ?? null);
         onSelect(defaultOption);
-        if (!defaultOption) setError("Layanan JNE REG/YES belum tersedia untuk kota ini.");
+        if (!defaultOption) setError("Layanan JNE belum tersedia untuk kota ini.");
       })
       .catch((reason: unknown) => {
         if (cancelled) return;
