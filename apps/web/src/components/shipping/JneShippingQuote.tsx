@@ -11,13 +11,15 @@ type Props = {
 };
 
 export default function JneShippingQuote({ city, province, weightGrams, onSelect }: Props) {
-  const [option, setOption] = useState<ShippingOption | null>(null);
+  const [options, setOptions] = useState<ShippingOption[]>([]);
+  const [selectedService, setSelectedService] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
-    setOption(null);
+    setOptions([]);
+    setSelectedService(null);
     onSelect(null);
     if (!city.trim()) return;
 
@@ -36,13 +38,17 @@ export default function JneShippingQuote({ city, province, weightGrams, onSelect
       .then(async (response) => {
         const data = await response.json() as { options?: ShippingOption[]; error?: string };
         if (!response.ok) throw new Error(data.error ?? "Gagal menghitung ongkir JNE.");
-        return data.options?.[0] ?? null;
+        return (data.options ?? [])
+          .filter((item) => ["REG", "YES"].includes(item.service.trim().toUpperCase()))
+          .sort((a, b) => (a.service.toUpperCase() === "REG" ? -1 : b.service.toUpperCase() === "REG" ? 1 : a.cost - b.cost));
       })
-      .then((nextOption) => {
+      .then((nextOptions) => {
         if (cancelled) return;
-        setOption(nextOption);
-        onSelect(nextOption);
-        if (!nextOption) setError("Layanan JNE belum tersedia untuk kota ini.");
+        setOptions(nextOptions);
+        const defaultOption = nextOptions[0] ?? null;
+        setSelectedService(defaultOption?.service ?? null);
+        onSelect(defaultOption);
+        if (!defaultOption) setError("Layanan JNE REG/YES belum tersedia untuk kota ini.");
       })
       .catch((reason: unknown) => {
         if (cancelled) return;
@@ -67,13 +73,34 @@ export default function JneShippingQuote({ city, province, weightGrams, onSelect
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-gray-900">JNE Express</p>
           <p className="text-xs text-gray-500">
-            {loading ? "Menghitung ongkir berdasarkan alamat terpilih…" : option ? `${option.service} · Estimasi ${option.etd}` : "Ongkir otomatis dari alamat terpilih"}
+            {loading ? "Menghitung ongkir berdasarkan alamat terpilih…" : "Pilih layanan pengiriman JNE"}
           </p>
         </div>
-        <p className="shrink-0 text-sm font-extrabold text-brand-700">
-          {loading ? "…" : option ? `Rp ${option.cost.toLocaleString("id-ID")}` : "—"}
-        </p>
       </div>
+      {!loading && options.length > 0 && (
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {options.map((item) => {
+            const selected = selectedService === item.service;
+            return (
+              <button
+                key={`${item.courier_code}-${item.service}`}
+                type="button"
+                onClick={() => {
+                  setSelectedService(item.service);
+                  onSelect(item);
+                }}
+                className={`flex items-center justify-between rounded-lg border px-3 py-2.5 text-left transition ${selected ? "border-brand-500 bg-brand-50" : "border-gray-200 bg-white hover:border-brand-300"}`}
+              >
+                <span>
+                  <span className="block text-sm font-bold text-gray-900">JNE {item.service}</span>
+                  <span className="block text-[11px] text-gray-500">Estimasi {item.etd}</span>
+                </span>
+                <span className="text-sm font-extrabold text-brand-700">Rp {item.cost.toLocaleString("id-ID")}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
     </div>
   );
