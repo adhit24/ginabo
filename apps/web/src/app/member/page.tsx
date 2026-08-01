@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { AddressModal } from "@/components/member/AddressModal";
 import type { AddressRow } from "@/types/database";
-import { createClient } from "@/lib/supabase/client";
+import { authFetch, createClient } from "@/lib/supabase/client";
 
 const tiers = ["Regular", "Silver", "Gold", "Platinum"];
 
@@ -133,7 +133,7 @@ export default function MemberPage() {
   async function loadAddresses() {
     setAddressesLoading(true);
     try {
-      const res = await fetch("/api/addresses");
+      const res = await authFetch("/api/addresses");
       const json = await res.json() as { ok: boolean; data?: AddressRow[] };
       setAddresses(json.ok && json.data ? json.data : []);
     } catch { setAddresses([]); }
@@ -172,7 +172,7 @@ export default function MemberPage() {
   async function handleSaveProfile() {
     setProfileError(""); setProfileSuccess(false); setProfileSaving(true);
     try {
-      const res = await fetch("/api/profile", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({
+      const res = await authFetch("/api/profile", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({
         full_name: form.name, phone: form.phone || null, date_of_birth: form.dob || null,
         gender: form.gender === "Laki-laki" ? "male" : form.gender === "Perempuan" ? "female" : null,
       }) });
@@ -197,7 +197,7 @@ export default function MemberPage() {
       const { error } = await supabase.storage.from("user-avatars").upload(path, file, { upsert: true, contentType: file.type });
       if (error) { setAvatarError("Gagal mengunggah foto."); return; }
       const { data } = supabase.storage.from("user-avatars").getPublicUrl(path);
-      const res = await fetch("/api/profile", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ avatar_url: data.publicUrl }) });
+      const res = await authFetch("/api/profile", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ avatar_url: data.publicUrl }) });
       const json = await res.json() as { ok: boolean; error?: { message: string } };
       if (!json.ok) { setAvatarError(json.error?.message ?? "Gagal menyimpan foto profil."); return; }
       await refreshProfile();

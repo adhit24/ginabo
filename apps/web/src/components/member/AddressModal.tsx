@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { AddressRow } from "@/types/database";
 import type { GeocodeResult } from "@/lib/geocode";
+import { authFetch } from "@/lib/supabase/client";
 
 interface AddressModalProps {
   open: boolean;
@@ -76,7 +77,7 @@ export function AddressModal({ open, onClose, onSaved }: AddressModalProps) {
     }
     setSaving(true);
     try {
-      const res = await fetch("/api/addresses", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...details, is_default: false }) });
+      const res = await authFetch("/api/addresses", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...details, is_default: false }) });
       const json = await res.json() as { ok: boolean; data?: AddressRow; error?: { message: string } };
       if (!json.ok || !json.data) { setSaveError(json.error?.message ?? "Gagal menyimpan alamat."); return; }
       onSaved(json.data); onClose();
