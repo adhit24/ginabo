@@ -64,13 +64,17 @@ export function AddressPicker({ selectedId, onSelect }: Props) {
       if (list.length === 0) {
         setShowForm(true);
       } else {
-        const preselected = list.find((a) => a.is_default) ?? list[0];
-        onSelect(preselected.id);
+        // Only choose the default address on the initial load. Once the user
+        // picks another address, a refresh must not silently switch back.
+        if (!selectedId) {
+          const preselected = list.find((a) => a.is_default) ?? list[0];
+          onSelect(preselected.id);
+        }
       }
     } finally {
       setLoading(false);
     }
-  }, [onSelect]);
+  }, [onSelect, selectedId]);
 
   useEffect(() => {
     void loadAddresses();
