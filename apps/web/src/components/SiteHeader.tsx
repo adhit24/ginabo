@@ -18,7 +18,6 @@ const announcements = [
 ];
 
 const infoMenu = [
-  { label: "Blog",                 href: "/blog" },
   { label: "FAQ",                  href: "/faq" },
   { label: "Kontak Kami",          href: "/contact" },
   { label: "Jadi Reseller",        href: "/reseller" },
