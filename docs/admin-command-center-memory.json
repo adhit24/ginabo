@@ -1,0 +1,228 @@
+{
+  "title": "Ginabo Admin Command Center Memory",
+  "created_at": "2026-07-29",
+  "timezone": "Asia/Jakarta",
+  "purpose": "Catatan lanjutan agar issue admin dashboard / command center bisa diangkat kembali di hari berikutnya tanpa perlu mengulang analisis dari awal.",
+  "project_path": "C:\\Users\\Win11\\Downloads\\Documents\\Digital Market\\ginabo_101\\ginabo",
+  "admin_command_center_summary": {
+    "vision": "Admin dashboard Ginabo diarahkan menjadi Business Operating System / Command Center, bukan dashboard statis.",
+    "core_goal": "Semua modul admin berjalan otomatis dari data produksi Supabase, dengan KPI, alert, workflow operasional, dan rekomendasi berbasis data live.",
+    "current_state": "Fondasi UI dan sebagian backend sudah tersedia, tetapi beberapa modul masih demo dan ada inkonsistensi skema data yang perlu dirapikan sebelum otomatisasi produksi stabil."
+  },
+  "important_files": {
+    "command_center_docs": [
+      "dashboard_command_center.md",
+      "GINABO_ADMIN_DASHBOARD_V2.md"
+    ],
+    "admin_main_page": "apps/web/src/app/admin/page.tsx",
+    "command_center_ui": "apps/web/src/components/admin/command-center/CommandCenterDashboard.tsx",
+    "command_center_api": "apps/web/src/app/api/admin/command-center/route.ts",
+    "command_center_provider": "apps/web/src/features/command-center/provider.ts",
+    "command_center_live_provider": "apps/web/src/features/command-center/live.ts",
+    "command_center_demo_v2": "apps/web/src/features/command-center/demo-v2.ts",
+    "supabase_migrations": [
+      "supabase/migrations/001_initial_schema.sql",
+      "supabase/migrations/003_rajaongkir_fields.sql",
+      "supabase/migrations/004_returns_system.sql"
+    ],
+    "returns_domain_logic": "apps/web/src/lib/returns.ts",
+    "returns_admin_action_api": "apps/web/src/app/api/admin/returns/[id]/action/route.ts",
+    "payment_webhook": "apps/web/src/app/api/payment/webhook/route.ts",
+    "checkout_api": "apps/web/src/app/api/checkout/route.ts",
+    "shipping_tracking_api": "apps/web/src/app/api/shipping/track/route.ts"
+  },
+  "how_it_currently_runs": {
+    "command_center_main": {
+      "route": "/admin",
+      "data_flow": "Frontend fetches /api/admin/command-center?period=7d or 30d.",
+      "refresh_behavior": "Auto-refresh every 60 seconds and when browser tab becomes visible.",
+      "data_source_switch": "COMMAND_CENTER_DATA_SOURCE controls provider: empty/demo uses demo data, live uses Supabase live aggregation.",
+      "current_realtime_level": "Near real-time polling, not full Supabase WebSocket subscription yet."
+    },
+    "live_command_center_provider": {
+      "reads_from": [
+        "orders",
+        "products",
+        "payments",
+        "profiles",
+        "returns"
+      ],
+      "calculates": [
+        "revenue",
+        "order count",
+        "average order value",
+        "fulfillment rate",
+        "return rate",
+        "inventory risk",
+        "business health scores",
+        "operational alerts",
+        "advisor actions",
+        "order queue",
+        "inventory risk list"
+      ]
+    },
+    "payment_automation": {
+      "webhook": "/api/payment/webhook",
+      "expected_behavior": [
+        "verify Midtrans notification",
+        "update payment status",
+        "update order status",
+        "decrement inventory",
+        "create notification"
+      ]
+    },
+    "returns_automation": {
+      "admin_action_api": "/api/admin/returns/[id]/action",
+      "supported_actions": [
+        "approve",
+        "reject",
+        "request_evidence",
+        "escalate",
+        "assign",
+        "mark_received",
+        "start_inspection",
+        "inspect_item",
+        "refund",
+        "exchange",
+        "complete",
+        "add_note",
+        "blacklist"
+      ],
+      "backend_capabilities": [
+        "policy engine",
+        "eligibility check",
+        "status transition guard",
+        "audit timeline",
+        "notification enqueue",
+        "refund creation",
+        "store credit wallet",
+        "voucher refund",
+        "fraud blacklist"
+      ]
+    }
+  },
+  "known_issues": [
+    {
+      "id": "admin-cc-001",
+      "severity": "high",
+      "title": "Several admin intelligence modules still use demo-v2 directly",
+      "details": "Customer Intelligence, Logistics, Inventory Intelligence, Marketing Intelligence, Executive Dashboard, Skincare Intelligence, and Alert Center currently import data from demo-v2.ts inside client pages instead of calling live backend APIs.",
+      "impact": "UI exists, but modules are not truly automatic or production-live yet.",
+      "affected_modules": [
+        "/admin/intelligence",
+        "/admin/logistics",
+        "/admin/inventory",
+        "/admin/marketing",
+        "/admin/executive",
+        "/admin/skincare",
+        "/admin/alerts",
+        "/admin/returns/intelligence"
+      ],
+      "recommended_next_step": "Create live API endpoints and provider functions for each module, mirroring the command-center provider pattern."
+    },
+    {
+      "id": "admin-cc-002",
+      "severity": "critical",
+      "title": "Schema naming is inconsistent between old types/API code and Supabase migrations",
+      "details": "Some code paths use fields like user_id, stock, phone, skin_concern, while migrations use profile_id, stock_quantity, phone_number, skin_concerns. Some legacy admin code also references AdminUser while Supabase migration uses admin_users.",
+      "impact": "Live automation can silently fail or calculate wrong values when code queries columns that do not exist in the production schema.",
+      "affected_files": [
+        "apps/web/src/types/database.ts",
+        "apps/web/src/app/api/checkout/route.ts",
+        "apps/web/src/app/api/payment/webhook/route.ts",
+        "apps/web/src/app/api/admin/overview/route.ts",
+        "apps/web/src/app/api/admin/me/route.ts"
+      ],
+      "recommended_next_step": "Choose canonical Supabase schema naming from migrations, regenerate/update types, then refactor API routes to use the same names consistently."
+    },
+    {
+      "id": "admin-cc-003",
+      "severity": "high",
+      "title": "Command Center is polling, not full realtime",
+      "details": "CommandCenterDashboard refreshes every 60 seconds. Supabase realtime is enabled for some tables in migration 001, but the frontend command center does not subscribe directly yet.",
+      "impact": "Dashboard is automatic but not instant. Operational teams may see updates delayed up to 60 seconds.",
+      "recommended_next_step": "After schema cleanup, add Supabase realtime subscriptions or invalidation events for orders, products, returns, payments, bookings, and notifications."
+    },
+    {
+      "id": "admin-cc-004",
+      "severity": "medium",
+      "title": "Alert Center is still demo-driven",
+      "details": "Alert Center currently uses getDemoAlertCenter from demo-v2.ts.",
+      "impact": "Critical alerts shown in UI are not guaranteed to reflect actual production risk.",
+      "recommended_next_step": "Build backend alert engine that derives alerts from live rules: delayed orders, low stock, return risk, refund spikes, courier delays, churn risk, payment failures, and inventory overstock."
+    },
+    {
+      "id": "admin-cc-005",
+      "severity": "medium",
+      "title": "AI Advisor currently behaves like rule-based recommendation, not full AI pipeline",
+      "details": "Command Center live provider currently generates advisor actions from basic heuristics such as inventory risk, old orders, and risky returns.",
+      "impact": "Useful as an operational advisor, but not yet a full AI business advisor with summaries, forecasts, and natural-language business reasoning.",
+      "recommended_next_step": "Create an AI advisor pipeline that consumes clean aggregate snapshots and produces executive summaries, risk explanations, and recommended next actions."
+    }
+  ],
+  "module_live_backend_plan": [
+    {
+      "module": "Command Center",
+      "status": "partially_live",
+      "next_backend_work": "Harden live provider, fix schema names, add previous-period comparison, then add realtime invalidation."
+    },
+    {
+      "module": "Customer Intelligence",
+      "status": "demo_only",
+      "next_backend_work": "Aggregate profiles, orders, returns, reviews, acquisition source, LTV, repeat purchase, churn risk, loyalty score, customer segment."
+    },
+    {
+      "module": "Logistics Command Center",
+      "status": "demo_only_ui_plus_some_order_tracking_api",
+      "next_backend_work": "Aggregate order pipeline from order status, shipped_at, tracking_number, shipping_courier, delivery SLA, courier tracking data."
+    },
+    {
+      "module": "Inventory Intelligence",
+      "status": "demo_only",
+      "next_backend_work": "Calculate velocity from order_items, stock days remaining, reorder point, overstock, dead stock, estimated revenue at risk."
+    },
+    {
+      "module": "Return Intelligence",
+      "status": "workflow_backend_ready_but_intelligence_demo",
+      "next_backend_work": "Aggregate return rate, refund rate, top returned products, top reasons, risk/fraud flags, trend data from returns and return_items."
+    },
+    {
+      "module": "Marketing Intelligence",
+      "status": "demo_only",
+      "next_backend_work": "Define marketing source tables/integration strategy for Meta, Google, TikTok, email, affiliate, influencer, referral, then calculate ROAS/CAC/LTV."
+    },
+    {
+      "module": "Executive Dashboard",
+      "status": "demo_only",
+      "next_backend_work": "Aggregate finance, revenue, profit, cash flow, inventory value, growth, retention, refund, forecast, and executive insights."
+    },
+    {
+      "module": "Skincare Intelligence",
+      "status": "demo_only",
+      "next_backend_work": "Use skin_type and skin_concerns from profiles plus order_items/reviews to calculate skin segment value, product effectiveness, repeat purchase by skin type."
+    },
+    {
+      "module": "Alert Center",
+      "status": "demo_only",
+      "next_backend_work": "Create live alert rules, persist generated alerts if needed, mark read/unread, and expose role-aware alert feed."
+    }
+  ],
+  "recommended_execution_order": [
+    "Audit and normalize Supabase schema usage across codebase.",
+    "Update database types to match actual Supabase migrations.",
+    "Fix critical API routes that use old column names, especially checkout, payment webhook, admin overview, admin me, inventory stock decrement.",
+    "Convert demo-only admin intelligence pages to API-backed provider pattern.",
+    "Build alert engine from live business rules.",
+    "Add background jobs/cron for recurring calculations and notifications.",
+    "Add Supabase realtime subscriptions or event-driven dashboard refresh.",
+    "Add AI Advisor on top of trusted aggregate snapshots."
+  ],
+  "notes_for_future_codex": [
+    "Do not start by redesigning UI; UI already exists for many V2 modules.",
+    "Prioritize backend correctness and schema consistency.",
+    "Use the Supabase migrations as canonical truth unless user says production DB differs.",
+    "Be careful with legacy Prisma schema and old uppercase table names such as Customer, Order, AdminUser.",
+    "Before implementing automation, verify exact live Supabase table/column names and environment variables.",
+    "Do not remove demo mode immediately; keep it as fallback while introducing live providers."
+  ]
+}
