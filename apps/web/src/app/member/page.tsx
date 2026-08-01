@@ -195,13 +195,14 @@ export default function MemberPage() {
       const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
       const path = `${user.id}/avatar.${ext}`;
       const { error } = await supabase.storage.from("user-avatars").upload(path, file, { upsert: true, contentType: file.type });
-      if (error) { setAvatarError("Gagal mengunggah foto."); return; }
+      if (error) { setAvatarError(`Gagal mengunggah foto: ${error.message}`); return; }
       const { data } = supabase.storage.from("user-avatars").getPublicUrl(path);
-      const res = await authFetch("/api/profile", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ avatar_url: data.publicUrl }) });
+      const publicUrl = `${data.publicUrl}?v=${Date.now()}`;
+      const res = await authFetch("/api/profile", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ avatar_url: publicUrl }) });
       const json = await res.json() as { ok: boolean; error?: { message: string } };
       if (!json.ok) { setAvatarError(json.error?.message ?? "Gagal menyimpan foto profil."); return; }
       await refreshProfile();
-    } catch { setAvatarError("Gagal mengunggah foto."); }
+    } catch (error) { setAvatarError(error instanceof Error ? error.message : "Gagal mengunggah foto."); }
     finally { setAvatarUploading(false); }
   }
 
@@ -376,7 +377,7 @@ export default function MemberPage() {
                   <div>
                     <label className={labelCls}>Nomor Handphone</label>
                     <input className={inputCls} style={inputStyle} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+62" />
-                    {!form.phone && <p className="mt-1 text-[11px] text-red-400/80">Belum diverifikasi</p>}
+                    {!form.phone && <p className="mt-1 text-[11px] text-red-400/80">Nomor belum diisi</p>}
                   </div>
 
                   <div>

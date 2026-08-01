@@ -43,6 +43,12 @@ export async function PATCH(req: NextRequest) {
 
   if (error || !data) return jsonError('Gagal menyimpan profil', 500, error?.message)
 
+  // Older staging databases may not have this optional column yet. Never
+  // make saving the other profile fields fail because of that drift.
+  if (parsed.data.gender !== undefined) {
+    await profiles.update({ gender: parsed.data.gender }).eq('id', user.id)
+  }
+
   return jsonOk({
     full_name: data.full_name,
     phone: data.phone_number,

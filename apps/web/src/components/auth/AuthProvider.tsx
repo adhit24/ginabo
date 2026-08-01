@@ -56,12 +56,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function fetchAndSetUser(supabaseUser: SupabaseUser) {
     const supabase = createClient();
-    const { data: profile } = await supabase
+    const { data: profile, error } = await supabase
       .from("profiles")
-      .select("full_name, loyalty_points, phone_number, date_of_birth, avatar_url")
+      .select("full_name, phone_number, date_of_birth, avatar_url")
       .eq("id", supabaseUser.id)
       .single();
-    setUser(toAppUser(supabaseUser, profile));
+    if (error) {
+      setUser((current) => current?.id === supabaseUser.id ? current : toAppUser(supabaseUser));
+      return;
+    }
+
+    // `gender` was added after the original profiles schema. Read it
+    // separately so older staging databases still load the other fields.
+    const { data: genderProfile } = await supabase
+      .from("profiles")
+      .select("gender")
+      .eq("id", supabaseUser.id)
+      .single();
+    const profileRecord = (profile as Record<string, unknown> | null) ?? {};
+    const gender = (genderProfile as { gender?: User["gender"] } | null)?.gender ?? null;
+    setUser(toAppUser(supabaseUser, { ...profileRecord, gender }));
   }
 
   useEffect(() => {
