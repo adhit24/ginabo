@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -8,6 +8,8 @@ import { useCart } from "@/components/cart/CartProvider";
 import { AddressPicker } from "@/components/checkout/AddressPicker";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { authFetch } from "@/lib/supabase/client";
+import ShippingCalculator from "@/components/shipping/ShippingCalculator";
+import type { ShippingOption } from "@/lib/rajaongkir";
 
 type CheckoutState =
   | { status: "idle" }
@@ -20,7 +22,12 @@ export default function CheckoutPage() {
   const { formatPrice } = useCurrency();
 
   const [addressId, setAddressId] = useState<string | null>(null);
+  const [shippingOption, setShippingOption] = useState<ShippingOption | null>(null);
   const [status, setStatus] = useState<CheckoutState>({ status: "idle" });
+  const packageWeight = useMemo(
+    () => Math.max(1000, cart.items.reduce((sum, item) => sum + (item.weightGrams ?? 100) * item.quantity, 0)),
+    [cart.items],
+  );
 
   async function submit() {
     if (cart.items.length === 0) return;
@@ -41,7 +48,9 @@ export default function CheckoutPage() {
             name: i.name
           })),
           address_id: addressId,
-          shipping_cost: 0
+          shipping_cost: shippingOption?.cost ?? 0,
+          shipping_courier: shippingOption?.courier_code ?? null,
+          shipping_service: shippingOption?.service ?? null,
         })
       });
       const json = (await res.json()) as {
@@ -96,7 +105,19 @@ export default function CheckoutPage() {
             <div className="flex-1">
               <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
                 <h2 className="mb-5 text-sm font-bold text-gray-900">Alamat Pengiriman</h2>
-                <AddressPicker selectedId={addressId} onSelect={setAddressId} />
+                <AddressPicker
+                  selectedId={addressId}
+                  onSelect={(id) => {
+                    setAddressId(id);
+                    setShippingOption(null);
+                  }}
+                />
+
+                <div className="mt-6 border-t border-gray-100 pt-5">
+                  <h2 className="mb-1 text-sm font-bold text-gray-900">Pilihan Pengiriman</h2>
+                  <p className="mb-4 text-xs text-gray-500">Masukkan kota tujuan untuk melihat pilihan kurir dan ongkir.</p>
+                  <ShippingCalculator weightGrams={packageWeight} selectedOption={shippingOption} onSelect={setShippingOption} />
+                </div>
 
                 <div className="mt-6 border-t border-gray-100 pt-5">
                   <h2 className="mb-2 text-sm font-bold text-gray-900">Metode Pembayaran</h2>
@@ -114,7 +135,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={submit}
-                  disabled={status.status === "submitting" || !addressId}
+                  disabled={status.status === "submitting" || !addressId || !shippingOption}
                   className="mt-6 w-full rounded-xl bg-brand-700 py-3.5 text-sm font-bold text-white transition hover:bg-brand-800 disabled:opacity-50"
                 >
                   {status.status === "submitting" ? "Memproses..." : "Buat Pesanan"}
@@ -155,11 +176,11 @@ export default function CheckoutPage() {
                   </div>
                   <div className="mt-1 flex items-center justify-between">
                     <span className="text-xs text-gray-500">Ongkir</span>
-                    <span className="text-xs font-semibold text-green-600">Gratis</span>
+                    <span className="text-xs font-semibold text-gray-700">{shippingOption ? formatPrice(shippingOption.cost) : "Pilih kurir"}</span>
                   </div>
                   <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
                     <span className="text-sm font-bold text-gray-900">Total</span>
-                    <span className="text-base font-extrabold text-brand-700">{formatPrice(totals.subtotalMinor)}</span>
+                    <span className="text-base font-extrabold text-brand-700">{formatPrice(totals.subtotalMinor + (shippingOption?.cost ?? 0))}</span>
                   </div>
                 </div>
               </div>

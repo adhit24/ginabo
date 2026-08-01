@@ -29,6 +29,8 @@ interface CheckoutBody {
   coupon_code?: string | null
   address_id: string
   shipping_cost: number
+  shipping_courier?: string | null
+  shipping_service?: string | null
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -58,7 +60,7 @@ export async function POST(req: NextRequest) {
     return jsonError('Request body tidak valid', 400)
   }
 
-  const { items, coupon_code, address_id, shipping_cost = 0 } = body
+  const { items, coupon_code, address_id, shipping_cost = 0, shipping_courier, shipping_service } = body
 
   if (!validateItems(items)) return jsonError('Field items tidak valid', 400)
   if (!address_id) return jsonError('address_id diperlukan', 400)
@@ -139,6 +141,20 @@ export async function POST(req: NextRequest) {
   // 7. Admin client for writes
   const admin = await createAdminClient()
 
+  const productKeys = [...new Set(items.map((item) => item.product_id))]
+  const { data: productsBySlug } = await admin.from('products').select('id, slug').in('slug', productKeys)
+  const uuidKeys = productKeys.filter((key) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key))
+  const { data: productsById } = uuidKeys.length
+    ? await admin.from('products').select('id, slug').in('id', uuidKeys)
+    : { data: [] }
+  const productMap = new Map<string, string>()
+  for (const product of [...(productsBySlug ?? []), ...(productsById ?? [])] as Array<{ id: string; slug: string }>) {
+    productMap.set(product.slug, product.id)
+    productMap.set(product.id, product.id)
+  }
+  const unresolvedProduct = productKeys.find((key) => !productMap.has(key))
+  if (unresolvedProduct) return jsonError(`Produk tidak ditemukan: ${unresolvedProduct}`, 400)
+
   // 8. Insert order — cast payload to bypass strict Insert generic
   const orderNumber = generateOrderNumber()
 
@@ -146,7 +162,7 @@ export async function POST(req: NextRequest) {
     .from('orders')
     .insert({
       order_number: orderNumber,
-      user_id: user.id,
+      profile_id: user.id,
       status: 'pending',
       subtotal,
       shipping_cost,
@@ -154,7 +170,9 @@ export async function POST(req: NextRequest) {
       tax_amount: 0,
       total_amount: totalAmount,
       coupon_id: couponId,
-      shipping_address_id: address_id,
+      shipping_address: address,
+      shipping_courier: shipping_courier ?? null,
+      shipping_service: shipping_service ?? null,
       notes: null,
     } as never)
     .select()
@@ -168,7 +186,7 @@ export async function POST(req: NextRequest) {
   // 9. Insert order_items
   const orderItemsPayload = items.map((item) => ({
     order_id: order.id,
-    product_id: item.product_id,
+    product_id: productMap.get(item.product_id),
     variant_id: item.variant_id ?? null,
     product_name: item.name,
     variant_name: null as string | null,
@@ -269,10 +287,8 @@ export async function POST(req: NextRequest) {
       .from('coupon_usages')
       .insert({
         coupon_id: couponId,
-        user_id: user.id,
+        profile_id: user.id,
         order_id: order.id,
-        discount_applied: discountAmount,
-        used_at: new Date().toISOString(),
       } as never)
   }
 
