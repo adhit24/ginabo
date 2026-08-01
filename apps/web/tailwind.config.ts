@@ -1,8 +1,17 @@
 import type { Config } from "tailwindcss";
+import typography from "@tailwindcss/typography";
 
 export default {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
+    screens: {
+      xs:  "375px",
+      sm:  "640px",
+      md:  "768px",
+      lg:  "1024px",
+      xl:  "1280px",
+      "2xl": "1536px",
+    },
     extend: {
       colors: {
         brand: {
@@ -26,12 +35,21 @@ export default {
           400: "#B8A8D8",
           500: "#9A88C4",
         },
+        // warm neutral untuk memecah monoton ungu di halaman partner
+        bone: {
+          50:  "#FBF8F4",
+          100: "#F4EEE6",
+          200: "#E9DFD2",
+        },
+        ink: "#1C1A17",
       },
       fontFamily: {
         sans:        ["var(--font-poppins)", "Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
         serif:       ["Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        display:     ["var(--font-fraunces)", "Georgia", "serif"],
         mono:        ["ui-monospace", "monospace"],
         poppins:     ["var(--font-poppins)", "sans-serif"],
+        outfit:      ["var(--font-outfit)", "sans-serif"],
         staatliches: ["var(--font-staatliches)", "sans-serif"],
       },
       borderRadius: {
@@ -58,6 +76,6 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [typography],
 } satisfies Config;
 

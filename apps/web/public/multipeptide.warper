@@ -1,0 +1,94 @@
+{
+  "version": "1.0",
+  "editor": "warper",
+  "mode": "circle",
+  "text": "multipeptide",
+  "textAlign": "left",
+  "lineHeight": 1.2,
+  "letterSpacing": 0,
+  "font": {
+    "src": "16837.ttf",
+    "name": "Borsok Regular",
+    "size": 80
+  },
+  "layers": [
+    {
+      "name": "Layer 1",
+      "textColor": "rgba(119,32,148,1)",
+      "stroke": {
+        "enabled": false,
+        "width": 2,
+        "behindText": true,
+        "color": "#0000ff"
+      },
+      "offset": {
+        "distance": 0,
+        "orientation": 45
+      },
+      "visible": true
+    }
+  ],
+  "transforms": {
+    "circle": {
+      "circleState": {
+        "centerX": 0.5293477069285151,
+        "centerY": 1.382492793132977,
+        "radiusRatio": 0.9415435971993567,
+        "controlAngleLeft": -2.0425790008247358,
+        "controlAngleRight": -1.0990136527650574,
+        "bottomArc": false
+      }
+    },
+    "freeform": {
+      "controlPositions": {
+        "topLeft": {
+          "x": 0,
+          "y": 0.33333333333333315
+        },
+        "topMiddle": {
+          "x": 0.5,
+          "y": 0
+        },
+        "topRight": {
+          "x": 1,
+          "y": 0.33333333333333315
+        },
+        "bottomLeft": {
+          "x": 0,
+          "y": 0.6666666666666664
+        },
+        "bottomMiddle": {
+          "x": 0.5,
+          "y": 1
+        },
+        "bottomRight": {
+          "x": 1,
+          "y": 0.6666666666666661
+        },
+        "topMiddleLeftHandle": {
+          "x": 0.24583333333333332,
+          "y": -1.578983857244667e-16
+        },
+        "topMiddleRightHandle": {
+          "x": 0.7541666666666667,
+          "y": 0
+        },
+        "bottomMiddleLeftHandle": {
+          "x": 0.24583333333333332,
+          "y": 0.9999999999999997
+        },
+        "bottomMiddleRightHandle": {
+          "x": 0.7541666666666667,
+          "y": 0.9999999999999997
+        }
+      },
+      "envelopeState": {
+        "aspectRatio": 0.5000000000000001,
+        "scale": 1.125,
+        "centerX": 0.5,
+        "centerY": 0.5000000000000002
+      }
+    }
+  },
+  "canvasBackground": "rgba(255,255,255,1)"
+}

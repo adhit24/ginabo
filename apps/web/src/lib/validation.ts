@@ -72,3 +72,18 @@ export const journey21ApplicationSchema = z.object({
   phone: z.string().min(8).max(30),
   email: z.string().email().optional().or(z.literal(""))
 });
+
+export const addressSchema = z.object({
+  label: z.string().max(60).optional().or(z.literal("")),
+  recipient_name: z.string().min(2).max(120),
+  phone: z.string().min(8).max(30),
+  address_line1: z.string().min(5).max(255),
+  address_line2: z.string().max(255).optional().or(z.literal("")),
+  city: z.string().min(2).max(120),
+  province: z.string().min(2).max(120),
+  postal_code: z.string().min(4).max(10),
+  country: z.string().min(2).max(60).default("Indonesia"),
+  is_default: z.boolean().default(false)
+});
+
+export const addressUpdateSchema = addressSchema.partial();

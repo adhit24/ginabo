@@ -1,7 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
-import { formatMoney } from "@/lib/money";
+import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 
 export type ProductCardData = {
@@ -30,14 +32,15 @@ function StarRating({ rating = 0 }: { rating: number }) {
 }
 
 export function ProductCard({ product }: { product: ProductCardData }) {
+  const { formatPrice } = useCurrency();
   const discount = product.discountPct ?? 0;
   const originalMinor = discount > 0 ? Math.round(product.priceMinor / (1 - discount / 100)) : 0;
   const rating = product.rating ?? 0;
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md">
+    <div className="group flex flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md">
       {/* Image */}
-      <Link href={`/shop/${product.slug}`} className="relative block aspect-square overflow-hidden bg-gray-50">
+      <Link href={`/shop/${product.slug}`} className="relative block overflow-hidden rounded-lg bg-gray-50" style={{ aspectRatio: "4/5" }}>
         {discount > 0 && (
           <span className="absolute left-2 top-2 z-10 rounded-md bg-amber-400 px-1.5 py-0.5 text-[11px] font-extrabold text-white">
             {discount}%
@@ -48,7 +51,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             src={product.imageUrl}
             alt={product.name}
             fill
-            className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+            className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
           />
         ) : (
@@ -67,11 +70,11 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         {/* Price */}
         <div className="flex flex-col gap-0.5">
           <span className="text-base font-bold text-brand-700">
-            {formatMoney(product.priceMinor, product.currency)}
+            {formatPrice(product.priceMinor)}
           </span>
           {discount > 0 && (
             <span className="text-[11px] text-gray-400 line-through">
-              {formatMoney(originalMinor, product.currency)}
+              {formatPrice(originalMinor)}
             </span>
           )}
         </div>

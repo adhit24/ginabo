@@ -1,158 +1,281 @@
-import { PaymentProvider, PaymentStatus, type Currency } from "@prisma/client";
+// POST /api/checkout — creates order + Midtrans Snap transaction
+// Replaces the legacy Prisma-based checkout with Supabase + Midtrans Snap.
 
-import { jsonError, jsonOk } from "@/lib/http";
-import { generateOrderNumber } from "@/lib/ids";
-import { prisma } from "@/lib/prisma";
-import { createProviderPayment } from "@/lib/payments";
-import { enqueueOrderNotifications } from "@/lib/notifications";
-import { checkoutSchema } from "@/lib/validation";
+import { NextRequest } from 'next/server'
+import { jsonError, jsonOk } from '@/lib/http'
+import { generateOrderNumber } from '@/lib/ids'
+import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server'
+import { createSnapTransaction, isMidtransProduction } from '@/lib/midtrans'
+import type { MidtransCustomerDetails, MidtransItemDetail } from '@/types/midtrans'
+import type {
+  OrderRow,
+  OrderItemRow,
+  PaymentRow,
+  AddressRow,
+  ProfileRow,
+  CouponRow,
+} from '@/types/database'
 
-function isDatabaseUnavailableError(e: unknown) {
-  const msg = e instanceof Error ? e.message : String(e);
-  return msg.includes("Environment variable not found: DATABASE_URL") || msg.includes("Can't reach database server") || msg.includes("P1001");
+// ─── Request schema ───────────────────────────────────────────────────────────
+
+interface CartItem {
+  product_id: string
+  variant_id?: string | null
+  qty: number
+  price: number // unit price in IDR
+  name: string
 }
 
-function normalizeString(v?: string) {
-  const s = typeof v === "string" ? v.trim() : "";
-  return s.length ? s : null;
+interface CheckoutBody {
+  items: CartItem[]
+  coupon_code?: string | null
+  address_id: string
+  shipping_cost: number
 }
 
-export async function POST(req: Request) {
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function validateItems(items: unknown): items is CartItem[] {
+  if (!Array.isArray(items) || items.length === 0) return false
+  return items.every(
+    (i) =>
+      typeof i === 'object' &&
+      i !== null &&
+      typeof (i as CartItem).product_id === 'string' &&
+      typeof (i as CartItem).qty === 'number' &&
+      (i as CartItem).qty > 0 &&
+      typeof (i as CartItem).price === 'number' &&
+      typeof (i as CartItem).name === 'string',
+  )
+}
+
+// ─── Route Handler ────────────────────────────────────────────────────────────
+
+export async function POST(req: NextRequest) {
+  // 1. Parse body
+  let body: CheckoutBody
   try {
-    const body = await req.json();
-    const parsed = checkoutSchema.safeParse(body);
-    if (!parsed.success) return jsonError("Invalid input", 400, parsed.error.flatten());
-
-    const customerInput = parsed.data.customer;
-    const email = normalizeString(customerInput.email ?? undefined);
-    const phone = normalizeString(customerInput.phone ?? undefined);
-
-    const provider = PaymentProvider[parsed.data.paymentProvider];
-    if (!provider) return jsonError("Invalid payment provider", 400);
-
-    const result = await prisma
-      .$transaction(async (tx) => {
-        let customerId: string;
-
-        if (email) {
-          const existing = await tx.customer.findUnique({ where: { email } });
-          if (existing) {
-            const updated = await tx.customer.update({
-              where: { id: existing.id },
-              data: { name: customerInput.name, phone: phone ?? existing.phone }
-            });
-            customerId = updated.id;
-          } else {
-            const created = await tx.customer.create({ data: { name: customerInput.name, email, phone } });
-            customerId = created.id;
-          }
-        } else if (phone) {
-          const existing = await tx.customer.findUnique({ where: { phone } });
-          if (existing) {
-            const updated = await tx.customer.update({
-              where: { id: existing.id },
-              data: { name: customerInput.name, email: email ?? existing.email }
-            });
-            customerId = updated.id;
-          } else {
-            const created = await tx.customer.create({ data: { name: customerInput.name, email, phone } });
-            customerId = created.id;
-          }
-        } else {
-          const created = await tx.customer.create({ data: { name: customerInput.name } });
-          customerId = created.id;
-        }
-
-        const products = await tx.product.findMany({
-          where: { id: { in: parsed.data.items.map((i) => i.productId) }, isActive: true },
-          include: { images: { orderBy: { sortOrder: "asc" } } }
-        });
-
-        if (products.length !== parsed.data.items.length) return { ok: false as const, error: "Produk tidak ditemukan" };
-
-        const productById = new Map(products.map((p) => [p.id, p]));
-        const currency = products[0]?.currency ?? "IDR";
-
-        let subtotalMinor = 0;
-        const orderItems = parsed.data.items.map((item) => {
-          const p = productById.get(item.productId);
-          if (!p) throw new Error("Missing product");
-          if (p.stockQty < item.quantity) throw new Error(`Stok tidak cukup untuk ${p.name}`);
-          subtotalMinor += p.priceMinor * item.quantity;
-          return {
-            productId: p.id,
-            productName: p.name,
-            unitPriceMinor: p.priceMinor,
-            quantity: item.quantity
-          };
-        });
-
-        let orderNumber = generateOrderNumber();
-        for (let i = 0; i < 3; i++) {
-          const exists = await tx.order.findUnique({ where: { orderNumber } });
-          if (!exists) break;
-          orderNumber = generateOrderNumber();
-        }
-
-        const order = await tx.order.create({
-          data: {
-            orderNumber,
-            status: "PENDING_PAYMENT",
-            customerId,
-            currency: currency as Currency,
-            subtotalMinor,
-            totalMinor: subtotalMinor,
-            items: { create: orderItems }
-          }
-        });
-
-        for (const item of parsed.data.items) {
-          const updated = await tx.product.updateMany({
-            where: { id: item.productId, stockQty: { gte: item.quantity } },
-            data: { stockQty: { decrement: item.quantity } }
-          });
-          if (updated.count !== 1) throw new Error("Stok berubah, coba lagi");
-        }
-
-        const payment = await tx.payment.create({
-          data: {
-            orderId: order.id,
-            provider,
-            status: PaymentStatus.REQUIRES_ACTION,
-            amountMinor: order.totalMinor,
-            currency: order.currency
-          }
-        });
-
-        await enqueueOrderNotifications({
-          tx,
-          orderNumber: order.orderNumber,
-          customer: { name: customerInput.name, email, phone }
-        });
-
-        return { ok: true as const, order, payment };
-      })
-      .catch((e) => {
-        if (!isDatabaseUnavailableError(e)) throw e;
-        return {
-          ok: true as const,
-          order: { orderNumber: generateOrderNumber(), totalMinor: 0, currency: "IDR" as Currency },
-          payment: { provider, status: PaymentStatus.REQUIRES_ACTION }
-        };
-      });
-
-    if (!result.ok) return jsonError(result.error, 400);
-
-    const paymentResult = await createProviderPayment({
-      provider: result.payment.provider,
-      order: { orderNumber: result.order.orderNumber, totalMinor: result.order.totalMinor, currency: result.order.currency }
-    });
-
-    return jsonOk({
-      orderNumber: result.order.orderNumber,
-      payment: { provider: result.payment.provider, status: result.payment.status, result: paymentResult }
-    });
-  } catch (e) {
-    return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
+    body = (await req.json()) as CheckoutBody
+  } catch {
+    return jsonError('Request body tidak valid', 400)
   }
+
+  const { items, coupon_code, address_id, shipping_cost = 0 } = body
+
+  if (!validateItems(items)) return jsonError('Field items tidak valid', 400)
+  if (!address_id) return jsonError('address_id diperlukan', 400)
+
+  // 2. Authenticate
+  const supabase = await createServerSupabaseClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) return jsonError('Silakan login terlebih dahulu', 401)
+
+  // 3. Fetch profile for customer details
+  const { data: rawProfile } = await supabase
+    .from('profiles')
+    .select('full_name, phone, email')
+    .eq('id', user.id)
+    .single()
+
+  const profile = rawProfile as Pick<ProfileRow, 'full_name' | 'phone' | 'email'> | null
+  const customerName = profile?.full_name ?? user.email ?? 'Pelanggan'
+  const customerPhone = profile?.phone ?? ''
+  const customerEmail = user.email ?? ''
+
+  // 4. Fetch address
+  const { data: rawAddress } = await supabase
+    .from('addresses')
+    .select('*')
+    .eq('id', address_id)
+    .eq('user_id', user.id)
+    .single()
+
+  if (!rawAddress) return jsonError('Alamat tidak ditemukan', 404)
+  const address = rawAddress as AddressRow
+
+  // 5. Validate coupon (optional)
+  let discountAmount = 0
+  let couponId: string | null = null
+
+  if (coupon_code) {
+    const { data: rawCoupon } = await supabase
+      .from('coupons')
+      .select('*')
+      .eq('code', coupon_code.toUpperCase())
+      .eq('is_active', true)
+      .single()
+
+    const coupon = rawCoupon as CouponRow | null
+    if (coupon) {
+      const subtotalForCoupon = items.reduce((sum, i) => sum + i.price * i.qty, 0)
+      const meetsMin = !coupon.min_purchase || subtotalForCoupon >= coupon.min_purchase
+
+      if (meetsMin) {
+        if (coupon.type === 'percentage') {
+          discountAmount = Math.round((subtotalForCoupon * coupon.value) / 100)
+          if (coupon.max_discount) discountAmount = Math.min(discountAmount, coupon.max_discount)
+        } else if (coupon.type === 'fixed_amount') {
+          discountAmount = coupon.value
+        } else if (coupon.type === 'free_shipping') {
+          discountAmount = shipping_cost
+        }
+        couponId = coupon.id
+      }
+    }
+  }
+
+  // 6. Calculate totals
+  const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
+  const totalAmount = Math.max(0, subtotal + shipping_cost - discountAmount)
+
+  // 7. Admin client for writes
+  const admin = await createAdminClient()
+
+  // 8. Insert order — cast payload to bypass strict Insert generic
+  const orderNumber = generateOrderNumber()
+
+  const { data: rawOrder, error: orderError } = await admin
+    .from('orders')
+    .insert({
+      order_number: orderNumber,
+      user_id: user.id,
+      status: 'pending',
+      subtotal,
+      shipping_cost,
+      discount_amount: discountAmount,
+      tax_amount: 0,
+      total_amount: totalAmount,
+      coupon_id: couponId,
+      shipping_address_id: address_id,
+      notes: null,
+    } as never)
+    .select()
+    .single()
+
+  if (orderError || !rawOrder) {
+    return jsonError('Gagal membuat pesanan', 500, orderError?.message)
+  }
+  const order = rawOrder as OrderRow
+
+  // 9. Insert order_items
+  const orderItemsPayload = items.map((item) => ({
+    order_id: order.id,
+    product_id: item.product_id,
+    variant_id: item.variant_id ?? null,
+    product_name: item.name,
+    variant_name: null as string | null,
+    quantity: item.qty,
+    unit_price: item.price,
+    total_price: item.price * item.qty,
+  }))
+
+  const { error: itemsError } = await admin
+    .from('order_items')
+    .insert(orderItemsPayload as never)
+
+  if (itemsError) {
+    await admin.from('orders').delete().eq('id', order.id as never)
+    return jsonError('Gagal menyimpan item pesanan', 500, itemsError.message)
+  }
+
+  // 10. Build Midtrans payload
+  const [firstName, ...rest] = customerName.split(' ')
+  const customerDetails: MidtransCustomerDetails = {
+    first_name: firstName,
+    last_name: rest.join(' ') || undefined,
+    email: customerEmail,
+    phone: customerPhone,
+    shipping_address: {
+      first_name: address.recipient_name,
+      phone: address.phone,
+      address: address.address_line1,
+      city: address.city,
+      postal_code: address.postal_code,
+      country_code: 'IDN',
+    },
+  }
+
+  const midtransItems: MidtransItemDetail[] = [
+    ...items.map((item) => ({
+      id: item.variant_id ?? item.product_id,
+      price: item.price,
+      quantity: item.qty,
+      name: item.name.slice(0, 50),
+    })),
+    ...(shipping_cost > 0
+      ? [{ id: 'SHIPPING', price: shipping_cost, quantity: 1, name: 'Ongkos Kirim' }]
+      : []),
+    ...(discountAmount > 0
+      ? [{ id: 'DISCOUNT', price: -discountAmount, quantity: 1, name: 'Diskon' }]
+      : []),
+  ]
+
+  // 11. Call Midtrans Snap
+  let snapToken: string
+  let snapRedirectUrl: string
+
+  try {
+    const snap = await createSnapTransaction(
+      orderNumber,
+      totalAmount,
+      customerDetails,
+      midtransItems,
+    )
+    snapToken = snap.token
+    snapRedirectUrl = snap.redirect_url
+  } catch (e) {
+    await admin.from('order_items').delete().eq('order_id', order.id as never)
+    await admin.from('orders').delete().eq('id', order.id as never)
+    return jsonError(
+      'Gagal menghubungi payment gateway',
+      502,
+      e instanceof Error ? e.message : String(e),
+    )
+  }
+
+  // 12. Save payment record
+  const { error: paymentError } = await admin
+    .from('payments')
+    .insert({
+      order_id: order.id,
+      midtrans_order_id: orderNumber,
+      midtrans_transaction_id: null,
+      payment_type: null,
+      status: 'pending',
+      gross_amount: totalAmount,
+      snap_token: snapToken,
+      snap_redirect_url: snapRedirectUrl,
+      fraud_status: null,
+      settlement_time: null,
+      expiry_time: null,
+      raw_response: null,
+    } as never)
+
+  if (paymentError) {
+    console.error('[checkout] Failed to save payment row:', paymentError.message)
+  }
+
+  // 13. Record coupon usage (best-effort)
+  if (couponId) {
+    await admin
+      .from('coupon_usages')
+      .insert({
+        coupon_id: couponId,
+        user_id: user.id,
+        order_id: order.id,
+        discount_applied: discountAmount,
+        used_at: new Date().toISOString(),
+      } as never)
+  }
+
+  return jsonOk({
+    order_number: orderNumber,
+    snap_token: snapToken,
+    redirect_url: snapRedirectUrl,
+    is_production: isMidtransProduction,
+  })
 }

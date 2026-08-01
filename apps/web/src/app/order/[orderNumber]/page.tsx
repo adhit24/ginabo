@@ -1,108 +1,388 @@
-import Link from "next/link";
+// Server Component — order detail page with payment status
+// Path: /order/[orderNumber]
 
-import type { Prisma } from "@prisma/client";
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { formatMoney } from '@/lib/money'
+import { PayButton } from './PayButton'
+import TrackingForm from '@/components/shipping/TrackingForm'
+import type { OrderStatus, PaymentStatus } from '@/types/database'
+import type { CourierCode } from '@/lib/rajaongkir'
 
-import { prisma } from "@/lib/prisma";
-import { formatMoney } from "@/lib/money";
-
-function isDatabaseUnavailableError(e: unknown) {
-  const msg = e instanceof Error ? e.message : String(e);
-  return msg.includes("Environment variable not found: DATABASE_URL") || msg.includes("Can't reach database server") || msg.includes("P1001");
+interface PageProps {
+  params: { orderNumber: string }
 }
 
-export default async function OrderConfirmationPage({ params }: { params: { orderNumber: string } }) {
-  type OrderWithDetails = Prisma.OrderGetPayload<{ include: { items: true; customer: true; payments: true } }>;
-  let order: OrderWithDetails | null = null;
-  try {
-    order = (await prisma.order.findUnique({
-      where: { orderNumber: params.orderNumber },
-      include: { items: true, customer: true, payments: { orderBy: { createdAt: "desc" } } }
-    })) as OrderWithDetails | null;
-  } catch (e) {
-    if (!isDatabaseUnavailableError(e)) throw e;
-    order = null;
-  }
+// ─── Status badge helpers ──────────────────────────────────────────────────────
 
-  if (!order) {
+const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
+  pending: 'Menunggu Pembayaran',
+  paid: 'Dibayar',
+  processing: 'Diproses',
+  shipped: 'Dikirim',
+  delivered: 'Selesai',
+  cancelled: 'Dibatalkan',
+}
+
+const ORDER_STATUS_CLASS: Record<OrderStatus, string> = {
+  pending: 'bg-yellow-100 text-yellow-800',
+  paid: 'bg-blue-100 text-blue-800',
+  processing: 'bg-indigo-100 text-indigo-800',
+  shipped: 'bg-purple-100 text-purple-800',
+  delivered: 'bg-green-100 text-green-800',
+  cancelled: 'bg-red-100 text-red-800',
+}
+
+const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {
+  pending: 'Belum Dibayar',
+  paid: 'Lunas',
+  failed: 'Gagal',
+  expired: 'Kadaluarsa',
+  refunded: 'Dikembalikan',
+  challenge: 'Ditinjau',
+}
+
+function StatusBadge({ status }: { status: OrderStatus }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${ORDER_STATUS_CLASS[status] ?? 'bg-gray-100 text-gray-700'}`}
+    >
+      {ORDER_STATUS_LABEL[status] ?? status}
+    </span>
+  )
+}
+
+// ─── Page ──────────────────────────────────────────────────────────────────────
+
+export default async function OrderDetailPage({ params }: PageProps) {
+  const { orderNumber } = params
+
+  const supabase = await createServerSupabaseClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
     return (
       <div className="rounded-3xl border border-gray-100 bg-white p-10 text-center">
-        <div className="text-sm font-semibold text-gray-900">Order belum bisa ditampilkan</div>
-        <div className="mt-2 text-sm text-gray-600">Database belum terhubung/jalan. UI tetap bisa kamu cek tanpa data order.</div>
-        <Link href="/shop" className="mt-3 inline-flex text-sm font-semibold text-brand-700 hover:text-brand-800">
-          Kembali ke Shop →
+        <p className="text-sm font-semibold text-gray-900">Kamu belum login</p>
+        <Link
+          href="/auth/login"
+          className="mt-3 inline-flex text-sm font-semibold text-brand-700 hover:text-brand-800"
+        >
+          Login untuk melihat pesanan
         </Link>
       </div>
-    );
+    )
   }
 
-  const payment = order.payments[0] ?? null;
+  // ─── Local projection types ────────────────────────────────────────────────
+
+  type PaymentRecord = {
+    id: string
+    status: PaymentStatus
+    snap_token: string | null
+    snap_redirect_url: string | null
+    payment_type: string | null
+    settlement_time: string | null
+    fraud_status: string | null
+  }
+
+  type AddressRecord = {
+    recipient_name: string
+    phone: string
+    address_line1: string
+    address_line2: string | null
+    city: string
+    province: string
+    postal_code: string
+  }
+
+  type OrderItem = {
+    id: string
+    product_name: string
+    variant_name: string | null
+    quantity: number
+    unit_price: number
+    total_price: number
+  }
+
+  type OrderProjection = {
+    id: string
+    order_number: string
+    status: string
+    subtotal: number
+    shipping_cost: number
+    discount_amount: number
+    tax_amount: number
+    total_amount: number
+    shipping_provider: string | null
+    shipping_courier: string | null
+    tracking_number: string | null
+    created_at: string
+    shipping_address: AddressRecord | null
+    items: OrderItem[]
+    payments: PaymentRecord[]
+  }
+
+  // Fetch order — RLS ensures ownership
+  const { data: rawOrder, error } = await supabase
+    .from('orders')
+    .select(
+      `
+      id,
+      order_number,
+      status,
+      subtotal,
+      shipping_cost,
+      discount_amount,
+      tax_amount,
+      total_amount,
+      shipping_provider,
+      shipping_courier,
+      tracking_number,
+      created_at,
+      shipping_address:addresses(
+        recipient_name,
+        phone,
+        address_line1,
+        address_line2,
+        city,
+        province,
+        postal_code
+      ),
+      items:order_items(
+        id,
+        product_name,
+        variant_name,
+        quantity,
+        unit_price,
+        total_price
+      ),
+      payments(
+        id,
+        status,
+        snap_token,
+        snap_redirect_url,
+        payment_type,
+        settlement_time,
+        fraud_status
+      )
+    `,
+    )
+    .eq('order_number', orderNumber as never)
+    .single()
+
+  if (error || !rawOrder) {
+    notFound()
+  }
+
+  const order = rawOrder as unknown as OrderProjection
+
+  const payments = order.payments ?? []
+  const latestPayment = payments[0] ?? null
+
+  const isPendingPayment = order.status === 'pending'
+  const isShipped = order.status === 'shipped'
+
+  const addr = order.shipping_address
+  const items = order.items ?? []
 
   return (
-    <div className="grid gap-6">
-      <div className="grid gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-900 md:text-3xl">Order Confirmation</h1>
-        <p className="text-sm text-gray-600">Terima kasih. Order kamu sudah tercatat.</p>
-      </div>
+    <div className="mx-auto max-w-2xl px-4 py-10">
+      <div className="grid gap-6">
+        {/* Header */}
+        <div className="grid gap-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
+            Detail Pesanan
+          </h1>
+          <p className="text-sm text-gray-500">
+            Terima kasih telah berbelanja di Ginabo!
+          </p>
+        </div>
 
-      <div className="grid gap-4 rounded-3xl border border-gray-100 bg-white p-8">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">Order Number</div>
-            <div className="mt-1 text-lg font-semibold text-gray-900">{order.orderNumber}</div>
+        {/* Order summary card */}
+        <div className="grid gap-5 rounded-3xl border border-gray-100 bg-white p-8 shadow-sm">
+          {/* Order number + status */}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Nomor Pesanan
+              </div>
+              <div className="mt-1 font-mono text-lg font-semibold text-gray-900">
+                {order.order_number}
+              </div>
+            </div>
+            <StatusBadge status={order.status as OrderStatus} />
           </div>
-          <div className="rounded-full bg-brand-100 px-4 py-2 text-sm font-semibold text-brand-800">{order.status}</div>
-        </div>
 
-        <div className="grid gap-2 text-sm text-gray-700">
-          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">Customer</div>
-          <div className="font-semibold text-gray-900">{order.customer.name}</div>
-          <div className="text-gray-600">{order.customer.email ?? "—"}</div>
-          <div className="text-gray-600">{order.customer.phone ?? "—"}</div>
-        </div>
+          {/* Date */}
+          <div className="text-sm text-gray-500">
+            Dipesan pada{' '}
+            <span className="font-medium text-gray-700">
+              {new Date(order.created_at).toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </span>
+          </div>
 
-        <div className="grid gap-3">
-          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">Items</div>
-          {order.items.map((i: OrderWithDetails["items"][number]) => (
-            <div key={i.id} className="flex items-start justify-between gap-4 text-sm">
-              <div className="min-w-0">
-                <div className="font-semibold text-gray-900">{i.productName}</div>
-                <div className="text-gray-600">
-                  {i.quantity} × {formatMoney(i.unitPriceMinor, order.currency)}
+          {/* Items */}
+          <div className="grid gap-3">
+            <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Produk
+            </div>
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-start justify-between gap-4 text-sm"
+              >
+                <div className="min-w-0">
+                  <div className="font-semibold text-gray-900">{item.product_name}</div>
+                  {item.variant_name && (
+                    <div className="text-xs text-gray-500">{item.variant_name}</div>
+                  )}
+                  <div className="text-gray-500">
+                    {item.quantity} &times; {formatMoney(item.unit_price)}
+                  </div>
+                </div>
+                <div className="shrink-0 font-semibold text-gray-900">
+                  {formatMoney(item.total_price)}
                 </div>
               </div>
-              <div className="shrink-0 font-semibold text-gray-900">{formatMoney(i.quantity * i.unitPriceMinor, order.currency)}</div>
+            ))}
+          </div>
+
+          {/* Totals */}
+          <div className="grid gap-1 border-t border-gray-100 pt-4 text-sm">
+            <div className="flex justify-between text-gray-600">
+              <span>Subtotal</span>
+              <span>{formatMoney(order.subtotal)}</span>
             </div>
-          ))}
-          <div className="border-t border-gray-100 pt-3">
-            <div className="flex items-center justify-between text-sm">
-              <div className="text-gray-600">Total</div>
-              <div className="font-semibold text-gray-900">{formatMoney(order.totalMinor, order.currency)}</div>
+            <div className="flex justify-between text-gray-600">
+              <span>Ongkos Kirim</span>
+              <span>{formatMoney(order.shipping_cost)}</span>
+            </div>
+            {order.discount_amount > 0 && (
+              <div className="flex justify-between text-green-700">
+                <span>Diskon</span>
+                <span>- {formatMoney(order.discount_amount)}</span>
+              </div>
+            )}
+            <div className="mt-1 flex justify-between font-semibold text-gray-900">
+              <span>Total</span>
+              <span>{formatMoney(order.total_amount)}</span>
             </div>
           </div>
+
+          {/* Payment info */}
+          {latestPayment && (
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 text-sm">
+              <div className="font-semibold text-gray-900">Pembayaran</div>
+              <div className="mt-1 text-gray-600">
+                Metode:{' '}
+                <span className="font-medium text-gray-800">
+                  {latestPayment.payment_type
+                    ? latestPayment.payment_type.replace(/_/g, ' ').toUpperCase()
+                    : '—'}
+                </span>
+              </div>
+              <div className="text-gray-600">
+                Status:{' '}
+                <span className="font-medium text-gray-800">
+                  {PAYMENT_STATUS_LABEL[latestPayment.status] ?? latestPayment.status}
+                </span>
+              </div>
+              {latestPayment.settlement_time && (
+                <div className="text-gray-600">
+                  Dikonfirmasi:{' '}
+                  <span className="font-medium text-gray-800">
+                    {new Date(latestPayment.settlement_time).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Shipping address */}
+          {addr && (
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 text-sm">
+              <div className="font-semibold text-gray-900">Alamat Pengiriman</div>
+              <div className="mt-1 text-gray-700">{addr.recipient_name}</div>
+              <div className="text-gray-600">{addr.phone}</div>
+              <div className="text-gray-600">
+                {addr.address_line1}
+                {addr.address_line2 ? `, ${addr.address_line2}` : ''}
+              </div>
+              <div className="text-gray-600">
+                {addr.city}, {addr.province} {addr.postal_code}
+              </div>
+            </div>
+          )}
+
+          {/* Tracking info for shipped orders */}
+          {isShipped && order.tracking_number && (
+            <div className="rounded-2xl border border-purple-100 bg-purple-50 p-5 text-sm">
+              <div className="mb-1 font-semibold text-purple-900">Info Pengiriman</div>
+              <div className="mb-3 text-purple-700">
+                <span className="font-medium">
+                  {order.shipping_courier?.toUpperCase() ?? order.shipping_provider ?? '—'}
+                </span>
+                {' · '}
+                <span className="font-mono">{order.tracking_number}</span>
+              </div>
+              {/* Live tracking form pre-filled */}
+              <div
+                className="rounded-xl p-4"
+                style={{ background: 'rgba(88,28,135,0.06)', border: '1px solid rgba(147,51,234,0.2)' }}
+              >
+                <TrackingForm
+                  defaultWaybill={order.tracking_number}
+                  defaultCourier={(order.shipping_courier?.toLowerCase() ?? 'jne') as CourierCode}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="rounded-2xl border border-gray-100 bg-brand-50 p-5">
-          <div className="text-sm font-semibold text-gray-900">Payment</div>
-          <div className="mt-1 text-sm text-gray-700">
-            Provider: <span className="font-semibold">{payment?.provider ?? "—"}</span>
-          </div>
-          <div className="mt-1 text-sm text-gray-700">
-            Status: <span className="font-semibold">{payment?.status ?? "—"}</span>
-          </div>
-          <div className="mt-3 text-sm text-gray-600">
-            Untuk payment gateway (Midtrans/Xendit/Stripe), endpoint dan struktur sudah disiapkan—tinggal masukkan API key dan webhook.
-          </div>
+        {/* CTA row */}
+        <div className="flex flex-wrap gap-3">
+          {isPendingPayment && latestPayment?.snap_token && (
+            <PayButton
+              snapToken={latestPayment.snap_token}
+              orderNumber={order.order_number}
+            />
+          )}
+          <Link
+            href="/shop"
+            className="inline-flex rounded-full border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-900 hover:border-gray-300"
+          >
+            Belanja Lagi
+          </Link>
+          <Link
+            href="/member"
+            className="inline-flex rounded-full border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-900 hover:border-gray-300"
+          >
+            Riwayat Pesanan
+          </Link>
+          {(order.status === 'delivered' || order.status === 'completed') && (
+            <Link
+              href={`/returns/new?order=${order.order_number}`}
+              className="inline-flex rounded-full bg-gray-900 px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
+            >
+              Ajukan Retur
+            </Link>
+          )}
         </div>
-      </div>
-
-      <div className="flex flex-wrap gap-3">
-        <Link href="/shop" className="inline-flex rounded-full border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-900 hover:border-gray-300">
-          Belanja lagi
-        </Link>
-        <Link href="/booking" className="inline-flex rounded-full bg-gray-900 px-5 py-3 text-sm font-semibold text-white hover:bg-black">
-          Booking Konsultasi
-        </Link>
       </div>
     </div>
-  );
+  )
 }

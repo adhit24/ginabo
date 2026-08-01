@@ -1,10 +1,12 @@
+export const runtime = 'edge';
+
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { createAdminSessionToken, getAdminSessionCookieName } from "@/lib/auth";
 import { jsonError, jsonOk } from "@/lib/http";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { adminLoginSchema } from "@/lib/validation";
 
 export async function POST(req: Request) {
@@ -13,14 +15,18 @@ export async function POST(req: Request) {
     const parsed = adminLoginSchema.safeParse(body);
     if (!parsed.success) return jsonError("Invalid input", 400, parsed.error.flatten());
 
-    const user = await prisma.adminUser.findUnique({ where: { email: parsed.data.email } });
-    if (!user) return jsonError("Email atau password salah", 401);
+    const { data: user, error } = await supabase
+      .from("AdminUser")
+      .select("*")
+      .eq("email", parsed.data.email)
+      .single();
+    if (error || !user) return jsonError("Email atau password salah", 401);
 
     const ok = await bcrypt.compare(parsed.data.password, user.passwordHash);
     if (!ok) return jsonError("Email atau password salah", 401);
 
     const token = await createAdminSessionToken({ sub: user.id, role: "ADMIN", email: user.email });
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     cookieStore.set(getAdminSessionCookieName(), token, {
       httpOnly: true,
       sameSite: "lax",

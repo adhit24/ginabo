@@ -179,7 +179,7 @@ export function SkinTypeSection() {
                 <div className="text-xs text-brand-500">{p.desc}</div>
                 <div className="mt-auto flex items-center justify-between pt-3">
                   <div>
-                    <div className="text-xs text-amber-400">★ {p.rating}</div>
+                    <div className="flex items-center gap-0.5 text-xs text-amber-400"><svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" /></svg> {p.rating}</div>
                     <div className="font-bold text-brand-700">{p.price}</div>
                   </div>
                   <span className="rounded-xl border border-brand-700 px-3 py-1.5 text-[11px] font-semibold text-brand-700 transition group-hover:bg-brand-700 group-hover:text-white">
@@ -197,7 +197,7 @@ export function SkinTypeSection() {
             href="/shop"
             className="inline-flex items-center gap-2 rounded-full border border-brand-800 px-8 py-3 text-sm font-semibold text-brand-800 transition hover:bg-brand-800 hover:text-white"
           >
-            Lihat Semua Produk →
+            Lihat Semua Produk
           </Link>
         </div>
 

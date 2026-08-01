@@ -58,9 +58,7 @@ export default function BookingPage() {
       }
     }
     void load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [date]);
 
   async function submit() {
@@ -90,139 +88,195 @@ export default function BookingPage() {
   }, [date]);
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <div className="grid gap-4">
-        <div className="grid gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-900 md:text-3xl">Booking</h1>
-          <p className="text-sm text-gray-600">Pilih slot konsultasi. Slot otomatis tertutup saat penuh.</p>
-        </div>
+    <div className="bg-white text-[#2a2a2a]">
 
-        <div className="grid gap-3 rounded-3xl border border-gray-100 bg-white p-6">
-          <label className="grid gap-1 text-sm">
-            <span className="font-semibold text-gray-900">Tanggal</span>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="rounded-2xl border border-gray-200 px-4 py-3 text-[16px] outline-none focus:border-brand-300 md:text-sm"
-            />
-          </label>
+      {/* ── HERO + BOOKING FORM ── */}
+      <section className="relative overflow-hidden pb-10 pt-14 md:pb-16 md:pt-20" style={{ background: "#ffffff" }}>
 
-          <div className="grid gap-2">
-            <div className="text-sm font-semibold text-gray-900">Slot tersedia</div>
-            <div className="text-sm text-gray-600">{selectedDayLabel}</div>
-            <div className="grid gap-2">
-              {state.status === "loading" ? (
-                <div className="rounded-2xl border border-gray-100 p-4 text-sm text-gray-600">Memuat slot...</div>
-              ) : slots.length === 0 ? (
-                <div className="rounded-2xl border border-gray-100 p-4 text-sm text-gray-600">Belum ada slot untuk tanggal ini.</div>
-              ) : (
-                slots.map((s) => {
-                  const start = new Date(s.startAt);
-                  const end = new Date(s.endAt);
-                  const label = `${format(start, "HH:mm")}–${format(end, "HH:mm")}`;
-                  const disabled = !s.isAvailable;
-                  const active = selectedSlotId === s.id;
-                  return (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => setSelectedSlotId(s.id)}
-                      disabled={disabled}
-                      className={[
-                        "flex items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm",
-                        disabled ? "cursor-not-allowed border-gray-100 bg-gray-50 text-gray-400" : "border-gray-200 bg-white hover:border-gray-300",
-                        active ? "border-brand-400 bg-brand-50" : ""
-                      ].join(" ")}
-                    >
-                      <span className="font-semibold">{label}</span>
-                      <span className="text-xs">{disabled ? "Penuh" : `${s.remaining} slot`}</span>
-                    </button>
-                  );
-                })
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid content-start gap-4">
-        <div className="rounded-3xl border border-gray-100 bg-white p-6">
-          <div className="text-sm font-semibold text-gray-900">Data Customer</div>
-          <p className="mt-1 text-sm text-gray-600">Data ini otomatis masuk ke database (CRM light).</p>
-
-          <div className="mt-4 grid gap-3">
-            <label className="grid gap-1 text-sm">
-              <span className="font-semibold text-gray-900">Nama</span>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="rounded-2xl border border-gray-200 px-4 py-3 text-[16px] outline-none focus:border-brand-300 md:text-sm"
-                placeholder="Nama lengkap"
-              />
-            </label>
-            <label className="grid gap-1 text-sm">
-              <span className="font-semibold text-gray-900">Email</span>
-              <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="rounded-2xl border border-gray-200 px-4 py-3 text-[16px] outline-none focus:border-brand-300 md:text-sm"
-                placeholder="email@contoh.com"
-              />
-            </label>
-            <label className="grid gap-1 text-sm">
-              <span className="font-semibold text-gray-900">Phone</span>
-              <input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="rounded-2xl border border-gray-200 px-4 py-3 text-[16px] outline-none focus:border-brand-300 md:text-sm"
-                placeholder="+62..."
-              />
-            </label>
-            <label className="grid gap-1 text-sm">
-              <span className="font-semibold text-gray-900">Notes</span>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="min-h-24 rounded-2xl border border-gray-200 px-4 py-3 text-[16px] outline-none focus:border-brand-300 md:text-sm"
-                placeholder="Ceritakan kondisi kulit / tujuan..."
-              />
-            </label>
-          </div>
-
-          {selectedSlot ? (
-            <div className="mt-4 rounded-2xl bg-brand-50 p-4 text-sm text-gray-700">
-              Slot dipilih:{" "}
-              <span className="font-semibold">
-                {format(new Date(selectedSlot.startAt), "HH:mm")}–{format(new Date(selectedSlot.endAt), "HH:mm")}
-              </span>
-            </div>
-          ) : null}
-
-          {state.status === "error" ? <div className="mt-4 text-sm font-semibold text-red-600">{state.message}</div> : null}
-          {state.status === "success" ? (
-            <div className="mt-4 rounded-2xl bg-brand-50 p-4 text-sm text-gray-700">
-              Booking berhasil. ID: <span className="font-semibold">{state.bookingNumber}</span>
-            </div>
-          ) : null}
-
-          <button
-            type="button"
-            onClick={submit}
-            disabled={!selectedSlotId || state.status === "submitting" || state.status === "loading"}
-            className="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-gray-900 px-5 py-3 text-sm font-semibold text-white hover:bg-black disabled:opacity-60"
+        {/* Header */}
+        <div className="relative mx-auto flex max-w-4xl flex-col items-center justify-center px-6 pb-10 text-center">
+          <span
+            className="mb-4 inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white"
+            style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
           >
-            {state.status === "submitting" ? "Memproses..." : "Konfirmasi Booking"}
-          </button>
-        </div>
-
-        <div className="rounded-3xl border border-gray-100 bg-white p-6">
-          <div className="text-sm font-semibold text-gray-900">Notifikasi</div>
-          <p className="mt-1 text-sm text-gray-600">
-            Sistem menyiapkan job notifikasi Email dan WhatsApp untuk booking confirmed dan reminder H-1 (API-ready).
+            Konsultasi Kulit
+          </span>
+          <h1 className="mb-3 text-3xl font-extrabold leading-tight md:text-4xl" style={{ color: "#4A1A5E" }}>
+            Booking{" "}
+            <span className="text-[#9333EA]">Konsultasi</span>
+          </h1>
+          <p className="max-w-sm text-sm leading-relaxed text-[#5a4a6a]">
+            Pilih slot konsultasi gratis bersama skin expert kami. Slot otomatis tertutup saat penuh.
           </p>
         </div>
-      </div>
+
+        <div className="relative mx-auto w-full max-w-4xl px-4 md:px-8">
+          <div className="grid gap-6 md:grid-cols-2">
+
+            {/* Left: Date + Slots */}
+            <div className="grid gap-4">
+              <div
+                className="grid gap-4 rounded-2xl p-7"
+                style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.15)", boxShadow: "0 8px 32px rgba(20,15,50,0.25)" }}
+              >
+                <div className="grid gap-1">
+                  <h2 className="text-lg font-bold text-white">Pilih Jadwal</h2>
+                  <p className="text-sm text-white/50">Slot tersedia ditampilkan berdasarkan tanggal pilihan.</p>
+                </div>
+
+                <label className="grid gap-1.5 text-sm">
+                  <span className="font-semibold text-white">Tanggal</span>
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="min-h-11 rounded-lg border px-3 py-2.5 text-[16px] text-white outline-none transition focus:ring-2 focus:ring-[#8b5cf6]/40 md:text-sm"
+                    style={{ background: "rgba(255,255,255,0.06)", borderColor: "rgba(139,92,246,0.2)" }}
+                  />
+                </label>
+
+                <div className="grid gap-2">
+                  <div className="text-sm font-semibold text-white">Slot Tersedia</div>
+                  <div className="text-xs font-medium text-[#c084fc]">{selectedDayLabel}</div>
+                  <div className="grid gap-2">
+                    {state.status === "loading" ? (
+                      <div className="rounded-lg p-4 text-sm text-white/40" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(139,92,246,0.15)" }}>Memuat slot...</div>
+                    ) : slots.length === 0 ? (
+                      <div className="rounded-lg p-4 text-sm text-white/40" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(139,92,246,0.15)" }}>Belum ada slot untuk tanggal ini.</div>
+                    ) : (
+                      slots.map((s) => {
+                        const start = new Date(s.startAt);
+                        const end = new Date(s.endAt);
+                        const label = `${format(start, "HH:mm")}–${format(end, "HH:mm")}`;
+                        const disabled = !s.isAvailable;
+                        const active = selectedSlotId === s.id;
+                        return (
+                          <button
+                            key={s.id}
+                            type="button"
+                            onClick={() => setSelectedSlotId(s.id)}
+                            disabled={disabled}
+                            className="flex items-center justify-between rounded-lg px-4 py-3 text-left text-sm transition"
+                            style={{
+                              border: active ? "1px solid rgba(139,92,246,0.6)" : "1px solid rgba(139,92,246,0.2)",
+                              background: active ? "rgba(139,92,246,0.15)" : disabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.06)",
+                              color: disabled ? "rgba(255,255,255,0.25)" : "white",
+                              cursor: disabled ? "not-allowed" : "pointer",
+                              boxShadow: active ? "0 0 16px rgba(139,92,246,0.2)" : "none",
+                            }}
+                          >
+                            <span className="font-semibold">{label}</span>
+                            <span className="text-xs" style={{ color: disabled ? "rgba(255,255,255,0.25)" : "#c084fc" }}>
+                              {disabled ? "Penuh" : `${s.remaining} slot`}
+                            </span>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Benefits strip */}
+              <div
+                className="rounded-2xl p-4"
+                style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.15)" }}
+              >
+                <div className="mb-2 text-xs font-bold uppercase tracking-wider text-[#c084fc]">Kenapa Konsultasi?</div>
+                <ul className="flex flex-col gap-1.5">
+                  {[
+                    "Gratis, tidak ada biaya apapun",
+                    "Rekomendasi produk sesuai jenis kulit",
+                    "Rutinitas AM/PM yang tepat untukmu",
+                    "Dipandu skin expert berpengalaman",
+                  ].map(b => (
+                    <li key={b} className="flex items-center gap-2 text-xs text-[#5a4a6a]">
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#c084fc]" /> {b}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Right: Form */}
+            <div className="grid content-start gap-4">
+              <div
+                className="rounded-2xl p-7"
+                style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.15)", boxShadow: "0 8px 32px rgba(20,15,50,0.25)" }}
+              >
+                <div className="grid gap-1 mb-5">
+                  <h2 className="text-lg font-bold text-white">Data Kamu</h2>
+                  <p className="text-sm text-white/50">Isi data dengan benar agar kami bisa menghubungimu.</p>
+                </div>
+
+                <div className="grid gap-4">
+                  {[
+                    { label: "Nama", value: name, onChange: (v: string) => setName(v), placeholder: "Contoh: Nadia Putri", type: "text" },
+                    { label: "Email", value: email, onChange: (v: string) => setEmail(v), placeholder: "Contoh: nama@email.com", type: "email" },
+                    { label: "Nomor WhatsApp", value: phone, onChange: (v: string) => setPhone(v), placeholder: "Contoh: 08xxxxxxxxxx", type: "tel" },
+                  ].map(f => (
+                    <label key={f.label} className="grid gap-1.5 text-sm">
+                      <span className="font-semibold text-white">{f.label}</span>
+                      <input
+                        type={f.type}
+                        value={f.value}
+                        onChange={(e) => f.onChange(e.target.value)}
+                        className="min-h-11 rounded-lg border px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:ring-2 focus:ring-[#8b5cf6]/40"
+                        style={{ background: "rgba(255,255,255,0.06)", borderColor: "rgba(139,92,246,0.2)" }}
+                        placeholder={f.placeholder}
+                      />
+                    </label>
+                  ))}
+                  <label className="grid gap-1.5 text-sm">
+                    <span className="font-semibold text-white">Catatan (opsional)</span>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      className="min-h-24 rounded-lg border px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:ring-2 focus:ring-[#8b5cf6]/40"
+                      style={{ background: "rgba(255,255,255,0.06)", borderColor: "rgba(139,92,246,0.2)" }}
+                      placeholder="Ceritakan kondisi kulit / tujuan..."
+                    />
+                  </label>
+                </div>
+
+                {selectedSlot && (
+                  <div className="mt-4 rounded-lg p-4 text-sm text-white/70" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
+                    Slot dipilih:{" "}
+                    <span className="font-semibold text-[#c084fc]">
+                      {format(new Date(selectedSlot.startAt), "HH:mm")}–{format(new Date(selectedSlot.endAt), "HH:mm")}
+                    </span>
+                    {" · "}{selectedDayLabel}
+                  </div>
+                )}
+
+                {state.status === "error" && (
+                  <div className="mt-4 rounded-lg px-4 py-3 text-sm text-red-300" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)" }}>{state.message}</div>
+                )}
+                {state.status === "success" && (
+                  <div className="mt-4 rounded-lg p-4 text-sm" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", color: "#86efac" }}>
+                    Booking berhasil! ID: <span className="font-bold">{state.bookingNumber}</span>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={submit}
+                  disabled={!selectedSlotId || state.status === "submitting" || state.status === "loading"}
+                  className="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-lg px-8 py-3 text-sm font-extrabold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
+                  style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 4px 16px rgba(139,92,246,0.35)" }}
+                >
+                  {state.status === "submitting" ? "Memproses..." : "Konfirmasi Booking"}
+                </button>
+
+                <div className="mt-4 text-center text-xs text-white/40">
+                  Konfirmasi Email & WhatsApp dikirim setelah booking berhasil, dan reminder H-1 sebelum jadwal.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

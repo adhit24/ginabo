@@ -1,6 +1,7 @@
-import { NotificationChannel } from "@prisma/client";
+export const runtime = 'edge';
+
 import { jsonError, jsonOk } from "@/lib/http";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { journey21ApplicationSchema } from "@/lib/validation";
 
 function isDatabaseUnavailableError(e: unknown) {
@@ -17,24 +18,24 @@ export async function POST(req: Request) {
     const notifyTo = process.env.JOURNEY21_NOTIFY_EMAIL ? String(process.env.JOURNEY21_NOTIFY_EMAIL) : "hello@ginabo.co";
     const subject = `21 Days Journey: ${parsed.data.name}`;
 
-    await prisma.notificationJob.create({
-      data: {
-        channel: NotificationChannel.EMAIL,
-        eventType: "JOURNEY_21_APPLICATION",
-        to: notifyTo,
-        subject,
-        body: [
-          "Pendaftaran 21 Days Journey:",
-          "",
-          `Nama: ${parsed.data.name}`,
-          `Phone: ${parsed.data.phone}`,
-          parsed.data.email ? `Email: ${parsed.data.email}` : null
-        ]
-          .filter(Boolean)
-          .join("\n"),
-        payload: parsed.data
-      }
+    const { error } = await supabase.from("NotificationJob").insert({
+      channel: "EMAIL",
+      eventType: "JOURNEY_21_APPLICATION",
+      to: notifyTo,
+      subject,
+      body: [
+        "Pendaftaran 21 Days Journey:",
+        "",
+        `Nama: ${parsed.data.name}`,
+        `Phone: ${parsed.data.phone}`,
+        parsed.data.email ? `Email: ${parsed.data.email}` : null
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      payload: parsed.data
     });
+
+    if (error) throw error;
 
     return jsonOk({ submitted: true });
   } catch (e) {

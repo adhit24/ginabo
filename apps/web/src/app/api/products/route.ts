@@ -1,11 +1,11 @@
 import { jsonError, jsonOk } from "@/lib/http";
-import { listActiveProducts } from "@/lib/catalog";
+import { listActiveProducts, type CatalogProduct } from "@/lib/catalog";
 
 export async function GET() {
   try {
     const products = await listActiveProducts();
     return jsonOk(
-      products.map((p) => ({
+      products.map((p: CatalogProduct) => ({
         id: p.id,
         slug: p.slug,
         name: p.name,
@@ -20,4 +20,3 @@ export async function GET() {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));
   }
 }
-
