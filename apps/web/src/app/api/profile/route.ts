@@ -9,6 +9,7 @@ import type { ProfileRow } from '@/types/database'
 
 export async function PATCH(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
+  const profiles = supabase.from('profiles') as any
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -27,14 +28,26 @@ export async function PATCH(req: NextRequest) {
     return jsonError('Data profil tidak valid', 400, parsed.error.flatten())
   }
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .update(parsed.data as never)
+  const update = {
+    ...(parsed.data.full_name !== undefined ? { full_name: parsed.data.full_name } : {}),
+    ...(parsed.data.phone !== undefined ? { phone_number: parsed.data.phone } : {}),
+    ...(parsed.data.date_of_birth !== undefined ? { date_of_birth: parsed.data.date_of_birth } : {}),
+    ...(parsed.data.avatar_url !== undefined ? { avatar_url: parsed.data.avatar_url } : {}),
+  }
+
+  const { data, error } = await profiles
+    .update(update as never)
     .eq('id', user.id)
-    .select('full_name, phone, date_of_birth, gender, avatar_url')
+    .select('full_name, phone_number, date_of_birth, avatar_url')
     .single()
 
   if (error || !data) return jsonError('Gagal menyimpan profil', 500, error?.message)
 
-  return jsonOk(data as Pick<ProfileRow, 'full_name' | 'phone' | 'date_of_birth' | 'gender' | 'avatar_url'>)
+  return jsonOk({
+    full_name: data.full_name,
+    phone: data.phone_number,
+    date_of_birth: data.date_of_birth,
+    gender: parsed.data.gender ?? null,
+    avatar_url: data.avatar_url,
+  } as Pick<ProfileRow, 'full_name' | 'phone' | 'date_of_birth' | 'gender' | 'avatar_url'>)
 }

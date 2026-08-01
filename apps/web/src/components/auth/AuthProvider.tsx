@@ -43,7 +43,7 @@ function toAppUser(supabaseUser: SupabaseUser, profile?: Record<string, unknown>
     tier: "Regular",
     points: (profile?.loyalty_points as number) ?? 100,
     joinedAt: `${MONTHS[createdAt.getMonth()]} ${createdAt.getFullYear()}`,
-    phone: (profile?.phone as string) ?? null,
+    phone: (profile?.phone_number as string) ?? (profile?.phone as string) ?? null,
     dateOfBirth: (profile?.date_of_birth as string) ?? null,
     gender: (profile?.gender as User["gender"]) ?? null,
     avatarUrl: (profile?.avatar_url as string) ?? null,
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const supabase = createClient();
     const { data: profile } = await supabase
       .from("profiles")
-      .select("full_name, loyalty_points, phone, date_of_birth, gender, avatar_url")
+      .select("full_name, loyalty_points, phone_number, date_of_birth, avatar_url")
       .eq("id", supabaseUser.id)
       .single();
     setUser(toAppUser(supabaseUser, profile));
