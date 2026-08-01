@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { useCart } from "@/components/cart/CartProvider";
 import { AddressPicker } from "@/components/checkout/AddressPicker";
+import { PaymentMethodSelector, type PaymentMethod } from "@/components/checkout/PaymentMethodSelector";
 import JneShippingQuote from "@/components/shipping/JneShippingQuote";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { authFetch } from "@/lib/supabase/client";
@@ -25,6 +26,7 @@ export default function CheckoutPage() {
   const [addressId, setAddressId] = useState<string | null>(null);
   const [selectedAddress, setSelectedAddress] = useState<AddressRow | null>(null);
   const [shippingOption, setShippingOption] = useState<ShippingOption | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [status, setStatus] = useState<CheckoutState>({ status: "idle" });
   const packageWeight = useMemo(
     () => Math.max(1000, cart.items.reduce((sum, item) => sum + (item.weightGrams ?? 100) * item.quantity, 0)),
@@ -58,6 +60,7 @@ export default function CheckoutPage() {
           shipping_cost: shippingOption?.cost ?? 0,
           shipping_courier: shippingOption?.courier_code ?? null,
           shipping_service: shippingOption?.service ?? null,
+          payment_method: paymentMethod?.provider ?? null,
         })
       });
       const json = (await res.json()) as {
@@ -134,10 +137,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="mt-6 border-t border-gray-100 pt-5">
-                  <h2 className="mb-2 text-sm font-bold text-gray-900">Metode Pembayaran</h2>
-                  <p className="rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-3 text-xs text-gray-500">
-                    Midtrans — QRIS, Virtual Account, Kartu Kredit. Kamu akan diarahkan ke halaman pembayaran setelah pesanan dibuat.
-                  </p>
+                  <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
                 </div>
 
                 {status.status === "error" && (
@@ -149,7 +149,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={submit}
-                  disabled={status.status === "submitting" || !addressId || !shippingOption}
+                  disabled={status.status === "submitting" || !addressId || !shippingOption || !paymentMethod}
                   className="mt-6 w-full rounded-xl bg-brand-700 py-3.5 text-sm font-bold text-white transition hover:bg-brand-800 disabled:opacity-50"
                 >
                   {status.status === "submitting" ? "Memproses..." : "Buat Pesanan"}
