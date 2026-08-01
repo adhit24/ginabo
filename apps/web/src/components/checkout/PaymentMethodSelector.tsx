@@ -59,14 +59,14 @@ function ProviderCard({ provider, selected, onClick }: { provider: Provider; sel
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className={`flex min-h-[112px] flex-col justify-between rounded-xl border p-3 text-left transition duration-200 ${selected ? "border-brand-500 bg-brand-50 shadow-sm ring-2 ring-brand-100" : "border-gray-200 bg-white hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-sm"}`}
+      className={`flex min-h-[104px] flex-col justify-between rounded-xl border p-2.5 text-left transition duration-200 ${selected ? "border-brand-500 bg-brand-50 shadow-sm ring-2 ring-brand-100" : "border-gray-200 bg-white hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-sm"}`}
     >
-      <span className="flex h-8 items-center">
-        <img src={provider.logo} alt={`${provider.label} logo`} className="max-h-8 max-w-[92px] object-contain" />
+      <span className="flex h-7 w-full items-center justify-center rounded-md bg-white">
+        <img src={provider.logo} alt={`${provider.label} logo`} className="max-h-6 max-w-[72px] object-contain" />
       </span>
       <span>
-        <span className="mt-2 block text-xs font-bold text-gray-900">{provider.label}</span>
-        <span className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${provider.fee === 0 ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
+        <span className="mt-1.5 block min-h-7 text-[11px] font-bold leading-tight text-gray-900">{provider.label}</span>
+        <span className={`inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${provider.fee === 0 ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-600"}`}>
           {feeLabel(provider.fee)}
         </span>
       </span>
