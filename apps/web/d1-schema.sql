@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS Product (
   priceMinor INTEGER NOT NULL,
   currency   TEXT    NOT NULL DEFAULT 'IDR',
   stockQty   INTEGER NOT NULL DEFAULT 0,
+  weightGrams INTEGER,
   isActive   INTEGER NOT NULL DEFAULT 1,
   createdAt  TEXT    NOT NULL DEFAULT (datetime('now')),
   updatedAt  TEXT    NOT NULL DEFAULT (datetime('now'))

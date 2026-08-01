@@ -29,6 +29,7 @@ async function main() {
         "Serum ringan untuk membantu kulit tampak lebih cerah alami, halus, dan tetap nyaman di tengah aktivitas harian. Cepat meresap dan enak dipakai sebelum makeup.",
       priceMinor: 285000,
       stockQty: 50,
+      weightGrams: 20,
       images: [{ url: "/product-serum-bg.png", alt: "GlowAge Serum", sortOrder: 0 }]
     },
     {
@@ -38,6 +39,7 @@ async function main() {
         "Moisture cream untuk membantu menjaga skin barrier dan menutrisi kulit agar terasa lebih lembap dan tenang. Nyaman dipakai pagi dan malam, tanpa rasa berat.",
       priceMinor: 195000,
       stockQty: 60,
+      weightGrams: 10,
       images: [{ url: "/product-cream-bg.png", alt: "Bright & Care Moisture Cream", sortOrder: 0 }]
     },
     {
@@ -47,6 +49,7 @@ async function main() {
         "Gel hydration 3-in-1 untuk membantu melembapkan, menenangkan, dan mendukung recovery saat kulit terasa capek. Tekstur ringan, cepat meresap, dan nyaman dipakai harian.",
       priceMinor: 215000,
       stockQty: 40,
+      weightGrams: 30,
       images: [{ url: "/product-dna-bg.png", alt: "Hydra Moist Gel Ultimate", sortOrder: 0 }]
     },
     {
@@ -56,6 +59,7 @@ async function main() {
         "Paket rutinitas AM/PM untuk perempuan aktif: GlowAge Serum + Bright & Care Cream + Hydra Moist Gel. Lebih praktis untuk dipakai konsisten, lebih hemat 20% dari harga normal.",
       priceMinor: 620000,
       stockQty: 30,
+      weightGrams: 40,
       images: [{ url: "/product-bundle.png", alt: "Daily Skin Nutrition Set", sortOrder: 0 }]
     },
     {
@@ -64,6 +68,7 @@ async function main() {
       description: "Ukuran travel untuk mulai coba rutinitas GlowAge. Nyaman dipakai rutin sebelum upgrade ke full size.",
       priceMinor: 165000,
       stockQty: 45,
+      weightGrams: 20,
       images: [{ url: "/product-serum-1.png", alt: "GlowAge Serum 20ml", sortOrder: 0 }]
     },
     {
@@ -72,6 +77,7 @@ async function main() {
       description: "Edisi promo untuk member. Moisture cream yang nyaman dipakai harian, fokus pada hidrasi dan kenyamanan kulit.",
       priceMinor: 175000,
       stockQty: 25,
+      weightGrams: 10,
       images: [{ url: "/product-cream-1.png", alt: "Bright & Care Cream Promo", sortOrder: 0 }]
     },
     {
@@ -81,6 +87,7 @@ async function main() {
         "Duo serum + cream untuk membantu kulit tampak lebih cerah alami, tetap lembap, dan terasa nyaman dipakai rutin. Cocok untuk kamu yang aktif dan ingin skincare yang tidak ribet.",
       priceMinor: 435000,
       stockQty: 20,
+      weightGrams: 30,
       images: [{ url: "/product-serum-2.png", alt: "Bright + Comfort Duo", sortOrder: 0 }]
     },
     {
@@ -90,6 +97,7 @@ async function main() {
         "Kombinasi serum + gel hydration untuk bantu kulit terasa lebih lembap, tenang, dan tampak lebih segar. Ringan dan nyaman untuk pemakaian harian.",
       priceMinor: 360000,
       stockQty: 35,
+      weightGrams: 50,
       images: [{ url: "/product-dna-1.png", alt: "Hydration + Glow Duo", sortOrder: 0 }]
     },
     {
@@ -128,6 +136,7 @@ async function main() {
         description: p.description,
         priceMinor: p.priceMinor,
         stockQty: p.stockQty,
+        weightGrams: p.weightGrams,
         isActive: true,
         images: { create: p.images }
       },
@@ -136,6 +145,7 @@ async function main() {
         description: p.description,
         priceMinor: p.priceMinor,
         stockQty: p.stockQty,
+        weightGrams: p.weightGrams,
         isActive: true,
         images: { deleteMany: {}, create: p.images }
       }

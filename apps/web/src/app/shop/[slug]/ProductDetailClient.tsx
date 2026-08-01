@@ -17,6 +17,7 @@ type Props = {
     priceMinor: number;
     currency: string;
     stockQty: number;
+    weightGrams: number | null;
     images: ProductImage[];
   };
 };
@@ -138,6 +139,11 @@ export function ProductDetailClient({ product }: Props) {
                 {product.description}
               </p>
             )}
+            {product.weightGrams !== null && (
+              <p className="text-[13px] font-medium text-[#303030]">
+                Berat produk: <span className="text-[#78257C]">{product.weightGrams} gram</span>
+              </p>
+            )}
 
             {/* Divider */}
             <div className="h-px bg-[#f0f0f0]" />
@@ -213,8 +219,11 @@ export function ProductDetailClient({ product }: Props) {
           <div className="py-8 max-w-3xl">
             {activeTab === 0 && (
               <div className="text-[14px] leading-relaxed text-[#808080]">
-                {product.description ? (
-                  <p>{product.description}</p>
+                {product.description || product.weightGrams !== null ? (
+                  <div className="flex flex-col gap-2">
+                    {product.description && <p>{product.description}</p>}
+                    {product.weightGrams !== null && <p className="font-medium text-[#303030]">Berat produk: {product.weightGrams} gram</p>}
+                  </div>
                 ) : (
                   <p className="text-[#ccc]">Deskripsi produk belum tersedia.</p>
                 )}
