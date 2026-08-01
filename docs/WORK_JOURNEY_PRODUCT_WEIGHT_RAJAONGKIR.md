@@ -2,6 +2,28 @@
 
 Dokumen handoff pekerjaan untuk fitur berat produk, bundling, dan persiapan integrasi ongkos kirim RajaOngkir/Komerce.
 
+## Strategi environment dan deployment
+
+Website dan repository berikut adalah **development/staging playground** untuk membangun dan menyempurnakan Ginabo:
+
+- Website development: https://ginabo-three.vercel.app/
+- Repository development: https://github.com/adhit24/ginabo
+
+Website dan repository berikut adalah **official production**:
+
+- Website official: https://www.ginabo.id/
+- Repository official: https://github.com/ginaboofficial/ginabo
+- Project Vercel official: https://vercel.com/ginabo-s-projects/ginabo
+
+Website official sengaja berada dalam kondisi **Under maintenance** agar pengunjung tidak kecewa selama performa, fitur, database, pembayaran, pengiriman, dan operasional masih dibangun.
+
+Aturan kerja:
+
+1. Semua eksperimen, perubahan kode, migration, dan pengujian dilakukan lebih dulu di `adhit24/ginabo` dan `ginabo-three.vercel.app`.
+2. Jangan push, deploy, atau mengubah `ginaboofficial/ginabo` maupun project Vercel official secara langsung selama fase pembangunan.
+3. Setelah fitur dianggap stabil dan lolos validasi, perubahan dipromosikan secara terencana ke repository official dan deployment official.
+4. Sebelum promosi, lakukan review perbedaan environment variable, database, webhook, domain, payment provider, dan shipping provider.
+
 ## Status terakhir
 
 - Repository: `adhit24/ginabo`
