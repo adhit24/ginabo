@@ -120,20 +120,23 @@ let the user fall back to typing — do not block the rest of the flow.
 
 ## 4. Foto Profil, max 2MB
 
-New public Supabase Storage bucket `avatars`, created via SQL migration:
-bucket row (`public: true`) plus RLS policies so an authenticated user can
-insert/update/delete only under their own `<user_id>/` path, with public
-read for everyone (avatars must display without an authenticated
-session).
+No new bucket needed. `supabase/migrations/002_storage_buckets.sql`
+already created a `user-avatars` bucket — public, `file_size_limit`
+2097152 (2MB), `allowed_mime_types` jpeg/png/webp — with RLS policies
+letting an authenticated user insert/update/delete only under their own
+`<user_id>/` path, and public read for everyone. Confirmed live on the
+production project via the Storage API (`GET /storage/v1/bucket`): this
+bucket already exists with exactly this config. Section 4 is purely
+application code — no migration work.
 
 Clicking the pencil icon on the avatar opens a file picker restricted to
 `image/png`, `image/jpeg`, `image/webp`. Client validates `file.size <=
 2 * 1024 * 1024` before doing anything else — oversized files never reach
-the network. On pass, upload directly to
-`avatars/<user_id>/avatar.<ext>` via
-`supabase.storage.from('avatars').upload(..., { upsert: true })` (same
-direct-upload pattern as return evidence), then `PATCH /api/profile` with
-the resulting public URL to persist `avatar_url`.
+the network (the bucket's own limit is a backstop, not the primary UX).
+On pass, upload directly to `user-avatars/<user_id>/avatar.<ext>` via
+`supabase.storage.from('user-avatars').upload(..., { upsert: true })`
+(same direct-upload pattern as return evidence), then `PATCH /api/profile`
+with the resulting public URL to persist `avatar_url`.
 
 Once `avatar_url` is set, the member page shows the image instead of
 initials — both the profile banner circle and the settings-tab avatar
