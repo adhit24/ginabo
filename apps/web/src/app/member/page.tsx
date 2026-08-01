@@ -8,8 +8,6 @@ import { AddressModal } from "@/components/member/AddressModal";
 import type { AddressRow } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 
-type ProfileFields = { phone: string | null; dateOfBirth: string | null; gender: "male" | "female" | "other" | null; avatarUrl: string | null };
-
 const tiers = ["Regular", "Silver", "Gold", "Platinum"];
 
 const tierProgress: Record<string, number> = {
@@ -110,11 +108,7 @@ const menuItems = [
 ];
 
 export default function MemberPage() {
-  const auth = useAuth() as ReturnType<typeof useAuth> & {
-    user: (NonNullable<ReturnType<typeof useAuth>["user"]> & ProfileFields) | null;
-    refreshProfile: () => Promise<void>;
-  };
-  const { user, isLoading, logout, changePassword, refreshProfile } = auth;
+  const { user, isLoading, logout, changePassword, refreshProfile } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");
   const [form, setForm] = useState({ name: "", phone: "", email: "", dob: "", gender: "" });
