@@ -1,0 +1,27 @@
+
+> ginabo-web@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3000
+
+  ▲ Next.js 14.2.35
+  - Local:        http://127.0.0.1:3000
+  - Network:      http://127.0.0.1:3000
+  - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 2.6s
+ ○ Compiling / ...
+ ✓ Compiled / in 7.7s (1499 modules)
+ GET / 200 in 8277ms
+ GET / 200 in 62ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 521ms (1466 modules)
+ GET /sw.js 404 in 650ms
+ ✓ Compiled /src/middleware in 347ms (127 modules)
+ ○ Compiling /shop/[slug] ...
+ ✓ Compiled /shop/[slug] in 535ms (1507 modules)
+ ✓ Compiled in 588ms (1518 modules)
+ ✓ Compiled in 417ms (1518 modules)
+ ✓ Compiled in 1171ms (1518 modules)
+ ✓ Compiled in 601ms (1518 modules)
+ ✓ Compiled in 539ms (1518 modules)
+[?25h
