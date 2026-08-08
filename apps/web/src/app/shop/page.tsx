@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useCart } from "@/components/cart/CartProvider";
-import { useShopCatalog, type ShopProduct } from "@/lib/useShopCatalog";
+import { useShopCatalog } from "@/lib/useShopCatalog";
+import { ProductCard } from "@/components/ProductCard";
 
 const CATEGORIES = [
   { key: "all",      label: "Semua Produk" },
@@ -19,67 +19,6 @@ const SORT_OPTIONS = [
   { key: "price-lo", label: "Harga Terendah" },
   { key: "price-hi", label: "Harga Tertinggi" },
 ];
-
-function StarRating({ rating }: { rating: string }) {
-  return (
-    <div className="flex items-center gap-1">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-      </svg>
-      <span className="text-[12px] text-[#808080]">{rating}</span>
-    </div>
-  );
-}
-
-function ProductCard({ product }: { product: ShopProduct }) {
-  const { addItem } = useCart();
-
-  function handleCart(e: React.MouseEvent) {
-    e.preventDefault();
-    addItem({
-      productId:  product.slug,
-      slug:       product.slug,
-      name:       product.name,
-      priceMinor: product.priceMinor,
-      currency:   "IDR",
-      imageUrl:   product.img,
-    });
-  }
-
-  return (
-    <Link href={`/shop/${product.slug}`} className="group flex flex-col bg-white rounded-[5px] border border-[#E2E2E2] overflow-hidden hover:shadow-[0_4px_20px_rgba(0,0,0,0.10)] transition-shadow">
-      {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-[#fafafa]">
-        <img
-          src={product.img}
-          alt={product.name}
-          className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
-        />
-        {product.tag && (
-          <span
-            className="absolute top-2 left-2 rounded-[3px] px-2 py-0.5 text-[10px] font-bold text-white"
-            style={{ background: product.tag.includes("OFF") ? "#e53e3e" : "#78257C" }}
-          >
-            {product.tag}
-          </span>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex flex-col gap-1.5 p-3 flex-1">
-        <p className="text-[11px] text-[#808080]">Ginabo</p>
-        <p className="text-[13px] font-semibold text-[#303030] leading-snug line-clamp-2">{product.name}</p>
-        <StarRating rating={product.rating} />
-        <div className="mt-auto pt-1">
-          {product.originalPrice && (
-            <p className="text-[11px] text-[#aaa] line-through">{product.originalPrice}</p>
-          )}
-          <p className="text-[14px] font-bold" style={{ color: "#78257C" }}>{product.price}</p>
-        </div>
-      </div>
-    </Link>
-  );
-}
 
 export default function ShopPage() {
   const allProducts = useShopCatalog();

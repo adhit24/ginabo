@@ -1,107 +1,66 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 
-import { useCurrency } from "@/components/currency/CurrencyProvider";
-import { AddToCartButton } from "@/components/cart/AddToCartButton";
-
 export type ProductCardData = {
-  id: string;
   slug: string;
   name: string;
-  description: string;
-  priceMinor: number;
-  currency: "IDR" | "USD";
-  imageUrl: string | null;
-  discountPct?: number;
-  rating?: number;
+  price: string;
+  originalPrice?: string;
+  img: string;
+  rating?: string;
+  tag?: string;
 };
 
-function StarRating({ rating = 0 }: { rating: number }) {
+function StarRating({ rating }: { rating?: string }) {
+  if (!rating) return null;
   return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map(i => (
-        <svg key={i} width="11" height="11" viewBox="0 0 24 24" fill={i <= Math.round(rating) ? "#F59E0B" : "#E5E7EB"}>
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-        </svg>
-      ))}
-      <span className="ml-1 text-[11px] text-gray-400">{rating > 0 ? rating.toFixed(1) : "0"}</span>
+    <div className="flex items-center gap-1">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+      </svg>
+      <span className="text-[12px] text-gray-400">{rating}</span>
     </div>
   );
 }
 
+// Single shared product card — the whole card is a link to the product
+// detail page (no add-to-cart button), matching the Somethinc pattern the
+// redesign is based on. Used by both the shop grid and the homepage catalog.
 export function ProductCard({ product }: { product: ProductCardData }) {
-  const { formatPrice } = useCurrency();
-  const discount = product.discountPct ?? 0;
-  const originalMinor = discount > 0 ? Math.round(product.priceMinor / (1 - discount / 100)) : 0;
-  const rating = product.rating ?? 0;
-
   return (
-    <div className="group flex flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md">
-      {/* Image */}
-      <Link href={`/shop/${product.slug}`} className="relative block overflow-hidden rounded-lg bg-gray-50" style={{ aspectRatio: "4/5" }}>
-        {discount > 0 && (
-          <span className="absolute left-2 top-2 z-10 rounded-md bg-amber-400 px-1.5 py-0.5 text-[11px] font-extrabold text-white">
-            {discount}%
-          </span>
-        )}
-        {product.imageUrl ? (
-          <Image
-            src={product.imageUrl}
-            alt={product.name}
-            fill
-            className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-          />
-        ) : (
-          <div className="grid h-full place-items-center text-xs text-gray-400">No image</div>
-        )}
-      </Link>
-
-      {/* Info */}
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <Link href={`/shop/${product.slug}`}>
-          <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900 hover:text-brand-700">
-            {product.name}
-          </p>
-        </Link>
-
-        {/* Price */}
-        <div className="flex flex-col gap-0.5">
-          <span className="text-base font-bold text-brand-700">
-            {formatPrice(product.priceMinor)}
-          </span>
-          {discount > 0 && (
-            <span className="text-[11px] text-gray-400 line-through">
-              {formatPrice(originalMinor)}
-            </span>
-          )}
-        </div>
-
-        {/* Rating */}
-        <StarRating rating={rating} />
-
-        {/* Buttons */}
-        <div className="mt-auto flex flex-col gap-1.5 pt-1">
-          <AddToCartButton
-            product={{
-              productId: product.id,
-              slug: product.slug,
-              name: product.name,
-              priceMinor: product.priceMinor,
-              currency: product.currency,
-              imageUrl: product.imageUrl
-            }}
-          />
-          <Link
-            href={`/shop/${product.slug}`}
-            className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-brand-300 px-4 py-3 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"
+    <Link
+      href={`/shop/${product.slug}`}
+      className="group flex flex-col overflow-hidden rounded-[10px] border border-brand-100 bg-white transition-shadow hover:shadow-[0_4px_20px_rgba(91,75,138,0.10)]"
+    >
+      <div className="relative aspect-square overflow-hidden bg-brand-50">
+        <img
+          src={product.img}
+          alt={product.name}
+          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+        />
+        {product.tag && (
+          <span
+            className={`absolute left-2 top-2 rounded-[3px] px-2 py-0.5 text-[10px] font-bold text-white ${
+              product.tag.includes("OFF") ? "bg-red-500" : "bg-brand-700"
+            }`}
           >
-            Beli Sekarang
-          </Link>
+            {product.tag}
+          </span>
+        )}
+      </div>
+
+      <div className="flex flex-1 flex-col gap-1.5 p-3">
+        <p className="text-[11px] text-gray-400">Ginabo</p>
+        <p className="line-clamp-2 text-[13px] font-semibold leading-snug text-brand-900">{product.name}</p>
+        <StarRating rating={product.rating} />
+        <div className="mt-auto pt-1">
+          {product.originalPrice && (
+            <p className="text-[11px] text-gray-400 line-through">{product.originalPrice}</p>
+          )}
+          <p className="text-[14px] font-bold text-brand-700">{product.price}</p>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
