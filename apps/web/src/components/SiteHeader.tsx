@@ -8,6 +8,7 @@ import { CartMini } from "@/components/cart/CartMini";
 import { CurrencySwitcher } from "@/components/currency/CurrencySwitcher";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { SearchBar } from "@/components/search/SearchBar";
 import { useRouter } from "next/navigation";
 
 const EASE = [0.25, 1, 0.5, 1] as const;
@@ -234,6 +235,8 @@ export function SiteHeader() {
 
             </nav>
 
+            <SearchBar />
+
             <CurrencySwitcher />
 
             <div className="w-px h-5 bg-[#E9D5FF]/60 mx-2" />
@@ -350,8 +353,9 @@ export function SiteHeader() {
           />
         </Link>
 
-        {/* Right: currency + user + cart */}
+        {/* Right: search + currency + user + cart */}
         <div className="flex items-center gap-1.5">
+          <SearchBar />
           <CurrencySwitcher />
           {user ? (
             <Link href="/member" className="flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-[#F3E8FF]/40">

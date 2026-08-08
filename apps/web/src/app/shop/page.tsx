@@ -1,53 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
-import { store, type GProduct } from "@/lib/adminStore";
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useCart } from "@/components/cart/CartProvider";
-
-// ── Static product data ───────────────────────────────────────────────────────
-const STATIC_PRODUCTS = [
-  {
-    slug: "hydra-moist-gel-ultimate", name: "Hydra Moist Gel Ultimate",
-    category: "skincare", tag: "Multifungsi", rating: "4.9", reviews: "178",
-    price: "Rp 118.999", priceMinor: 118999, img: "/salmonfix.png",
-  },
-  {
-    slug: "bright-care-moisture-cream", name: "Bright & Care Moisture Cream",
-    category: "skincare", tag: "Barrier Care", rating: "4.9", reviews: "257",
-    price: "Rp 79.999", priceMinor: 79999, img: "/moistfix.png",
-  },
-  {
-    slug: "glowage-multi-active-serum", name: "GlowAge Multi-Active Serum",
-    category: "skincare", tag: "Best Seller", rating: "4.9", reviews: "387",
-    price: "Rp 89.999", priceMinor: 89999, img: "/serumfix.png",
-  },
-];
-
-const STATIC_BUNDLES = [
-  {
-    slug: "ginabo-complete-skin", name: "Ginabo Complete Skin Nutrition Set",
-    category: "bundling", tag: "50% OFF", rating: "5.0", reviews: "127",
-    price: "Rp 287.999", priceMinor: 287999, originalPrice: "Rp 575.999", img: "/essential.png",
-  },
-  {
-    slug: "repair-glow-set", name: "Repair & Glow Set",
-    category: "bundling", tag: "50% OFF", rating: "5.0", reviews: "89",
-    price: "Rp 207.999", priceMinor: 207999, originalPrice: "Rp 415.999", img: "/repair_glow.png",
-  },
-  {
-    slug: "daily-barrier-routine-set", name: "Daily Skin Barrier Set",
-    category: "bundling", tag: "50% OFF", rating: "5.0", reviews: "76",
-    price: "Rp 197.999", priceMinor: 197999, originalPrice: "Rp 395.999", img: "/skin_barrier.png",
-  },
-  {
-    slug: "bright-renewal-set", name: "Bright Renewal Set",
-    category: "bundling", tag: "50% OFF", rating: "5.0", reviews: "63",
-    price: "Rp 169.999", priceMinor: 169999, originalPrice: "Rp 339.999", img: "/bright_renewal.png",
-  },
-];
-
-type ShopProduct = typeof STATIC_PRODUCTS[0] & { originalPrice?: string };
+import { useShopCatalog, type ShopProduct } from "@/lib/useShopCatalog";
 
 const CATEGORIES = [
   { key: "all",      label: "Semua Produk" },
@@ -125,31 +82,17 @@ function ProductCard({ product }: { product: ShopProduct }) {
 }
 
 export default function ShopPage() {
-  const [allProducts, setAllProducts] = useState<ShopProduct[]>([...STATIC_PRODUCTS, ...STATIC_BUNDLES]);
+  const allProducts = useShopCatalog();
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q") ?? "";
   const [category, setCategory]       = useState("all");
   const [sort, setSort]               = useState("newest");
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-
-  useEffect(() => {
-    const storeProds = store.getProducts().map(p => ({
-      slug: p.slug || p.id, name: p.name, category: "skincare",
-      tag: p.tag || "", rating: p.rating, reviews: p.reviews,
-      price: p.priceLabel ? `${p.priceLabel} ${p.priceVal}` : p.priceVal,
-      priceMinor: p.priceMinor, img: p.img ?? "",
-    }));
-    const storeBundles = store.getBundles().map(p => ({
-      slug: p.slug || p.id, name: p.name, category: "bundling",
-      tag: "Bundling", rating: p.rating, reviews: p.reviews,
-      price: p.priceVal, priceMinor: p.priceMinor, img: p.img ?? "",
-      originalPrice: p.originalPrice,
-    }));
-    const existingSlugs = new Set([...STATIC_PRODUCTS, ...STATIC_BUNDLES].map(p => p.slug));
-    const newProds = [...storeProds, ...storeBundles].filter(p => !existingSlugs.has(p.slug));
-    if (newProds.length > 0) setAllProducts(prev => [...prev, ...newProds]);
-  }, []);
 
   const filtered = allProducts
     .filter(p => category === "all" || p.category === category)
+    .filter(p => !searchQuery.trim() || p.name.toLowerCase().includes(searchQuery.trim().toLowerCase()))
     .sort((a, b) => {
       if (sort === "price-lo") return a.priceMinor - b.priceMinor;
       if (sort === "price-hi") return b.priceMinor - a.priceMinor;
@@ -217,16 +160,33 @@ export default function ShopPage() {
                 <span className="text-[13px] text-[#808080] hidden md:inline">{filtered.length} produk</span>
               </div>
 
-              {/* Sort */}
-              <select
-                value={sort}
-                onChange={e => setSort(e.target.value)}
-                className="border border-[#E2E2E2] rounded-[5px] px-3 py-1.5 text-[13px] text-[#303030] bg-white outline-none cursor-pointer"
-              >
-                {SORT_OPTIONS.map(o => (
-                  <option key={o.key} value={o.key}>{o.label}</option>
-                ))}
-              </select>
+              <div className="flex items-center gap-2">
+                {/* Search within shop */}
+                <div className="relative hidden sm:block">
+                  <svg width="14" height="14" fill="none" stroke="#808080" strokeWidth="2" viewBox="0 0 24 24" className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Cari produk..."
+                    className="w-40 rounded-[5px] border border-[#E2E2E2] py-1.5 pl-8 pr-3 text-[13px] text-[#303030] outline-none focus:border-[#78257C]"
+                  />
+                </div>
+
+                {/* Sort */}
+                <select
+                  value={sort}
+                  onChange={e => setSort(e.target.value)}
+                  className="border border-[#E2E2E2] rounded-[5px] px-3 py-1.5 text-[13px] text-[#303030] bg-white outline-none cursor-pointer"
+                >
+                  {SORT_OPTIONS.map(o => (
+                    <option key={o.key} value={o.key}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Product Grid */}
@@ -238,7 +198,11 @@ export default function ShopPage() {
 
             {filtered.length === 0 && (
               <div className="py-16 text-center text-[#808080]">
-                <p className="text-[15px]">Tidak ada produk dalam kategori ini.</p>
+                <p className="text-[15px]">
+                  {searchQuery.trim()
+                    ? <>Tidak ada produk untuk &ldquo;{searchQuery}&rdquo;.</>
+                    : "Tidak ada produk dalam kategori ini."}
+                </p>
               </div>
             )}
           </div>
