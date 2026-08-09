@@ -1,7 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
-import { formatMoney } from "@/lib/money";
+import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 
 export type ProductCardData = {
@@ -30,6 +32,7 @@ function StarRating({ rating = 0 }: { rating: number }) {
 }
 
 export function ProductCard({ product }: { product: ProductCardData }) {
+  const { formatPrice } = useCurrency();
   const discount = product.discountPct ?? 0;
   const originalMinor = discount > 0 ? Math.round(product.priceMinor / (1 - discount / 100)) : 0;
   const rating = product.rating ?? 0;
@@ -67,11 +70,11 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         {/* Price */}
         <div className="flex flex-col gap-0.5">
           <span className="text-base font-bold text-brand-700">
-            {formatMoney(product.priceMinor, product.currency)}
+            {formatPrice(product.priceMinor)}
           </span>
           {discount > 0 && (
             <span className="text-[11px] text-gray-400 line-through">
-              {formatMoney(originalMinor, product.currency)}
+              {formatPrice(originalMinor)}
             </span>
           )}
         </div>

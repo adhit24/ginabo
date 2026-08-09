@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import type { ProductRow } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
@@ -19,12 +20,14 @@ const STATIC_PAGES = [
 export async function GET() {
   const supabase = createAdminClient();
 
-  const { data: products } = await supabase
+  const { data: rawProducts } = await supabase
     .from("products")
     .select("slug, updated_at")
-    .eq("is_active", true);
+    .eq("is_active", true as never);
 
-  const productUrls = (products ?? []).map(
+  const products = (rawProducts ?? []) as Pick<ProductRow, "slug" | "updated_at">[];
+
+  const productUrls = products.map(
     (p) => `
   <url>
     <loc>${BASE_URL}/shop/${p.slug}</loc>

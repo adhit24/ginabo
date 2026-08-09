@@ -15,7 +15,7 @@ export function getD1Db(): D1Database | null {
 export async function d1ListActiveProducts(db: D1Database) {
   const { results } = await db
     .prepare(
-      `SELECT p.id, p.slug, p.name, p.description, p.priceMinor, p.currency, p.stockQty, p.isActive,
+      `SELECT p.id, p.slug, p.name, p.description, p.priceMinor, p.currency, p.stockQty, p.weightGrams, p.isActive,
               i.url as imgUrl, i.alt as imgAlt, i.sortOrder as imgSortOrder
        FROM Product p
        LEFT JOIN ProductImage i ON i.productId = p.id AND i.sortOrder = 0
@@ -32,6 +32,7 @@ export async function d1ListActiveProducts(db: D1Database) {
     priceMinor: r.priceMinor as number,
     currency: r.currency as "IDR" | "USD",
     stockQty: r.stockQty as number,
+    weightGrams: r.weightGrams as number | null,
     isActive: Boolean(r.isActive),
     images: r.imgUrl ? [{ url: r.imgUrl as string, alt: r.imgAlt as string | null, sortOrder: r.imgSortOrder as number }] : [],
   }));
@@ -58,6 +59,7 @@ export async function d1GetProductBySlug(db: D1Database, slug: string) {
     priceMinor: product.priceMinor as number,
     currency: product.currency as "IDR" | "USD",
     stockQty: product.stockQty as number,
+    weightGrams: product.weightGrams as number | null,
     isActive: Boolean(product.isActive),
     images,
   };

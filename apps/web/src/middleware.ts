@@ -1,6 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { getAdminSessionCookieName, verifyAdminSessionToken } from "@/lib/auth";
+import { MAINTENANCE_HTML } from "@/lib/maintenancePage";
+
+// ─── Maintenance mode ─────────────────────────────────────────────────────────
+
+/**
+ * Storefront-wide kill switch. Flip to `false` and push to reopen — this is
+ * a code constant (not an env var) so a single commit is enough to take the
+ * site down or bring it back up, with no dashboard step required.
+ */
+const MAINTENANCE_MODE = false;
+
+/** Paths that stay reachable even while the site is under maintenance. */
+const MAINTENANCE_ALLOWLIST = ["/admin", "/api/admin", "/api/payment/webhook"] as const;
 
 // ─── Route classification ────────────────────────────────────────────────────
 
@@ -55,6 +68,19 @@ function hasSupabaseSession(req: NextRequest): boolean {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  // 0. Maintenance mode — short-circuit everything except the allowlist.
+  if (MAINTENANCE_MODE && !startsWith(pathname, MAINTENANCE_ALLOWLIST)) {
+    return new NextResponse(MAINTENANCE_HTML, {
+      status: 503,
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        "Retry-After": "3600",
+        "X-Robots-Tag": "noindex",
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
   // 1. Always allow explicitly public API routes (webhooks, etc.)
   if (startsWith(pathname, PUBLIC_API_ALLOWLIST)) {
     return NextResponse.next();
@@ -94,6 +120,8 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
+    // Catch-all for maintenance mode (skips Next internals and static files).
+    "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)",
     // Admin pages and API
     "/admin/:path*",
     "/api/admin/:path*",

@@ -72,3 +72,28 @@ export const journey21ApplicationSchema = z.object({
   phone: z.string().min(8).max(30),
   email: z.string().email().optional().or(z.literal(""))
 });
+
+export const addressSchema = z.object({
+  label: z.string().max(60).optional().or(z.literal("")),
+  recipient_name: z.string().min(2).max(120),
+  phone: z.string().min(8).max(30),
+  address_line1: z.string().min(5).max(255),
+  address_line2: z.string().max(255).optional().or(z.literal("")),
+  city: z.string().min(2).max(120),
+  province: z.string().min(2).max(120),
+  postal_code: z.string().min(4).max(10),
+  country: z.string().min(2).max(60).default("Indonesia"),
+  is_default: z.boolean().default(false)
+});
+
+export const addressUpdateSchema = addressSchema.partial();
+
+export const profileUpdateSchema = z.object({
+  full_name: z.string().min(2).max(120).optional(),
+  phone: z.string().min(8).max(30).nullable().optional(),
+  date_of_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  gender: z.enum(["male", "female", "other"]).nullable().optional(),
+  avatar_url: z.string().url().optional(),
+}).refine((data) => Object.keys(data).length > 0, {
+  message: "Tidak ada data untuk diperbarui",
+});

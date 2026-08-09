@@ -7,8 +7,7 @@
  * 2. Dapatkan API key dari dashboard
  * 3. Set env vars:
  *    RAJAONGKIR_API_KEY=your_api_key
- *    RAJAONGKIR_PLAN=starter         # starter | basic | pro
- *    RAJAONGKIR_ORIGIN_CITY_ID=501   # ID kota asal/gudang Ginabo (501 = Surabaya)
+ *    RAJAONGKIR_ORIGIN_CITY_ID=15992 # ID destinasi gudang (Kecapi, Cirebon)
  *
  * Free plan (Starter): JNE, POS, TIKI only
  * Pro plan: +J&T, SiCepat, Ninja, GrabExpress, dll.
@@ -40,11 +39,14 @@ export interface RajaOngkirProvince {
 
 export interface RajaOngkirCity {
   city_id: string;
-  province_id: string;
-  province: string;
-  type: "Kabupaten" | "Kota";
+  province_id?: string;
+  province?: string;
+  type?: "Kabupaten" | "Kota";
   city_name: string;
-  postal_code: string;
+  postal_code?: string;
+  label?: string;
+  district_name?: string;
+  subdistrict_name?: string;
 }
 
 export interface RajaOngkirCostDetail {
@@ -101,19 +103,12 @@ export interface ShippingOption {
 
 function getConfig() {
   const apiKey = process.env.RAJAONGKIR_API_KEY;
-  const plan = (process.env.RAJAONGKIR_PLAN ?? "starter") as "starter" | "basic" | "pro";
-
-  const BASE_URLS = {
-    starter: "https://api.rajaongkir.com/starter",
-    basic:   "https://api.rajaongkir.com/basic",
-    pro:     "https://pro.rajaongkir.com/api",
-  };
 
   return {
     apiKey,
-    baseUrl: BASE_URLS[plan],
+    baseUrl: "https://rajaongkir.komerce.id/api/v1",
     configured: Boolean(apiKey),
-    originCityId: process.env.RAJAONGKIR_ORIGIN_CITY_ID ?? "501", // default Surabaya
+    originCityId: process.env.RAJAONGKIR_ORIGIN_CITY_ID ?? "15992", // Kecapi, Cirebon
   };
 }
 
@@ -139,13 +134,13 @@ async function rajaFetch<T>(endpoint: string, options?: RequestInit): Promise<T>
     throw new Error(`RajaOngkir API error: ${res.status} ${res.statusText}`);
   }
 
-  const json = await res.json() as { rajaongkir: { status: { code: number; description: string }; results: T } };
+  const json = await res.json() as { meta?: { code: number; message: string; status: string }; data?: T };
 
-  if (json.rajaongkir.status.code !== 200) {
-    throw new Error(`RajaOngkir: ${json.rajaongkir.status.description}`);
+  if (!json.meta || json.meta.code !== 200) {
+    throw new Error(`RajaOngkir: ${json.meta?.message ?? "Respons API tidak valid"}`);
   }
 
-  return json.rajaongkir.results;
+  return json.data as T;
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -156,9 +151,27 @@ export async function getProvinces(): Promise<RajaOngkirProvince[]> {
 }
 
 /** Ambil daftar kota/kabupaten (bisa filter per provinsi) */
-export async function getCities(provinceId?: string): Promise<RajaOngkirCity[]> {
-  const query = provinceId ? `?province=${provinceId}` : "";
-  return rajaFetch<RajaOngkirCity[]>(`/city${query}`);
+export async function getCities(search: string): Promise<RajaOngkirCity[]> {
+  const query = new URLSearchParams({ search, limit: "20", offset: "0" });
+  const results = await rajaFetch<Array<{
+    id: number;
+    label: string;
+    province_name: string;
+    city_name: string;
+    district_name: string;
+    subdistrict_name: string;
+    zip_code: string;
+  }>>(`/destination/domestic-destination?${query.toString()}`);
+
+  return results.map((item) => ({
+    city_id: String(item.id),
+    city_name: item.city_name,
+    province: item.province_name,
+    postal_code: item.zip_code,
+    label: item.label,
+    district_name: item.district_name,
+    subdistrict_name: item.subdistrict_name,
+  }));
 }
 
 /**
@@ -182,33 +195,33 @@ export async function calculateShippingCost(
         destination: destinationCityId,
         weight:      String(weightGrams),
         courier:     courierCode,
+        price:       "lowest",
       });
 
       type CostResults = Array<{
         code: string;
         name: string;
-        costs: RajaOngkirService[];
+        service: string;
+        description: string;
+        cost: number;
+        etd: string;
       }>;
 
-      const results = await rajaFetch<CostResults>("/cost", {
+      const results = await rajaFetch<CostResults>("/calculate/domestic-cost", {
         method: "POST",
         body: body.toString(),
       });
 
       const courierInfo = COURIERS.find((c) => c.code === courierCode);
       for (const result of results) {
-        for (const svc of result.costs) {
-          const costDetail = svc.cost[0];
-          if (!costDetail) continue;
-          options.push({
-            courier_code:        courierCode,
-            courier_name:        courierInfo?.name ?? result.name,
-            service:             svc.service,
-            service_description: svc.description,
-            cost:                costDetail.value,
-            etd:                 costDetail.etd ? `${costDetail.etd} hari` : "-",
-          });
-        }
+        options.push({
+          courier_code:        courierCode,
+          courier_name:        courierInfo?.name ?? result.name,
+          service:             result.service,
+          service_description: result.description,
+          cost:                result.cost,
+          etd:                 result.etd ? `${result.etd} hari` : "-",
+        });
       }
     })
   );

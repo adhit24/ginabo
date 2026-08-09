@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { CurrencyProvider } from "@/components/currency/CurrencyProvider";
 import { ClientShell } from "@/components/ClientShell";
 
 const montserrat = Montserrat({
@@ -57,13 +58,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           `}
         </Script>
         <AuthProvider>
-          <CartProvider>
-            <ClientShell>
-              <SiteHeader />
-              <main className="w-full">{children}</main>
-              <SiteFooter />
-            </ClientShell>
-          </CartProvider>
+          <CurrencyProvider>
+            <CartProvider>
+              <ClientShell>
+                <SiteHeader />
+                <main className="w-full">{children}</main>
+                <SiteFooter />
+              </ClientShell>
+            </CartProvider>
+          </CurrencyProvider>
         </AuthProvider>
       </body>
     </html>

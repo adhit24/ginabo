@@ -20,20 +20,23 @@ export default function ShippingCalculator({ weightGrams, onSelect, selectedOpti
   const [citiesLoaded, setCitiesLoaded] = useState(false);
 
   useEffect(() => {
-    fetch("/api/shipping/cities")
+    if (citySearch.trim().length < 2) {
+      setCities([]);
+      setCitiesLoaded(true);
+      return;
+    }
+    setCitiesLoaded(false);
+    const timer = window.setTimeout(() => fetch(`/api/shipping/cities?search=${encodeURIComponent(citySearch.trim())}`)
       .then((r) => r.json())
       .then((d: { cities?: RajaOngkirCity[] }) => {
         if (d.cities) setCities(d.cities);
         setCitiesLoaded(true);
       })
-      .catch(() => setCitiesLoaded(true));
-  }, []);
+      .catch(() => setCitiesLoaded(true)), 300);
+    return () => window.clearTimeout(timer);
+  }, [citySearch]);
 
-  const filteredCities = citySearch.length >= 2
-    ? cities.filter((c) =>
-        `${c.city_name} ${c.type}`.toLowerCase().includes(citySearch.toLowerCase())
-      ).slice(0, 10)
-    : [];
+  const filteredCities = cities.slice(0, 10);
 
   async function handleCalculate() {
     if (!selectedCityId) return;
@@ -65,15 +68,15 @@ export default function ShippingCalculator({ weightGrams, onSelect, selectedOpti
   }
 
   const inputStyle = {
-    background: "rgba(255,255,255,0.07)",
-    border: "1px solid rgba(255,255,255,0.15)",
+    background: "#ffffff",
+    border: "1px solid #e5e7eb",
   };
 
   return (
     <div className="flex flex-col gap-4">
       {/* City search */}
       <div className="relative flex flex-col gap-1.5">
-        <label className="text-xs font-semibold uppercase tracking-wider text-white/50">
+        <label className="text-xs font-semibold uppercase tracking-wider text-gray-500">
           Kota Tujuan
         </label>
         <input
@@ -81,14 +84,14 @@ export default function ShippingCalculator({ weightGrams, onSelect, selectedOpti
           placeholder="Ketik nama kota..."
           value={citySearch}
           onChange={(e) => setCitySearch(e.target.value)}
-          className="rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none"
+          className="rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none"
           style={inputStyle}
           disabled={!citiesLoaded}
         />
         {filteredCities.length > 0 && (
           <div
             className="absolute top-full z-20 mt-1 w-full rounded-xl py-1 shadow-xl"
-            style={{ background: "#1e0a38", border: "1px solid rgba(255,255,255,0.15)" }}
+            style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}
           >
             {filteredCities.map((c) => (
               <button
@@ -98,10 +101,10 @@ export default function ShippingCalculator({ weightGrams, onSelect, selectedOpti
                   setSelectedCityId(c.city_id);
                   setCitySearch(`${c.type} ${c.city_name}`);
                 }}
-                className="w-full px-4 py-2.5 text-left text-sm text-white/80 transition hover:bg-white/10"
+                className="w-full px-4 py-2.5 text-left text-sm text-gray-700 transition hover:bg-gray-50"
               >
                 {c.type} {c.city_name}
-                <span className="ml-2 text-xs text-white/40">{c.province}</span>
+                  <span className="ml-2 text-xs text-gray-400">{c.label ?? `${c.city_name} ${c.postal_code ?? ""}`}</span>
               </button>
             ))}
           </div>
@@ -110,7 +113,7 @@ export default function ShippingCalculator({ weightGrams, onSelect, selectedOpti
 
       {/* Courier checkboxes */}
       <div className="flex flex-col gap-1.5">
-        <p className="text-xs font-semibold uppercase tracking-wider text-white/50">Kurir</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Kurir</p>
         <div className="flex flex-wrap gap-2">
           {COURIERS.map((c) => {
             const checked = selectedCouriers.includes(c.code);
@@ -125,9 +128,9 @@ export default function ShippingCalculator({ weightGrams, onSelect, selectedOpti
                 }
                 className="rounded-lg px-3 py-1.5 text-xs font-semibold transition"
                 style={{
-                  background: checked ? "rgba(168,85,247,0.25)" : "rgba(255,255,255,0.06)",
-                  border: checked ? "1px solid rgba(168,85,247,0.6)" : "1px solid rgba(255,255,255,0.12)",
-                  color: checked ? "#e9d5ff" : "rgba(255,255,255,0.5)",
+                  background: checked ? "#f3e8ff" : "#f9fafb",
+                  border: checked ? "1px solid #a855f7" : "1px solid #e5e7eb",
+                  color: checked ? "#7e22ce" : "#6b7280",
                 }}
               >
                 {c.name}
@@ -148,7 +151,7 @@ export default function ShippingCalculator({ weightGrams, onSelect, selectedOpti
       </button>
 
       {error && (
-        <p className="text-sm text-red-400">{error}</p>
+        <p className="text-sm text-red-600">{error}</p>
       )}
 
       {/* Results */}
@@ -165,20 +168,20 @@ export default function ShippingCalculator({ weightGrams, onSelect, selectedOpti
                 onClick={() => onSelect?.(opt)}
                 className="flex items-center justify-between rounded-xl px-4 py-3 text-left transition"
                 style={{
-                  background: isSelected ? "rgba(168,85,247,0.2)" : "rgba(255,255,255,0.05)",
-                  border: isSelected ? "1px solid rgba(168,85,247,0.6)" : "1px solid rgba(255,255,255,0.1)",
+                  background: isSelected ? "#faf5ff" : "#ffffff",
+                  border: isSelected ? "1px solid #a855f7" : "1px solid #e5e7eb",
                 }}
               >
                 <div>
-                  <p className="text-sm font-semibold text-white">
-                    {opt.courier_name} <span className="text-white/60">{opt.service}</span>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {opt.courier_name} <span className="text-gray-500">{opt.service}</span>
                   </p>
-                  <p className="text-xs text-white/40">
+                  <p className="text-xs text-gray-500">
                     {opt.service_description} · Estimasi {opt.etd}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-white">
+                  <p className="text-sm font-bold text-gray-900">
                     Rp {opt.cost.toLocaleString("id-ID")}
                   </p>
                 </div>

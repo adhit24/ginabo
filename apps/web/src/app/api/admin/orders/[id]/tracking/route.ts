@@ -38,13 +38,11 @@ export async function PATCH(
     .from("orders")
     .update({
       tracking_number:  body.tracking_number.trim(),
-      shipping_courier: body.shipping_courier.trim().toLowerCase(),
-      shipping_service: body.shipping_service?.trim() ?? null,
-      shipped_at:       new Date().toISOString(),
+      shipping_provider: body.shipping_courier.trim().toLowerCase(),
       status:           "shipped",
-    })
-    .eq("id", params.id)
-    .select("id, order_number, tracking_number, shipping_courier, status")
+    } as never)
+    .eq("id", params.id as never)
+    .select("id, order_number, tracking_number, shipping_provider, status")
     .single();
 
   if (error) {

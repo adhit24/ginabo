@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { calculateShippingCost, isRajaOngkirConfigured, type CourierCode } from "@/lib/rajaongkir";
+import { calculateShippingCost, getCities, isRajaOngkirConfigured, type CourierCode } from "@/lib/rajaongkir";
 
 /**
  * POST /api/shipping/cost
@@ -16,21 +16,34 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as {
       destination_city_id?: string;
+      destination_city_name?: string;
+      destination_province_name?: string;
       weight_grams?: number;
       couriers?: CourierCode[];
     };
 
-    if (!body.destination_city_id) {
-      return NextResponse.json({ error: "destination_city_id wajib diisi" }, { status: 400 });
+    let destinationCityId = body.destination_city_id;
+    if (!destinationCityId && body.destination_city_name) {
+      const cities = await getCities(body.destination_city_name);
+      const normalizedCity = body.destination_city_name.toLowerCase().replace(/^(kota|kabupaten)\s+/i, "").trim();
+      const normalizedProvince = body.destination_province_name?.toLowerCase().trim();
+      const match = cities.find((city) => {
+        const cityName = city.city_name.toLowerCase().replace(/^(kota|kabupaten)\s+/i, "").trim();
+        return cityName === normalizedCity && (!normalizedProvince || city.province?.toLowerCase().includes(normalizedProvince));
+      }) ?? cities[0];
+      destinationCityId = match?.city_id;
+    }
+    if (!destinationCityId) {
+      return NextResponse.json({ error: "Kota pada alamat belum ditemukan di RajaOngkir." }, { status: 400 });
     }
     if (!body.weight_grams || body.weight_grams < 1) {
       return NextResponse.json({ error: "weight_grams wajib diisi (minimal 1 gram)" }, { status: 400 });
     }
 
     const options = await calculateShippingCost(
-      body.destination_city_id,
+      destinationCityId,
       body.weight_grams,
-      body.couriers
+      body.couriers ?? ["jne"]
     );
 
     return NextResponse.json({ options });

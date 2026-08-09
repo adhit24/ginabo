@@ -1,10 +1,11 @@
 "use client";
 
 import { useCart } from "@/components/cart/CartProvider";
-import { formatMoney } from "@/lib/money";
+import { useCurrency } from "@/components/currency/CurrencyProvider";
 
 export function CartMini() {
   const { totals, openCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   return (
     <button
@@ -35,7 +36,7 @@ export function CartMini() {
 
       {/* Price */}
       <span className="hidden text-xs font-semibold text-white sm:inline" suppressHydrationWarning>
-        {formatMoney(totals.subtotalMinor, "IDR")}
+        {formatPrice(totals.subtotalMinor)}
       </span>
     </button>
   );

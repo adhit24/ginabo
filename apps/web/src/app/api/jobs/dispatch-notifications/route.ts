@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { Resend } from "resend";
+import type { NotificationRow, ProfileRow } from "@/types/database";
 
 export async function POST(req: Request) {
   // Verify cron secret to prevent unauthorized calls
@@ -15,10 +16,10 @@ export async function POST(req: Request) {
 
   const now = new Date().toISOString();
 
-  const { data: jobs, error: fetchError } = await supabase
+  const { data: rawJobs, error: fetchError } = await supabase
     .from("notifications")
     .select("*")
-    .eq("is_read", false)
+    .eq("status", "pending" as never)
     .lte("created_at", now)
     .limit(50);
 
@@ -26,18 +27,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: fetchError.message }, { status: 500 });
   }
 
+  const jobs = (rawJobs ?? []) as NotificationRow[];
+
   let processed = 0;
   let sent = 0;
 
-  for (const job of jobs ?? []) {
+  for (const job of jobs) {
     processed++;
     try {
       if (job.channel === "email" && resend && job.user_id) {
-        const { data: profile } = await supabase
+        const { data: rawProfile } = await supabase
           .from("profiles")
           .select("email, full_name")
-          .eq("id", job.user_id)
+          .eq("id", job.user_id as never)
           .single();
+
+        const profile = rawProfile as Pick<ProfileRow, "email" | "full_name"> | null;
 
         if (profile?.email) {
           await resend.emails.send({
@@ -52,8 +57,8 @@ export async function POST(req: Request) {
 
       await supabase
         .from("notifications")
-        .update({ is_read: true })
-        .eq("id", job.id);
+        .update({ status: "sent", sent_at: new Date().toISOString() } as never)
+        .eq("id", job.id as never);
     } catch {
       // Continue processing other jobs
     }

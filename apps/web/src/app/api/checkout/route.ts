@@ -11,8 +11,6 @@ import type {
   OrderRow,
   OrderItemRow,
   PaymentRow,
-  AddressRow,
-  ProfileRow,
   CouponRow,
 } from '@/types/database'
 
@@ -31,6 +29,9 @@ interface CheckoutBody {
   coupon_code?: string | null
   address_id: string
   shipping_cost: number
+  shipping_courier?: string | null
+  shipping_service?: string | null
+  payment_fee?: number
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
     return jsonError('Request body tidak valid', 400)
   }
 
-  const { items, coupon_code, address_id, shipping_cost = 0 } = body
+  const { items, coupon_code, address_id, shipping_cost = 0, shipping_courier, shipping_service, payment_fee = 0 } = body
 
   if (!validateItems(items)) return jsonError('Field items tidak valid', 400)
   if (!address_id) return jsonError('address_id diperlukan', 400)
@@ -75,27 +76,33 @@ export async function POST(req: NextRequest) {
   if (authError || !user) return jsonError('Silakan login terlebih dahulu', 401)
 
   // 3. Fetch profile for customer details
-  const { data: rawProfile } = await supabase
-    .from('profiles')
-    .select('full_name, phone, email')
+  const profiles = supabase.from('profiles') as any
+  const addresses = supabase.from('addresses') as any
+  const { data: rawProfile } = await profiles
+    .select('full_name, phone_number, email')
     .eq('id', user.id)
     .single()
 
-  const profile = rawProfile as Pick<ProfileRow, 'full_name' | 'phone' | 'email'> | null
+  const profile = rawProfile as { full_name: string | null; phone_number: string | null; email: string } | null
   const customerName = profile?.full_name ?? user.email ?? 'Pelanggan'
-  const customerPhone = profile?.phone ?? ''
+  const customerPhone = profile?.phone_number ?? ''
   const customerEmail = user.email ?? ''
 
   // 4. Fetch address
-  const { data: rawAddress } = await supabase
-    .from('addresses')
+  const { data: rawAddress } = await addresses
     .select('*')
     .eq('id', address_id)
-    .eq('user_id', user.id)
+    .eq('profile_id', user.id)
     .single()
 
   if (!rawAddress) return jsonError('Alamat tidak ditemukan', 404)
-  const address = rawAddress as AddressRow
+  const address = {
+    recipient_name: rawAddress.recipient_name,
+    phone: rawAddress.phone_number,
+    address_line1: rawAddress.address_line1,
+    city: rawAddress.kota_kabupaten,
+    postal_code: rawAddress.postal_code,
+  }
 
   // 5. Validate coupon (optional)
   let discountAmount = 0
@@ -130,10 +137,24 @@ export async function POST(req: NextRequest) {
 
   // 6. Calculate totals
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
-  const totalAmount = Math.max(0, subtotal + shipping_cost - discountAmount)
+  const totalAmount = Math.max(0, subtotal + shipping_cost + payment_fee - discountAmount)
 
   // 7. Admin client for writes
   const admin = await createAdminClient()
+
+  const productKeys = [...new Set(items.map((item) => item.product_id))]
+  const { data: productsBySlug } = await admin.from('products').select('id, slug').in('slug', productKeys)
+  const uuidKeys = productKeys.filter((key) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key))
+  const { data: productsById } = uuidKeys.length
+    ? await admin.from('products').select('id, slug').in('id', uuidKeys)
+    : { data: [] }
+  const productMap = new Map<string, string>()
+  for (const product of [...(productsBySlug ?? []), ...(productsById ?? [])] as Array<{ id: string; slug: string }>) {
+    productMap.set(product.slug, product.id)
+    productMap.set(product.id, product.id)
+  }
+  const unresolvedProduct = productKeys.find((key) => !productMap.has(key))
+  if (unresolvedProduct) return jsonError(`Produk tidak ditemukan: ${unresolvedProduct}`, 400)
 
   // 8. Insert order — cast payload to bypass strict Insert generic
   const orderNumber = generateOrderNumber()
@@ -142,7 +163,7 @@ export async function POST(req: NextRequest) {
     .from('orders')
     .insert({
       order_number: orderNumber,
-      user_id: user.id,
+      profile_id: user.id,
       status: 'pending',
       subtotal,
       shipping_cost,
@@ -150,7 +171,9 @@ export async function POST(req: NextRequest) {
       tax_amount: 0,
       total_amount: totalAmount,
       coupon_id: couponId,
-      shipping_address_id: address_id,
+      shipping_address: address,
+      shipping_courier: shipping_courier ?? null,
+      shipping_service: shipping_service ?? null,
       notes: null,
     } as never)
     .select()
@@ -164,7 +187,7 @@ export async function POST(req: NextRequest) {
   // 9. Insert order_items
   const orderItemsPayload = items.map((item) => ({
     order_id: order.id,
-    product_id: item.product_id,
+    product_id: productMap.get(item.product_id),
     variant_id: item.variant_id ?? null,
     product_name: item.name,
     variant_name: null as string | null,
@@ -208,6 +231,9 @@ export async function POST(req: NextRequest) {
     })),
     ...(shipping_cost > 0
       ? [{ id: 'SHIPPING', price: shipping_cost, quantity: 1, name: 'Ongkos Kirim' }]
+      : []),
+    ...(payment_fee > 0
+      ? [{ id: 'PAYMENT_FEE', price: payment_fee, quantity: 1, name: 'Biaya layanan pembayaran' }]
       : []),
     ...(discountAmount > 0
       ? [{ id: 'DISCOUNT', price: -discountAmount, quantity: 1, name: 'Diskon' }]
@@ -265,10 +291,8 @@ export async function POST(req: NextRequest) {
       .from('coupon_usages')
       .insert({
         coupon_id: couponId,
-        user_id: user.id,
+        profile_id: user.id,
         order_id: order.id,
-        discount_applied: discountAmount,
-        used_at: new Date().toISOString(),
       } as never)
   }
 

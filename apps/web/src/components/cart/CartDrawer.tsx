@@ -3,10 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "./CartProvider";
-import { formatMoney } from "@/lib/money";
+import { useCurrency } from "@/components/currency/CurrencyProvider";
 
 export function CartDrawer() {
   const { state, totals, isOpen, closeCart, updateQuantity, removeItem } = useCart();
+  const { formatPrice } = useCurrency();
 
   return (
     <>
@@ -76,8 +77,8 @@ export function CartDrawer() {
                     <div className="flex flex-1 flex-col justify-between gap-1">
                       <p className="line-clamp-2 text-sm font-semibold leading-snug text-white">{item.name}</p>
                       <div>
-                        <span className="text-sm font-bold text-[#c084fc]">{formatMoney(item.priceMinor, item.currency)}</span>
-                        <span className="ml-2 text-[11px] text-white/30 line-through">{formatMoney(originalMinor, item.currency)}</span>
+                        <span className="text-sm font-bold text-[#c084fc]">{formatPrice(item.priceMinor)}</span>
+                        <span className="ml-2 text-[11px] text-white/30 line-through">{formatPrice(originalMinor)}</span>
                       </div>
 
                       {/* Qty + delete */}
@@ -121,7 +122,7 @@ export function CartDrawer() {
           <div className="px-5 pb-[calc(1.5rem+var(--safe-bottom))] pt-4" style={{ borderTop: "1px solid rgba(192,132,252,0.12)", background: "rgba(15,10,30,0.5)" }}>
             <div className="mb-4 flex items-center justify-between">
               <span className="text-sm font-semibold text-white/50">Subtotal</span>
-              <span className="text-base font-bold text-white">{formatMoney(totals.subtotalMinor, "IDR")}</span>
+              <span className="text-base font-bold text-white">{formatPrice(totals.subtotalMinor)}</span>
             </div>
             <div className="flex flex-col gap-2">
               <Link

@@ -2,7 +2,7 @@
 // Uses @supabase/supabase-js with cookie forwarding for session hydration
 
 import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import type { Database } from '@/types/database'
 
 function getRequiredEnv(name: string): string {
@@ -20,6 +20,7 @@ function getRequiredEnv(name: string): string {
  *   const { data } = await supabase.from('products').select('*')
  */
 export async function createServerSupabaseClient() {
+  const headerStore = await headers()
   const cookieStore = await cookies()
 
   const url = getRequiredEnv('NEXT_PUBLIC_SUPABASE_URL')
@@ -28,6 +29,12 @@ export async function createServerSupabaseClient() {
   // Extract the session token from the auth cookie set by the browser client
   const authCookieName = `sb-${new URL(url).hostname.split('.')[0]}-auth-token`
   const sessionCookie = cookieStore.get(authCookieName)?.value ?? null
+  const authHeader = headerStore.get('authorization')
+  const bearerFromHeader = authHeader?.toLowerCase().startsWith('bearer ')
+    ? authHeader.slice('bearer '.length)
+    : null
+  const bearerFromCookie = sessionCookie ? _extractAccessToken(sessionCookie) : null
+  const token = bearerFromHeader ?? bearerFromCookie ?? ''
 
   const client = createClient<Database>(url, anonKey, {
     auth: {
@@ -36,9 +43,7 @@ export async function createServerSupabaseClient() {
       detectSessionInUrl: false,
     },
     global: {
-      headers: sessionCookie
-        ? { Authorization: `Bearer ${_extractAccessToken(sessionCookie)}` }
-        : {},
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     },
   })
 

@@ -77,6 +77,7 @@ model Product {
   priceMinor  Int
   currency    Currency    @default(IDR)
   stockQty    Int         @default(0)
+  weightGrams Int?
   isActive    Boolean     @default(true)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt

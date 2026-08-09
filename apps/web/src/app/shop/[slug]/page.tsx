@@ -23,6 +23,7 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
         priceMinor:  product.priceMinor,
         currency:    product.currency,
         stockQty:    product.stockQty,
+        weightGrams: product.weightGrams,
         images:      product.images ?? [],
       }}
     />

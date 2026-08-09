@@ -13,6 +13,10 @@ export interface User {
   tier: MemberTier;
   points: number;
   joinedAt: string;
+  phone: string | null;
+  dateOfBirth: string | null;
+  gender: "male" | "female" | "other" | null;
+  avatarUrl: string | null;
 }
 
 interface AuthContextValue {
@@ -22,6 +26,8 @@ interface AuthContextValue {
   signup: (name: string, email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
   logout: () => void;
   signInWithGoogle: () => void;
+  changePassword: (newPassword: string) => Promise<{ ok: boolean; error?: string }>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -37,6 +43,10 @@ function toAppUser(supabaseUser: SupabaseUser, profile?: Record<string, unknown>
     tier: "Regular",
     points: (profile?.loyalty_points as number) ?? 100,
     joinedAt: `${MONTHS[createdAt.getMonth()]} ${createdAt.getFullYear()}`,
+    phone: (profile?.phone_number as string) ?? (profile?.phone as string) ?? null,
+    dateOfBirth: (profile?.date_of_birth as string) ?? null,
+    gender: (profile?.gender as User["gender"]) ?? null,
+    avatarUrl: (profile?.avatar_url as string) ?? null,
   };
 }
 
@@ -44,18 +54,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  async function fetchAndSetUser(supabaseUser: SupabaseUser) {
     const supabase = createClient();
-
-    async function fetchAndSetUser(supabaseUser: SupabaseUser) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("full_name, loyalty_points")
-        .eq("id", supabaseUser.id)
-        .single();
-      setUser(toAppUser(supabaseUser, profile));
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("full_name, phone_number, date_of_birth, avatar_url")
+      .eq("id", supabaseUser.id)
+      .single();
+    if (error) {
+      setUser((current) => current?.id === supabaseUser.id ? current : toAppUser(supabaseUser));
+      return;
     }
 
+    // `gender` was added after the original profiles schema. Read it
+    // separately so older staging databases still load the other fields.
+    const { data: genderProfile } = await supabase
+      .from("profiles")
+      .select("gender")
+      .eq("id", supabaseUser.id)
+      .single();
+    const profileRecord = (profile as Record<string, unknown> | null) ?? {};
+    const gender = (genderProfile as { gender?: User["gender"] } | null)?.gender ?? null;
+    setUser(toAppUser(supabaseUser, { ...profileRecord, gender }));
+  }
+
+  useEffect(() => {
+    const supabase = createClient();
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         fetchAndSetUser(session.user).finally(() => setIsLoading(false));
@@ -121,7 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         full_name: name.trim(),
         loyalty_points: 100,
-      });
+      } as never);
     }
 
     return { ok: true };
@@ -136,8 +160,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = "/api/auth/google";
   }
 
+  async function changePassword(newPassword: string) {
+    if (!newPassword || newPassword.length < 6) return { ok: false, error: "Password minimal 6 karakter." };
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  }
+
+  async function refreshProfile() {
+    const supabase = createClient();
+    const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+    if (supabaseUser) await fetchAndSetUser(supabaseUser);
+  }
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, signInWithGoogle }}>
+    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, signInWithGoogle, changePassword, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

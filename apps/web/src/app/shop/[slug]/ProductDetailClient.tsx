@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
+import { useCurrency } from "@/components/currency/CurrencyProvider";
 
 type ProductImage = { url: string; alt: string | null; sortOrder: number };
 
@@ -16,21 +17,16 @@ type Props = {
     priceMinor: number;
     currency: string;
     stockQty: number;
+    weightGrams: number | null;
     images: ProductImage[];
   };
 };
-
-function formatPrice(minor: number, currency: string) {
-  if (currency === "IDR") {
-    return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(minor);
-  }
-  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(minor / 100);
-}
 
 const TABS = ["Detail", "Cara Pakai", "Kandungan", "Tanya Jawab"];
 
 export function ProductDetailClient({ product }: Props) {
   const { addItem } = useCart();
+  const { formatPrice } = useCurrency();
   const [activeImg, setActiveImg]   = useState(0);
   const [activeTab, setActiveTab]   = useState(0);
   const [qty, setQty]               = useState(1);
@@ -133,7 +129,7 @@ export function ProductDetailClient({ product }: Props) {
             {/* Price */}
             <div className="flex items-baseline gap-3">
               <span className="text-[22px] font-bold" style={{ color: "#78257C" }}>
-                {formatPrice(product.priceMinor, product.currency)}
+                {formatPrice(product.priceMinor)}
               </span>
             </div>
 
@@ -141,6 +137,11 @@ export function ProductDetailClient({ product }: Props) {
             {product.description && (
               <p className="text-[14px] leading-relaxed text-[#808080]">
                 {product.description}
+              </p>
+            )}
+            {product.weightGrams !== null && (
+              <p className="text-[13px] font-medium text-[#303030]">
+                Berat produk: <span className="text-[#78257C]">{product.weightGrams} gram</span>
               </p>
             )}
 
@@ -218,8 +219,11 @@ export function ProductDetailClient({ product }: Props) {
           <div className="py-8 max-w-3xl">
             {activeTab === 0 && (
               <div className="text-[14px] leading-relaxed text-[#808080]">
-                {product.description ? (
-                  <p>{product.description}</p>
+                {product.description || product.weightGrams !== null ? (
+                  <div className="flex flex-col gap-2">
+                    {product.description && <p>{product.description}</p>}
+                    {product.weightGrams !== null && <p className="font-medium text-[#303030]">Berat produk: {product.weightGrams} gram</p>}
+                  </div>
                 ) : (
                   <p className="text-[#ccc]">Deskripsi produk belum tersedia.</p>
                 )}

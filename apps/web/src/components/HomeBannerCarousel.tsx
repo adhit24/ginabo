@@ -76,7 +76,7 @@ export function HomeBannerCarousel({
   }
 
   return (
-    <div className={className ?? "relative overflow-hidden rounded-3xl border border-brand-100 bg-gradient-hero shadow-brand-sm"}>
+    <div className={className ?? "relative overflow-hidden bg-gradient-hero"}>
       <div
         className={[
           "flex w-full will-change-transform",
@@ -86,12 +86,12 @@ export function HomeBannerCarousel({
       >
         {slides.map((s) => {
           const inner = (
-            <div className={aspectClassName ?? "relative aspect-[16/7] w-full md:aspect-[16/6]"}>
+            <div className={aspectClassName ?? "relative aspect-[16/7] w-full md:aspect-[16/5]"}>
               <Image
                 src={s.src}
                 alt={s.alt}
                 fill
-                className={imageClassName ?? "object-contain"}
+                className={imageClassName ?? "object-cover"}
                 sizes="100vw"
                 priority={slides[0]?.src === s.src}
               />

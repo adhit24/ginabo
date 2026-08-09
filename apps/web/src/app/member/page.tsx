@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { AddressModal } from "@/components/member/AddressModal";
+import type { AddressRow } from "@/types/database";
+import { authFetch, createClient } from "@/lib/supabase/client";
 
 const tiers = ["Regular", "Silver", "Gold", "Platinum"];
 
@@ -80,6 +83,19 @@ function IconLogout() {
     </svg>
   );
 }
+function EyeIcon({ open }: { open: boolean }) {
+  return open ? (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ) : (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.3 20.3 0 0 1 4.22-5.19M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a20.3 20.3 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+      <path d="M1 1l22 22" />
+    </svg>
+  );
+}
 
 const menuItems = [
   { id: "profile",   label: "Pengaturan Akun",   icon: <IconProfile /> },
@@ -92,14 +108,110 @@ const menuItems = [
 ];
 
 export default function MemberPage() {
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading, logout, changePassword, refreshProfile } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");
-  const [form, setForm] = useState({ name: "", phone: "", email: "", dob_d: "", dob_m: "", dob_y: "", gender: "" });
+  const [form, setForm] = useState({ name: "", phone: "", email: "", dob: "", gender: "" });
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileError, setProfileError] = useState("");
+  const [profileSuccess, setProfileSuccess] = useState(false);
+
+  const [pwModalOpen, setPwModalOpen] = useState(false);
+  const [pwForm, setPwForm] = useState({ password: "", confirm: "" });
+  const [pwShow, setPwShow] = useState(false);
+  const [pwShowConfirm, setPwShowConfirm] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState(false);
+  const [addresses, setAddresses] = useState<AddressRow[]>([]);
+  const [addressesLoading, setAddressesLoading] = useState(true);
+  const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  async function loadAddresses() {
+    setAddressesLoading(true);
+    try {
+      const res = await authFetch("/api/addresses");
+      const json = await res.json() as { ok: boolean; data?: AddressRow[] };
+      setAddresses(json.ok && json.data ? json.data : []);
+    } catch { setAddresses([]); }
+    finally { setAddressesLoading(false); }
+  }
+
+  function handleAddressSaved(address: AddressRow) { setAddresses(prev => [address, ...prev]); }
+
+  function closePwModal() {
+    setPwModalOpen(false);
+    setPwForm({ password: "", confirm: "" });
+    setPwError("");
+    setPwSuccess(false);
+    setPwShow(false);
+    setPwShowConfirm(false);
+  }
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwError("");
+    if (pwForm.password !== pwForm.confirm) {
+      setPwError("Password dan konfirmasi tidak cocok.");
+      return;
+    }
+    setPwLoading(true);
+    const result = await changePassword(pwForm.password);
+    setPwLoading(false);
+    if (result.ok) {
+      setPwSuccess(true);
+      setPwForm({ password: "", confirm: "" });
+    } else {
+      setPwError(result.error ?? "Gagal mengubah password.");
+    }
+  }
+
+  async function handleSaveProfile() {
+    setProfileError(""); setProfileSuccess(false); setProfileSaving(true);
+    try {
+      const res = await authFetch("/api/profile", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({
+        full_name: form.name, phone: form.phone || null, date_of_birth: form.dob || null,
+        gender: form.gender === "Laki-laki" ? "male" : form.gender === "Perempuan" ? "female" : null,
+      }) });
+      const json = await res.json() as { ok: boolean; error?: { message: string } };
+      if (!json.ok) { setProfileError(json.error?.message ?? "Gagal menyimpan profil."); return; }
+      await refreshProfile(); setProfileSuccess(true); window.setTimeout(() => setProfileSuccess(false), 3000);
+    } catch { setProfileError("Gagal menyimpan profil."); }
+    finally { setProfileSaving(false); }
+  }
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]; e.target.value = ""; if (!file) return;
+    if (!user) return;
+    setAvatarError("");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) { setAvatarError("Format foto harus JPG, PNG, atau WEBP."); return; }
+    if (file.size > 2 * 1024 * 1024) { setAvatarError("Ukuran foto maksimal 2MB."); return; }
+    setAvatarUploading(true);
+    try {
+      const supabase = createClient();
+      const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+      const path = `${user.id}/avatar.${ext}`;
+      const { error } = await supabase.storage.from("user-avatars").upload(path, file, { upsert: true, contentType: file.type });
+      if (error) { setAvatarError(`Gagal mengunggah foto: ${error.message}`); return; }
+      const { data } = supabase.storage.from("user-avatars").getPublicUrl(path);
+      const publicUrl = `${data.publicUrl}?v=${Date.now()}`;
+      const res = await authFetch("/api/profile", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ avatar_url: publicUrl }) });
+      const json = await res.json() as { ok: boolean; error?: { message: string } };
+      if (!json.ok) { setAvatarError(json.error?.message ?? "Gagal menyimpan foto profil."); return; }
+      await refreshProfile();
+    } catch (error) { setAvatarError(error instanceof Error ? error.message : "Gagal mengunggah foto."); }
+    finally { setAvatarUploading(false); }
+  }
 
   useEffect(() => {
     if (!isLoading && !user) router.replace("/auth/login");
-    if (user) setForm(f => ({ ...f, name: user.name, email: user.email }));
+    if (user) {
+      setForm(f => ({ ...f, name: user.name, email: user.email, phone: user.phone ?? "", dob: user.dateOfBirth ?? "", gender: user.gender === "male" ? "Laki-laki" : user.gender === "female" ? "Perempuan" : "" }));
+      void loadAddresses();
+    }
   }, [user, isLoading, router]);
 
   if (isLoading || !user) {
@@ -138,9 +250,7 @@ export default function MemberPage() {
             {/* Left: avatar + info */}
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full text-xl font-extrabold text-white" style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 0 20px rgba(139,92,246,0.4)" }}>
-                  {initials}
-                </div>
+                {user.avatarUrl ? <img src={user.avatarUrl} alt={user.name} className="h-16 w-16 rounded-full object-cover" /> : <div className="flex h-16 w-16 items-center justify-center rounded-full text-xl font-extrabold text-white" style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 0 20px rgba(139,92,246,0.4)" }}>{initials}</div>}
               </div>
               <div>
                 <div className="text-lg font-bold text-white">{user.name}</div>
@@ -247,16 +357,17 @@ export default function MemberPage() {
                 <div className="mb-6 h-px" style={{ background: "rgba(139,92,246,0.15)" }} />
 
                 {/* Avatar upload area */}
-                <div className="mb-6 flex justify-center">
+                <div className="mb-2 flex justify-center">
                   <div className="relative">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full text-2xl font-extrabold text-white" style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 0 20px rgba(139,92,246,0.4)" }}>
-                      {initials}
-                    </div>
-                    <button className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full text-[10px] text-white shadow" style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}>
+                    {user.avatarUrl ? <img src={user.avatarUrl} alt={user.name} className="h-20 w-20 rounded-full object-cover" /> : <div className="flex h-20 w-20 items-center justify-center rounded-full text-2xl font-extrabold text-white" style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 0 20px rgba(139,92,246,0.4)" }}>{initials}</div>}
+                    <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleAvatarChange} />
+                    <button type="button" aria-label="Ganti foto profil" onClick={() => avatarInputRef.current?.click()} disabled={avatarUploading} className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full text-[10px] text-white shadow disabled:opacity-50" style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}>
                       <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Z" /></svg>
                     </button>
                   </div>
                 </div>
+                {avatarUploading && <p className="mb-3 text-center text-xs text-white/40">Mengunggah...</p>}
+                {avatarError && <p className="mb-3 text-center text-xs text-red-400/80">{avatarError}</p>}
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
@@ -266,27 +377,12 @@ export default function MemberPage() {
                   <div>
                     <label className={labelCls}>Nomor Handphone</label>
                     <input className={inputCls} style={inputStyle} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+62" />
-                    {!form.phone && <p className="mt-1 text-[11px] text-red-400/80">Belum diverifikasi</p>}
+                    {!form.phone && <p className="mt-1 text-[11px] text-red-400/80">Nomor belum diisi</p>}
                   </div>
 
                   <div>
                     <label className={labelCls}>Tanggal Lahir</label>
-                    <div className="flex gap-2">
-                      <select className={inputCls} style={inputStyle} value={form.dob_d} onChange={e => setForm(f => ({ ...f, dob_d: e.target.value }))}>
-                        <option value="">Date</option>
-                        {Array.from({ length: 31 }, (_, i) => i + 1).map(d => <option key={d} value={d}>{d}</option>)}
-                      </select>
-                      <select className={inputCls} style={inputStyle} value={form.dob_m} onChange={e => setForm(f => ({ ...f, dob_m: e.target.value }))}>
-                        <option value="">Month</option>
-                        {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((m, i) => (
-                          <option key={m} value={i + 1}>{m}</option>
-                        ))}
-                      </select>
-                      <select className={inputCls} style={inputStyle} value={form.dob_y} onChange={e => setForm(f => ({ ...f, dob_y: e.target.value }))}>
-                        <option value="">Year</option>
-                        {Array.from({ length: 60 }, (_, i) => new Date().getFullYear() - i).map(y => <option key={y} value={y}>{y}</option>)}
-                      </select>
-                    </div>
+                    <input type="date" className={inputCls} style={{ ...inputStyle, colorScheme: "dark" }} value={form.dob} onChange={e => setForm(f => ({ ...f, dob: e.target.value }))} max={new Date().toISOString().slice(0, 10)} />
                   </div>
                   <div>
                     <label className={labelCls}>Jenis Kelamin</label>
@@ -316,7 +412,12 @@ export default function MemberPage() {
                     <label className={labelCls}>Password</label>
                     <div className="flex items-center justify-between rounded-lg px-3 py-2.5" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(139,92,246,0.2)" }}>
                       <p className="text-xs text-white/40">Jika ingin mengubah password demi keamanan privasi</p>
-                      <button className="ml-3 shrink-0 rounded-lg px-4 py-1.5 text-xs font-bold text-white transition hover:opacity-90" style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}>
+                      <button
+                        type="button"
+                        onClick={() => setPwModalOpen(true)}
+                        className="ml-3 shrink-0 rounded-lg px-4 py-1.5 text-xs font-bold text-white transition hover:opacity-90"
+                        style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}
+                      >
                         Ganti Password ›
                       </button>
                     </div>
@@ -325,17 +426,19 @@ export default function MemberPage() {
                   <div className="md:col-span-2">
                     <label className={labelCls}>Alamat</label>
                     <div className="flex items-center justify-between rounded-lg px-3 py-2.5" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(139,92,246,0.2)" }}>
-                      <p className="text-xs text-white/40">belum ada alamat profile</p>
-                      <button className="ml-3 shrink-0 rounded-lg px-4 py-1.5 text-xs font-semibold text-white/70 transition hover:text-white" style={{ border: "1px solid rgba(139,92,246,0.3)" }}>
+                      <p className="text-xs text-white/40">{addressesLoading ? "Memuat..." : addresses.length ? `${addresses.length} alamat tersimpan` : "belum ada alamat profile"}</p>
+                      <button type="button" onClick={() => setAddressModalOpen(true)} className="ml-3 shrink-0 rounded-lg px-4 py-1.5 text-xs font-semibold text-white/70 transition hover:text-white" style={{ border: "1px solid rgba(139,92,246,0.3)" }}>
                         Tambah Alamat ›
                       </button>
                     </div>
                   </div>
                 </div>
 
+                {profileError && <p className="mt-4 text-center text-xs text-red-400/90">{profileError}</p>}
+                {profileSuccess && <p className="mt-4 text-center text-xs text-green-300">Profil berhasil disimpan.</p>}
                 <div className="mt-6 flex justify-center">
-                  <button className="rounded-xl px-12 py-3 text-sm font-bold text-white shadow transition hover:opacity-90" style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 4px 16px rgba(139,92,246,0.35)" }}>
-                    Simpan
+                  <button type="button" onClick={handleSaveProfile} disabled={profileSaving} className="rounded-xl px-12 py-3 text-sm font-bold text-white shadow transition hover:opacity-90 disabled:opacity-40" style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 4px 16px rgba(139,92,246,0.35)" }}>
+                    {profileSaving ? "Menyimpan..." : "Simpan"}
                   </button>
                 </div>
               </div>
@@ -362,12 +465,10 @@ export default function MemberPage() {
               <div>
                 <h2 className="mb-1 text-base font-bold text-white">Alamat Pengiriman</h2>
                 <div className="mb-6 h-px" style={{ background: "rgba(139,92,246,0.15)" }} />
-                <div className="rounded-xl p-10 text-center" style={{ background: "rgba(139,92,246,0.06)", border: "1px dashed rgba(139,92,246,0.25)" }}>
-                  <p className="text-sm text-white/40">Belum ada alamat tersimpan</p>
-                  <button className="mt-4 rounded-xl px-6 py-2.5 text-sm font-semibold text-white/70 transition hover:text-white" style={{ border: "1px solid rgba(139,92,246,0.3)" }}>
-                    + Tambah Alamat
-                  </button>
-                </div>
+                {addressesLoading ? <p className="text-sm text-white/40">Memuat...</p> : addresses.length === 0 ? <div className="rounded-xl p-10 text-center" style={{ background: "rgba(139,92,246,0.06)", border: "1px dashed rgba(139,92,246,0.25)" }}><p className="text-sm text-white/40">Belum ada alamat tersimpan</p><button type="button" onClick={() => setAddressModalOpen(true)} className="mt-4 rounded-xl px-6 py-2.5 text-sm font-semibold text-white/70" style={{ border: "1px solid rgba(139,92,246,0.3)" }}>+ Tambah Alamat</button></div> : <div className="flex flex-col gap-3">
+                  {addresses.map(addr => <div key={addr.id} className="rounded-lg px-4 py-3" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(139,92,246,0.12)" }}><div className="flex flex-wrap items-center gap-2"><span className="text-sm font-semibold text-white">{addr.recipient_name}</span>{addr.is_default && <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-white" style={{ background: "rgba(139,92,246,0.3)" }}>Utama</span>}{addr.label && <span className="text-[11px] text-white/40">{addr.label}</span>}</div><p className="mt-0.5 text-xs text-white/50">{addr.phone}</p><p className="mt-0.5 text-xs leading-5 text-white/50">{addr.address_line1}{addr.address_line2 ? `, ${addr.address_line2}` : ""}, {addr.city}, {addr.province} {addr.postal_code}</p></div>)}
+                  <button type="button" onClick={() => setAddressModalOpen(true)} className="self-start text-xs font-bold text-[#c084fc]">+ Tambah Alamat Baru</button>
+                </div>}
               </div>
             )}
 
@@ -436,6 +537,97 @@ export default function MemberPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Ganti Password Modal ── */}
+      {pwModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={closePwModal}>
+          <div
+            className="w-full max-w-sm rounded-2xl p-6"
+            style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.2)", boxShadow: "0 8px 32px rgba(20,15,50,0.4)" }}
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 className="mb-4 text-base font-bold text-white">Ganti Password</h3>
+
+            {pwSuccess ? (
+              <div>
+                <div className="mb-4 rounded-lg px-4 py-3 text-sm font-medium text-green-300" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}>
+                  Password berhasil diubah.
+                </div>
+                <button
+                  type="button"
+                  onClick={closePwModal}
+                  className="w-full rounded-lg py-2.5 text-sm font-bold text-white transition hover:opacity-90"
+                  style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}
+                >
+                  Tutup
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
+                {pwError && (
+                  <div className="rounded-lg px-4 py-3 text-sm font-medium text-red-300" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)" }}>
+                    {pwError}
+                  </div>
+                )}
+
+                <label className="grid gap-1.5 text-sm">
+                  <span className={labelCls}>Password Baru</span>
+                  <div className="relative">
+                    <input
+                      type={pwShow ? "text" : "password"} required minLength={6} placeholder="Min. 6 karakter"
+                      value={pwForm.password} onChange={e => setPwForm(f => ({ ...f, password: e.target.value }))}
+                      className={`${inputCls} pr-10`} style={inputStyle}
+                    />
+                    <button type="button" onClick={() => setPwShow(v => !v)} tabIndex={-1}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 transition hover:text-white/80"
+                      aria-label={pwShow ? "Sembunyikan password" : "Tampilkan password"}
+                    >
+                      <EyeIcon open={pwShow} />
+                    </button>
+                  </div>
+                </label>
+
+                <label className="grid gap-1.5 text-sm">
+                  <span className={labelCls}>Konfirmasi Password Baru</span>
+                  <div className="relative">
+                    <input
+                      type={pwShowConfirm ? "text" : "password"} required minLength={6} placeholder="Ulangi password baru"
+                      value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))}
+                      className={`${inputCls} pr-10`} style={inputStyle}
+                    />
+                    <button type="button" onClick={() => setPwShowConfirm(v => !v)} tabIndex={-1}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 transition hover:text-white/80"
+                      aria-label={pwShowConfirm ? "Sembunyikan konfirmasi password" : "Tampilkan konfirmasi password"}
+                    >
+                      <EyeIcon open={pwShowConfirm} />
+                    </button>
+                  </div>
+                </label>
+
+                <div className="mt-1 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={closePwModal}
+                    className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white/70 transition hover:text-white"
+                    style={{ border: "1px solid rgba(139,92,246,0.3)" }}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={pwLoading}
+                    className="flex-1 rounded-lg py-2.5 text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                    style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)" }}
+                  >
+                    {pwLoading ? "Menyimpan..." : "Simpan"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+      <AddressModal open={addressModalOpen} onClose={() => setAddressModalOpen(false)} onSaved={handleAddressSaved} />
     </div>
   );
 }

@@ -33,7 +33,7 @@ function GoogleCallbackInner() {
         email: data.user.email,
         full_name: data.user.user_metadata?.full_name ?? data.user.email?.split("@")[0] ?? "User",
         loyalty_points: 100,
-      });
+      } as never);
 
       router.replace("/member");
     });
