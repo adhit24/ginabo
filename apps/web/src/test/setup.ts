@@ -1,5 +1,8 @@
 import "@testing-library/jest-dom/vitest";
-import { cleanup } from "@testing-library/react";
 import { afterEach } from "vitest";
 
-afterEach(() => cleanup());
+// Keep the global setup independent from React Testing Library's optional DOM
+// peer so pure domain tests can run in the current install as well.
+afterEach(() => {
+  document.body.innerHTML = "";
+});

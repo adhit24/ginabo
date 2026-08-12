@@ -6,6 +6,7 @@ import { jsonError, jsonOk } from '@/lib/http'
 import { addressSchema } from '@/lib/validation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import type { AddressRow } from '@/types/database'
+import { normalizeIndonesianPhone } from '@/lib/auth/profileContract'
 
 type DbAddressRow = {
   id: string
@@ -79,6 +80,13 @@ export async function POST(req: NextRequest) {
     return jsonError('Data alamat tidak valid', 400, parsed.error.flatten())
   }
 
+  let normalizedPhone: string
+  try {
+    normalizedPhone = normalizeIndonesianPhone(parsed.data.phone)
+  } catch (error) {
+    return jsonError('Nomor WhatsApp alamat tidak valid', 400, error instanceof Error ? error.message : String(error))
+  }
+
   // A user's very first address is always their default.
   const { count } = await addresses
     .select('id', { count: 'exact', head: true })
@@ -99,7 +107,7 @@ export async function POST(req: NextRequest) {
       profile_id: user.id,
       label: parsed.data.label || 'Rumah',
       recipient_name: parsed.data.recipient_name,
-      phone_number: parsed.data.phone,
+       phone_number: normalizedPhone,
       address_line1: parsed.data.address_line1,
       address_line2: parsed.data.address_line2 || null,
       kota_kabupaten: parsed.data.city,

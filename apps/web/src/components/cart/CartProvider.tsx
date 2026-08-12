@@ -3,6 +3,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import type { CartItem, CartState } from "@/components/cart/cartTypes";
+import { trackCustomerEvent } from "@/lib/analytics/events";
 import { CartDrawer } from "./CartDrawer";
 
 type CartContextValue = {
@@ -81,6 +82,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const removeItem = useCallback((productId: string) => {
     setState((prev) => ({ items: prev.items.filter((i) => i.productId !== productId) }));
+    trackCustomerEvent({ event_name: "remove_from_cart", product_id: productId });
   }, []);
 
   const clear = useCallback(() => setState({ items: [] }), []);

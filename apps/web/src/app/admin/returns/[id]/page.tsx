@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatMoney } from "@/lib/money";
 import { StatusBadge } from "@/components/returns/StatusBadge";
@@ -30,8 +30,8 @@ interface AdminReturnDetail {
   evidence: { id: string; media_type: string; url: string | null; caption: string | null; usage_history: string | null }[];
 }
 
-export default function AdminReturnDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function AdminReturnDetailPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const [data, setData] = useState<AdminReturnDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);

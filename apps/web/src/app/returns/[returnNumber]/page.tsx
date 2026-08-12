@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatMoney } from "@/lib/money";
 import { StatusBadge } from "@/components/returns/StatusBadge";
@@ -27,8 +27,8 @@ interface ReturnDetail {
   evidence: { id: string; media_type: string; url: string | null; caption: string | null }[];
 }
 
-export default function ReturnDetailPage({ params }: { params: Promise<{ returnNumber: string }> }) {
-  const { returnNumber } = use(params);
+export default function ReturnDetailPage({ params }: { params: { returnNumber: string } }) {
+  const { returnNumber } = params;
   const [data, setData] = useState<ReturnDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

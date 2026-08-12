@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { buildProfileUpsert } from "@/lib/auth/profileContract";
 
 function GoogleCallbackInner() {
   const router = useRouter();
@@ -28,12 +29,19 @@ function GoogleCallbackInner() {
         return;
       }
 
-      await supabase.from("profiles").upsert({
+      const profile = buildProfileUpsert({
         id: data.user.id,
-        email: data.user.email,
-        full_name: data.user.user_metadata?.full_name ?? data.user.email?.split("@")[0] ?? "User",
-        loyalty_points: 100,
-      } as never);
+        email: data.user.email ?? "",
+        name: data.user.user_metadata?.full_name ?? data.user.email?.split("@")[0] ?? "User",
+        phone: data.user.user_metadata?.phone_number ?? null,
+      });
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .upsert(profile as never, { onConflict: "id" });
+      if (profileError) {
+        router.replace("/auth/login?error=profile_failed");
+        return;
+      }
 
       router.replace("/member");
     });

@@ -101,7 +101,7 @@ export function AuthModal({ open, onClose, initialTab = "login" }: AuthModalProp
       return;
     }
     setLoading(true);
-    const result = await signup(signupForm.name, signupForm.email, signupForm.password);
+    const result = await signup(signupForm.name, signupForm.email, signupForm.phone, signupForm.password);
     setLoading(false);
     if (result.ok) {
       onClose();

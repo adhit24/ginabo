@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { mapCatalogProduct } from "@/lib/catalogMapping";
 
 export type CatalogProduct = {
   id: string;
@@ -25,51 +26,34 @@ const demoProducts: CatalogProduct[] = [
   { id: "demo_prod_bundle_3", slug: "ginabo-complete-skin", name: "Ginabo Complete Skin Nutrition Set", description: "Bundling lengkap Bright & Care, Multi Active Serum, dan Hydra Moist untuk rutinitas skincare menyeluruh.", priceMinor: 575000, currency: "IDR", stockQty: 25, weightGrams: 60, isActive: true, images: [{ url: "/essential.png", alt: "Bundling Complete Set", sortOrder: 0 }] },
 ];
 
-function toProduct(row: Record<string, unknown>): CatalogProduct {
-  const rawImages = (row.product_images ?? []) as Array<{ url: string; alt: string | null; sort_order: number }>;
-  const images = rawImages
-    .map((img) => ({ url: img.url, alt: img.alt, sortOrder: img.sort_order }))
-    .sort((a, b) => a.sortOrder - b.sortOrder);
-
-  return {
-    id: row.id as string,
-    slug: row.slug as string,
-    name: row.name as string,
-    description: (row.description as string | null) ?? "",
-    priceMinor: row.price as number,
-    currency: "IDR",
-    stockQty: (row.stock_quantity as number) ?? 0,
-    weightGrams: (row.weight_grams as number | null) ?? null,
-    isActive: (row.is_active as boolean) ?? true,
-    images,
-  };
-}
-
 export async function listActiveProducts(): Promise<CatalogProduct[]> {
   const { data, error } = await supabase
     .from("products")
-    .select(`*, product_images(url, alt, sort_order)`)
+    .select(`*, product_images(url, alt_text, sort_order)`)
     .eq("is_active", true)
     .order("created_at", { ascending: false });
 
   if (error || !data || data.length === 0) {
-    return demoProducts.filter((p) => p.isActive);
+    if (process.env.GINABO_DEMO_CATALOG === "true") return demoProducts.filter((p) => p.isActive);
+    throw new Error(error?.message ?? "Catalog kosong atau tidak tersedia");
   }
 
-  return (data as Record<string, unknown>[]).map(toProduct);
+  return (data as Record<string, unknown>[]).map(mapCatalogProduct);
 }
 
 export async function getProductBySlug(slug: string): Promise<CatalogProduct | null> {
   const { data, error } = await supabase
     .from("products")
-    .select(`*, product_images(url, alt, sort_order)`)
+    .select(`*, product_images(url, alt_text, sort_order)`)
     .eq("slug", slug)
     .eq("is_active", true)
     .single();
 
   if (error || !data) {
-    return demoProducts.find((p) => p.slug === slug) ?? null;
+    if (process.env.GINABO_DEMO_CATALOG === "true") return demoProducts.find((p) => p.slug === slug) ?? null;
+    if (error?.code === "PGRST116") return null;
+    throw new Error(error?.message ?? "Produk tidak tersedia");
   }
 
-  return toProduct(data as Record<string, unknown>);
+  return mapCatalogProduct(data as Record<string, unknown>);
 }

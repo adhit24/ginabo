@@ -6,6 +6,8 @@ import { jsonError, jsonOk } from '@/lib/http'
 import { generateOrderNumber } from '@/lib/ids'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server'
 import { createSnapTransaction, isMidtransProduction } from '@/lib/midtrans'
+import { calculateShippingCost, getCities, isRajaOngkirConfigured } from '@/lib/rajaongkir'
+import { calculateServerCheckoutTotal, normalizeCheckoutRequestItems, priceCheckoutItems, type ServerProduct, type ServerVariant } from '@/lib/checkout/checkoutService'
 import type { MidtransCustomerDetails, MidtransItemDetail } from '@/types/midtrans'
 import type {
   OrderRow,
@@ -20,34 +22,16 @@ interface CartItem {
   product_id: string
   variant_id?: string | null
   qty: number
-  price: number // unit price in IDR
-  name: string
 }
 
 interface CheckoutBody {
   items: CartItem[]
   coupon_code?: string | null
   address_id: string
-  shipping_cost: number
   shipping_courier?: string | null
   shipping_service?: string | null
-  payment_fee?: number
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function validateItems(items: unknown): items is CartItem[] {
-  if (!Array.isArray(items) || items.length === 0) return false
-  return items.every(
-    (i) =>
-      typeof i === 'object' &&
-      i !== null &&
-      typeof (i as CartItem).product_id === 'string' &&
-      typeof (i as CartItem).qty === 'number' &&
-      (i as CartItem).qty > 0 &&
-      typeof (i as CartItem).price === 'number' &&
-      typeof (i as CartItem).name === 'string',
-  )
+  payment_method?: string | null
+  checkout_idempotency_key?: string | null
 }
 
 // ─── Route Handler ────────────────────────────────────────────────────────────
@@ -61,10 +45,16 @@ export async function POST(req: NextRequest) {
     return jsonError('Request body tidak valid', 400)
   }
 
-  const { items, coupon_code, address_id, shipping_cost = 0, shipping_courier, shipping_service, payment_fee = 0 } = body
+  let requestedItems: CartItem[]
+  try {
+    requestedItems = normalizeCheckoutRequestItems(body.items) as CartItem[]
+  } catch (error) {
+    return jsonError(error instanceof Error ? error.message : 'Field items tidak valid', 400)
+  }
+  const { coupon_code, address_id, shipping_courier, shipping_service, payment_method, checkout_idempotency_key } = body
 
-  if (!validateItems(items)) return jsonError('Field items tidak valid', 400)
   if (!address_id) return jsonError('address_id diperlukan', 400)
+  if (!shipping_courier || !shipping_service) return jsonError('Layanan pengiriman wajib dipilih', 400)
 
   // 2. Authenticate
   const supabase = await createServerSupabaseClient()
@@ -97,66 +87,84 @@ export async function POST(req: NextRequest) {
 
   if (!rawAddress) return jsonError('Alamat tidak ditemukan', 404)
   const address = {
+    id: rawAddress.id,
     recipient_name: rawAddress.recipient_name,
     phone: rawAddress.phone_number,
     address_line1: rawAddress.address_line1,
+    address_line2: rawAddress.address_line2,
+    kelurahan: rawAddress.kelurahan,
+    kecamatan: rawAddress.kecamatan,
     city: rawAddress.kota_kabupaten,
+    province: rawAddress.provinsi,
     postal_code: rawAddress.postal_code,
+    country: 'Indonesia',
   }
 
-  // 5. Validate coupon (optional)
+  // 5. Fetch canonical products and variants; never trust browser prices/names.
+  const admin = await createAdminClient()
+  const adminAny = admin as any
+  const productKeys = [...new Set(requestedItems.map((item) => item.product_id))]
+  const variantKeys = [...new Set(requestedItems.flatMap((item) => item.variant_id ? [item.variant_id] : []))]
+  const { data: productRows, error: productError } = await admin
+    .from('products')
+    .select('id, name, base_price, stock_quantity, weight_grams, is_active')
+    .in('id', productKeys)
+  if (productError) return jsonError('Gagal membaca katalog produk', 503, productError.message)
+  const { data: variantRows, error: variantError } = variantKeys.length
+    ? await admin.from('product_variants').select('id, product_id, name, price_modifier, stock_quantity, weight_grams, is_active').in('id', variantKeys)
+    : { data: [], error: null }
+  if (variantError) return jsonError('Gagal membaca varian produk', 503, variantError.message)
+  let items
+  try {
+    items = priceCheckoutItems(requestedItems, (productRows ?? []) as ServerProduct[], (variantRows ?? []) as ServerVariant[])
+  } catch (error) {
+    return jsonError(error instanceof Error ? error.message : 'Produk tidak tersedia', 409)
+  }
+
+  // 6. Recalculate shipping from the snapshot address and canonical weight.
+  const shippingWeightGrams = Math.max(1000, items.reduce((sum, item) => sum + (item.weightGrams ?? 100) * item.quantity, 0))
+  if (!isRajaOngkirConfigured()) return jsonError('Shipping API belum dikonfigurasi', 503)
+  const cities = await getCities(address.city)
+  const normalizedCity = address.city.toLowerCase().replace(/^(kota|kabupaten)\s+/i, '').trim()
+  const normalizedProvince = rawAddress.provinsi?.toLowerCase().trim()
+  const city = cities.find((candidate) => candidate.city_name.toLowerCase().replace(/^(kota|kabupaten)\s+/i, '').trim() === normalizedCity && (!normalizedProvince || candidate.province?.toLowerCase().includes(normalizedProvince))) ?? cities[0]
+  if (!city?.city_id) return jsonError('Kota alamat belum tersedia di shipping provider', 400)
+  const shippingOptions = await calculateShippingCost(city.city_id, shippingWeightGrams, [shipping_courier as 'jne'])
+  const shippingOption = shippingOptions.find((option) => option.service.toUpperCase() === shipping_service.toUpperCase())
+  if (!shippingOption) return jsonError('Layanan pengiriman tidak valid atau sudah berubah', 409)
+  const shippingCost = shippingOption.cost
+  const paymentFees: Record<string, number> = { bca_va: 4000, mandiri_va: 4000, bni_va: 4000, bri_va: 4000, mega_va: 3500, bsi_va: 3000, maybank_va: 3000, ovo: 750, gopay: 1000 }
+  const paymentFee = payment_method ? paymentFees[payment_method] ?? 0 : 0
+
+  // 7. Validate coupon against the server subtotal.
   let discountAmount = 0
   let couponId: string | null = null
-
   if (coupon_code) {
-    const { data: rawCoupon } = await supabase
-      .from('coupons')
-      .select('*')
-      .eq('code', coupon_code.toUpperCase())
-      .eq('is_active', true)
-      .single()
-
+    const { data: rawCoupon } = await supabase.from('coupons').select('*').eq('code', coupon_code.toUpperCase()).eq('is_active', true).single()
     const coupon = rawCoupon as CouponRow | null
-    if (coupon) {
-      const subtotalForCoupon = items.reduce((sum, i) => sum + i.price * i.qty, 0)
-      const meetsMin = !coupon.min_purchase || subtotalForCoupon >= coupon.min_purchase
+    const subtotalForCoupon = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+    if (coupon && (!coupon.min_purchase || subtotalForCoupon >= coupon.min_purchase)) {
+      if (coupon.type === 'percentage') discountAmount = Math.round((subtotalForCoupon * coupon.value) / 100)
+      if (coupon.type === 'fixed_amount') discountAmount = coupon.value
+      if (coupon.type === 'free_shipping') discountAmount = shippingCost
+      if (coupon.max_discount) discountAmount = Math.min(discountAmount, coupon.max_discount)
+      couponId = coupon.id
+    }
+  }
+  const totals = calculateServerCheckoutTotal({ items, shippingCost, paymentFee, discountAmount })
+  const { subtotal, total: totalAmount } = totals
 
-      if (meetsMin) {
-        if (coupon.type === 'percentage') {
-          discountAmount = Math.round((subtotalForCoupon * coupon.value) / 100)
-          if (coupon.max_discount) discountAmount = Math.min(discountAmount, coupon.max_discount)
-        } else if (coupon.type === 'fixed_amount') {
-          discountAmount = coupon.value
-        } else if (coupon.type === 'free_shipping') {
-          discountAmount = shipping_cost
-        }
-        couponId = coupon.id
-      }
+  // 8. Idempotent repeat submit returns the existing order/payment.
+  if (checkout_idempotency_key) {
+    const { data: existingOrder } = await adminAny.from('orders').select('id, order_number').eq('profile_id', user.id).eq('checkout_idempotency_key', checkout_idempotency_key).maybeSingle()
+    if (existingOrder) {
+      const { data: existingPayment } = await adminAny.from('payments').select('snap_token, snap_redirect_url').eq('order_id', existingOrder.id).maybeSingle()
+      if (existingPayment) return jsonOk({ order_number: existingOrder.order_number, snap_token: existingPayment.snap_token, redirect_url: existingPayment.snap_redirect_url, is_production: isMidtransProduction })
     }
   }
 
-  // 6. Calculate totals
-  const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
-  const totalAmount = Math.max(0, subtotal + shipping_cost + payment_fee - discountAmount)
+  // 9. Insert order — cast payload to bypass strict Insert generic
 
-  // 7. Admin client for writes
-  const admin = await createAdminClient()
-
-  const productKeys = [...new Set(items.map((item) => item.product_id))]
-  const { data: productsBySlug } = await admin.from('products').select('id, slug').in('slug', productKeys)
-  const uuidKeys = productKeys.filter((key) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key))
-  const { data: productsById } = uuidKeys.length
-    ? await admin.from('products').select('id, slug').in('id', uuidKeys)
-    : { data: [] }
-  const productMap = new Map<string, string>()
-  for (const product of [...(productsBySlug ?? []), ...(productsById ?? [])] as Array<{ id: string; slug: string }>) {
-    productMap.set(product.slug, product.id)
-    productMap.set(product.id, product.id)
-  }
-  const unresolvedProduct = productKeys.find((key) => !productMap.has(key))
-  if (unresolvedProduct) return jsonError(`Produk tidak ditemukan: ${unresolvedProduct}`, 400)
-
-  // 8. Insert order — cast payload to bypass strict Insert generic
   const orderNumber = generateOrderNumber()
 
   const { data: rawOrder, error: orderError } = await admin
@@ -166,10 +174,13 @@ export async function POST(req: NextRequest) {
       profile_id: user.id,
       status: 'pending',
       subtotal,
-      shipping_cost,
+      shipping_cost: shippingCost,
       discount_amount: discountAmount,
       tax_amount: 0,
       total_amount: totalAmount,
+      payment_fee: paymentFee,
+      shipping_weight_grams: shippingWeightGrams,
+      checkout_idempotency_key: checkout_idempotency_key ?? null,
       coupon_id: couponId,
       shipping_address: address,
       shipping_courier: shipping_courier ?? null,
@@ -187,13 +198,13 @@ export async function POST(req: NextRequest) {
   // 9. Insert order_items
   const orderItemsPayload = items.map((item) => ({
     order_id: order.id,
-    product_id: productMap.get(item.product_id),
-    variant_id: item.variant_id ?? null,
-    product_name: item.name,
-    variant_name: null as string | null,
-    quantity: item.qty,
-    unit_price: item.price,
-    total_price: item.price * item.qty,
+    product_id: item.productId,
+    variant_id: item.variantId ?? null,
+    product_name: item.productName,
+    variant_name: item.variantName ?? null,
+    quantity: item.quantity,
+    unit_price: item.unitPrice,
+    total_price: item.unitPrice * item.quantity,
   }))
 
   const { error: itemsError } = await admin
@@ -224,16 +235,16 @@ export async function POST(req: NextRequest) {
 
   const midtransItems: MidtransItemDetail[] = [
     ...items.map((item) => ({
-      id: item.variant_id ?? item.product_id,
-      price: item.price,
-      quantity: item.qty,
-      name: item.name.slice(0, 50),
+      id: item.variantId ?? item.productId,
+      price: item.unitPrice,
+      quantity: item.quantity,
+      name: `${item.productName}${item.variantName ? ` - ${item.variantName}` : ''}`.slice(0, 50),
     })),
-    ...(shipping_cost > 0
-      ? [{ id: 'SHIPPING', price: shipping_cost, quantity: 1, name: 'Ongkos Kirim' }]
+    ...(shippingCost > 0
+      ? [{ id: 'SHIPPING', price: shippingCost, quantity: 1, name: 'Ongkos Kirim' }]
       : []),
-    ...(payment_fee > 0
-      ? [{ id: 'PAYMENT_FEE', price: payment_fee, quantity: 1, name: 'Biaya layanan pembayaran' }]
+    ...(paymentFee > 0
+      ? [{ id: 'PAYMENT_FEE', price: paymentFee, quantity: 1, name: 'Biaya layanan pembayaran' }]
       : []),
     ...(discountAmount > 0
       ? [{ id: 'DISCOUNT', price: -discountAmount, quantity: 1, name: 'Diskon' }]
@@ -254,8 +265,13 @@ export async function POST(req: NextRequest) {
     snapToken = snap.token
     snapRedirectUrl = snap.redirect_url
   } catch (e) {
-    await admin.from('order_items').delete().eq('order_id', order.id as never)
-    await admin.from('orders').delete().eq('id', order.id as never)
+    await adminAny.from('payments').insert({
+      order_id: order.id,
+      midtrans_order_id: orderNumber,
+      midtrans_gross_amount: totalAmount,
+      status: 'failed',
+      raw_notification: null,
+    })
     return jsonError(
       'Gagal menghubungi payment gateway',
       502,
@@ -272,18 +288,16 @@ export async function POST(req: NextRequest) {
       midtrans_transaction_id: null,
       payment_type: null,
       status: 'pending',
-      gross_amount: totalAmount,
+      midtrans_gross_amount: totalAmount,
       snap_token: snapToken,
       snap_redirect_url: snapRedirectUrl,
       fraud_status: null,
       settlement_time: null,
       expiry_time: null,
-      raw_response: null,
+      raw_notification: null,
     } as never)
 
-  if (paymentError) {
-    console.error('[checkout] Failed to save payment row:', paymentError.message)
-  }
+  if (paymentError) return jsonError('Payment initiation tidak tercatat; pesanan ditahan untuk audit', 500, paymentError.message)
 
   // 13. Record coupon usage (best-effort)
   if (couponId) {

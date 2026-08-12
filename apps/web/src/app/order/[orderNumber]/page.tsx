@@ -36,6 +36,7 @@ const ORDER_STATUS_CLASS: Record<OrderStatus, string> = {
 
 const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {
   pending: 'Belum Dibayar',
+  success: 'Lunas',
   paid: 'Lunas',
   failed: 'Gagal',
   expired: 'Kadaluarsa',

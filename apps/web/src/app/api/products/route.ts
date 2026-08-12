@@ -13,6 +13,7 @@ export async function GET() {
         priceMinor: p.priceMinor,
         currency: p.currency,
         stockQty: p.stockQty,
+        weightGrams: p.weightGrams,
         imageUrl: p.images[0]?.url ?? null
       }))
     );

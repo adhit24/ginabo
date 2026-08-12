@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { buildProfileUpsert } from "@/lib/auth/profileContract";
 
 export type MemberTier = "Regular" | "Silver" | "Gold" | "Platinum";
 
@@ -23,7 +24,7 @@ interface AuthContextValue {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
-  signup: (name: string, email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
+  signup: (name: string, email: string, phone: string, password: string) => Promise<{ ok: boolean; error?: string }>;
   logout: () => void;
   signInWithGoogle: () => void;
   changePassword: (newPassword: string) => Promise<{ ok: boolean; error?: string }>;
@@ -120,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { ok: true };
   }
 
-  async function signup(name: string, email: string, password: string) {
+  async function signup(name: string, email: string, phone: string, password: string) {
     if (!email.includes("@")) return { ok: false, error: "Format email tidak valid." };
     if (!name.trim()) return { ok: false, error: "Nama tidak boleh kosong." };
     if (!password || password.length < 6) return { ok: false, error: "Password minimal 6 karakter." };
@@ -129,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: name.trim() } },
+      options: { data: { full_name: name.trim(), phone_number: phone.trim() || null } },
     });
 
     if (error) {
@@ -140,12 +141,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (data.user) {
-      await supabase.from("profiles").upsert({
-        id: data.user.id,
-        email,
-        full_name: name.trim(),
-        loyalty_points: 100,
-      } as never);
+      const profile = buildProfileUpsert({ id: data.user.id, email, name, phone });
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .upsert(profile as never, { onConflict: "id" });
+      if (profileError) return { ok: false, error: "Akun dibuat, tetapi data profil belum tersimpan. Silakan login ulang." };
     }
 
     return { ok: true };

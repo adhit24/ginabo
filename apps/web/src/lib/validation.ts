@@ -89,8 +89,8 @@ export const addressSchema = z.object({
 export const addressUpdateSchema = addressSchema.partial();
 
 export const profileUpdateSchema = z.object({
-  full_name: z.string().min(2).max(120).optional(),
-  phone: z.string().min(8).max(30).nullable().optional(),
+  full_name: z.string().trim().min(2).max(120).optional(),
+  phone: z.string().trim().min(8).max(30).nullable().optional(),
   date_of_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
   gender: z.enum(["male", "female", "other"]).nullable().optional(),
   avatar_url: z.string().url().optional(),

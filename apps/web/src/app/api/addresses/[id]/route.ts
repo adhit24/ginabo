@@ -6,6 +6,7 @@ import { jsonError, jsonOk } from '@/lib/http'
 import { addressUpdateSchema } from '@/lib/validation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import type { AddressRow } from '@/types/database'
+import { normalizeIndonesianPhone } from '@/lib/auth/profileContract'
 
 interface RouteContext {
   params: { id: string }
@@ -39,10 +40,19 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
       .eq('is_default', true)
   }
 
+  let normalizedPhone: string | undefined
+  try {
+    normalizedPhone = parsed.data.phone !== undefined
+      ? normalizeIndonesianPhone(parsed.data.phone)
+      : undefined
+  } catch (error) {
+    return jsonError('Nomor WhatsApp alamat tidak valid', 400, error instanceof Error ? error.message : String(error))
+  }
+
   const update: Record<string, unknown> = {}
   if ('label' in parsed.data) update.label = parsed.data.label || 'Rumah'
   if ('recipient_name' in parsed.data) update.recipient_name = parsed.data.recipient_name
-  if ('phone' in parsed.data) update.phone_number = parsed.data.phone
+  if (normalizedPhone !== undefined) update.phone_number = normalizedPhone
   if ('address_line1' in parsed.data) update.address_line1 = parsed.data.address_line1
   if ('address_line2' in parsed.data) update.address_line2 = parsed.data.address_line2 || null
   if ('city' in parsed.data) update.kota_kabupaten = parsed.data.city

@@ -6,6 +6,7 @@ import { jsonError, jsonOk } from '@/lib/http'
 import { profileUpdateSchema } from '@/lib/validation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import type { ProfileRow } from '@/types/database'
+import { normalizeIndonesianPhone } from '@/lib/auth/profileContract'
 
 export async function PATCH(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
@@ -28,32 +29,38 @@ export async function PATCH(req: NextRequest) {
     return jsonError('Data profil tidak valid', 400, parsed.error.flatten())
   }
 
+  let normalizedPhone: string | null | undefined
+  try {
+    normalizedPhone = parsed.data.phone === null
+      ? null
+      : parsed.data.phone !== undefined
+        ? normalizeIndonesianPhone(parsed.data.phone)
+        : undefined
+  } catch (error) {
+    return jsonError('Nomor WhatsApp tidak valid', 400, error instanceof Error ? error.message : String(error))
+  }
+
   const update = {
-    ...(parsed.data.full_name !== undefined ? { full_name: parsed.data.full_name } : {}),
-    ...(parsed.data.phone !== undefined ? { phone_number: parsed.data.phone } : {}),
+    ...(parsed.data.full_name !== undefined ? { full_name: parsed.data.full_name.trim() } : {}),
+    ...(normalizedPhone !== undefined ? { phone_number: normalizedPhone } : {}),
     ...(parsed.data.date_of_birth !== undefined ? { date_of_birth: parsed.data.date_of_birth } : {}),
     ...(parsed.data.avatar_url !== undefined ? { avatar_url: parsed.data.avatar_url } : {}),
+    ...(parsed.data.gender !== undefined ? { gender: parsed.data.gender } : {}),
   }
 
   const { data, error } = await profiles
     .update(update as never)
     .eq('id', user.id)
-    .select('full_name, phone_number, date_of_birth, avatar_url')
+    .select('full_name, phone_number, date_of_birth, gender, avatar_url, loyalty_points')
     .single()
 
   if (error || !data) return jsonError('Gagal menyimpan profil', 500, error?.message)
-
-  // Older staging databases may not have this optional column yet. Never
-  // make saving the other profile fields fail because of that drift.
-  if (parsed.data.gender !== undefined) {
-    await profiles.update({ gender: parsed.data.gender }).eq('id', user.id)
-  }
 
   return jsonOk({
     full_name: data.full_name,
     phone: data.phone_number,
     date_of_birth: data.date_of_birth,
-    gender: parsed.data.gender ?? null,
+    gender: data.gender ?? null,
     avatar_url: data.avatar_url,
   } as Pick<ProfileRow, 'full_name' | 'phone' | 'date_of_birth' | 'gender' | 'avatar_url'>)
 }

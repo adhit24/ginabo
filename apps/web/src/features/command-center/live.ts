@@ -29,7 +29,7 @@ interface ProductRow {
   id: string;
   name: string;
   sku: string;
-  stock: number;
+  stock_quantity: number;
   is_active: boolean;
 }
 
@@ -119,10 +119,10 @@ export function aggregateRows({
 
   // Inventory risks: products with < 7 days of stock at estimated velocity
   const inventoryRisks = typedProducts
-    .filter((p) => p.stock > 0)
+    .filter((p) => p.stock_quantity > 0)
     .map((p) => {
       const dailyVelocity = Math.max(1, Math.round((orderCount / windowDays) * 0.1 * 10) / 10);
-      const daysRemaining = Math.floor(p.stock / dailyVelocity);
+      const daysRemaining = Math.floor(p.stock_quantity / dailyVelocity);
       return { ...p, dailyVelocity, daysRemaining, recommendedRestock: Math.ceil(dailyVelocity * 30) };
     })
     .filter((p) => p.daysRemaining <= 7)
@@ -132,7 +132,7 @@ export function aggregateRows({
       id: p.id,
       name: p.name,
       sku: p.sku,
-      stock: p.stock,
+      stock: p.stock_quantity,
       dailyVelocity: p.dailyVelocity,
       daysRemaining: p.daysRemaining,
       recommendedRestock: p.recommendedRestock,
@@ -140,7 +140,7 @@ export function aggregateRows({
 
   const inventoryRiskCount = typedProducts.filter((p) => {
     const dv = Math.max(1, Math.round((orderCount / windowDays) * 0.1 * 10) / 10);
-    return p.stock / dv <= 7;
+    return p.stock_quantity / dv <= 7;
   }).length;
 
   // Trend: build per-day buckets for last 7 days
@@ -221,7 +221,7 @@ function createSupabaseRepository(): LiveCommandCenterRepository {
     async getProducts() {
       const { data, error } = await db
         .from("products")
-        .select("id, name, sku, stock, is_active")
+        .select("id, name, sku, stock_quantity, is_active")
         .eq("is_active", true);
       if (error) throw error;
       return data ?? [];
@@ -229,7 +229,7 @@ function createSupabaseRepository(): LiveCommandCenterRepository {
     async getPaymentsSince(iso) {
       const { data, error } = await db
         .from("payments")
-        .select("id, status, gross_amount, created_at")
+        .select("id, status, midtrans_gross_amount, created_at")
         .gte("created_at", iso);
       if (error) throw error;
       return data ?? [];

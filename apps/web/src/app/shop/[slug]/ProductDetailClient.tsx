@@ -9,6 +9,7 @@ import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { Reveal } from "@/components/ui/Reveal";
 import { ProductCard } from "@/components/ProductCard";
 import { useShopCatalog } from "@/lib/useShopCatalog";
+import { trackCustomerEvent } from "@/lib/analytics/events";
 
 const EASE = [0.25, 1, 0.5, 1] as const;
 
@@ -114,15 +115,21 @@ export function ProductDetailClient({ product }: Props) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  useEffect(() => {
+    trackCustomerEvent({ event_name: "product_viewed", product_id: product.id, metadata: { slug: product.slug } });
+  }, [product.id, product.slug]);
+
   function handleAddToCart() {
     addItem({
       productId:  product.id,
       slug:       product.slug,
       name:       product.name,
-      priceMinor: product.priceMinor * qty,
+      priceMinor: product.priceMinor,
       currency:   (product.currency as "IDR" | "USD") ?? "IDR",
       imageUrl:   images[0]?.url ?? null,
-    });
+      weightGrams: product.weightGrams,
+    }, qty);
+    trackCustomerEvent({ event_name: "add_to_cart", product_id: product.id, metadata: { quantity: qty } });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }

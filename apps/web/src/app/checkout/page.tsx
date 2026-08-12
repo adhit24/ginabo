@@ -12,8 +12,9 @@ import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { authFetch } from "@/lib/supabase/client";
 import type { ShippingOption } from "@/lib/rajaongkir";
 import type { AddressRow } from "@/types/database";
+import { trackCustomerEvent } from "@/lib/analytics/events";
 
-const DEMO_PAYMENT_MODE = true;
+const DEMO_PAYMENT_MODE = process.env.NEXT_PUBLIC_GINABO_DEMO_PAYMENT_MODE === "true";
 
 type CheckoutState =
   | { status: "idle" }
@@ -29,6 +30,7 @@ export default function CheckoutPage() {
   const [selectedAddress, setSelectedAddress] = useState<AddressRow | null>(null);
   const [shippingOption, setShippingOption] = useState<ShippingOption | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [checkoutIdempotencyKey] = useState(() => `checkout-${Date.now()}-${Math.random().toString(36).slice(2)}`);
   const [status, setStatus] = useState<CheckoutState>({ status: "idle" });
   const packageWeight = useMemo(
     () => Math.max(1000, cart.items.reduce((sum, item) => sum + (item.weightGrams ?? 100) * item.quantity, 0)),
@@ -47,6 +49,7 @@ export default function CheckoutPage() {
       return;
     }
     setStatus({ status: "submitting" });
+    trackCustomerEvent({ event_name: "checkout_started", metadata: { item_count: cart.items.length } });
     try {
       if (DEMO_PAYMENT_MODE) {
         const orderNumber = `GNB-DEMO-${Date.now().toString().slice(-8)}`;
@@ -70,15 +73,13 @@ export default function CheckoutPage() {
           items: cart.items.map((i) => ({
             product_id: i.productId,
             qty: i.quantity,
-            price: i.priceMinor,
-            name: i.name
+            variant_id: null,
           })),
           address_id: addressId,
-          shipping_cost: shippingOption?.cost ?? 0,
           shipping_courier: shippingOption?.courier_code ?? null,
           shipping_service: shippingOption?.service ?? null,
           payment_method: paymentMethod?.provider ?? null,
-          payment_fee: paymentMethod?.fee ?? 0,
+          checkout_idempotency_key: checkoutIdempotencyKey,
         })
       });
       const json = (await res.json()) as {
@@ -91,8 +92,10 @@ export default function CheckoutPage() {
         return;
       }
       clear();
+      trackCustomerEvent({ event_name: "checkout_completed", metadata: { order_number: json.data.order_number } });
       router.push(`/order/${json.data.order_number}`);
     } catch (e) {
+      trackCustomerEvent({ event_name: "payment_failed", metadata: { stage: "checkout" } });
       setStatus({ status: "error", message: e instanceof Error ? e.message : String(e) });
     }
   }
