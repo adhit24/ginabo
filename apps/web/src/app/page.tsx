@@ -42,7 +42,9 @@ function SectionLabel({ children, center }: { children: ReactNode; center?: bool
 }
 
 // ── CTA Card — simple hover scale ───────────────────────────────────────────
-function CTACard({ href, src, alt }: { href: string; src: string; alt: string }) {
+// `tint` recolors a lighter/off-palette source image (via mix-blend-color) so
+// it reads as the same purple depth as the other cards in the row.
+function CTACard({ href, src, alt, tint }: { href: string; src: string; alt: string; tint?: string }) {
   return (
     <Link
       href={href}
@@ -56,6 +58,12 @@ function CTACard({ href, src, alt }: { href: string; src: string; alt: string })
           className="object-cover object-center"
           sizes="(max-width:640px) 33vw, (max-width:1280px) calc((100vw - 64px) / 3), 420px"
         />
+        {tint && (
+          <div
+            className="absolute inset-0 mix-blend-color pointer-events-none"
+            style={{ backgroundColor: tint, opacity: 0.65 }}
+          />
+        )}
       </div>
     </Link>
   );
@@ -149,9 +157,9 @@ export default function HomePage() {
       <div className="w-full px-2 md:px-5 lg:px-8 xl:px-10 pt-2 md:pt-3 pb-3 md:pb-5">
         <div className="grid grid-cols-3 gap-2 md:gap-3 lg:gap-4">
 
-          <CTACard href="/skincheck" src="/coba_facescan.png"   alt="Cek Kulitmu Analisis AI"  />
-          <CTACard href="/reseller"  src="/jadi_reseller.png" alt="Jadi Reseller Ginabo"       />
-          <CTACard href="/about"     src="/belanja_tenang.png"    alt="Halal & BPOM Terdaftar"     />
+          <CTACard href="/skincheck" src="/analisawajah_edit.png" alt="Coba Analisa Wajah AI"  />
+          <CTACard href="/reseller"  src="/reseller_edit.png"     alt="Jadi Reseller Ginabo"   />
+          <CTACard href="/about"     src="/blanjatenang_edit.png" alt="Belanja Tenang - Halal & BPOM Terdaftar" tint="#6B4A8F" />
 
         </div>
       </div>
