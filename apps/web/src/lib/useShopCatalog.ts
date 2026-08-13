@@ -18,9 +18,9 @@ export type ShopProduct = {
 
 export const STATIC_PRODUCTS: ShopProduct[] = [
   {
-    slug: "hydra-moist-gel-ultimate", name: "Hydra Moist Gel Ultimate",
+    slug: "hydra-moist-gel", name: "Hydra Moist Gel",
     category: "skincare", tag: "Multifungsi", rating: "4.9", reviews: "178",
-    price: "Rp 118.999", priceMinor: 118999, img: "/salmonfix.png",
+    price: "Rp 89.000", priceMinor: 89000, img: "/salmonfix.png",
   },
   {
     slug: "bright-care-moisture-cream", name: "Bright & Care Moisture Cream",
