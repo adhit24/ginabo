@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const { data: products, error } = await supabase
       .from("products")
-      .select("id, slug, name, description, base_price, stock_quantity, is_active, created_at, product_images(url, sort_order)")
+      .select("id, slug, name, description, short_description, ingredients, weight_grams, base_price, stock_quantity, is_active, average_rating, review_count, created_at, product_images(url, sort_order)")
       .order("sort_order", { ascending: true });
 
     if (error) return jsonError("Server error", 500, error.message);
@@ -23,10 +23,15 @@ export async function GET() {
           slug: p.slug,
           name: p.name,
           description: p.description,
+          shortDescription: p.short_description,
+          ingredients: p.ingredients,
+          weightGrams: p.weight_grams,
           priceMinor: p.base_price,
           currency: "IDR",
           stockQty: p.stock_quantity,
           isActive: p.is_active,
+          averageRating: p.average_rating,
+          reviewCount: p.review_count,
           imageUrl: images[0]?.url ?? null,
           createdAt: p.created_at,
         };
@@ -54,6 +59,9 @@ export async function POST(req: Request) {
         slug: parsed.data.slug,
         name: parsed.data.name,
         description: parsed.data.description,
+        short_description: parsed.data.shortDescription || null,
+        ingredients: parsed.data.ingredients || null,
+        weight_grams: parsed.data.weightGrams ?? null,
         base_price: parsed.data.priceMinor,
         stock_quantity: parsed.data.stockQty,
         is_active: parsed.data.isActive,

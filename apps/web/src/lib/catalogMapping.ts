@@ -30,6 +30,8 @@ export function mapCatalogProduct(row: Record<string, unknown>): CatalogProduct 
     stockQty: typeof row.stock_quantity === "number" ? row.stock_quantity : 0,
     weightGrams: typeof row.weight_grams === "number" ? row.weight_grams : null,
     isActive: row.is_active !== false,
+    averageRating: typeof row.average_rating === "number" ? row.average_rating : null,
+    reviewCount: typeof row.review_count === "number" ? row.review_count : 0,
     images,
   };
 }

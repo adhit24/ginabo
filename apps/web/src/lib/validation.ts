@@ -50,11 +50,14 @@ export const adminProductSchema = z.object({
   slug: z.string().min(3).max(120),
   name: z.string().min(2).max(160),
   description: z.string().min(10).max(5000),
+  shortDescription: z.string().max(500).optional().or(z.literal("")),
+  ingredients: z.string().max(2000).optional().or(z.literal("")),
+  weightGrams: z.number().int().min(0).max(100000).optional(),
   priceMinor: z.number().int().min(0).max(1000000000),
   currency: z.enum(["IDR", "USD"]).default("IDR"),
   stockQty: z.number().int().min(0).max(1000000),
   isActive: z.boolean().default(true),
-  imageUrl: z.string().url().optional().or(z.literal(""))
+  imageUrl: z.string().optional().or(z.literal(""))
 });
 
 export const resellerApplicationSchema = z.object({

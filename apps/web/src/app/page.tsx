@@ -10,6 +10,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { Marquee } from "@/components/ui/Marquee";
 
 import { store, type GProduct } from "@/lib/adminStore";
+import { listActiveProducts, type CatalogProduct } from "@/lib/catalog";
 import { ProductCard } from "@/components/ProductCard";
 
 // ── Static Data ───────────────────────────────────────────────────────────────
@@ -91,7 +92,7 @@ type CatalogItem = {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
-  const [products, setProducts] = useState<GProduct[]>([]);
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [bundles,  setBundles]  = useState<GProduct[]>([]);
   const [catFilter, setCatFilter] = useState("all");
   const [catSort, setCatSort]     = useState("newest");
@@ -101,7 +102,7 @@ export default function HomePage() {
   const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setProducts(store.getProducts());
+    listActiveProducts().then(setProducts).catch(() => setProducts([]));
     setBundles(store.getBundles());
   }, []);
 
@@ -115,8 +116,11 @@ export default function HomePage() {
 
   const catalogItems = useMemo<CatalogItem[]>(() => {
     const singles: CatalogItem[] = products.map(p => ({
-      id: p.id, slug: p.slug || p.id, name: p.name, priceVal: p.priceVal, priceMinor: p.priceMinor,
-      priceLabel: p.priceLabel, img: p.img, rating: p.rating, reviews: p.reviews,
+      id: p.id, slug: p.slug, name: p.name,
+      priceVal: `Rp ${p.priceMinor.toLocaleString("id-ID")}`, priceMinor: p.priceMinor,
+      img: p.images[0]?.url ?? "",
+      rating: p.averageRating != null ? p.averageRating.toFixed(1) : "5.0",
+      reviews: String(p.reviewCount),
       type: "single",
     }));
     const bundleItems: CatalogItem[] = bundles.map(p => ({

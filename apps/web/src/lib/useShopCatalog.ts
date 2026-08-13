@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { store } from "@/lib/adminStore";
+import { listActiveProducts } from "@/lib/catalog";
 
 export type ShopProduct = {
   slug: string;
@@ -15,24 +16,6 @@ export type ShopProduct = {
   img: string;
   originalPrice?: string;
 };
-
-export const STATIC_PRODUCTS: ShopProduct[] = [
-  {
-    slug: "hydra-moist-gel", name: "Hydra Moist Gel",
-    category: "skincare", tag: "Multifungsi", rating: "4.9", reviews: "178",
-    price: "Rp 89.000", priceMinor: 89000, img: "/salmonfix.png",
-  },
-  {
-    slug: "bright-care-moisture-cream", name: "Bright & Care Moisture Cream",
-    category: "skincare", tag: "Barrier Care", rating: "4.9", reviews: "257",
-    price: "Rp 79.999", priceMinor: 79999, img: "/moistfix.png",
-  },
-  {
-    slug: "glowage-multi-active-serum", name: "GlowAge Multi-Active Serum",
-    category: "skincare", tag: "Best Seller", rating: "4.9", reviews: "387",
-    price: "Rp 89.999", priceMinor: 89999, img: "/serumfix.png",
-  },
-];
 
 export const STATIC_BUNDLES: ShopProduct[] = [
   {
@@ -57,32 +40,49 @@ export const STATIC_BUNDLES: ShopProduct[] = [
   },
 ];
 
-const BASE_CATALOG: ShopProduct[] = [...STATIC_PRODUCTS, ...STATIC_BUNDLES];
-
 /**
- * Shared client-side product catalog (STATIC_PRODUCTS/STATIC_BUNDLES merged
- * with anything the admin store adds, deduped by slug) so the shop page and
- * the header search both read the exact same list.
+ * Shared client-side product catalog: live products from Supabase (source of
+ * truth for /shop/[slug] and checkout) merged with the still-localStorage
+ * bundle catalog, deduped by slug, so the shop page and header search read
+ * the same list. Products are no longer read from adminStore — editing them
+ * happens in /admin/products, which now writes to Supabase directly.
  */
 export function useShopCatalog(): ShopProduct[] {
-  const [allProducts, setAllProducts] = useState<ShopProduct[]>(BASE_CATALOG);
+  const [allProducts, setAllProducts] = useState<ShopProduct[]>(STATIC_BUNDLES);
 
   useEffect(() => {
-    const storeProds = store.getProducts().map(p => ({
-      slug: p.slug || p.id, name: p.name, category: "skincare",
-      tag: p.tag || "", rating: p.rating, reviews: p.reviews,
-      price: p.priceLabel ? `${p.priceLabel} ${p.priceVal}` : p.priceVal,
-      priceMinor: p.priceMinor, img: p.img ?? "",
-    }));
-    const storeBundles = store.getBundles().map(p => ({
-      slug: p.slug || p.id, name: p.name, category: "bundling",
-      tag: "Bundling", rating: p.rating, reviews: p.reviews,
-      price: p.priceVal, priceMinor: p.priceMinor, img: p.img ?? "",
-      originalPrice: p.originalPrice,
-    }));
-    const existingSlugs = new Set(BASE_CATALOG.map(p => p.slug));
-    const newProds = [...storeProds, ...storeBundles].filter(p => !existingSlugs.has(p.slug));
-    if (newProds.length > 0) setAllProducts(prev => [...prev, ...newProds]);
+    let cancelled = false;
+
+    listActiveProducts()
+      .then((products) => {
+        if (cancelled) return;
+        const liveProducts: ShopProduct[] = products.map((p) => ({
+          slug: p.slug, name: p.name, category: "skincare",
+          tag: p.averageRating != null ? "Best Seller" : "",
+          rating: p.averageRating != null ? p.averageRating.toFixed(1) : "5.0",
+          reviews: String(p.reviewCount),
+          price: `Rp ${p.priceMinor.toLocaleString("id-ID")}`,
+          priceMinor: p.priceMinor,
+          img: p.images[0]?.url ?? "",
+        }));
+
+        const storeBundles = store.getBundles().map(p => ({
+          slug: p.slug || p.id, name: p.name, category: "bundling",
+          tag: "Bundling", rating: p.rating, reviews: p.reviews,
+          price: p.priceVal, priceMinor: p.priceMinor, img: p.img ?? "",
+          originalPrice: p.originalPrice,
+        }));
+        const existingBundleSlugs = new Set(STATIC_BUNDLES.map(p => p.slug));
+        const newBundles = storeBundles.filter(p => !existingBundleSlugs.has(p.slug));
+
+        setAllProducts([...liveProducts, ...STATIC_BUNDLES, ...newBundles]);
+      })
+      .catch(() => {
+        // Live catalog unavailable — fall back to bundles only rather than crashing the page.
+        if (!cancelled) setAllProducts(STATIC_BUNDLES);
+      });
+
+    return () => { cancelled = true; };
   }, []);
 
   return allProducts;

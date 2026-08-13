@@ -8,7 +8,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
   try {
     const { data: product, error } = await supabase
       .from("products")
-      .select("id, slug, name, description, base_price, stock_quantity, is_active, product_images(url, sort_order)")
+      .select("id, slug, name, description, short_description, ingredients, weight_grams, base_price, stock_quantity, is_active, average_rating, review_count, product_images(url, sort_order)")
       .eq("id", params.id)
       .single();
 
@@ -23,10 +23,15 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
       slug: product.slug,
       name: product.name,
       description: product.description,
+      shortDescription: product.short_description,
+      ingredients: product.ingredients,
+      weightGrams: product.weight_grams,
       priceMinor: product.base_price,
       currency: "IDR",
       stockQty: product.stock_quantity,
       isActive: product.is_active,
+      averageRating: product.average_rating,
+      reviewCount: product.review_count,
       imageUrl: images[0]?.url ?? null,
     });
   } catch (e) {
@@ -48,6 +53,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     if (parsed.data.slug !== undefined) updatePayload.slug = parsed.data.slug;
     if (parsed.data.name !== undefined) updatePayload.name = parsed.data.name;
     if (parsed.data.description !== undefined) updatePayload.description = parsed.data.description;
+    if (parsed.data.shortDescription !== undefined) updatePayload.short_description = parsed.data.shortDescription || null;
+    if (parsed.data.ingredients !== undefined) updatePayload.ingredients = parsed.data.ingredients || null;
+    if (parsed.data.weightGrams !== undefined) updatePayload.weight_grams = parsed.data.weightGrams;
     if (parsed.data.priceMinor !== undefined) updatePayload.base_price = parsed.data.priceMinor;
     if (parsed.data.stockQty !== undefined) updatePayload.stock_quantity = parsed.data.stockQty;
     if (parsed.data.isActive !== undefined) updatePayload.is_active = parsed.data.isActive;
