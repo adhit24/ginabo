@@ -130,7 +130,15 @@ export async function listActiveProducts(): Promise<CatalogProduct[]> {
       .order("created_at", { ascending: false });
 
     if (data && data.length > 0) {
-      dbProducts = (data as Record<string, unknown>[]).map(mapCatalogProduct);
+      dbProducts = (data as Record<string, unknown>[]).map((item) => {
+        const prod = mapCatalogProduct(item);
+        // Force local custom images to override database paths
+        const demo = demoProducts.find((d) => d.slug === prod.slug);
+        if (demo) {
+          prod.images = demo.images;
+        }
+        return prod;
+      });
     }
   } catch (e) {
     console.error("Failed to fetch products from db", e);
@@ -159,7 +167,13 @@ export async function getProductBySlug(slug: string): Promise<CatalogProduct | n
       .single();
 
     if (data) {
-      return mapCatalogProduct(data as Record<string, unknown>);
+      const prod = mapCatalogProduct(data as Record<string, unknown>);
+      // Force local custom images to override database paths
+      const demo = demoProducts.find((d) => d.slug === prod.slug);
+      if (demo) {
+        prod.images = demo.images;
+      }
+      return prod;
     }
   } catch (e) {
     console.error("Failed to get product from db", e);
