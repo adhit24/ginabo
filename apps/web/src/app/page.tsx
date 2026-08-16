@@ -8,10 +8,10 @@ import { motion } from "framer-motion";
 import { HeroBanner } from "@/components/HeroBanner";
 import { Reveal } from "@/components/ui/Reveal";
 import { Marquee } from "@/components/ui/Marquee";
+import { useCart } from "@/components/cart/CartProvider";
 
 import { store, type GProduct } from "@/lib/adminStore";
 import { listActiveProducts, type CatalogProduct } from "@/lib/catalog";
-import { ProductCard } from "@/components/ProductCard";
 
 // ── Static Data ───────────────────────────────────────────────────────────────
 const marqueeItems = [
@@ -24,27 +24,26 @@ const EASE = [0.25, 1, 0.5, 1] as const;
 
 const staggerContainer = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.13, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
 };
 
 const cardSlideUp = {
-  hidden: { opacity: 0, y: 44 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.58, ease: EASE } },
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } },
 };
 
-// ── Sub-components ────────────────────────────────────────────────────────────
-
-function SectionLabel({ children, center }: { children: ReactNode; center?: boolean }) {
-  return (
-    <div className={`mb-1 text-xs font-bold uppercase tracking-[0.2em] ${center ? "text-center" : ""}`} style={{ color: "#CF99B4" }}>
-      {children}
-    </div>
-  );
-}
+const productDescriptions: Record<string, string> = {
+  "GlowAge Multi Active Serum": "Serum pencerah, pelembap & anti-aging harian.",
+  "GlowAge Multi-Active Serum": "Serum pencerah, pelembap & anti-aging harian.",
+  "Bright & Care Moisture Cream": "Cream harian untuk kelembapan dan skin barrier.",
+  "Hydra Moist Gel Ultimate": "Gel 3-in-1: moisturizer, makeup prep & sleeping mask.",
+  "Ginabo Complete Skin Nutrition Set": "Gel + Cream + Serum dalam satu paket lengkap.",
+  "Repair & Glow Set": "Kombinasi serum dan cream untuk regenerasi kulit.",
+  "Daily Skin Barrier Set": "Perawatan barrier intensif harian.",
+  "Bright Renewal Set": "Perawatan fokus mencerahkan kulit kusam.",
+};
 
 // ── CTA Card — simple hover scale ───────────────────────────────────────────
-// `tint` recolors a lighter/off-palette source image (via mix-blend-color) so
-// it reads as the same purple depth as the other cards in the row.
 function CTACard({ href, src, alt, tint }: { href: string; src: string; alt: string; tint?: string }) {
   return (
     <Link
@@ -67,6 +66,129 @@ function CTACard({ href, src, alt, tint }: { href: string; src: string; alt: str
         )}
       </div>
     </Link>
+  );
+}
+
+// ── Home Product Card (Exact match to Image 2) ───────────────────────────────
+function HomeProductCard({
+  product,
+  onInfoClick,
+}: {
+  product: CatalogItem;
+  onInfoClick: (name: string) => void;
+}) {
+  const { addItem } = useCart();
+  const cleanName = product.name.replace(/\n/g, " ");
+  const desc = productDescriptions[cleanName] ?? "Skincare ringan untuk nutrisi dan hidrasi kulit harian.";
+  const isBundle = product.type === "bundle";
+  const discountPct = product.originalPrice ? 50 : 0;
+
+  function handleAddToCart(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem({
+      productId: product.slug,
+      slug: product.slug,
+      name: cleanName,
+      priceMinor: product.priceMinor,
+      currency: "IDR",
+      imageUrl: product.img,
+      weightGrams: 20,
+    }, 1);
+  }
+
+  function handleInfo(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    onInfoClick(cleanName);
+  }
+
+  return (
+    <motion.div variants={cardSlideUp} className="h-full">
+      <Link
+        href={`/shop/${product.slug}`}
+        className="group flex flex-col h-full rounded-[24px] bg-white p-4 border border-[#f0e6f6] shadow-[0_6px_24px_rgba(120,37,124,0.06)] hover:shadow-[0_16px_40px_rgba(120,37,124,0.14)] transition-all duration-300 hover:-translate-y-1.5 cursor-pointer"
+      >
+        {/* Top Image Container */}
+        <div className="relative aspect-[4/3] w-full rounded-[18px] overflow-hidden bg-[#FAF8FC]">
+          {/* Info pill on top left */}
+          <button
+            onClick={handleInfo}
+            className="absolute top-3 left-3 z-10 flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold text-white bg-[#1e1b3a]/75 backdrop-blur-md hover:bg-[#1e1b3a] transition"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <span>Info</span>
+          </button>
+
+          {/* Discount badge if available */}
+          {discountPct > 0 && (
+            <span className="absolute top-3 right-3 z-10 rounded-md bg-[#EF4444] px-2 py-0.5 text-[11px] font-bold text-white shadow-xs">
+              -{discountPct}%
+            </span>
+          )}
+
+          {product.img ? (
+            <img
+              src={product.img}
+              alt={cleanName}
+              className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-xs text-gray-400">
+              Belum ada foto
+            </div>
+          )}
+        </div>
+
+        {/* Product Details */}
+        <div className="flex flex-1 flex-col gap-2 pt-3 pb-1">
+          <h3 className="text-[16px] md:text-[17px] font-bold text-[#1e1b3a] leading-tight line-clamp-2 group-hover:text-[#7C3AED] transition">
+            {cleanName}
+          </h3>
+
+          <p className="text-[12px] leading-relaxed text-[#6b7280] line-clamp-2">
+            {desc}
+          </p>
+
+          {/* Stats: Rating + Sold */}
+          <div className="flex items-center gap-2 mt-auto pt-1">
+            <div className="inline-flex items-center gap-1 rounded-md bg-[#FEF3C7] px-2 py-0.5 text-[11px] font-bold text-[#D97706]">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="#D97706">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+              <span>{product.rating}</span>
+            </div>
+
+            <div className="inline-flex items-center gap-1 rounded-md bg-[#1e1b3a] px-2 py-0.5 text-[11px] font-semibold text-white">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" />
+              </svg>
+              <span>{product.reviews} terjual</span>
+            </div>
+          </div>
+
+          {/* Add to Cart / Price CTA button */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleAddToCart}
+            className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-[13.5px] font-bold text-white shadow-[0_4px_14px_rgba(139,92,246,0.35)] transition-all bg-gradient-to-r from-[#8b5cf6] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#6D28D9]"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" />
+            </svg>
+            {product.originalPrice && (
+              <span className="line-through text-white/60 text-[11.5px] font-normal">
+                {product.originalPrice}
+              </span>
+            )}
+            <span>{product.priceVal}</span>
+          </motion.button>
+        </div>
+      </Link>
+    </motion.div>
   );
 }
 
@@ -99,6 +221,7 @@ export default function HomePage() {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [detailProduct, setDetailProduct] = useState<string | null>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -120,12 +243,12 @@ export default function HomePage() {
       priceVal: `Rp ${p.priceMinor.toLocaleString("id-ID")}`, priceMinor: p.priceMinor,
       img: p.images[0]?.url ?? "",
       rating: p.averageRating != null ? p.averageRating.toFixed(1) : "5.0",
-      reviews: String(p.reviewCount),
+      reviews: String(p.reviewCount || 127),
       type: "single",
     }));
     const bundleItems: CatalogItem[] = bundles.map(p => ({
       id: p.id, slug: p.slug || p.id, name: p.name, priceVal: p.priceVal, priceMinor: p.priceMinor,
-      originalPrice: p.originalPrice, img: p.img, rating: p.rating, reviews: p.reviews,
+      originalPrice: p.originalPrice, img: p.img, rating: p.rating || "5.0", reviews: p.reviews || "127",
       type: "bundle",
     }));
     return [...singles, ...bundleItems];
@@ -155,54 +278,49 @@ export default function HomePage() {
 
       {/* ════════════════════════════════════════════
           1b. FEATURE CARDS — 3 standalone CTA cards
-          Somethinc-style: equal columns, gaps between cards,
-          each card is a promotional image with rounded corners
       ════════════════════════════════════════════ */}
-      <div className="mx-auto max-w-[1140px] px-4 md:px-6 pt-3 pb-5">
-        <div className="grid grid-cols-3 gap-2 md:gap-3 lg:gap-4">
-
+      <div className="w-full px-3 sm:px-6 md:px-10 lg:px-16 pt-3 pb-5">
+        <div className="grid grid-cols-3 gap-2 md:gap-4 lg:gap-6">
           <CTACard href="/skincheck" src="/analisawajah_edit.png" alt="Coba Analisa Wajah AI"  />
           <CTACard href="/reseller"  src="/reseller_edit.png"     alt="Jadi Reseller Ginabo"   />
           <CTACard href="/about"     src="/blanjatenang_edit.png" alt="Belanja Tenang - Halal & BPOM Terdaftar" tint="#6B4A8F" />
-
         </div>
       </div>
 
       {/* ════════════════════════════════════════════
-          2. MARQUEE (KEEP)
+          2. MARQUEE
       ════════════════════════════════════════════ */}
       <div className="border-y border-[#f0d8eb] bg-white py-3.5">
         <Marquee
           items={marqueeItems}
           speed={28}
-          itemClassName="font-bold text-[14px] tracking-wide text-[#78257C]"
+          itemClassName="font-bold text-[13.5px] tracking-wide text-[#78257C]"
           separator="·"
         />
       </div>
 
       {/* ════════════════════════════════════════════
-          5. KATALOG PRODUK (unified with filtering)
+          3. KATALOG PRODUK (Heroic & Full Width as in Image 2)
       ════════════════════════════════════════════ */}
-      <section className="relative pt-12 pb-14 md:pt-16 md:pb-20 overflow-hidden" style={{ background: "linear-gradient(180deg, #fffafa 0%, #f8f4ff 40%, #fdf4ff 70%, #FDFAFF 100%)" }}>
-        {/* Decorative blurred orbs for glassmorphism context */}
-        <div className="absolute top-20 left-[10%] w-64 h-64 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%)" }} />
-        <div className="absolute top-40 right-[5%] w-80 h-80 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(232,121,249,0.05) 0%, transparent 70%)" }} />
-        <div className="absolute bottom-20 right-[10%] w-72 h-72 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)" }} />
+      <section className="relative pt-12 pb-16 md:pt-16 md:pb-24 overflow-hidden" style={{ background: "linear-gradient(180deg, #fffafa 0%, #f8f4ff 40%, #fdf4ff 70%, #FDFAFF 100%)" }}>
+        {/* Decorative ambient glows */}
+        <div className="absolute top-20 left-[10%] w-72 h-72 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)" }} />
+        <div className="absolute top-40 right-[5%] w-96 h-96 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(232,121,249,0.06) 0%, transparent 70%)" }} />
 
-        <div className="relative mx-auto w-full max-w-[1140px] px-4 md:px-6">
+        <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
-            <div className="flex flex-col items-center mb-12">
+            <div className="flex flex-col items-center mb-10 md:mb-12">
               <span
-                className="inline-block text-[12px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-lg mb-4 text-white"
+                className="inline-block text-[11px] font-bold uppercase tracking-[0.25em] px-4 py-1.5 rounded-lg mb-3 text-white"
                 style={{
                   background: "linear-gradient(135deg, #9333EA, #7C3AED)",
                   boxShadow: "0 2px 8px rgba(120,37,124,0.25)",
                 }}
               >
-                Katalog
+                KATALOG
               </span>
               <h2
-                className="text-center font-sans font-extrabold leading-[1.1] text-[clamp(2rem,5vw,3.2rem)]"
+                className="text-center font-extrabold leading-[1.1] text-[clamp(2.2rem,5vw,3.5rem)]"
                 style={{
                   background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 40%, #A855F7 70%, #C084FC 100%)",
                   WebkitBackgroundClip: "text",
@@ -215,34 +333,34 @@ export default function HomePage() {
             </div>
           </Reveal>
 
-          <div className="flex gap-6 md:gap-10">
+          <div className="flex gap-6 md:gap-8 items-start">
             {/* ── Sidebar (desktop) ── */}
             <aside className="hidden md:block w-[220px] flex-shrink-0">
               <div className="sticky top-28">
                 <div
-                  className="rounded-[20px] p-5"
+                  className="rounded-[24px] p-5"
                   style={{
                     background: "linear-gradient(135deg, #1e1b3a 0%, #2d2556 100%)",
                     border: "1px solid rgba(139,92,246,0.15)",
-                    boxShadow: "0 8px 32px rgba(20,15,50,0.25)",
+                    boxShadow: "0 12px 36px rgba(20,15,50,0.3)",
                   }}
                 >
-                  <h3 className="mb-4 text-[12px] font-extrabold uppercase tracking-[0.15em]" style={{ color: "#c4b5fd" }}>
-                    Kategori
+                  <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: "#c4b5fd" }}>
+                    KATEGORI
                   </h3>
                   <ul className="flex flex-col gap-1.5">
                     {HOME_CATEGORIES.map(cat => (
                       <li key={cat.key}>
                         <button
                           onClick={() => setCatFilter(cat.key)}
-                          className={`w-full text-left px-4 py-2.5 rounded-xl text-[14px] font-semibold transition-all duration-200 ${
+                          className={`w-full text-left px-4 py-3 rounded-2xl text-[14px] font-semibold transition-all duration-200 ${
                             catFilter === cat.key
                               ? "text-white font-bold shadow-md"
                               : "text-[#a5a0c8] hover:text-white hover:bg-white/10"
                           }`}
                           style={catFilter === cat.key ? {
                             background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
-                            boxShadow: "0 4px 14px rgba(139,92,246,0.3)",
+                            boxShadow: "0 4px 14px rgba(139,92,246,0.45)",
                           } : {}}
                         >
                           {cat.label}
@@ -262,7 +380,7 @@ export default function HomePage() {
                   {/* Mobile filter button */}
                   <button
                     onClick={() => setMobileFilterOpen(true)}
-                    className="md:hidden flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[14px] font-semibold text-white transition hover:opacity-90"
+                    className="md:hidden flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:opacity-90"
                     style={{
                       background: "linear-gradient(135deg, #1e1b3a, #2d2556)",
                       boxShadow: "0 4px 12px rgba(20,15,50,0.25)",
@@ -278,10 +396,10 @@ export default function HomePage() {
                   <div className="relative" ref={sortRef}>
                     <button
                       onClick={() => setSortOpen(v => !v)}
-                      className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-[14px] font-semibold text-white transition-all duration-300 hover:opacity-90"
+                      className="flex items-center gap-2 rounded-2xl px-5 py-3 text-[14px] font-semibold text-white transition-all duration-300 hover:opacity-90"
                       style={{
                         background: "linear-gradient(135deg, #1e1b3a, #2d2556)",
-                        boxShadow: "0 4px 12px rgba(20,15,50,0.25)",
+                        boxShadow: "0 4px 14px rgba(20,15,50,0.25)",
                       }}
                     >
                       {HOME_SORT_OPTIONS.find(o => o.key === catSort)?.label ?? "Terbaru"}
@@ -307,7 +425,7 @@ export default function HomePage() {
                           <button
                             key={o.key}
                             onClick={() => { setCatSort(o.key); setSortOpen(false); }}
-                            className={`w-full text-left px-4 py-2.5 text-[14px] font-medium transition-all duration-200 ${
+                            className={`w-full text-left px-4 py-2.5 text-[13.5px] font-medium transition-all duration-200 ${
                               catSort === o.key
                                 ? "text-white bg-gradient-to-r from-[#9333EA]/30 to-transparent font-semibold"
                                 : "text-white/70 hover:text-white hover:bg-white/5"
@@ -322,7 +440,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Search bar */}
-                <div className="relative max-w-[260px] flex-1">
+                <div className="relative max-w-[280px] flex-1">
                   <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a5a0c8]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <circle cx="11" cy="11" r="8" />
                     <path d="m21 21-4.35-4.35" strokeLinecap="round" />
@@ -332,35 +450,29 @@ export default function HomePage() {
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                     placeholder="Cari produk..."
-                    className="w-full rounded-xl py-2.5 pl-10 pr-4 text-[14px] font-medium text-white placeholder-[#a5a0c8]/60 outline-none transition-all duration-300 focus:ring-2 focus:ring-[#8b5cf6]/40"
+                    className="w-full rounded-2xl py-3 pl-10 pr-4 text-[14px] font-medium text-white placeholder-[#a5a0c8]/60 outline-none transition-all duration-300 focus:ring-2 focus:ring-[#8b5cf6]/40"
                     style={{
                       background: "linear-gradient(135deg, #1e1b3a, #2d2556)",
-                      boxShadow: "0 4px 12px rgba(20,15,50,0.25)",
+                      boxShadow: "0 4px 14px rgba(20,15,50,0.25)",
                       border: "1px solid rgba(139,92,246,0.1)",
                     }}
                   />
                 </div>
               </div>
 
-              {/* Product Grid */}
+              {/* Product Grid (Large, crisp, clear cards as in Image 2) */}
               <motion.div
                 key={`${catFilter}-${catSort}-${searchQuery}`}
                 variants={staggerContainer}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6"
               >
                 {filteredCatalog.map((p) => (
-                  <ProductCard
+                  <HomeProductCard
                     key={p.id}
-                    product={{
-                      slug: p.slug,
-                      name: p.name.replace(/\n/g, " "),
-                      price: p.priceLabel ? `${p.priceLabel} ${p.priceVal}` : p.priceVal,
-                      originalPrice: p.originalPrice,
-                      img: p.img,
-                      rating: p.rating,
-                    }}
+                    product={p}
+                    onInfoClick={setDetailProduct}
                   />
                 ))}
               </motion.div>
@@ -422,29 +534,36 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
+          </motion.div>
+        </>
+      )}
 
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              <h4 className="text-[12px] font-semibold text-[#9ca3af] uppercase tracking-wider mb-3">Urutkan</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {HOME_SORT_OPTIONS.map(o => (
-                  <button
-                    key={o.key}
-                    onClick={() => { setCatSort(o.key); setMobileFilterOpen(false); }}
-                    className={`rounded-2xl py-2.5 text-[12px] font-medium transition-all duration-200 ${
-                      catSort === o.key
-                        ? "text-white shadow-md"
-                        : "text-[#6b7280]"
-                    }`}
-                    style={catSort === o.key
-                      ? { background: "linear-gradient(135deg, #8b5cf6, #a855f7)", boxShadow: "0 4px 14px rgba(139,92,246,0.3)" }
-                      : { background: "rgba(255,255,255,0.6)", border: "1px solid rgba(0,0,0,0.06)" }
-                    }
-                  >
-                    {o.label}
-                  </button>
-                ))}
-              </div>
+      {/* ── Product Detail Quick Info Modal ── */}
+      {detailProduct && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" onClick={() => setDetailProduct(null)} />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="fixed inset-0 z-50 m-auto h-fit w-[85vw] max-w-md rounded-2xl p-6"
+            style={{
+              background: "#ffffff",
+              border: "1px solid rgba(147,51,234,0.15)",
+              boxShadow: "0 24px 64px rgba(20,15,50,0.2)",
+            }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-bold text-[#1e1b3a]">{detailProduct}</h3>
+              <button
+                onClick={() => setDetailProduct(null)}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+              </button>
             </div>
+            <p className="text-[13.5px] leading-relaxed text-[#555555]">
+              {productDescriptions[detailProduct] ?? "Informasi produk lengkap tersedia di halaman detail produk."}
+            </p>
           </motion.div>
         </>
       )}
@@ -453,7 +572,7 @@ export default function HomePage() {
           7. INFO STRIP (3 blok)
       ════════════════════════════════════════════ */}
       <section className="border-y border-[#f0f0f0] bg-white py-0">
-        <div className="mx-auto max-w-[1140px] px-4 md:px-6">
+        <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#f0f0f0]">
             {[
               {
