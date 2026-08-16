@@ -292,26 +292,27 @@ export function ProductDetailClient({ product }: Props) {
   return (
     <div className="min-h-screen bg-white font-sans antialiased text-[#1a1a1a]">
       {/* ── Breadcrumb Bar ── */}
-      <div className="bg-white py-4 px-4 md:px-8 border-b border-[#EAEAEA]">
+      <div className="bg-white py-3.5 px-4 md:px-8 border-b border-[#EAEAEA]">
         <div className="mx-auto max-w-[1240px]">
-          <nav className="flex items-center flex-wrap gap-2 text-[14px] md:text-[16px] text-[#666666]">
+          <nav className="flex items-center flex-wrap gap-2 text-[13px] lg:text-[14px] text-[#666666]">
             <Link href="/" className="hover:text-[#8E51B8] transition font-medium">Home</Link>
             <span className="text-[#B0B0B0]">/</span>
             <Link href="/shop" className="hover:text-[#8E51B8] transition font-medium">POPULAR PRODUCTS</Link>
             <span className="text-[#B0B0B0]">/</span>
             <Link href="/shop" className="hover:text-[#8E51B8] transition font-medium">Skincare</Link>
             <span className="text-[#B0B0B0]">/</span>
-            <span className="text-[#1a1a1a] font-bold truncate max-w-[260px] md:max-w-none">{product.name}</span>
+            <span className="text-[#1a1a1a] font-bold truncate max-w-[240px] lg:max-w-none">{product.name}</span>
           </nav>
         </div>
       </div>
 
       {/* ── Main Product Section ── */}
-      <main className="mx-auto max-w-[1240px] px-4 md:px-8 py-8 md:py-14">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14 items-start">
+      <main className="mx-auto max-w-[1240px] px-4 md:px-8 py-6 lg:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
           
           {/* ── Left Column: Main Image Zoom + Horizontal Thumbnails (5 cols) ── */}
-          <div className="md:col-span-5 lg:col-span-5 flex flex-col gap-4">
+          {/* FIX POINT 7: Use lg:sticky lg:top-24 so sticky is only active on desktop, preventing mobile overlap */}
+          <div className="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-24">
             
             {/* 1. Main Zoom Card */}
             <div 
@@ -344,7 +345,7 @@ export function ProductDetailClient({ product }: Props) {
                         fill
                         priority
                         className="object-contain p-6 md:p-8 transition-all"
-                        sizes="(max-width: 768px) 100vw, 520px"
+                        sizes="(max-width: 1024px) 100vw, 520px"
                       />
                     </div>
                   </motion.div>
@@ -364,7 +365,7 @@ export function ProductDetailClient({ product }: Props) {
                   <button
                     onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
                     aria-label="Foto selanjutnya"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-[#555555] hover:text-[#8E51B8] shadow-md transition opacity-0 group-hover:opacity-100"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-[#555555] hover:text-[#8E51B8] shadow-md transition opacity-0 group-hover:opacity-100"
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
                   </button>
@@ -373,7 +374,7 @@ export function ProductDetailClient({ product }: Props) {
 
               {/* Pagination Indicator `< 1 / 7 >` */}
               <div className="absolute bottom-3 inset-x-0 flex justify-center items-center pointer-events-none">
-                <div className="flex items-center gap-2.5 text-[14px] font-bold text-[#555555] bg-white/95 backdrop-blur-xs px-4 py-1 rounded-full shadow-xs border border-[#E0E0E0]">
+                <div className="flex items-center gap-2.5 text-[13px] font-bold text-[#555555] bg-white/95 backdrop-blur-xs px-3.5 py-1 rounded-full shadow-xs border border-[#E0E0E0]">
                   <span className="text-[#999999]">&lt;</span>
                   <span>{activeImg + 1} / {gallery.length}</span>
                   <span className="text-[#999999]">&gt;</span>
@@ -394,7 +395,7 @@ export function ProductDetailClient({ product }: Props) {
                     <button
                       key={idx}
                       onClick={() => setActiveImg(idx)}
-                      className={`relative flex-shrink-0 w-[72px] h-[72px] md:w-[84px] md:h-[84px] rounded-[8px] bg-white border transition-all overflow-hidden p-1.5 ${
+                      className={`relative flex-shrink-0 w-[68px] h-[68px] lg:w-[80px] lg:h-[80px] rounded-[8px] bg-white border transition-all overflow-hidden p-1.5 ${
                         isActive
                           ? "border-[#8E51B8] ring-2 ring-[#8E51B8]/50 shadow-sm"
                           : "border-[#D8D8D8] hover:border-gray-500 opacity-90 hover:opacity-100"
@@ -405,7 +406,7 @@ export function ProductDetailClient({ product }: Props) {
                         alt={card.alt}
                         fill
                         className="object-contain p-0.5"
-                        sizes="84px"
+                        sizes="80px"
                       />
                     </button>
                   );
@@ -425,29 +426,31 @@ export function ProductDetailClient({ product }: Props) {
 
           </div>
 
-          {/* ── Right Column: Headings, Pricing, 32px Upgraded Details & How To Use (7 cols) ── */}
-          <div className="md:col-span-7 lg:col-span-7 flex flex-col gap-6">
+          {/* ── Right Column: Info Produk (7 cols) ── */}
+          <div className="lg:col-span-7 flex flex-col gap-5">
             
-            {/* 1. Header: Product Name + Share */}
+            {/* ── 1. Header Produk ── */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex flex-col">
-                <h1 className="text-[30px] md:text-[36px] lg:text-[40px] font-black text-[#1a1a1a] leading-[1.18] tracking-tight">
+                {/* Judul produk: 20px di mobile, 28px di desktop */}
+                <h1 className="text-[20px] lg:text-[28px] font-extrabold text-[#1a1a1a] leading-[1.25] tracking-tight">
                   {product.name}
                 </h1>
-                <p className="text-[17px] md:text-[20px] text-[#666666] font-medium mt-2 leading-snug">
+                {/* Subjudul: 13px di mobile, 16px di desktop */}
+                <p className="text-[13px] lg:text-[16px] font-normal text-[#606060] mt-1 leading-snug">
                   {subtitle}
                 </p>
               </div>
 
-              {/* Share button */}
+              {/* Tombol Share: 13px di mobile, 15px di desktop */}
               <div className="relative flex-shrink-0" ref={shareRef}>
                 <button
                   onClick={() => setShareOpen(!shareOpen)}
                   aria-label="Share product"
-                  className="flex items-center gap-2 text-[16px] md:text-[18px] font-bold text-[#666666] hover:text-[#8E51B8] transition pt-1.5"
+                  className="flex items-center gap-1.5 text-[13px] lg:text-[15px] font-semibold text-[#7C6FEF] hover:text-[#6859e0] transition pt-1"
                 >
                   <span>Share</span>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
                     <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
                   </svg>
@@ -460,20 +463,20 @@ export function ProductDetailClient({ product }: Props) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -6, scale: 0.95 }}
                       transition={{ duration: 0.15, ease: EASE }}
-                      className="absolute right-0 top-full mt-2 z-30 w-56 rounded-[10px] border border-[#E0E0E0] bg-white p-2.5 shadow-xl text-[15px]"
+                      className="absolute right-0 top-full mt-2 z-30 w-52 rounded-[10px] border border-[#E0E0E0] bg-white p-2 shadow-xl text-[14px]"
                     >
                       <button
                         onClick={handleCopyLink}
-                        className="flex w-full items-center gap-3 rounded-[6px] px-4 py-2.5 text-[#303030] hover:bg-[#FAF5FC] hover:text-[#8E51B8] font-medium transition"
+                        className="flex w-full items-center gap-2.5 rounded-[6px] px-3.5 py-2.5 text-[#303030] hover:bg-[#FAF5FC] hover:text-[#8E51B8] font-medium transition"
                       >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1" /></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1" /></svg>
                         {copied ? "Tersalin!" : "Salin Tautan"}
                       </button>
                       <button
                         onClick={() => openShareWindow(`https://wa.me/?text=${encodeURIComponent(`${product.name} - ${shareUrl()}`)}`)}
-                        className="flex w-full items-center gap-3 rounded-[6px] px-4 py-2.5 text-[#303030] hover:bg-[#FAF5FC] hover:text-[#8E51B8] font-medium transition"
+                        className="flex w-full items-center gap-2.5 rounded-[6px] px-3.5 py-2.5 text-[#303030] hover:bg-[#FAF5FC] hover:text-[#8E51B8] font-medium transition"
                       >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.5 0-10 4.5-10 10 0 1.77.46 3.44 1.27 4.89L2 22l5.25-1.38A9.96 9.96 0 0 0 12.04 22c5.5 0 10-4.5 10-10s-4.5-10-10-10Zm0 18.13c-1.64 0-3.16-.48-4.44-1.3l-.32-.19-3.11.82.83-3.03-.2-.31A8.1 8.1 0 0 1 3.93 12c0-4.48 3.64-8.13 8.11-8.13S20.15 7.52 20.15 12s-3.64 8.13-8.11 8.13Z" /></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.5 0-10 4.5-10 10 0 1.77.46 3.44 1.27 4.89L2 22l5.25-1.38A9.96 9.96 0 0 0 12.04 22c5.5 0 10-4.5 10-10s-4.5-10-10-10Zm0 18.13c-1.64 0-3.16-.48-4.44-1.3l-.32-.19-3.11.82.83-3.03-.2-.31A8.1 8.1 0 0 1 3.93 12c0-4.48 3.64-8.13 8.11-8.13S20.15 7.52 20.15 12s-3.64 8.13-8.11 8.13Z" /></svg>
                         WhatsApp
                       </button>
                     </motion.div>
@@ -482,38 +485,38 @@ export function ProductDetailClient({ product }: Props) {
               </div>
             </div>
 
-            {/* 2. Price Line */}
-            <div className="flex items-baseline gap-4 pt-1">
-              <span className="text-[34px] md:text-[42px] lg:text-[46px] font-black text-[#E91E63] tracking-tight leading-none">
+            {/* Harga: 24px di mobile, 34px di desktop | Harga Coret: 14px di mobile, 18px di desktop | Badge: 11px / 14px pill */}
+            <div className="flex items-baseline gap-3 pt-0.5">
+              <span className="text-[24px] lg:text-[34px] font-extrabold text-[#E01E2B] tracking-tight leading-none">
                 {formatPrice(product.priceMinor)}
               </span>
-              <span className="text-[18px] md:text-[22px] text-[#999999] line-through font-medium">
+              <span className="text-[14px] lg:text-[18px] text-[#9CA3AF] line-through font-normal">
                 {formatPrice(originalPriceMinor)}
               </span>
-              <span className="rounded-[6px] bg-[#FCE4EC] text-[#E91E63] px-3 py-1 text-[15px] md:text-[16px] font-black">
+              <span className="rounded-full bg-[#FBD9E9] text-[#DB2777] px-2 lg:px-2.5 py-0.5 text-[11px] lg:text-[14px] font-semibold">
                 -{discountPercent}%
               </span>
             </div>
 
-            {/* 3. Quantity Selector */}
-            <div className="flex flex-col gap-2 pt-1">
-              <span className="text-[15px] md:text-[17px] font-semibold text-[#555555]">Quantity</span>
+            {/* Label Quantity: 12px di mobile, 14px di desktop */}
+            <div className="flex flex-col gap-1.5 pt-1">
+              <span className="text-[12px] lg:text-[14px] font-semibold text-[#505050]">Quantity</span>
               <div className="flex items-center">
                 <div className="inline-flex items-center rounded-[8px] border border-[#CCCCCC] bg-white">
                   <button
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
                     disabled={qty <= 1}
-                    className="flex h-10 w-11 items-center justify-center text-[22px] text-[#555555] hover:bg-[#F5F5F5] transition disabled:opacity-30 disabled:cursor-not-allowed font-medium"
+                    className="flex h-8 w-9 lg:h-9 lg:w-10 items-center justify-center text-[18px] text-[#505050] hover:bg-[#F5F5F5] transition disabled:opacity-30 disabled:cursor-not-allowed font-medium"
                     aria-label="Kurangi"
                   >
                     −
                   </button>
-                  <span className="w-12 text-center text-[18px] font-black text-[#1a1a1a] select-none">
+                  <span className="w-9 lg:w-10 text-center text-[15px] lg:text-[16px] font-bold text-[#1a1a1a] select-none">
                     {qty}
                   </span>
                   <button
                     onClick={() => setQty((q) => q + 1)}
-                    className="flex h-10 w-11 items-center justify-center text-[22px] text-[#555555] hover:bg-[#F5F5F5] transition font-medium"
+                    className="flex h-8 w-9 lg:h-9 lg:w-10 items-center justify-center text-[18px] text-[#505050] hover:bg-[#F5F5F5] transition font-medium"
                     aria-label="Tambah"
                   >
                     +
@@ -522,28 +525,28 @@ export function ProductDetailClient({ product }: Props) {
               </div>
             </div>
 
-            {/* 4. Large Add to Cart CTA Button */}
+            {/* ── 2. Tombol Add to Cart: 10px rounded, #8B7FF0, 14px/16px, w-full lg:w-[480px] max-w-full ── */}
             <div className="pt-2">
               <motion.button
                 onClick={handleAddToCart}
                 disabled={product.stockQty === 0}
                 whileTap={{ scale: 0.99 }}
-                className={`relative w-full flex items-center justify-center gap-3 rounded-[10px] py-4.5 text-[18px] md:text-[20px] font-black text-white transition-all shadow-md ${
+                className={`relative w-full lg:w-[480px] max-w-full flex items-center justify-center gap-2.5 rounded-[10px] py-3 lg:py-3.5 px-4 text-[14px] lg:text-[16px] font-bold text-white shadow-md transition-all ${
                   added
                     ? "bg-emerald-600"
                     : product.stockQty === 0
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-[#8E51B8] hover:bg-[#78257C]"
+                    : "bg-[#8B7FF0] hover:bg-[#786ce0]"
                 }`}
               >
                 {added ? (
                   <>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
                     <span>Berhasil Ditambahkan ke Keranjang</span>
                   </>
                 ) : (
                   <>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
                     </svg>
                     <span>{product.stockQty === 0 ? "Stok Habis" : "Add to Cart"}</span>
@@ -552,76 +555,83 @@ export function ProductDetailClient({ product }: Props) {
               </motion.button>
             </div>
 
-            {/* 5. ⭐️ SECTION 1 & 2: DETAILS & HOW TO USE (Scale Up to 32px on Desktop) ⭐️ */}
-            <div className="pt-6 flex flex-col gap-6">
-              {/* Tab Pills */}
-              <div className="flex items-center gap-4">
+            {/* ── 3. Tab DETAILS / HOW TO USE (13px mobile, 16px desktop, 10px 20px / 14px 34px padding) ── */}
+            <div className="pt-4 flex flex-col gap-4">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => setActiveTab("details")}
-                  className={`rounded-full px-8 py-3.5 text-[16px] md:text-[20px] lg:text-[22px] font-black uppercase tracking-wider transition ${
+                  style={activeTab === "details" ? {
+                    background: "linear-gradient(90deg, #78257C 0%, #A445B2 100%)",
+                    boxShadow: "0 4px 14px rgba(120,37,124,0.35)",
+                  } : {}}
+                  className={`rounded-full px-5 py-2.5 lg:px-[34px] lg:py-[14px] text-[13px] lg:text-[16px] font-bold uppercase tracking-wider transition ${
                     activeTab === "details"
-                      ? "bg-[#FAF5FC] text-[#8E51B8] border-3 border-[#8E51B8] shadow-sm"
-                      : "bg-transparent text-[#666666] hover:text-[#1a1a1a] font-bold"
+                      ? "text-white border-0"
+                      : "bg-transparent text-[#707070] hover:text-[#1a1a1a]"
                   }`}
                 >
                   DETAILS
                 </button>
                 <button
                   onClick={() => setActiveTab("how-to-use")}
-                  className={`rounded-full px-8 py-3.5 text-[16px] md:text-[20px] lg:text-[22px] font-black uppercase tracking-wider transition ${
+                  style={activeTab === "how-to-use" ? {
+                    background: "linear-gradient(90deg, #78257C 0%, #A445B2 100%)",
+                    boxShadow: "0 4px 14px rgba(120,37,124,0.35)",
+                  } : {}}
+                  className={`rounded-full px-5 py-2.5 lg:px-[34px] lg:py-[14px] text-[13px] lg:text-[16px] font-bold uppercase tracking-wider transition ${
                     activeTab === "how-to-use"
-                      ? "bg-[#FAF5FC] text-[#8E51B8] border-3 border-[#8E51B8] shadow-sm"
-                      : "bg-transparent text-[#666666] hover:text-[#1a1a1a] font-bold"
+                      ? "text-white border-0"
+                      : "bg-transparent text-[#707070] hover:text-[#1a1a1a]"
                   }`}
                 >
                   HOW TO USE
                 </button>
               </div>
 
-              {/* Tab Content */}
+              {/* ── 4. Isi Tab DETAILS ── */}
               <div className="pt-2">
                 {activeTab === "details" ? (
-                  <div className="flex flex-col gap-6">
-                    {/* 1. Main Description (Up to 32px on desktop!) */}
-                    <p className="text-[18px] md:text-[28px] lg:text-[32px] leading-[1.5] text-[#222222] font-normal tracking-tight">
+                  <div className="flex flex-col gap-4">
+                    {/* Paragraf Deskripsi: font-size:24px; line-height:1.6 (desktop) / 14px (mobile) */}
+                    <p className="text-[14px] lg:text-[24px] lg:leading-[1.6] text-[#505050] font-normal">
                       {product.description ||
                         "Gentle Brightening Serum formulated with powerful brighteners, Alpha Arbutin + Niacinamide to reveal a radiant & more even skin tone. Minimizes dark spots, hyperpigmentation & pores. Can be used daily to strengthen the skin barrier for healthier, smoother skin. Suitable for all skin types & sensitive skin."}
                     </p>
 
-                    {/* Certifications Checklist (Up to 30px on desktop with large green checkmarks) */}
-                    <div className="flex flex-col gap-4 pt-2">
+                    {/* Tiap item checklist: font-size:20px (desktop) / 13.5px (mobile) */}
+                    <div className="flex flex-col gap-2.5 pt-1">
                       {CERTIFICATIONS.map((cert, i) => (
-                        <div key={i} className="flex items-center gap-3.5 text-[#111111] font-bold text-[18px] md:text-[26px] lg:text-[30px] leading-snug">
-                          <span className="flex h-7 w-7 md:h-9 md:w-9 items-center justify-center rounded-[6px] bg-emerald-500 text-white flex-shrink-0 shadow-xs">
-                            <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.8"><polyline points="20 6 9 17 4 12" /></svg>
+                        <div key={i} className="flex items-center gap-2.5 text-[#303030] font-medium text-[13.5px] lg:text-[20px]">
+                          <span className="flex h-5 w-5 lg:h-6 lg:w-6 items-center justify-center rounded-[4px] bg-emerald-500 text-white flex-shrink-0 shadow-xs">
+                            <svg className="w-3.5 h-3.5 lg:w-4 lg:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><polyline points="20 6 9 17 4 12" /></svg>
                           </span>
                           <span>{cert}</span>
                         </div>
                       ))}
                     </div>
 
-                    {/* Netto / Berat (Up to 30px on desktop) */}
-                    <div className="pt-4 text-[18px] md:text-[26px] lg:text-[30px] text-[#444444] border-t border-[#EAEAEA] mt-2">
+                    {/* Netto / Berat */}
+                    <div className="pt-2 text-[13.5px] lg:text-[20px] text-[#444444]">
                       <span>Netto / Berat: </span>
-                      <span className="font-black text-[#111111]">{product.weightGrams ? `${product.weightGrams} gram` : "20 gram"}</span>
+                      <span className="font-bold text-[#1a1a1a]">{product.weightGrams ? `${product.weightGrams} gram` : "20 gram"}</span>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-6 text-[#222222]">
-                    <h3 className="text-[20px] md:text-[28px] lg:text-[32px] font-black text-[#111111]">
+                  <div className="flex flex-col gap-4 text-[#505050]">
+                    <h3 className="text-[16px] lg:text-[22px] font-bold text-[#1a1a1a]">
                       Langkah Penggunaan Rutin (AM / PM):
                     </h3>
-                    <div className="flex flex-col gap-5">
+                    <div className="flex flex-col gap-3.5">
                       {DETAILED_USAGE_STEPS.map((step, i) => (
-                        <div key={i} className="flex items-start gap-3.5">
-                          <span className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-[#8E51B8] text-white font-bold text-[16px] md:text-[20px] flex-shrink-0 mt-1">
+                        <div key={i} className="flex items-start gap-3">
+                          <span className="flex h-7 w-7 lg:h-8 lg:w-8 items-center justify-center rounded-full bg-[#8E51B8] text-white font-bold text-[13px] lg:text-[15px] flex-shrink-0 mt-0.5">
                             {i + 1}
                           </span>
-                          <div className="flex flex-col gap-1">
-                            <h4 className="text-[18px] md:text-[26px] lg:text-[28px] font-extrabold text-[#111111]">
+                          <div className="flex flex-col gap-0.5">
+                            <h4 className="text-[14px] lg:text-[18px] font-bold text-[#1a1a1a]">
                               {step.title}
                             </h4>
-                            <p className="text-[16px] md:text-[22px] lg:text-[25px] leading-[1.5] text-[#444444]">
+                            <p className="text-[13px] lg:text-[16px] leading-relaxed text-[#505050]">
                               {step.desc}
                             </p>
                           </div>
@@ -633,17 +643,17 @@ export function ProductDetailClient({ product }: Props) {
               </div>
             </div>
 
-            {/* 6. ⭐️ SECTION 3: KANDUNGAN & BAHAN AKTIF (Scale Up to 32px on Desktop) ⭐️ */}
-            <div className="mt-8 pt-6 border-t-2 border-[#E0E0E0]">
+            {/* ── 5. Section KANDUNGAN & BAHAN AKTIF ── */}
+            <div className="mt-4 pt-4 border-t border-[#EDEDED]">
               <button
                 onClick={() => setIngredientsOpen(!ingredientsOpen)}
                 className="w-full flex items-center justify-between py-2 text-left group cursor-pointer"
               >
-                <h3 className="text-[20px] md:text-[28px] lg:text-[32px] font-black uppercase tracking-wide text-[#111111] group-hover:text-[#8E51B8] transition">
+                <h3 className="text-[15px] lg:text-[20px] font-bold uppercase tracking-wide text-[#1a1a1a] group-hover:text-[#78257C] transition">
                   KANDUNGAN & BAHAN AKTIF
                 </h3>
                 <svg
-                  className={`w-7 h-7 md:w-9 md:h-9 text-[#444444] transition-transform duration-300 ${ingredientsOpen ? "rotate-180" : ""}`}
+                  className={`w-5 h-5 lg:w-6 lg:h-6 text-[#555555] transition-transform duration-300 ${ingredientsOpen ? "rotate-180" : ""}`}
                   fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"
                 >
                   <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
@@ -657,28 +667,28 @@ export function ProductDetailClient({ product }: Props) {
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.25, ease: EASE }}
-                    className="overflow-hidden pt-5 flex flex-col gap-5"
+                    className="overflow-hidden pt-3 flex flex-col gap-3.5"
                   >
-                    {/* Active ingredients cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Kartu bahan: Judul 14px/18px (#78257C), Deskripsi 12px/15px (#606060) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {activeIngredients.items.map((item, idx) => (
                         <div
                           key={idx}
-                          className="rounded-[12px] border-2 border-[#E5DEEF] bg-[#FCFAFE] p-5 flex flex-col gap-2 shadow-2xs"
+                          className="rounded-[8px] border border-[#EAE5F5] bg-[#FCFAFE] p-3.5 flex flex-col gap-1 shadow-2xs"
                         >
-                          <h4 className="text-[18px] md:text-[24px] lg:text-[26px] font-black text-[#8E51B8]">
+                          <h4 className="text-[14px] lg:text-[18px] font-bold text-[#78257C]">
                             {item.name}
                           </h4>
-                          <p className="text-[16px] md:text-[20px] lg:text-[22px] leading-relaxed text-[#333333]">
+                          <p className="text-[12px] lg:text-[15px] leading-snug text-[#606060]">
                             {item.desc}
                           </p>
                         </div>
                       ))}
                     </div>
 
-                    {/* Full ingredients snippet */}
-                    <div className="rounded-[12px] bg-[#F7F7F7] p-5 border border-[#E8E8E8] text-[15px] md:text-[19px] lg:text-[20px] text-[#444444] leading-relaxed">
-                      <span className="font-extrabold text-[#111111]">Full Ingredients: </span>
+                    {/* Teks Full Ingredients: 12px/15px (#808080) leading-relaxed pt-1 */}
+                    <div className="rounded-[8px] bg-[#F9F9F9] p-3.5 border border-[#EEEEEE] text-[12px] lg:text-[15px] text-[#808080] leading-relaxed pt-1">
+                      <span className="font-bold text-[#303030]">Full Ingredients: </span>
                       <span>{activeIngredients.full}</span>
                     </div>
                   </motion.div>
@@ -690,34 +700,34 @@ export function ProductDetailClient({ product }: Props) {
         </div>
       </main>
 
-      {/* ── Section: YOU MAY ALSO LIKE ── */}
+      {/* ── 6. Section YOU MAY ALSO LIKE (Heading 20px/32px, Subteks 13px/18px) ── */}
       {related.length > 0 && (
-        <section className="border-t border-[#EAEAEA] bg-white py-14 md:py-20">
+        <section className="border-t border-[#EAEAEA] bg-white py-12 lg:py-16">
           <div className="mx-auto max-w-[1240px] px-4 md:px-8">
-            <div className="text-center mb-10">
-              <h2 className="text-[26px] md:text-[32px] font-black uppercase tracking-wider text-[#111111]">
+            <div className="text-center mb-8">
+              <h2 className="text-[20px] lg:text-[32px] font-extrabold uppercase tracking-widest text-[#2A2A2A]">
                 YOU MAY ALSO LIKE
               </h2>
-              <p className="text-[16px] md:text-[18px] text-[#666666] mt-1 font-medium">
+              <p className="text-[13px] lg:text-[18px] text-[#707070] mt-1 font-medium">
                 Kombinasi produk terbaik untuk hasil kulit maksimal
               </p>
             </div>
 
             {/* Horizontal Product Cards Grid */}
             <div className="relative">
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-5 md:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
                 {related.map((item, idx) => (
                   <div
                     key={item.slug}
                     className="flex flex-col rounded-[10px] border border-[#E5E5E5] bg-white p-3.5 hover:shadow-lg transition relative group"
                   >
                     {/* Discount badge */}
-                    <span className="absolute top-3 right-3 z-10 rounded-[4px] bg-[#FCE4EC] text-[#E91E63] px-2 py-0.5 text-[12px] font-bold">
+                    <span className="absolute top-3 right-3 z-10 rounded-[4px] bg-[#FCE4EC] text-[#E91E63] px-2 py-0.5 text-[11px] font-bold">
                       {idx === 0 ? "21% Off" : idx === 1 ? "31% Off" : idx === 2 ? "18% Off" : "31% Off"}
                     </span>
 
                     {/* Best Seller pill */}
-                    <span className="absolute top-3 left-3 z-10 rounded-[4px] bg-[#E0F2FE] text-[#0284C7] px-2 py-0.5 text-[11px] font-bold">
+                    <span className="absolute top-3 left-3 z-10 rounded-[4px] bg-[#E0F2FE] text-[#0284C7] px-2 py-0.5 text-[10px] font-bold">
                       Best Seller
                     </span>
 
@@ -733,16 +743,16 @@ export function ProductDetailClient({ product }: Props) {
                     </Link>
 
                     {/* Product Info */}
-                    <div className="flex flex-col flex-1 gap-1.5">
-                      <Link href={`/shop/${item.slug}`} className="line-clamp-2 text-[15px] md:text-[16px] font-bold text-[#111111] hover:text-[#8E51B8] transition leading-snug">
+                    <div className="flex flex-col flex-1 gap-1">
+                      <Link href={`/shop/${item.slug}`} className="line-clamp-2 text-[14px] lg:text-[15px] font-bold text-[#1a1a1a] hover:text-[#8E51B8] transition leading-snug">
                         {item.name}
                       </Link>
                       <div className="flex items-baseline gap-2 mt-auto pt-2">
-                        <span className="text-[17px] md:text-[18px] font-black text-[#E91E63]">
+                        <span className="text-[15px] lg:text-[16px] font-extrabold text-[#E01E2B]">
                           {item.price}
                         </span>
                         {item.originalPrice && (
-                          <span className="text-[13px] text-[#999999] line-through">
+                          <span className="text-[12px] text-[#9CA3AF] line-through">
                             {item.originalPrice}
                           </span>
                         )}
@@ -752,9 +762,9 @@ export function ProductDetailClient({ product }: Props) {
                     {/* Card Add To Cart Button */}
                     <button
                       onClick={() => handleAddRelatedToCart(item)}
-                      className="mt-3 w-full flex items-center justify-center gap-1.5 rounded-[8px] bg-[#8E51B8] hover:bg-[#78257C] py-3 text-[14px] font-bold text-white transition shadow-none"
+                      className="mt-2.5 w-full flex items-center justify-center gap-1.5 rounded-[8px] bg-[#8B7FF0] hover:bg-[#786ce0] py-2.5 text-[13px] font-bold text-white transition shadow-none"
                     >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                         <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" />
                       </svg>
                       <span>Add to Cart</span>
@@ -764,7 +774,7 @@ export function ProductDetailClient({ product }: Props) {
               </div>
 
               {/* Right Chevron arrow */}
-              <div className="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-200 text-gray-700 hover:text-[#8E51B8] cursor-pointer">
+              <div className="hidden lg:flex absolute -right-5 top-1/2 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-200 text-gray-700 hover:text-[#8E51B8] cursor-pointer">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
               </div>
             </div>
@@ -784,8 +794,8 @@ export function ProductDetailClient({ product }: Props) {
                 </svg>
               </div>
               <div className="text-left">
-                <p className="text-[15px] font-black text-[#111111] uppercase tracking-wider">STORE LOCATOR</p>
-                <p className="text-[13.5px] text-[#666666]">Find your nearest online or offline store</p>
+                <p className="text-[14.5px] font-bold text-[#1a1a1a] uppercase tracking-wider">STORE LOCATOR</p>
+                <p className="text-[13px] text-[#666666]">Find your nearest online or offline store</p>
               </div>
             </Link>
 
@@ -797,8 +807,8 @@ export function ProductDetailClient({ product }: Props) {
                 </svg>
               </div>
               <div className="text-left">
-                <p className="text-[15px] font-black text-[#111111] uppercase tracking-wider">BECOME A RESELLER</p>
-                <p className="text-[13.5px] text-[#666666]">Get full support and earn rewards for every order</p>
+                <p className="text-[14.5px] font-bold text-[#1a1a1a] uppercase tracking-wider">BECOME A RESELLER</p>
+                <p className="text-[13px] text-[#666666]">Get full support and earn rewards for every order</p>
               </div>
             </Link>
 
@@ -810,8 +820,8 @@ export function ProductDetailClient({ product }: Props) {
                 </svg>
               </div>
               <div className="text-left">
-                <p className="text-[15px] font-black text-[#111111] uppercase tracking-wider">FAQ</p>
-                <p className="text-[13.5px] text-[#666666]">Find everything you need to know about Ginabo</p>
+                <p className="text-[14.5px] font-bold text-[#1a1a1a] uppercase tracking-wider">FAQ</p>
+                <p className="text-[13px] text-[#666666]">Find everything you need to know about Ginabo</p>
               </div>
             </Link>
           </div>
