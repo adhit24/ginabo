@@ -30,7 +30,7 @@ const demoProducts: CatalogProduct[] = [
     isActive: true,
     averageRating: null,
     reviewCount: 0,
-    images: [{ url: "/GlowAge_Multi_Active_Serum.png", alt: "GlowAge Multi-Active Serum", sortOrder: 0 }],
+    images: [{ url: "/GlowAge Multi Active Serum.png", alt: "GlowAge Multi-Active Serum", sortOrder: 0 }],
   },
   {
     id: "p2",
@@ -44,7 +44,7 @@ const demoProducts: CatalogProduct[] = [
     isActive: true,
     averageRating: null,
     reviewCount: 0,
-    images: [{ url: "/Bright&Care_Moisture_Cream.png", alt: "Bright & Care Moisture Cream", sortOrder: 0 }],
+    images: [{ url: "/Bright & Care Moisture Cream.png", alt: "Bright & Care Moisture Cream", sortOrder: 0 }],
   },
   {
     id: "p1",
@@ -58,7 +58,7 @@ const demoProducts: CatalogProduct[] = [
     isActive: true,
     averageRating: null,
     reviewCount: 0,
-    images: [{ url: "/Hydra_Moist_Gel_Ultimate.png", alt: "Hydra Moist Gel Ultimate", sortOrder: 0 }],
+    images: [{ url: "/Hydra Moist Gel Ultimate.png", alt: "Hydra Moist Gel Ultimate", sortOrder: 0 }],
   },
 
   // ── 4 Bundling Products (Paket) ──
