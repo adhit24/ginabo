@@ -229,7 +229,7 @@ export function ProductDetailClient({ product }: Props) {
 
   function scrollThumbnailsRight() {
     if (!thumbnailScrollRef.current) return;
-    thumbnailScrollRef.current.scrollBy({ left: 160, behavior: "smooth" });
+    thumbnailScrollRef.current.scrollBy({ left: 180, behavior: "smooth" });
   }
 
   function handleAddToCart() {
@@ -278,28 +278,28 @@ export function ProductDetailClient({ product }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans antialiased text-[#231F20]">
-      {/* ── Breadcrumb Bar (Somethinc replica) ── */}
-      <div className="bg-white py-3 px-4 md:px-8 border-b border-[#F0F0F0]">
-        <div className="mx-auto max-w-[1140px]">
-          <nav className="flex items-center flex-wrap gap-1.5 text-[13px] md:text-[14px] text-[#707070]">
-            <Link href="/" className="hover:text-[#8E51B8] transition">Home</Link>
-            <span className="text-[#A0A0A0]">/</span>
-            <Link href="/shop" className="hover:text-[#8E51B8] transition">POPULAR PRODUCTS</Link>
-            <span className="text-[#A0A0A0]">/</span>
-            <Link href="/shop" className="hover:text-[#8E51B8] transition">Skincare</Link>
-            <span className="text-[#A0A0A0]">/</span>
-            <span className="text-[#231F20] font-bold truncate max-w-[260px] md:max-w-none">{product.name}</span>
+    <div className="min-h-screen bg-white font-sans antialiased text-[#1a1a1a]">
+      {/* ── Breadcrumb Bar ── */}
+      <div className="bg-white py-3.5 px-4 md:px-8 border-b border-[#EAEAEA]">
+        <div className="mx-auto max-w-[1200px]">
+          <nav className="flex items-center flex-wrap gap-2 text-[14px] md:text-[15px] text-[#666666]">
+            <Link href="/" className="hover:text-[#8E51B8] transition font-medium">Home</Link>
+            <span className="text-[#B0B0B0]">/</span>
+            <Link href="/shop" className="hover:text-[#8E51B8] transition font-medium">POPULAR PRODUCTS</Link>
+            <span className="text-[#B0B0B0]">/</span>
+            <Link href="/shop" className="hover:text-[#8E51B8] transition font-medium">Skincare</Link>
+            <span className="text-[#B0B0B0]">/</span>
+            <span className="text-[#1a1a1a] font-bold truncate max-w-[260px] md:max-w-none">{product.name}</span>
           </nav>
         </div>
       </div>
 
       {/* ── Main Product Section ── */}
-      <main className="mx-auto max-w-[1140px] px-4 md:px-6 py-6 md:py-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-start">
+      <main className="mx-auto max-w-[1200px] px-4 md:px-8 py-8 md:py-12">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14 items-start">
           
           {/* ── Left Column: Main Image Zoom + Horizontal Thumbnails (5 cols) ── */}
-          <div className="md:col-span-5 lg:col-span-5 flex flex-col gap-3">
+          <div className="md:col-span-5 lg:col-span-5 flex flex-col gap-4">
             
             {/* 1. Main Zoom Card */}
             <div 
@@ -307,7 +307,7 @@ export function ProductDetailClient({ product }: Props) {
               onMouseEnter={() => setIsZoomed(true)}
               onMouseLeave={() => setIsZoomed(false)}
               onMouseMove={handleMouseMove}
-              className="relative aspect-square w-full rounded-[8px] bg-white border border-[#E8E8E8] overflow-hidden cursor-crosshair select-none group"
+              className="relative aspect-square w-full rounded-[10px] bg-white border border-[#E0E0E0] overflow-hidden cursor-crosshair select-none group shadow-xs"
             >
               <div className="relative w-full h-full overflow-hidden">
                 <AnimatePresence mode="wait">
@@ -332,7 +332,7 @@ export function ProductDetailClient({ product }: Props) {
                         fill
                         priority
                         className="object-contain p-6 md:p-8 transition-all"
-                        sizes="(max-width: 768px) 100vw, 480px"
+                        sizes="(max-width: 768px) 100vw, 520px"
                       />
                     </div>
                   </motion.div>
@@ -345,26 +345,26 @@ export function ProductDetailClient({ product }: Props) {
                   <button
                     onClick={(e) => { e.stopPropagation(); handlePrevImage(); }}
                     aria-label="Foto sebelumnya"
-                    className="absolute left-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#707070] hover:text-[#8E51B8] shadow-sm transition opacity-0 group-hover:opacity-100"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-[#555555] hover:text-[#8E51B8] shadow-md transition opacity-0 group-hover:opacity-100"
                   >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
                     aria-label="Foto selanjutnya"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#707070] hover:text-[#8E51B8] shadow-sm transition opacity-0 group-hover:opacity-100"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-[#555555] hover:text-[#8E51B8] shadow-md transition opacity-0 group-hover:opacity-100"
                   >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
                   </button>
                 </>
               )}
 
               {/* Pagination Indicator `< 1 / 7 >` */}
-              <div className="absolute bottom-2.5 inset-x-0 flex justify-center items-center pointer-events-none">
-                <div className="flex items-center gap-2 text-[12.5px] font-semibold text-[#707070] bg-white/90 backdrop-blur-xs px-3 py-0.5 rounded-full shadow-xs border border-[#EBEBEB]">
-                  <span className="text-[#A0A0A0]">&lt;</span>
+              <div className="absolute bottom-3 inset-x-0 flex justify-center items-center pointer-events-none">
+                <div className="flex items-center gap-2.5 text-[13px] font-bold text-[#555555] bg-white/95 backdrop-blur-xs px-3.5 py-1 rounded-full shadow-xs border border-[#E0E0E0]">
+                  <span className="text-[#999999]">&lt;</span>
                   <span>{activeImg + 1} / {gallery.length}</span>
-                  <span className="text-[#A0A0A0]">&gt;</span>
+                  <span className="text-[#999999]">&gt;</span>
                 </div>
               </div>
             </div>
@@ -373,7 +373,7 @@ export function ProductDetailClient({ product }: Props) {
             <div className="relative flex items-center">
               <div
                 ref={thumbnailScrollRef}
-                className="flex gap-2 overflow-x-auto scrollbar-none py-1 scroll-smooth w-full select-none"
+                className="flex gap-2.5 overflow-x-auto scrollbar-none py-1 scroll-smooth w-full select-none"
                 style={{ scrollbarWidth: "none" }}
               >
                 {gallery.map((card, idx) => {
@@ -382,10 +382,10 @@ export function ProductDetailClient({ product }: Props) {
                     <button
                       key={idx}
                       onClick={() => setActiveImg(idx)}
-                      className={`relative flex-shrink-0 w-[66px] h-[66px] md:w-[74px] md:h-[74px] rounded-[6px] bg-white border transition-all overflow-hidden p-1 ${
+                      className={`relative flex-shrink-0 w-[72px] h-[72px] md:w-[82px] md:h-[82px] rounded-[8px] bg-white border transition-all overflow-hidden p-1.5 ${
                         isActive
-                          ? "border-[#8E51B8] ring-2 ring-[#8E51B8]/40 shadow-xs"
-                          : "border-[#E0E0E0] hover:border-gray-400 opacity-85 hover:opacity-100"
+                          ? "border-[#8E51B8] ring-2 ring-[#8E51B8]/50 shadow-sm"
+                          : "border-[#D8D8D8] hover:border-gray-500 opacity-90 hover:opacity-100"
                       }`}
                     >
                       <Image
@@ -393,7 +393,7 @@ export function ProductDetailClient({ product }: Props) {
                         alt={card.alt}
                         fill
                         className="object-contain p-0.5"
-                        sizes="74px"
+                        sizes="82px"
                       />
                     </button>
                   );
@@ -404,25 +404,25 @@ export function ProductDetailClient({ product }: Props) {
                 <button
                   onClick={scrollThumbnailsRight}
                   aria-label="Scroll kanan"
-                  className="flex-shrink-0 ml-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-white border border-[#E0E0E0] text-[#707070] hover:text-[#8E51B8] shadow-xs transition"
+                  className="flex-shrink-0 ml-2 flex h-8 w-8 items-center justify-center rounded-full bg-white border border-[#D8D8D8] text-[#555555] hover:text-[#8E51B8] shadow-xs transition"
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
                 </button>
               )}
             </div>
 
           </div>
 
-          {/* ── Right Column: Title, Price, CTA, Enlarged Details/How to Use (7 cols) ── */}
-          <div className="md:col-span-7 lg:col-span-7 flex flex-col gap-4">
+          {/* ── Right Column: Enlarged Headline, Price, CTA, Details/How to Use (7 cols) ── */}
+          <div className="md:col-span-7 lg:col-span-7 flex flex-col gap-5">
             
             {/* 1. Header: Product Name + Share */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex flex-col">
-                <h1 className="text-[24px] md:text-[28px] font-bold text-[#231F20] leading-[1.2] tracking-tight">
+                <h1 className="text-[28px] md:text-[34px] lg:text-[38px] font-black text-[#1a1a1a] leading-[1.18] tracking-tight">
                   {product.name}
                 </h1>
-                <p className="text-[14px] md:text-[15px] text-[#707070] font-medium mt-1">
+                <p className="text-[16px] md:text-[17.5px] text-[#666666] font-medium mt-1.5 leading-snug">
                   {subtitle}
                 </p>
               </div>
@@ -432,10 +432,10 @@ export function ProductDetailClient({ product }: Props) {
                 <button
                   onClick={() => setShareOpen(!shareOpen)}
                   aria-label="Share product"
-                  className="flex items-center gap-1.5 text-[14px] font-semibold text-[#707070] hover:text-[#8E51B8] transition pt-1"
+                  className="flex items-center gap-1.5 text-[15px] font-bold text-[#666666] hover:text-[#8E51B8] transition pt-1.5"
                 >
                   <span>Share</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
                     <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
                   </svg>
@@ -448,20 +448,20 @@ export function ProductDetailClient({ product }: Props) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -6, scale: 0.95 }}
                       transition={{ duration: 0.15, ease: EASE }}
-                      className="absolute right-0 top-full mt-1.5 z-30 w-48 rounded-[8px] border border-[#E5E5E5] bg-white p-1.5 shadow-lg text-[13px]"
+                      className="absolute right-0 top-full mt-2 z-30 w-52 rounded-[10px] border border-[#E0E0E0] bg-white p-2 shadow-xl text-[14px]"
                     >
                       <button
                         onClick={handleCopyLink}
-                        className="flex w-full items-center gap-2.5 rounded-[4px] px-3 py-2 text-[#303030] hover:bg-[#FAF5FC] hover:text-[#8E51B8] transition"
+                        className="flex w-full items-center gap-2.5 rounded-[6px] px-3.5 py-2.5 text-[#303030] hover:bg-[#FAF5FC] hover:text-[#8E51B8] font-medium transition"
                       >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1" /></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1" /></svg>
                         {copied ? "Tersalin!" : "Salin Tautan"}
                       </button>
                       <button
                         onClick={() => openShareWindow(`https://wa.me/?text=${encodeURIComponent(`${product.name} - ${shareUrl()}`)}`)}
-                        className="flex w-full items-center gap-2.5 rounded-[4px] px-3 py-2 text-[#303030] hover:bg-[#FAF5FC] hover:text-[#8E51B8] transition"
+                        className="flex w-full items-center gap-2.5 rounded-[6px] px-3.5 py-2.5 text-[#303030] hover:bg-[#FAF5FC] hover:text-[#8E51B8] font-medium transition"
                       >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.5 0-10 4.5-10 10 0 1.77.46 3.44 1.27 4.89L2 22l5.25-1.38A9.96 9.96 0 0 0 12.04 22c5.5 0 10-4.5 10-10s-4.5-10-10-10Zm0 18.13c-1.64 0-3.16-.48-4.44-1.3l-.32-.19-3.11.82.83-3.03-.2-.31A8.1 8.1 0 0 1 3.93 12c0-4.48 3.64-8.13 8.11-8.13S20.15 7.52 20.15 12s-3.64 8.13-8.11 8.13Z" /></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.5 0-10 4.5-10 10 0 1.77.46 3.44 1.27 4.89L2 22l5.25-1.38A9.96 9.96 0 0 0 12.04 22c5.5 0 10-4.5 10-10s-4.5-10-10-10Zm0 18.13c-1.64 0-3.16-.48-4.44-1.3l-.32-.19-3.11.82.83-3.03-.2-.31A8.1 8.1 0 0 1 3.93 12c0-4.48 3.64-8.13 8.11-8.13S20.15 7.52 20.15 12s-3.64 8.13-8.11 8.13Z" /></svg>
                         WhatsApp
                       </button>
                     </motion.div>
@@ -470,38 +470,38 @@ export function ProductDetailClient({ product }: Props) {
               </div>
             </div>
 
-            {/* 2. Price Line */}
-            <div className="flex items-baseline gap-3 pt-0.5">
-              <span className="text-[28px] md:text-[32px] font-extrabold text-[#E91E63] tracking-tight">
+            {/* 2. Enlarged Price Line */}
+            <div className="flex items-baseline gap-3.5 pt-1">
+              <span className="text-[32px] md:text-[38px] lg:text-[42px] font-black text-[#E91E63] tracking-tight leading-none">
                 {formatPrice(product.priceMinor)}
               </span>
-              <span className="text-[14px] md:text-[15.5px] text-[#A0A0A0] line-through font-normal">
+              <span className="text-[17px] md:text-[19px] text-[#999999] line-through font-medium">
                 {formatPrice(originalPriceMinor)}
               </span>
-              <span className="rounded-[4px] bg-[#FCE4EC] text-[#E91E63] px-2 py-0.5 text-[12px] font-bold">
+              <span className="rounded-[6px] bg-[#FCE4EC] text-[#E91E63] px-2.5 py-1 text-[13.5px] md:text-[14px] font-black">
                 -{discountPercent}%
               </span>
             </div>
 
             {/* 3. Quantity Selector */}
-            <div className="flex flex-col gap-1.5 pt-1">
-              <span className="text-[13px] font-medium text-[#707070]">Quantity</span>
+            <div className="flex flex-col gap-2 pt-1">
+              <span className="text-[14px] md:text-[15px] font-semibold text-[#555555]">Quantity</span>
               <div className="flex items-center">
-                <div className="inline-flex items-center rounded-[6px] border border-[#D5D5D5] bg-white">
+                <div className="inline-flex items-center rounded-[8px] border border-[#CCCCCC] bg-white">
                   <button
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
                     disabled={qty <= 1}
-                    className="flex h-8 w-9 items-center justify-center text-[18px] text-[#707070] hover:bg-[#F5F5F5] transition disabled:opacity-30 disabled:cursor-not-allowed font-medium"
+                    className="flex h-9 w-10 items-center justify-center text-[20px] text-[#555555] hover:bg-[#F5F5F5] transition disabled:opacity-30 disabled:cursor-not-allowed font-medium"
                     aria-label="Kurangi"
                   >
                     −
                   </button>
-                  <span className="w-9 text-center text-[14px] font-bold text-[#231F20] select-none">
+                  <span className="w-10 text-center text-[16px] font-extrabold text-[#1a1a1a] select-none">
                     {qty}
                   </span>
                   <button
                     onClick={() => setQty((q) => q + 1)}
-                    className="flex h-8 w-9 items-center justify-center text-[18px] text-[#707070] hover:bg-[#F5F5F5] transition font-medium"
+                    className="flex h-9 w-10 items-center justify-center text-[20px] text-[#555555] hover:bg-[#F5F5F5] transition font-medium"
                     aria-label="Tambah"
                   >
                     +
@@ -510,13 +510,13 @@ export function ProductDetailClient({ product }: Props) {
               </div>
             </div>
 
-            {/* 4. Add to Cart Button */}
+            {/* 4. Large Add to Cart CTA Button */}
             <div className="pt-2">
               <motion.button
                 onClick={handleAddToCart}
                 disabled={product.stockQty === 0}
                 whileTap={{ scale: 0.99 }}
-                className={`relative w-full flex items-center justify-center gap-2.5 rounded-[8px] py-4 text-[15px] md:text-[16px] font-extrabold text-white transition-all shadow-none ${
+                className={`relative w-full flex items-center justify-center gap-3 rounded-[10px] py-4.5 text-[17px] md:text-[18px] font-black text-white transition-all shadow-md ${
                   added
                     ? "bg-emerald-600"
                     : product.stockQty === 0
@@ -526,12 +526,12 @@ export function ProductDetailClient({ product }: Props) {
               >
                 {added ? (
                   <>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
                     <span>Berhasil Ditambahkan ke Keranjang</span>
                   </>
                 ) : (
                   <>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
                     </svg>
                     <span>{product.stockQty === 0 ? "Stok Habis" : "Add to Cart"}</span>
@@ -540,47 +540,47 @@ export function ProductDetailClient({ product }: Props) {
               </motion.button>
             </div>
 
-            {/* 5. ENLARGED Segmented Pill Tabs: DETAILS & HOW TO USE (Matching attached image) */}
-            <div className="pt-3 flex flex-col gap-4">
+            {/* 5. MASSIVE ENLARGED Pill Tabs & Section (DETAILS & HOW TO USE) */}
+            <div className="pt-4 flex flex-col gap-4">
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setActiveTab("details")}
-                  className={`rounded-full px-6 py-2.5 text-[13.5px] md:text-[14px] font-extrabold uppercase tracking-wider transition ${
+                  className={`rounded-full px-7 py-3 text-[15px] md:text-[16px] font-black uppercase tracking-wider transition ${
                     activeTab === "details"
                       ? "bg-[#FAF5FC] text-[#8E51B8] border-2 border-[#8E51B8]"
-                      : "bg-transparent text-[#707070] hover:text-[#231F20] font-bold"
+                      : "bg-transparent text-[#666666] hover:text-[#1a1a1a] font-bold"
                   }`}
                 >
                   DETAILS
                 </button>
                 <button
                   onClick={() => setActiveTab("how-to-use")}
-                  className={`rounded-full px-6 py-2.5 text-[13.5px] md:text-[14px] font-extrabold uppercase tracking-wider transition ${
+                  className={`rounded-full px-7 py-3 text-[15px] md:text-[16px] font-black uppercase tracking-wider transition ${
                     activeTab === "how-to-use"
                       ? "bg-[#FAF5FC] text-[#8E51B8] border-2 border-[#8E51B8]"
-                      : "bg-transparent text-[#707070] hover:text-[#231F20] font-bold"
+                      : "bg-transparent text-[#666666] hover:text-[#1a1a1a] font-bold"
                   }`}
                 >
                   HOW TO USE
                 </button>
               </div>
 
-              {/* Tab Content with Enlarged Font */}
-              <div className="pt-1">
+              {/* Tab Content with Super Large & Legible Font */}
+              <div className="pt-2">
                 {activeTab === "details" ? (
-                  <div className="flex flex-col gap-4">
-                    {/* Main Description (Larger text) */}
-                    <p className="text-[15px] md:text-[15.5px] leading-[26px] text-[#333333] font-normal">
+                  <div className="flex flex-col gap-5">
+                    {/* Main Description (Large, highly readable text) */}
+                    <p className="text-[17px] md:text-[18px] leading-[30px] md:leading-[32px] text-[#2c2c2c] font-normal">
                       {product.description ||
                         "Gentle Brightening Serum formulated with powerful brighteners, Alpha Arbutin + Niacinamide to reveal a radiant & more even skin tone. Minimizes dark spots, hyperpigmentation & pores. Can be used daily to strengthen the skin barrier for healthier, smoother skin. Suitable for all skin types & sensitive skin."}
                     </p>
 
-                    {/* Certifications Checklist (Enlarged with prominent green checkmarks) */}
-                    <div className="flex flex-col gap-2.5 pt-1">
+                    {/* Certifications Checklist (Prominent, large items) */}
+                    <div className="flex flex-col gap-3 pt-1">
                       {CERTIFICATIONS.map((cert, i) => (
-                        <div key={i} className="flex items-center gap-2.5 text-[#231F20] font-semibold text-[14.5px] md:text-[15px]">
-                          <span className="flex h-5 w-5 items-center justify-center rounded-[4px] bg-emerald-500 text-white flex-shrink-0">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><polyline points="20 6 9 17 4 12" /></svg>
+                        <div key={i} className="flex items-center gap-3 text-[#1a1a1a] font-bold text-[16px] md:text-[17.5px]">
+                          <span className="flex h-6 w-6 items-center justify-center rounded-[5px] bg-emerald-500 text-white flex-shrink-0">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><polyline points="20 6 9 17 4 12" /></svg>
                           </span>
                           <span>{cert}</span>
                         </div>
@@ -588,14 +588,14 @@ export function ProductDetailClient({ product }: Props) {
                     </div>
 
                     {/* Netto / Berat */}
-                    <div className="pt-2 text-[14.5px] md:text-[15px] text-[#444444]">
+                    <div className="pt-3 text-[16px] md:text-[17.5px] text-[#444444] border-t border-[#F0F0F0] mt-1">
                       <span>Netto / Berat: </span>
-                      <span className="font-extrabold text-[#231F20]">{product.weightGrams ? `${product.weightGrams} gram` : "20 gram"}</span>
+                      <span className="font-black text-[#1a1a1a]">{product.weightGrams ? `${product.weightGrams} gram` : "20 gram"}</span>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-3 text-[14.5px] md:text-[15px] text-[#333333] leading-[25px]">
-                    <ol className="flex flex-col gap-2.5 list-decimal list-inside font-medium">
+                  <div className="flex flex-col gap-3.5 text-[16.5px] md:text-[17.5px] text-[#2c2c2c] leading-[28px]">
+                    <ol className="flex flex-col gap-3 list-decimal list-inside font-medium">
                       {HOW_TO_USE_STEPS.map((step, i) => (
                         <li key={i} className="pl-1">
                           <span>{step}</span>
@@ -607,17 +607,17 @@ export function ProductDetailClient({ product }: Props) {
               </div>
             </div>
 
-            {/* 6. Section: KANDUNGAN & BAHAN AKTIF (Enlarged and interactive as in screenshot) */}
-            <div className="mt-4 pt-4 border-t border-[#EDEDED]">
+            {/* 6. Section: KANDUNGAN & BAHAN AKTIF (Large & Bold Accordion) */}
+            <div className="mt-5 pt-5 border-t border-[#E0E0E0]">
               <button
                 onClick={() => setIngredientsOpen(!ingredientsOpen)}
-                className="w-full flex items-center justify-between py-2 text-left group"
+                className="w-full flex items-center justify-between py-2 text-left group cursor-pointer"
               >
-                <h3 className="text-[15px] md:text-[16px] font-extrabold uppercase tracking-wide text-[#231F20] group-hover:text-[#8E51B8] transition">
+                <h3 className="text-[17px] md:text-[19px] font-black uppercase tracking-wide text-[#1a1a1a] group-hover:text-[#8E51B8] transition">
                   KANDUNGAN & BAHAN AKTIF
                 </h3>
                 <svg
-                  className={`w-5 h-5 text-[#707070] transition-transform duration-300 ${ingredientsOpen ? "rotate-180" : ""}`}
+                  className={`w-6 h-6 text-[#555555] transition-transform duration-300 ${ingredientsOpen ? "rotate-180" : ""}`}
                   fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"
                 >
                   <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
@@ -631,19 +631,19 @@ export function ProductDetailClient({ product }: Props) {
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.25, ease: EASE }}
-                    className="overflow-hidden pt-3 flex flex-col gap-4"
+                    className="overflow-hidden pt-4 flex flex-col gap-4"
                   >
                     {/* 2-column active ingredients cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       {activeIngredients.items.map((item, idx) => (
                         <div
                           key={idx}
-                          className="rounded-[8px] border border-[#EAE5F5] bg-[#FCFAFE] p-3.5 flex flex-col gap-1"
+                          className="rounded-[10px] border border-[#E5DEEF] bg-[#FCFAFE] p-4 flex flex-col gap-1.5 shadow-2xs"
                         >
-                          <h4 className="text-[14.5px] md:text-[15px] font-bold text-[#8E51B8]">
+                          <h4 className="text-[16px] md:text-[17px] font-extrabold text-[#8E51B8]">
                             {item.name}
                           </h4>
-                          <p className="text-[13px] md:text-[13.5px] leading-relaxed text-[#555555]">
+                          <p className="text-[14.5px] md:text-[15px] leading-relaxed text-[#444444]">
                             {item.desc}
                           </p>
                         </div>
@@ -651,8 +651,8 @@ export function ProductDetailClient({ product }: Props) {
                     </div>
 
                     {/* Full ingredients snippet */}
-                    <div className="rounded-[8px] bg-[#F9F9F9] p-3.5 border border-[#EEEEEE] text-[13px] text-[#555555] leading-relaxed">
-                      <span className="font-bold text-[#231F20]">Full Ingredients: </span>
+                    <div className="rounded-[10px] bg-[#F7F7F7] p-4 border border-[#E8E8E8] text-[14.5px] text-[#444444] leading-relaxed">
+                      <span className="font-extrabold text-[#1a1a1a]">Full Ingredients: </span>
                       <span>{activeIngredients.full}</span>
                     </div>
                   </motion.div>
@@ -666,54 +666,57 @@ export function ProductDetailClient({ product }: Props) {
 
       {/* ── Section: YOU MAY ALSO LIKE ── */}
       {related.length > 0 && (
-        <section className="border-t border-[#F0F0F0] bg-white py-12 md:py-16">
-          <div className="mx-auto max-w-[1140px] px-4 md:px-6">
-            <div className="text-center mb-8">
-              <h2 className="text-[20px] md:text-[22px] font-extrabold uppercase tracking-widest text-[#231F20]">
+        <section className="border-t border-[#EAEAEA] bg-white py-14 md:py-20">
+          <div className="mx-auto max-w-[1200px] px-4 md:px-8">
+            <div className="text-center mb-10">
+              <h2 className="text-[24px] md:text-[28px] font-black uppercase tracking-wider text-[#1a1a1a]">
                 YOU MAY ALSO LIKE
               </h2>
+              <p className="text-[15px] text-[#666666] mt-1 font-medium">
+                Kombinasi produk terbaik untuk hasil kulit maksimal
+              </p>
             </div>
 
             {/* Horizontal Product Cards Grid */}
             <div className="relative">
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-5 md:gap-6">
                 {related.map((item, idx) => (
                   <div
                     key={item.slug}
-                    className="flex flex-col rounded-[8px] border border-[#EDEDED] bg-white p-3 hover:shadow-md transition relative group"
+                    className="flex flex-col rounded-[10px] border border-[#E5E5E5] bg-white p-3.5 hover:shadow-lg transition relative group"
                   >
                     {/* Discount badge */}
-                    <span className="absolute top-2.5 right-2.5 z-10 rounded-[3px] bg-[#FCE4EC] text-[#E91E63] px-2 py-0.5 text-[11px] font-bold">
+                    <span className="absolute top-3 right-3 z-10 rounded-[4px] bg-[#FCE4EC] text-[#E91E63] px-2 py-0.5 text-[12px] font-bold">
                       {idx === 0 ? "21% Off" : idx === 1 ? "31% Off" : idx === 2 ? "18% Off" : "31% Off"}
                     </span>
 
                     {/* Best Seller pill */}
-                    <span className="absolute top-2.5 left-2.5 z-10 rounded-[3px] bg-[#E0F2FE] text-[#0284C7] px-2 py-0.5 text-[10px] font-bold">
+                    <span className="absolute top-3 left-3 z-10 rounded-[4px] bg-[#E0F2FE] text-[#0284C7] px-2 py-0.5 text-[11px] font-bold">
                       Best Seller
                     </span>
 
                     {/* Product Image */}
-                    <Link href={`/shop/${item.slug}`} className="relative aspect-square w-full rounded-[6px] bg-[#FAF8FC] overflow-hidden my-2.5 block">
+                    <Link href={`/shop/${item.slug}`} className="relative aspect-square w-full rounded-[8px] bg-[#FAF8FC] overflow-hidden my-3 block">
                       <Image
                         src={item.img || "/product-serum-1.png"}
                         alt={item.name}
                         fill
                         className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
-                        sizes="240px"
+                        sizes="260px"
                       />
                     </Link>
 
                     {/* Product Info */}
-                    <div className="flex flex-col flex-1 gap-1">
-                      <Link href={`/shop/${item.slug}`} className="line-clamp-2 text-[14px] md:text-[15px] font-bold text-[#231F20] hover:text-[#8E51B8] transition leading-snug">
+                    <div className="flex flex-col flex-1 gap-1.5">
+                      <Link href={`/shop/${item.slug}`} className="line-clamp-2 text-[15px] md:text-[16px] font-bold text-[#1a1a1a] hover:text-[#8E51B8] transition leading-snug">
                         {item.name}
                       </Link>
                       <div className="flex items-baseline gap-2 mt-auto pt-2">
-                        <span className="text-[15px] md:text-[16px] font-extrabold text-[#E91E63]">
+                        <span className="text-[17px] md:text-[18px] font-black text-[#E91E63]">
                           {item.price}
                         </span>
                         {item.originalPrice && (
-                          <span className="text-[12px] text-[#A0A0A0] line-through">
+                          <span className="text-[13px] text-[#999999] line-through">
                             {item.originalPrice}
                           </span>
                         )}
@@ -723,9 +726,9 @@ export function ProductDetailClient({ product }: Props) {
                     {/* Card Add To Cart Button */}
                     <button
                       onClick={() => handleAddRelatedToCart(item)}
-                      className="mt-2.5 w-full flex items-center justify-center gap-1.5 rounded-[6px] bg-[#8E51B8] hover:bg-[#78257C] py-2.5 text-[13px] font-bold text-white transition shadow-none"
+                      className="mt-3 w-full flex items-center justify-center gap-1.5 rounded-[8px] bg-[#8E51B8] hover:bg-[#78257C] py-3 text-[14px] font-bold text-white transition shadow-none"
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                         <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" />
                       </svg>
                       <span>Add to Cart</span>
@@ -735,8 +738,8 @@ export function ProductDetailClient({ product }: Props) {
               </div>
 
               {/* Right Chevron arrow */}
-              <div className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 h-9 w-9 items-center justify-center rounded-full bg-white shadow-md border border-gray-200 text-gray-700 hover:text-[#8E51B8] cursor-pointer">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
+              <div className="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg border border-gray-200 text-gray-700 hover:text-[#8E51B8] cursor-pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
               </div>
             </div>
           </div>
@@ -744,45 +747,45 @@ export function ProductDetailClient({ product }: Props) {
       )}
 
       {/* ── 3-Card Info Strip ── */}
-      <section className="bg-[#F4F0FA] border-t border-[#EAE5F5] py-7">
-        <div className="mx-auto max-w-[1140px] px-4 md:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+      <section className="bg-[#F4F0FA] border-t border-[#EAE5F5] py-8">
+        <div className="mx-auto max-w-[1200px] px-4 md:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-center">
             {/* 1. Store Locator */}
-            <Link href="/stores" className="flex items-center justify-center gap-3 p-3.5 rounded-[8px] hover:bg-white/60 transition group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#8E51B8] text-[#8E51B8]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <Link href="/stores" className="flex items-center justify-center gap-3.5 p-4 rounded-[10px] hover:bg-white/60 transition group">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#8E51B8] text-[#8E51B8]">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
                 </svg>
               </div>
               <div className="text-left">
-                <p className="text-[13px] font-extrabold text-[#231F20] uppercase tracking-wider">STORE LOCATOR</p>
-                <p className="text-[12px] text-[#707070]">Find your nearest online or offline store</p>
+                <p className="text-[14.5px] font-black text-[#1a1a1a] uppercase tracking-wider">STORE LOCATOR</p>
+                <p className="text-[13px] text-[#666666]">Find your nearest online or offline store</p>
               </div>
             </Link>
 
             {/* 2. Become a Reseller */}
-            <Link href="/reseller" className="flex items-center justify-center gap-3 p-3.5 rounded-[8px] hover:bg-white/60 transition group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#8E51B8] text-[#8E51B8]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <Link href="/reseller" className="flex items-center justify-center gap-3.5 p-4 rounded-[10px] hover:bg-white/60 transition group">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#8E51B8] text-[#8E51B8]">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
                 </svg>
               </div>
               <div className="text-left">
-                <p className="text-[13px] font-extrabold text-[#231F20] uppercase tracking-wider">BECOME A RESELLER</p>
-                <p className="text-[12px] text-[#707070]">Get full support and earn rewards for every order</p>
+                <p className="text-[14.5px] font-black text-[#1a1a1a] uppercase tracking-wider">BECOME A RESELLER</p>
+                <p className="text-[13px] text-[#666666]">Get full support and earn rewards for every order</p>
               </div>
             </Link>
 
             {/* 3. FAQ */}
-            <Link href="/faq" className="flex items-center justify-center gap-3 p-3.5 rounded-[8px] hover:bg-white/60 transition group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#8E51B8] text-[#8E51B8]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <Link href="/faq" className="flex items-center justify-center gap-3.5 p-4 rounded-[10px] hover:bg-white/60 transition group">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#8E51B8] text-[#8E51B8]">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" />
                 </svg>
               </div>
               <div className="text-left">
-                <p className="text-[13px] font-extrabold text-[#231F20] uppercase tracking-wider">FAQ</p>
-                <p className="text-[12px] text-[#707070]">Find everything you need to know about Ginabo</p>
+                <p className="text-[14.5px] font-black text-[#1a1a1a] uppercase tracking-wider">FAQ</p>
+                <p className="text-[13px] text-[#666666]">Find everything you need to know about Ginabo</p>
               </div>
             </Link>
           </div>
