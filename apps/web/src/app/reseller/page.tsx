@@ -69,9 +69,57 @@ const icons = {
       <path d="M12 2C6.477 2 2 6.478 2 12c0 1.88.516 3.637 1.41 5.142L2 22l4.978-1.388A9.945 9.945 0 0 0 12 22c5.522 0 10-4.478 10-10S17.522 2 12 2zm.003 18a7.965 7.965 0 0 1-4.075-1.114l-.292-.173-3.03.845.852-3.042-.19-.305A7.965 7.965 0 0 1 4 12C4 7.582 7.582 4 12 4s8 4.582 8 8-3.582 8-8 8z" />
     </svg>
   ),
+  shieldCheck: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 3l7 3v6c0 4.4-3 8-7 9-4-1-7-4.6-7-9V6z" /><path d="M9 12l2 2 4-4" />
+    </svg>
+  ),
+  percent: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="19" y1="5" x2="5" y2="19" /><circle cx="7.5" cy="7.5" r="2.5" /><circle cx="16.5" cy="16.5" r="2.5" />
+    </svg>
+  ),
+  headset: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 15v-3a8 8 0 0 1 16 0v3" /><rect x="2" y="14" width="4" height="6" rx="1.6" /><rect x="18" y="14" width="4" height="6" rx="1.6" />
+    </svg>
+  ),
+  users: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+    </svg>
+  ),
+  trending: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 17l6-6 4 4 7-7" /><path d="M14 8h6v6" />
+    </svg>
+  ),
+  clock: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" />
+    </svg>
+  ),
+  box: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 7h16v11H4z" /><path d="M4 11h16" /><circle cx="8" cy="14.5" r="1.2" />
+    </svg>
+  ),
 };
 
 // ─── DATA ─────────────────────────────────────────────────────────────────────
+
+const heroFacts = [
+  { icon: icons.shieldCheck, label: "Produk Berkualitas" },
+  { icon: icons.percent, label: "Margin Menarik" },
+  { icon: icons.headset, label: "Dukungan Sepenuh Hati" },
+];
+
+const heroStats = [
+  { value: "500+", label: "Reseller aktif", icon: icons.users },
+  { value: "40%", label: "Margin hingga", icon: icons.trending },
+  { value: "1×24 Jam", label: "Approval cepat", icon: icons.clock },
+  { value: "Rp0", label: "Biaya pendaftaran", icon: icons.box },
+];
 
 const stats = [
   { value: "500+", label: "Reseller aktif" },
@@ -199,42 +247,97 @@ export default function ResellerProgramPage() {
   return (
     <div className="bg-white text-[#2a2a2a]">
 
-      {/* ══ 1. HERO — plain banner, same treatment as homepage HeroBanner ═══ */}
-      <h1 className="sr-only">Program Reseller Ginabo</h1>
+      {/* ══ 1. HERO — banner-hero.png background with copy overlay ══════════ */}
       <div className="w-full md:px-5 lg:px-8 xl:px-10 md:pt-3">
-        <div className="relative aspect-[3/1] w-full overflow-hidden md:rounded-2xl">
+        <section
+          aria-labelledby="hero-heading"
+          className="relative min-h-[560px] w-full overflow-hidden sm:min-h-[520px] md:aspect-[1916/821] md:min-h-0 md:rounded-2xl"
+          style={{ backgroundColor: "#c3a7d8" }}
+        >
           <Image
             src="/hero/banner-hero.png"
-            alt="Bangun bisnis beauty-mu bersama Ginabo — Program Reseller Ginabo"
+            alt=""
             fill
             priority
-            className="object-cover"
+            className="object-cover object-[72%_top] md:object-center"
             sizes="100vw"
           />
-        </div>
-      </div>
+          <div
+            className="absolute inset-0 md:hidden"
+            style={{ background: "linear-gradient(180deg, rgba(195,167,216,0) 40%, rgba(195,167,216,.94) 62%, #c3a7d8 78%)" }}
+            aria-hidden="true"
+          />
 
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3 px-5 py-5">
-        <Link
-          href="/reseller/register"
-          className="inline-flex min-h-[42px] items-center gap-2.5 rounded-2xl px-6 text-[14.5px] font-bold text-white transition hover:opacity-90"
-          style={{ background: "linear-gradient(135deg,#6D28D9,#9333EA)", boxShadow: "0 12px 30px rgba(109,40,217,.34)" }}
-        >
-          Gabung Jadi Reseller
-          <span className="flex h-6 w-6 items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,.22)" }}>
-            {icons.arrowRight}
-          </span>
-        </Link>
-        <a
-          href="#program"
-          className="inline-flex min-h-[42px] items-center gap-2.5 rounded-2xl bg-white px-6 text-[14.5px] font-bold"
-          style={{ color: "#6D28D9", boxShadow: "0 8px 22px rgba(60,29,105,.12)" }}
-        >
-          Pelajari Program
-          <span className="flex h-6 w-6 items-center justify-center rounded-full" style={{ background: "#F1E9FD" }}>
-            {icons.arrowRight}
-          </span>
-        </a>
+          <div className="absolute inset-0 flex items-end px-6 pb-7 sm:px-9 md:items-center md:pb-0 md:px-12">
+            <div className="w-full max-w-[420px]">
+              <span
+                className="inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[11px] font-bold sm:px-[18px] sm:py-[9px] sm:text-[13px]"
+                style={{ background: "rgba(255,255,255,.78)", color: "#6D28D9" }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9.5" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                </svg>
+                Program Reseller Ginabo
+              </span>
+              <h1
+                id="hero-heading"
+                className="mt-2.5 text-[22px] font-extrabold leading-[1.12] tracking-[-.02em] sm:mt-3 sm:text-[32px] lg:text-[44px]"
+                style={{ color: "#241338" }}
+              >
+                Bangun bisnis<br /><span style={{ color: "#7C3AED" }}>beauty-mu</span><br />bersama Ginabo.
+              </h1>
+              <p className="mt-2 max-w-[360px] text-[11px] font-medium leading-[1.6] sm:mt-3 sm:text-[13.5px]" style={{ color: "#5b4b72" }}>
+                Dapatkan produk berkualitas, margin menarik, dan dukungan penuh untuk tumbuh bersama Ginabo di seluruh Indonesia.
+              </p>
+              <div className="mt-3.5 flex flex-wrap gap-2 sm:mt-5 sm:gap-3">
+                <Link
+                  href="/reseller/register"
+                  className="inline-flex min-h-[34px] items-center gap-1.5 rounded-xl px-3.5 text-[11px] font-bold text-white transition hover:opacity-90 sm:min-h-[42px] sm:gap-2.5 sm:rounded-2xl sm:px-6 sm:text-[14.5px]"
+                  style={{ background: "linear-gradient(135deg,#6D28D9,#9333EA)", boxShadow: "0 12px 30px rgba(109,40,217,.34)" }}
+                >
+                  Gabung Jadi Reseller
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full sm:h-6 sm:w-6" style={{ background: "rgba(255,255,255,.22)" }}>
+                    {icons.arrowRight}
+                  </span>
+                </Link>
+                <a
+                  href="#program"
+                  className="inline-flex min-h-[34px] items-center gap-1.5 rounded-xl bg-white px-3.5 text-[11px] font-bold sm:min-h-[42px] sm:gap-2.5 sm:rounded-2xl sm:px-6 sm:text-[14.5px]"
+                  style={{ color: "#6D28D9", boxShadow: "0 8px 22px rgba(60,29,105,.12)" }}
+                >
+                  Pelajari Program
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full sm:h-6 sm:w-6" style={{ background: "#F1E9FD" }}>
+                    {icons.arrowRight}
+                  </span>
+                </a>
+              </div>
+              <ul className="mt-3.5 hidden flex-wrap items-center gap-x-4 gap-y-2 sm:flex sm:gap-x-[22px] sm:gap-y-3 sm:mt-5">
+                {heroFacts.map((f) => (
+                  <li key={f.label} className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full sm:h-[34px] sm:w-[34px]" style={{ border: "1px solid rgba(109,40,217,.28)", color: "#6D28D9" }}>
+                      {f.icon}
+                    </span>
+                    <span className="text-[10.5px] font-medium leading-[1.3] sm:text-[13px]" style={{ color: "#4a3b60" }}>{f.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="absolute inset-y-0 right-3 hidden flex-col justify-center gap-2 sm:right-6 sm:flex sm:gap-2.5 lg:right-10">
+            {heroStats.map((s) => (
+              <div key={s.label} className="flex items-center gap-2.5 rounded-xl bg-white px-3 py-2 sm:gap-3.5 sm:rounded-2xl sm:px-4 sm:py-3" style={{ boxShadow: "0 12px 30px rgba(60,29,105,.14)" }}>
+                <span className="flex h-8 w-8 flex-none items-center justify-center rounded-lg sm:h-[38px] sm:w-[38px] sm:rounded-xl" style={{ background: "#F4EEFD" }}>
+                  {s.icon}
+                </span>
+                <span>
+                  <b className="block text-[14px] font-extrabold leading-[1.1] sm:text-[19px]" style={{ color: "#241338" }}>{s.value}</b>
+                  <span className="block whitespace-nowrap text-[9.5px] font-medium sm:text-[12px]" style={{ color: "#7b6b90" }}>{s.label}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
 
       {/* ══ 2. STATS BAR ═════════════════════════════════════════════════════ */}
