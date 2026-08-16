@@ -46,10 +46,10 @@ export const DEFAULT_PRODUCTS: GProduct[] = [
 ];
 
 export const DEFAULT_BUNDLES: GProduct[] = [
-  { id: "b1", slug: "ginabo-complete-skin",       name: "Ginabo Complete\nSkin Nutrition Set", priceVal: "Rp 287.999", priceMinor: 287999, originalPrice: "Rp 575.999", img: "/Hydra_Moist_Gel_Ultimate_GlowAge_Multi_Active_Serum_Bright_Care_Moisture_Cream.png",    rating: "5.0", reviews: "127" },
   { id: "b2", slug: "repair-glow-set",            name: "Repair &\nGlow Set",                  priceVal: "Rp 207.999", priceMinor: 207999, originalPrice: "Rp 415.999", img: "/Hydra_Moist_Gel_Ultimate_GlowAge_Multi_Active_Serum.png",  rating: "5.0", reviews: "127" },
   { id: "b3", slug: "daily-barrier-routine-set",  name: "Daily Skin\nBarrier Set",              priceVal: "Rp 197.999", priceMinor: 197999, originalPrice: "Rp 395.999", img: "/Hydra_Moist_Gel_Ultimate&Bright_Care_Moisture_Cream.png", rating: "5.0", reviews: "127" },
   { id: "b4", slug: "bright-renewal-set",         name: "Bright\nRenewal Set",                  priceVal: "Rp 169.999", priceMinor: 169999, originalPrice: "Rp 339.999", img: "/GlowAge_Multi_Active_Serum&Bright_Care_Moisture_Cream.png", rating: "5.0", reviews: "127" },
+  { id: "b1", slug: "ginabo-complete-skin",       name: "Ginabo Complete\nSkin Nutrition Set", priceVal: "Rp 287.999", priceMinor: 287999, originalPrice: "Rp 575.999", img: "/Hydra_Moist_Gel_Ultimate_GlowAge_Multi_Active_Serum_Bright_Care_Moisture_Cream.png",    rating: "5.0", reviews: "127" },
 ];
 
 export const DEFAULT_FLASH: GFlashItem[] = [
@@ -77,7 +77,14 @@ function write<T>(key: string, value: T) {
 export const store = {
   getProducts:      ()              => read<GProduct[]>  ("ginabo_products",       DEFAULT_PRODUCTS),
   setProducts:      (p: GProduct[]) => write("ginabo_products", p),
-  getBundles:       ()              => read<GProduct[]>  ("ginabo_bundles",        DEFAULT_BUNDLES),
+  getBundles:       ()              => {
+    const cached = read<GProduct[]>("ginabo_bundles", DEFAULT_BUNDLES);
+    if (cached && cached.length > 0 && cached[0].id === "b1") {
+      write("ginabo_bundles", DEFAULT_BUNDLES);
+      return DEFAULT_BUNDLES;
+    }
+    return cached;
+  },
   setBundles:       (b: GProduct[]) => write("ginabo_bundles",  b),
   getFlash:         ()              => read<GFlashItem[]>("ginabo_flashsale",       DEFAULT_FLASH),
   setFlash:         (f: GFlashItem[]) => write("ginabo_flashsale", f),

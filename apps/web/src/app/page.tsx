@@ -401,15 +401,51 @@ export default function HomePage() {
                 variants={staggerContainer}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6"
+                className="flex flex-col gap-10"
               >
-                {filteredCatalog.map((p) => (
-                  <HomeProductCard
-                    key={p.id}
-                    product={p}
-                    onInfoClick={setDetailProduct}
-                  />
-                ))}
+                {catFilter === "all" ? (
+                  <>
+                    {/* Row 1: Singles (3 products) */}
+                    <div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5 md:gap-6">
+                        {filteredCatalog
+                          .filter((p) => p.type === "single")
+                          .map((p) => (
+                            <HomeProductCard
+                              key={p.id}
+                              product={p}
+                              onInfoClick={setDetailProduct}
+                            />
+                          ))}
+                      </div>
+                    </div>
+
+                    {/* Row 2: Bundles (4 products) */}
+                    <div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
+                        {filteredCatalog
+                          .filter((p) => p.type === "bundle")
+                          .map((p) => (
+                            <HomeProductCard
+                              key={p.id}
+                              product={p}
+                              onInfoClick={setDetailProduct}
+                            />
+                          ))}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
+                    {filteredCatalog.map((p) => (
+                      <HomeProductCard
+                        key={p.id}
+                        product={p}
+                        onInfoClick={setDetailProduct}
+                      />
+                    ))}
+                  </div>
+                )}
               </motion.div>
 
               {filteredCatalog.length === 0 && (
