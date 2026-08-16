@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { TIERS, TIER_ORDER, fmtRp, partnerPrice, useResellerTier } from "@/components/reseller/ResellerTierProvider";
 
 // ─── MOTION TOKENS ────────────────────────────────────────────────────────────
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -50,10 +50,6 @@ function waLink() {
   return `https://wa.me/6285199264835?text=${encodeURIComponent(text)}`;
 }
 
-function fmtRp(n: number) {
-  return "Rp" + Math.round(n).toLocaleString("id-ID");
-}
-
 // ─── SVG ICON COMPONENTS ─────────────────────────────────────────────────────
 const icons = {
   money: (
@@ -89,6 +85,26 @@ const icons = {
   headset: (
     <svg className="h-[17px] w-[17px]" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M4 15v-3a8 8 0 0 1 16 0v3" /><rect x="2" y="14" width="4" height="6" rx="1.6" /><rect x="18" y="14" width="4" height="6" rx="1.6" />
+    </svg>
+  ),
+  users: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+    </svg>
+  ),
+  trending: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 17l6-6 4 4 7-7" /><path d="M14 8h6v6" />
+    </svg>
+  ),
+  clock: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" />
+    </svg>
+  ),
+  box: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 7h16v11H4z" /><path d="M4 11h16" /><circle cx="8" cy="14.5" r="1.2" />
     </svg>
   ),
   sports: (
@@ -138,10 +154,10 @@ const heroFacts = [
 ];
 
 const stats = [
-  { value: "500+", label: "Reseller aktif" },
-  { value: "40%", label: "Margin hingga" },
-  { value: "1×24 Jam", label: "Approval cepat" },
-  { value: "Rp0", label: "Biaya pendaftaran" },
+  { value: "500+", label: "Reseller aktif", icon: icons.users },
+  { value: "40%", label: "Margin hingga", icon: icons.trending },
+  { value: "1×24 Jam", label: "Approval cepat", icon: icons.clock },
+  { value: "Rp0", label: "Biaya pendaftaran", icon: icons.box },
 ];
 
 const benefits = [
@@ -151,46 +167,35 @@ const benefits = [
   { icon: icons.heart, title: "Support berkelanjutan", desc: "Tim kami siap mendampingi kamu di setiap langkah perjalanan bisnismu." },
 ];
 
-type TierKey = "starter" | "growth" | "premier";
-
-const tiers: { key: TierKey; level: string; bg: string; border: string; laba: string; rate: number; grad: string; perks: string[]; cta: string; featured: boolean }[] = [
-  {
-    key: "starter",
-    level: "STARTER",
+const tierVisuals = {
+  starter: {
     bg: "#ffffff",
     border: "#ECE5F7",
-    laba: "Rp3,5 jt",
-    rate: 0.3,
+    labelColor: "#7C3AED",
     grad: "linear-gradient(135deg, #9333EA, #7C3AED)",
     perks: ["Akses harga grosir", "Materi promosi dasar", "Support komunitas"],
     cta: "Pilih Starter",
     featured: false,
   },
-  {
-    key: "growth",
-    level: "GROWTH",
+  growth: {
     bg: "linear-gradient(160deg, #7C3AED 0%, #6D28D9 100%)",
     border: "transparent",
-    laba: "Rp10 jt",
-    rate: 0.35,
+    labelColor: "#fff",
     grad: "linear-gradient(135deg, #9333EA, #8b5cf6)",
     perks: ["Akses harga grosir", "Materi promosi lengkap", "Priority support", "Undangan training eksklusif"],
     cta: "Pilih Growth",
     featured: true,
   },
-  {
-    key: "premier",
-    level: "PREMIER",
+  premier: {
     bg: "#FFFDF8",
     border: "#F0E3C8",
-    laba: "Rp25 jt",
-    rate: 0.4,
+    labelColor: "#B98A2E",
     grad: "linear-gradient(135deg, #B98A2E, #E0B75A)",
     perks: ["Akses harga grosir terbaik", "Materi & konten premium", "Account manager", "Bonus & reward eksklusif"],
     cta: "Pilih Premier",
     featured: false,
   },
-];
+} as const;
 
 const steps = [
   { n: "1", title: "Daftar", desc: "Isi formulir pendaftaran secara online." },
@@ -208,9 +213,9 @@ const rewardCategories = [
 ];
 
 const products = [
-  { name: "GlowAge Multi-Active Serum", img: "/serumfix.png", tag: "BESTSELLER", badge: "#7C3AED", retail: 85000 },
-  { name: "Bright & Care Moisture Cream", img: "/moistfix.png", tag: "FAVORIT", badge: "#9333EA", retail: 95000 },
-  { name: "Hydra Moist Gel Ultimate", img: "/salmonfix.png", tag: "BARU", badge: "#8b5cf6", retail: 120000 },
+  { name: "GlowAge Multi Active Serum", retail: 85000 },
+  { name: "Bright & Care Moisture Cream", retail: 95000 },
+  { name: "Hydra Moist Gel Ultimate", retail: 120000 },
 ];
 
 const testimonials = [
@@ -277,65 +282,86 @@ export default function ResellerProgramPage() {
   const salesRp = sales * 1_000_000;
   const profitRp = salesRp * 0.35;
 
-  const picked = useMemo(() => tiers.find((t) => t.key === "growth")!, []);
+  const { tier, setTier, picked } = useResellerTier();
 
   return (
     <div className="bg-white text-[#2a2a2a]">
 
-      {/* ══ 1. HERO ══════════════════════════════════════════════════════════ */}
-      <section aria-labelledby="hero-heading" className="pt-8 md:pt-12" style={{ background: "linear-gradient(180deg, #FBFAFE, #F6F2FD)" }}>
-        <div className="mx-auto max-w-6xl px-5">
-          <h1 id="hero-heading" className="sr-only">Program Reseller Ginabo</h1>
-          <Reveal className="overflow-hidden rounded-3xl shadow-[0_20px_60px_rgba(120,37,124,0.18)]">
-            <Image
-              src="/hero/reseller.png"
-              alt="Gabung jadi Reseller Ginabo — jualan jadi lebih mudah, bukan sendirian"
-              width={2172}
-              height={724}
-              className="h-auto w-full"
-              priority
-            />
-          </Reveal>
-
-          <motion.div
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
-            className="flex flex-wrap items-center justify-center gap-3 py-8"
-          >
-            <motion.div variants={fadeUp} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+      {/* ══ 1. HERO — full-bleed banner-hero.png ═════════════════════════════ */}
+      <section
+        aria-labelledby="hero-heading"
+        className="relative flex min-h-[400px] items-center overflow-hidden bg-cover bg-[right_center] px-6 py-[210px] md:aspect-[1916/821] md:bg-[right_center] md:py-0 md:[background-size:150%_auto] md:[background-position:72%_top] lg:bg-cover lg:bg-[right_center]"
+        style={{ backgroundColor: "#c3a7d8", backgroundImage: "url(/hero/banner-hero.png)" }}
+      >
+        <div className="relative mx-auto flex w-full max-w-6xl flex-wrap items-center gap-6 px-5">
+          <div className="w-full min-w-[320px] md:w-[42%] md:max-w-[520px]">
+            <span
+              className="inline-flex items-center gap-2 rounded-full px-[18px] py-[9px] text-[13px] font-bold"
+              style={{ background: "rgba(255,255,255,.78)", color: "#6D28D9" }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9.5" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              </svg>
+              Program Reseller Ginabo
+            </span>
+            <h1
+              id="hero-heading"
+              className="mt-3 text-[clamp(30px,3.9vw,52px)] font-extrabold leading-[1.1] tracking-[-.02em]"
+              style={{ color: "#241338" }}
+            >
+              Bangun bisnis<br /><span style={{ color: "#7C3AED" }}>beauty-mu</span><br />bersama Ginabo.
+            </h1>
+            <p className="mt-3 max-w-[400px] text-[clamp(12px,1.12vw,15px)] font-medium leading-[1.7]" style={{ color: "#5b4b72" }}>
+              Dapatkan produk berkualitas, margin menarik, dan dukungan penuh untuk tumbuh bersama Ginabo di seluruh Indonesia.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/reseller/register"
-                className="inline-flex min-h-[48px] items-center gap-2 rounded-xl px-7 py-3.5 text-[14px] font-extrabold text-white shadow-lg transition hover:opacity-90"
-                style={{ background: "linear-gradient(135deg, #6D28D9, #9333EA)", boxShadow: "0 12px 30px rgba(109,40,217,.34)" }}
+                className="inline-flex min-h-[42px] items-center gap-2.5 rounded-2xl px-6 text-[14.5px] font-bold text-white transition hover:opacity-90"
+                style={{ background: "linear-gradient(135deg,#6D28D9,#9333EA)", boxShadow: "0 12px 30px rgba(109,40,217,.34)" }}
               >
                 Gabung Jadi Reseller
-                {icons.arrowRight}
+                <span className="flex h-6 w-6 items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,.22)" }}>
+                  {icons.arrowRight}
+                </span>
               </Link>
-            </motion.div>
-            <motion.div variants={fadeUp} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <a
                 href="#program"
-                className="inline-flex min-h-[48px] items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-[14px] font-bold shadow-md transition hover:shadow-lg"
-                style={{ color: "#6D28D9" }}
+                className="inline-flex min-h-[42px] items-center gap-2.5 rounded-2xl bg-white px-6 text-[14.5px] font-bold"
+                style={{ color: "#6D28D9", boxShadow: "0 8px 22px rgba(60,29,105,.12)" }}
               >
                 Pelajari Program
-                {icons.arrowRight}
-              </a>
-            </motion.div>
-          </motion.div>
-
-          <motion.ul
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
-            className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 pb-10 text-[13px] font-bold text-[#4a3b60]"
-          >
-            {heroFacts.map((f) => (
-              <motion.li key={f.label} variants={fadeUp} className="flex items-center gap-2.5">
-                <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full border border-[#6D28D9]/25 text-[#6D28D9]">
-                  {f.icon}
+                <span className="flex h-6 w-6 items-center justify-center rounded-full" style={{ background: "#F1E9FD" }}>
+                  {icons.arrowRight}
                 </span>
-                {f.label}
-              </motion.li>
+              </a>
+            </div>
+            <ul className="mt-6 flex flex-wrap items-center gap-x-[22px] gap-y-3">
+              {heroFacts.map((f, i) => (
+                <li key={f.label} className="flex items-center gap-2.5">
+                  {i > 0 && <span className="hidden h-[34px] w-px sm:block" style={{ background: "rgba(109,40,217,.18)" }} />}
+                  <span className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full" style={{ border: "1px solid rgba(109,40,217,.28)", color: "#6D28D9" }}>
+                    {f.icon}
+                  </span>
+                  <span className="text-[13px] font-medium leading-[1.35]" style={{ color: "#4a3b60" }}>{f.label}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="ml-auto grid w-full grid-cols-2 gap-2.5 md:flex md:w-[210px] md:flex-col">
+            {stats.map((s) => (
+              <div key={s.label} className="flex items-center gap-3.5 rounded-2xl bg-white px-4 py-3" style={{ boxShadow: "0 12px 30px rgba(60,29,105,.14)" }}>
+                <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-xl" style={{ background: "#F4EEFD" }}>
+                  {s.icon}
+                </span>
+                <span>
+                  <b className="block text-[19px] font-extrabold leading-[1.1]" style={{ color: "#241338" }}>{s.value}</b>
+                  <span className="block whitespace-nowrap text-[12px] font-medium" style={{ color: "#7b6b90" }}>{s.label}</span>
+                </span>
+              </div>
             ))}
-          </motion.ul>
+          </div>
         </div>
       </section>
 
@@ -452,58 +478,63 @@ export default function ResellerProgramPage() {
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
             className="grid items-stretch gap-4 md:grid-cols-3"
           >
-            {tiers.map((t) => (
-              <motion.article
-                key={t.level}
-                variants={fadeUp}
-                whileHover={{ y: -6 }}
-                className={`relative flex flex-col gap-4 overflow-hidden rounded-2xl p-5 transition-shadow md:p-6 ${t.featured ? "md:-my-2 md:py-8" : ""}`}
-                style={{
-                  background: t.bg,
-                  border: t.featured ? "none" : `1.5px solid ${t.border}`,
-                  boxShadow: t.featured ? "0 16px 44px rgba(147,51,234,0.32)" : "0 4px 20px rgba(120,37,124,0.06)",
-                }}
-              >
-                {t.featured && (
-                  <div className="absolute right-4 top-4 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur">
-                    MOST POPULAR
-                  </div>
-                )}
-
-                <div className="self-start rounded-lg px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white" style={{ background: t.grad }}>
-                  {t.level} PARTNER
-                </div>
-
-                <div>
-                  <p className={`text-[11px] font-semibold uppercase tracking-wide ${t.featured ? "text-white/65" : "text-[#5a4a6a]"}`}>
-                    Modal mulai dari
-                  </p>
-                  <p className={`mt-0.5 text-[28px] font-extrabold leading-none ${t.featured ? "text-white" : ""}`} style={!t.featured ? { color: "#4A1A5E" } : undefined}>
-                    {t.laba}
-                  </p>
-                  <p className={`mt-1.5 text-[13px] font-semibold ${t.featured ? "text-white/85" : "text-[#4a3b60]"}`}>
-                    Margin hingga {Math.round(t.rate * 100)}%
-                  </p>
-                </div>
-
-                <ul className="flex flex-col gap-2">
-                  {t.perks.map((p) => (
-                    <li key={p} className={`flex items-start gap-2 text-[13px] font-medium ${t.featured ? "text-white/90" : "text-[#5a4a6a]"}`}>
-                      <span className={t.featured ? "text-white" : "text-[#7C3AED]"}>{icons.check}</span>
-                      {p}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href="/reseller/register"
-                  className="mt-auto block min-h-[44px] rounded-xl py-3 text-center text-[13px] font-bold transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9333EA]"
-                  style={t.featured ? { background: "#fff", color: "#6D28D9" } : { background: t.grad, color: "#fff" }}
+            {TIER_ORDER.map((key) => {
+              const t = TIERS[key];
+              const v = tierVisuals[key];
+              return (
+                <motion.article
+                  key={key}
+                  variants={fadeUp}
+                  whileHover={{ y: -6 }}
+                  className={`relative flex flex-col gap-4 overflow-hidden rounded-2xl p-5 transition-shadow md:p-6 ${v.featured ? "md:-my-2 md:py-8" : ""}`}
+                  style={{
+                    background: v.bg,
+                    border: v.featured ? "none" : `1.5px solid ${v.border}`,
+                    boxShadow: v.featured ? "0 16px 44px rgba(147,51,234,0.32)" : "0 4px 20px rgba(120,37,124,0.06)",
+                  }}
                 >
-                  {t.cta}
-                </Link>
-              </motion.article>
-            ))}
+                  {v.featured && (
+                    <div className="absolute right-4 top-4 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur">
+                      MOST POPULAR
+                    </div>
+                  )}
+
+                  <div className="self-start rounded-lg px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white" style={{ background: v.grad }}>
+                    {t.short.toUpperCase()} PARTNER
+                  </div>
+
+                  <div>
+                    <p className={`text-[11px] font-semibold uppercase tracking-wide ${v.featured ? "text-white/65" : "text-[#5a4a6a]"}`}>
+                      Modal mulai dari
+                    </p>
+                    <p className={`mt-0.5 text-[28px] font-extrabold leading-none ${v.featured ? "text-white" : ""}`} style={!v.featured ? { color: "#4A1A5E" } : undefined}>
+                      {t.modal}
+                    </p>
+                    <p className={`mt-1.5 text-[13px] font-semibold ${v.featured ? "text-white/85" : "text-[#4a3b60]"}`}>
+                      {t.margin}
+                    </p>
+                  </div>
+
+                  <ul className="flex flex-col gap-2">
+                    {v.perks.map((p) => (
+                      <li key={p} className={`flex items-start gap-2 text-[13px] font-medium ${v.featured ? "text-white/90" : "text-[#5a4a6a]"}`}>
+                        <span className={v.featured ? "text-white" : "text-[#7C3AED]"}>{icons.check}</span>
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link
+                    href="/reseller/register"
+                    onClick={() => setTier(key)}
+                    className="mt-auto block min-h-[44px] rounded-xl py-3 text-center text-[13px] font-bold transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9333EA]"
+                    style={v.featured ? { background: "#fff", color: "#6D28D9" } : { background: v.grad, color: "#fff" }}
+                  >
+                    {v.cta}
+                  </Link>
+                </motion.article>
+              );
+            })}
           </motion.div>
         </div>
       </section>
@@ -577,49 +608,19 @@ export default function ResellerProgramPage() {
         </div>
       </section>
 
-      {/* ══ 8. PRODUCTS ══════════════════════════════════════════════════════ */}
-      <section aria-labelledby="products-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
-        <div className="mx-auto max-w-6xl px-5">
-          <SectionHeading id="products-heading" label="Yang Kamu Jual" title="Skincare berkualitas, mudah dijual" />
-
-          <motion.div
-            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
-            className="grid gap-4 sm:grid-cols-3"
-          >
-            {products.map((p) => (
-              <motion.article
-                key={p.name}
-                variants={fadeUp}
-                whileHover={{ y: -6 }}
-                className="overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-                style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
-              >
-                <div className="relative aspect-square" style={{ background: "#faf5ff" }}>
-                  <Image src={p.img} alt={p.name} fill className="object-cover" sizes="(min-width: 640px) 33vw, 100vw" />
-                  <span className="absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-extrabold text-white" style={{ background: p.badge }}>
-                    {p.tag}
-                  </span>
-                </div>
-                <div className="p-4">
-                  <h3 className="text-[13px] font-extrabold" style={{ color: "#4A1A5E" }}>{p.name}</h3>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {["BPOM RI", "Halal", "Cruelty Free"].map((b) => (
-                      <span key={b} className="rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "#F3E8FF", color: "#7C3AED", border: "1px solid rgba(147,51,234,0.15)" }}>
-                        {b}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </motion.article>
-            ))}
-          </motion.div>
-        </div>
+      {/* ══ 8. PRODUCTS — banner-produk.png ══════════════════════════════════ */}
+      <section aria-labelledby="products-heading" className="px-[34px] py-11" style={{ background: "linear-gradient(160deg,#F3EDFC,#EDE4FA)" }}>
+        <h2 id="products-heading" className="sr-only">Skincare berkualitas, mudah dijual</h2>
+        <Reveal className="mx-auto max-w-6xl">
+          {/* eslint-disable-next-line @next/next/no-img-element -- single full-bleed marketing banner with baked-in copy, not a next/image candidate */}
+          <img src="/hero/banner-produk.png" alt="Skincare berkualitas, mudah dijual: GlowAge Multi Active Serum, Bright & Care Moisture Cream, Hydra Moist Gel Ultimate" width={1928} height={816} className="h-auto w-full object-contain" />
+        </Reveal>
       </section>
 
       {/* ══ 9. PRICE COMPARISON ══════════════════════════════════════════════ */}
-      <section aria-labelledby="price-heading" className="pb-16 md:pb-24" style={{ background: "#ffffff" }}>
+      <section aria-labelledby="price-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
-          <SectionHeading id="price-heading" label="Harga Partner" title="Selisih harga yang jadi keuntunganmu" desc={`Contoh perhitungan untuk tier ${picked.level.charAt(0)}${picked.level.slice(1).toLowerCase()} (margin ${Math.round(picked.rate * 100)}%).`} />
+          <SectionHeading id="price-heading" label="Harga Partner" title="Selisih harga yang jadi keuntunganmu" desc={`Contoh perhitungan untuk tier ${picked.short} (margin ${Math.round(picked.rate * 100)}%).`} />
 
           <Reveal className="overflow-hidden rounded-2xl" style={{ border: "1px solid #F1ECF9" }}>
             <div className="overflow-x-auto">
@@ -631,7 +632,7 @@ export default function ResellerProgramPage() {
                   <span className="px-4 py-3.5">Profit / pcs</span>
                 </div>
                 {products.map((p, i) => {
-                  const partner = Math.round((p.retail * (1 - picked.rate)) / 500) * 500;
+                  const partner = partnerPrice(p.retail, tier);
                   return (
                     <div key={p.name} className={`grid grid-cols-[1.6fr_1fr_1fr_1fr] items-center border-t border-[#F4F0FA] ${i % 2 === 1 ? "bg-[#FDFCFF]" : ""}`}>
                       <span className="px-5 py-4 text-[13px] font-semibold text-[#241338]">{p.name}</span>
