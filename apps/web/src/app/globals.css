@@ -185,6 +185,7 @@ a {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  aspect-ratio: 4 / 4.2 !important;
   transition: box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
@@ -194,6 +195,8 @@ a {
   object-fit: contain !important;
   border-radius: 20px !important;
   padding: 0 !important;
+  transform: scale(1.35) !important;
+  transform-origin: center center !important;
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
@@ -218,7 +221,7 @@ a {
   box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12);
 }
 .gnb-flat-card:hover .gnb-img-wrap img {
-  transform: scale(1.08) !important;
+  transform: scale(1.46) !important;
 }
 
 .gnb-best-seller-badge {
