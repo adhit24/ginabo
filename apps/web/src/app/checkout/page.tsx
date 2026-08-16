@@ -101,48 +101,50 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-5 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white font-sans antialiased text-[#231F20]">
       {/* Breadcrumb */}
-      <div className="rounded-2xl border border-gray-100 bg-white px-4 py-3">
-        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
-          <Link href="/" className="hover:text-brand-700">Home</Link>
-          <span>›</span>
-          <Link href="/cart" className="hover:text-brand-700">Keranjang</Link>
-          <span>›</span>
-          <span className="font-semibold text-gray-700">Checkout</span>
+      <div className="bg-white py-3 px-4 md:px-8 border-b border-[#F0F0F0]">
+        <div className="mx-auto max-w-[1140px]">
+          <nav className="flex items-center gap-2 text-[12px] md:text-[13px] text-[#707070]">
+            <Link href="/" className="hover:text-[#8E51B8] transition">Home</Link>
+            <span className="text-[#A0A0A0]">/</span>
+            <Link href="/cart" className="hover:text-[#8E51B8] transition">Shopping Bag</Link>
+            <span className="text-[#A0A0A0]">/</span>
+            <span className="text-[#231F20] font-semibold">Checkout</span>
+          </nav>
         </div>
       </div>
 
-      <div className="grid gap-6">
-        <div>
-          <h1 className="text-2xl font-extrabold text-gray-900">Checkout</h1>
-          <p className="mt-1 text-sm text-gray-500">Lengkapi data pengiriman dan pembayaran untuk menyelesaikan pesanan.</p>
+      <div className="mx-auto w-full max-w-[1140px] px-4 md:px-6 py-8">
+        <div className="mb-6 pb-4 border-b border-[#EDEDED]">
+          <h1 className="text-[22px] md:text-[26px] font-bold text-[#231F20]">Checkout</h1>
+          <p className="mt-1 text-[13px] text-[#707070]">Lengkapi data pengiriman dan pembayaran untuk menyelesaikan pesanan.</p>
         </div>
 
         {cart.items.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 rounded-2xl border border-gray-100 bg-white py-16 text-center shadow-sm">
+          <div className="flex flex-col items-center gap-3 rounded-[8px] border border-[#EDEDED] bg-white py-16 text-center">
             <svg width="48" height="48" fill="none" stroke="#d1d5db" strokeWidth="1.5" viewBox="0 0 24 24">
               <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 01-8 0" />
             </svg>
-            <p className="text-sm text-gray-400">Keranjang kamu kosong.</p>
-            <Link href="/shop" className="rounded-xl bg-brand-700 px-8 py-3 text-sm font-bold text-white hover:bg-brand-800">
+            <p className="text-[14px] text-gray-500">Keranjang kamu kosong.</p>
+            <Link href="/shop" className="rounded-[6px] bg-[#8E51B8] hover:bg-[#78257C] px-6 py-2.5 text-[13px] font-bold text-white transition">
               Belanja Sekarang
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-            {/* ── Left: Form ── */}
-            <div className="flex-1">
-              <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
-                <h2 className="mb-5 text-sm font-bold text-gray-900">Alamat Pengiriman</h2>
+            {/* ── Left: Form (8 cols) ── */}
+            <div className="lg:col-span-8">
+              <div className="rounded-[8px] border border-[#EDEDED] bg-white p-5 sm:p-6">
+                <h2 className="mb-4 text-[14px] font-bold text-[#231F20] uppercase tracking-wider">1. Alamat Pengiriman</h2>
                 <AddressPicker
                   selectedId={addressId}
                   onSelect={handleAddressSelect}
                 />
 
-                <div className="mt-6 border-t border-gray-100 pt-5">
-                  <h2 className="mb-3 text-sm font-bold text-gray-900">Jasa Pengiriman</h2>
+                <div className="mt-6 border-t border-[#EDEDED] pt-5">
+                  <h2 className="mb-3 text-[14px] font-bold text-[#231F20] uppercase tracking-wider">2. Jasa Pengiriman</h2>
                   {selectedAddress ? (
                     <JneShippingQuote
                       city={selectedAddress.city}
@@ -151,18 +153,19 @@ export default function CheckoutPage() {
                       onSelect={setShippingOption}
                     />
                   ) : (
-                    <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs text-gray-500">
+                    <p className="rounded-[6px] border border-[#E0E0E0] bg-[#FAF8FC] px-4 py-3 text-[12.5px] text-[#707070]">
                       Pilih alamat pengiriman untuk menghitung ongkir otomatis.
                     </p>
                   )}
                 </div>
 
-                <div className="mt-6 border-t border-gray-100 pt-5">
+                <div className="mt-6 border-t border-[#EDEDED] pt-5">
+                  <h2 className="mb-3 text-[14px] font-bold text-[#231F20] uppercase tracking-wider">3. Metode Pembayaran</h2>
                   <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
                 </div>
 
                 {status.status === "error" && (
-                  <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  <div className="mt-4 rounded-[6px] border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-600">
                     {status.message}
                   </div>
                 )}
@@ -171,65 +174,60 @@ export default function CheckoutPage() {
                   type="button"
                   onClick={submit}
                   disabled={status.status === "submitting" || !addressId || !shippingOption || !paymentMethod}
-                  className="mt-6 w-full rounded-xl bg-brand-700 py-3.5 text-sm font-bold text-white transition hover:bg-brand-800 disabled:opacity-50"
+                  className="mt-6 w-full rounded-[6px] bg-[#8E51B8] hover:bg-[#78257C] py-3.5 text-[14px] font-bold text-white transition disabled:opacity-50 shadow-none"
                 >
-                  {status.status === "submitting" ? "Memproses..." : "Buat Pesanan"}
+                  {status.status === "submitting" ? "Memproses..." : "Buat Pesanan Sekarang"}
                 </button>
 
                 <div className="mt-3 text-center">
-                  <Link href="/cart" className="text-xs text-gray-400 hover:text-brand-600">Kembali ke Keranjang</Link>
+                  <Link href="/cart" className="text-[12.5px] text-[#707070] hover:text-[#8E51B8] transition">Kembali ke Shopping Bag</Link>
                 </div>
               </div>
             </div>
 
-            {/* ── Right: Order Summary ── */}
-            <div className="w-full lg:w-80 lg:shrink-0">
-              <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-                <h2 className="mb-4 text-sm font-bold text-gray-900">Ringkasan Pesanan</h2>
+            {/* ── Right: Order Summary (4 cols) ── */}
+            <div className="lg:col-span-4 sticky top-24">
+              <div className="rounded-[8px] border border-[#EDEDED] bg-white p-5">
+                <h2 className="mb-4 text-[14px] font-bold text-[#231F20] uppercase tracking-wider border-b border-[#EDEDED] pb-3">
+                  Ringkasan Pesanan
+                </h2>
 
-                <div className="flex flex-col divide-y divide-gray-50">
+                <div className="flex flex-col divide-y divide-[#F5F5F5]">
                   {cart.items.map(i => (
                     <div key={i.productId} className="flex items-center gap-3 py-3">
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-[4px] bg-[#FAF8FC] border border-[#EDEDED]">
                         {i.imageUrl && (
                           <img src={i.imageUrl} alt={i.name} className="h-full w-full object-contain p-1" />
                         )}
                       </div>
                       <div className="flex-1">
-                        <p className="line-clamp-1 text-sm font-semibold text-gray-900">{i.name}</p>
-                        <p className="text-[11px] text-gray-400">{i.quantity} × {formatPrice(i.priceMinor)}</p>
+                        <p className="line-clamp-1 text-[13px] font-bold text-[#231F20]">{i.name}</p>
+                        <p className="text-[11.5px] text-[#707070]">{i.quantity} × {formatPrice(i.priceMinor)}</p>
                       </div>
-                      <span className="shrink-0 text-sm font-bold text-gray-900">{formatPrice(i.quantity * i.priceMinor)}</span>
+                      <span className="shrink-0 text-[13px] font-bold text-[#231F20]">{formatPrice(i.quantity * i.priceMinor)}</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-3 border-t border-gray-100 pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">Subtotal</span>
-                    <span className="text-xs font-semibold text-gray-700">{formatPrice(totals.subtotalMinor)}</span>
+                <div className="mt-3 border-t border-[#EDEDED] pt-4 flex flex-col gap-2 text-[12.5px]">
+                  <div className="flex items-center justify-between text-[#707070]">
+                    <span>Subtotal</span>
+                    <span className="font-semibold text-[#231F20]">{formatPrice(totals.subtotalMinor)}</span>
                   </div>
-                  <div className="mt-1 flex items-center justify-between">
-                    <span className="text-xs text-gray-500">Ongkir</span>
-                    <span className="text-xs font-semibold text-gray-700">{shippingOption ? formatPrice(shippingOption.cost) : "Pilih kurir"}</span>
+                  <div className="flex items-center justify-between text-[#707070]">
+                    <span>Ongkir</span>
+                    <span className="font-semibold text-[#231F20]">{shippingOption ? formatPrice(shippingOption.cost) : "Pilih kurir"}</span>
                   </div>
-                  <div className="mt-1 flex items-center justify-between">
-                    <span className="text-xs text-gray-500">Biaya pembayaran</span>
-                    <span className="text-xs font-semibold text-gray-700">{paymentMethod ? formatPrice(paymentMethod.fee) : "Pilih metode"}</span>
+                  <div className="flex items-center justify-between text-[#707070]">
+                    <span>Biaya Pembayaran</span>
+                    <span className="font-semibold text-[#231F20]">{paymentMethod ? formatPrice(paymentMethod.fee) : "Pilih metode"}</span>
                   </div>
-                  <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
-                    <span className="text-sm font-bold text-gray-900">Total</span>
-                    <span className="text-base font-extrabold text-brand-700">{formatPrice(totals.subtotalMinor + (shippingOption?.cost ?? 0) + (paymentMethod?.fee ?? 0))}</span>
+                  <div className="mt-2 flex items-center justify-between border-t border-[#EDEDED] pt-3 text-[14px] font-bold text-[#231F20]">
+                    <span>Total</span>
+                    <span className="text-[16px] font-extrabold text-[#E91E63]">
+                      {formatPrice(totals.subtotalMinor + (shippingOption?.cost ?? 0) + (paymentMethod?.fee ?? 0))}
+                    </span>
                   </div>
-                </div>
-              </div>
-
-              <div className="mt-4 rounded-2xl border border-brand-100 bg-brand-50 p-4">
-                <div className="flex items-start gap-2">
-                  <svg className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg>
-                  <p className="text-xs leading-relaxed text-brand-600">
-                    Setelah pesanan dibuat, kamu akan diarahkan ke halaman pesanan untuk menyelesaikan pembayaran via Midtrans.
-                  </p>
                 </div>
               </div>
             </div>

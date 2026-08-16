@@ -158,7 +158,7 @@ export default function HomePage() {
           Somethinc-style: equal columns, gaps between cards,
           each card is a promotional image with rounded corners
       ════════════════════════════════════════════ */}
-      <div className="w-full px-2 md:px-5 lg:px-8 xl:px-10 pt-2 md:pt-3 pb-3 md:pb-5">
+      <div className="mx-auto max-w-[1140px] px-4 md:px-6 pt-3 pb-5">
         <div className="grid grid-cols-3 gap-2 md:gap-3 lg:gap-4">
 
           <CTACard href="/skincheck" src="/analisawajah_edit.png" alt="Coba Analisa Wajah AI"  />
@@ -183,13 +183,13 @@ export default function HomePage() {
       {/* ════════════════════════════════════════════
           5. KATALOG PRODUK (unified with filtering)
       ════════════════════════════════════════════ */}
-      <section className="relative pt-14 pb-14 md:pt-20 md:pb-20 overflow-hidden" style={{ background: "linear-gradient(180deg, #fffafa 0%, #f8f4ff 40%, #fdf4ff 70%, #FDFAFF 100%)" }}>
+      <section className="relative pt-12 pb-14 md:pt-16 md:pb-20 overflow-hidden" style={{ background: "linear-gradient(180deg, #fffafa 0%, #f8f4ff 40%, #fdf4ff 70%, #FDFAFF 100%)" }}>
         {/* Decorative blurred orbs for glassmorphism context */}
         <div className="absolute top-20 left-[10%] w-64 h-64 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%)" }} />
         <div className="absolute top-40 right-[5%] w-80 h-80 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(232,121,249,0.05) 0%, transparent 70%)" }} />
         <div className="absolute bottom-20 right-[10%] w-72 h-72 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%)" }} />
 
-        <div className="relative mx-auto w-full max-w-7xl px-5 md:px-8">
+        <div className="relative mx-auto w-full max-w-[1140px] px-4 md:px-6">
           <Reveal>
             <div className="flex flex-col items-center mb-12">
               <span
@@ -453,7 +453,7 @@ export default function HomePage() {
           7. INFO STRIP (3 blok)
       ════════════════════════════════════════════ */}
       <section className="border-y border-[#f0f0f0] bg-white py-0">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-[1140px] px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#f0f0f0]">
             {[
               {
