@@ -42,9 +42,11 @@ function getProductGalleryCards(product: Props["product"]): ProductMediaCard[] {
     }));
   }
 
+  const mainImg = product.images[0]?.url;
+
   if (slug.includes("serum") || slug.includes("glowage")) {
     return [
-      { url: "/product-serum-1.png", alt: "GlowAge Multi-Active Serum", label: "Kemasan Utama" },
+      { url: mainImg || "/Hydra_Moist_Gel_Ultimate&Bright_Care_Moisture_Cream.png", alt: "GlowAge Multi-Active Serum", label: "Kemasan Utama" },
       { url: "/product-serum-2.png", alt: "Brighten & Glow Formula", label: "Brighten & Glow" },
       { url: "/product-serum-3.png", alt: "Kandungan Aktif Niacinamide", label: "Kandungan Aktif" },
       { url: "/product-serum-4.png", alt: "Hasil Uji Klinis", label: "Hasil Klinis" },
@@ -56,7 +58,7 @@ function getProductGalleryCards(product: Props["product"]): ProductMediaCard[] {
 
   if (slug.includes("cream") || slug.includes("bright-care")) {
     return [
-      { url: "/product-cream-1.png", alt: "Bright & Care Moisture Cream", label: "Kemasan Utama" },
+      { url: mainImg || "/Bright&Care_Moisture_Cream.png", alt: "Bright & Care Moisture Cream", label: "Kemasan Utama" },
       { url: "/product-cream-2.png", alt: "Skin Barrier Moisture Lock", label: "Barrier Lock" },
       { url: "/product-cream-3.png", alt: "Deep Hydration Infusion", label: "Deep Hydration" },
       { url: "/product-cream-4.png", alt: "Soothing & Calming Effect", label: "Menenangkan Kulit" },
@@ -67,7 +69,7 @@ function getProductGalleryCards(product: Props["product"]): ProductMediaCard[] {
 
   if (slug.includes("dna") || slug.includes("hydra") || slug.includes("gel")) {
     return [
-      { url: "/product-dna-1.png", alt: "Hydra Moist Gel Ultimate", label: "Kemasan Utama" },
+      { url: mainImg || "/Hydra_Moist_Gel_Ultimate.png", alt: "Hydra Moist Gel Ultimate", label: "Kemasan Utama" },
       { url: "/product-dna-2.png", alt: "Salmon DNA 3-in-1", label: "Salmon DNA 3-in-1" },
       { url: "/product-dna-3.png", alt: "Cooling & Fresh Gel", label: "Cooling & Fresh" },
       { url: "/product-dna-4.png", alt: "Skin Recovery Support", label: "Skin Recovery" },
@@ -77,9 +79,9 @@ function getProductGalleryCards(product: Props["product"]): ProductMediaCard[] {
   }
 
   if (slug.includes("bundle") || slug.includes("set") || slug.includes("complete")) {
-    const mainImg = product.images[0]?.url || "/essential.png";
+    const fallbackBundle = "/Hydra_Moist_Gel_Ultimate_GlowAge_Multi_Active_Serum_Bright_Care_Moisture_Cream.png";
     return [
-      { url: mainImg, alt: product.name, label: "Paket Lengkap" },
+      { url: mainImg || fallbackBundle, alt: product.name, label: "Paket Lengkap" },
       { url: "/ginabo_bundling_3.png", alt: "Komposisi Produk Bundling", label: "Isi Rangkaian" },
       { url: "/gnb21.png", alt: "21 Days Skin Transformation", label: "21 Days Journey" },
       { url: "/halal_card.png", alt: "Sertifikasi BPOM & Halal", label: "Sertifikasi Resmi" },
@@ -87,7 +89,7 @@ function getProductGalleryCards(product: Props["product"]): ProductMediaCard[] {
     ];
   }
 
-  const fallbackUrl = product.images[0]?.url || "/product-serum-1.png";
+  const fallbackUrl = mainImg || "/Hydra_Moist_Gel_Ultimate&Bright_Care_Moisture_Cream.png";
   return [
     { url: fallbackUrl, alt: product.name, label: "Kemasan Utama" },
     { url: "/halal_card.png", alt: "Sertifikasi BPOM & Halal", label: "Sertifikasi Resmi" },

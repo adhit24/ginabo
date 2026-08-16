@@ -40,23 +40,25 @@ export function getAdminCreds() {
 }
 
 export const DEFAULT_PRODUCTS: GProduct[] = [
-  { id: "p1", slug: "hydra-moist-gel",            name: "Hydra Moist\nGel Ultimate",       priceVal: "Rp 120.000", priceMinor: 120000, img: "/salmonfix.png", rating: "5.0", reviews: "127", tag: "DNA Salmon · 30ml" },
-  { id: "p2", slug: "bright-care-moisture-cream", name: "Bright & Care\nMoisture Cream",  priceVal: "Rp 75.000",  priceMinor: 75000,  img: "/moistfix.png",  rating: "5.0", reviews: "127", tag: "Moisturizer · 10g"  },
-  { id: "p3", slug: "glowage-multi-active-serum", name: "GlowAge Multi-\nActive Serum",   priceVal: "Rp 90.000",  priceMinor: 90000,  img: "/serumfix.png",  rating: "5.0", reviews: "127", tag: "Serum · 30ml"       },
+  { id: "p1", slug: "hydra-moist-gel-ultimate",   name: "Hydra Moist\nGel Ultimate",       priceVal: "Rp 120.000", priceMinor: 120000, img: "/Hydra_Moist_Gel_Ultimate.png", rating: "5.0", reviews: "127", tag: "DNA Salmon · 30ml" },
+  { id: "p2", slug: "bright-care-moisture-cream", name: "Bright & Care\nMoisture Cream",  priceVal: "Rp 75.000",  priceMinor: 75000,  img: "/Bright&Care_Moisture_Cream.png",  rating: "5.0", reviews: "127", tag: "Moisturizer · 10g"  },
+  { id: "p3", slug: "glowage-multi-active-serum", name: "GlowAge Multi-\nActive Serum",   priceVal: "Rp 90.000",  priceMinor: 90000,  img: "/Hydra_Moist_Gel_Ultimate&Bright_Care_Moisture_Cream.png",  rating: "5.0", reviews: "127", tag: "Serum · 30ml"       },
 ];
 
 export const DEFAULT_BUNDLES: GProduct[] = [
-  { id: "b1", slug: "ginabo-complete-skin",       name: "Ginabo Complete\nSkin Nutrition Set", priceVal: "Rp 287.999", priceMinor: 287999, originalPrice: "Rp 575.999", img: "/essential.png",    rating: "5.0", reviews: "127" },
-  { id: "b2", slug: "repair-glow-set",            name: "Repair &\nGlow Set",                  priceVal: "Rp 207.999", priceMinor: 207999, originalPrice: "Rp 415.999", img: "/repair_glow.png",  rating: "5.0", reviews: "127" },
-  { id: "b3", slug: "daily-barrier-routine-set",  name: "Daily Skin\nBarrier Set",              priceVal: "Rp 197.999", priceMinor: 197999, originalPrice: "Rp 395.999", img: "/skin_barrier.png", rating: "5.0", reviews: "127" },
-  { id: "b4", slug: "bright-renewal-set",         name: "Bright\nRenewal Set",                  priceVal: "Rp 169.999", priceMinor: 169999, originalPrice: "Rp 339.999", img: "/bright_renewal.png", rating: "5.0", reviews: "127" },
+  { id: "b1", slug: "ginabo-complete-skin",       name: "Ginabo Complete\nSkin Nutrition Set", priceVal: "Rp 287.999", priceMinor: 287999, originalPrice: "Rp 575.999", img: "/Hydra_Moist_Gel_Ultimate_GlowAge_Multi_Active_Serum_Bright_Care_Moisture_Cream.png",    rating: "5.0", reviews: "127" },
+  { id: "b2", slug: "repair-glow-set",            name: "Repair &\nGlow Set",                  priceVal: "Rp 207.999", priceMinor: 207999, originalPrice: "Rp 415.999", img: "/Hydra_Moist_Gel_Ultimate_GlowAge_Multi_Active_Serum.png",  rating: "5.0", reviews: "127" },
+  { id: "b3", slug: "daily-barrier-routine-set",  name: "Daily Skin\nBarrier Set",              priceVal: "Rp 197.999", priceMinor: 197999, originalPrice: "Rp 395.999", img: "/Hydra_Moist_Gel_Ultimate&Bright_Care_Moisture_Cream.png", rating: "5.0", reviews: "127" },
+  { id: "b4", slug: "bright-renewal-set",         name: "Bright\nRenewal Set",                  priceVal: "Rp 169.999", priceMinor: 169999, originalPrice: "Rp 339.999", img: "/GlowAge_Multi_Active_Serum&Bright_Care_Moisture_Cream.png", rating: "5.0", reviews: "127" },
 ];
 
 export const DEFAULT_FLASH: GFlashItem[] = [
-  { id: "p3", name: "GlowAge Multi-Active Serum",   type: "Serum · 30ml",      salePrice: "Rp 228.000", salePriceMinor: 228000, original: "Rp 285.000", discount: "20%", img: "/serumfix.png"  },
-  { id: "p2", name: "Bright & Care Moisture Cream", type: "Moisturizer · 10g", salePrice: "Rp 146.000", salePriceMinor: 146000, original: "Rp 195.000", discount: "25%", img: "/moistfix.png"  },
-  { id: "p1", name: "Hydra Moist Gel Ultimate",     type: "DNA Salmon · 30ml", salePrice: "Rp 150.000", salePriceMinor: 150000, original: "Rp 215.000", discount: "30%", img: "/salmonfix.png" },
+  { id: "p3", name: "GlowAge Multi-Active Serum",   type: "Serum · 30ml",      salePrice: "Rp 228.000", salePriceMinor: 228000, original: "Rp 285.000", discount: "20%", img: "/Hydra_Moist_Gel_Ultimate&Bright_Care_Moisture_Cream.png"  },
+  { id: "p2", name: "Bright & Care Moisture Cream", type: "Moisturizer · 10g", salePrice: "Rp 146.000", salePriceMinor: 146000, original: "Rp 195.000", discount: "25%", img: "/Bright&Care_Moisture_Cream.png"  },
+  { id: "p1", name: "Hydra Moist Gel Ultimate",     type: "DNA Salmon · 30ml", salePrice: "Rp 150.000", salePriceMinor: 150000, original: "Rp 215.000", discount: "30%", img: "/Hydra_Moist_Gel_Ultimate.png" },
 ];
+
+type GStorageType = GProduct[] | GFlashItem[] | boolean;
 
 function read<T>(key: string, fallback: T): T {
   try {
