@@ -251,7 +251,7 @@ export default function ResellerProgramPage() {
       <div className="w-full md:px-5 lg:px-8 xl:px-10 md:pt-3">
         <section
           aria-labelledby="hero-heading"
-          className="relative min-h-[560px] w-full overflow-hidden sm:min-h-[520px] md:aspect-[1916/821] md:min-h-0 md:rounded-2xl"
+          className="relative min-h-[560px] w-full overflow-hidden sm:min-h-[520px] md:aspect-[3/1] md:min-h-0 md:rounded-2xl"
           style={{ backgroundColor: "#c3a7d8" }}
         >
           <Image
@@ -289,24 +289,24 @@ export default function ResellerProgramPage() {
               <p className="mt-2 max-w-[360px] text-[11px] font-medium leading-[1.6] sm:mt-3 sm:text-[13.5px]" style={{ color: "#5b4b72" }}>
                 Dapatkan produk berkualitas, margin menarik, dan dukungan penuh untuk tumbuh bersama Ginabo di seluruh Indonesia.
               </p>
-              <div className="mt-3.5 flex flex-wrap gap-2 sm:mt-5 sm:gap-3">
+              <div className="mt-3.5 flex flex-col gap-2 sm:mt-5 sm:flex-row sm:flex-wrap sm:gap-3">
                 <Link
                   href="/reseller/register"
-                  className="inline-flex min-h-[34px] items-center gap-1.5 rounded-xl px-3.5 text-[11px] font-bold text-white transition hover:opacity-90 sm:min-h-[42px] sm:gap-2.5 sm:rounded-2xl sm:px-6 sm:text-[14.5px]"
+                  className="inline-flex min-h-[48px] w-full items-center justify-between gap-1.5 rounded-xl px-6 text-[15px] font-semibold text-white transition hover:opacity-90 sm:rounded-2xl md:w-[260px] md:min-h-[50px] md:text-[17.5px]"
                   style={{ background: "linear-gradient(135deg,#6D28D9,#9333EA)", boxShadow: "0 12px 30px rgba(109,40,217,.34)" }}
                 >
                   Gabung Jadi Reseller
-                  <span className="flex h-4 w-4 items-center justify-center rounded-full sm:h-6 sm:w-6" style={{ background: "rgba(255,255,255,.22)" }}>
+                  <span className="flex h-4 w-4 flex-none items-center justify-center rounded-full sm:h-6 sm:w-6" style={{ background: "rgba(255,255,255,.22)" }}>
                     {icons.arrowRight}
                   </span>
                 </Link>
                 <a
                   href="#program"
-                  className="inline-flex min-h-[34px] items-center gap-1.5 rounded-xl bg-white px-3.5 text-[11px] font-bold sm:min-h-[42px] sm:gap-2.5 sm:rounded-2xl sm:px-6 sm:text-[14.5px]"
+                  className="inline-flex min-h-[48px] w-full items-center justify-between gap-1.5 rounded-xl bg-white px-6 text-[15px] font-semibold sm:rounded-2xl md:w-[260px] md:min-h-[50px] md:text-[17.5px]"
                   style={{ color: "#6D28D9", boxShadow: "0 8px 22px rgba(60,29,105,.12)" }}
                 >
                   Pelajari Program
-                  <span className="flex h-4 w-4 items-center justify-center rounded-full sm:h-6 sm:w-6" style={{ background: "#F1E9FD" }}>
+                  <span className="flex h-4 w-4 flex-none items-center justify-center rounded-full sm:h-6 sm:w-6" style={{ background: "#F1E9FD" }}>
                     {icons.arrowRight}
                   </span>
                 </a>
