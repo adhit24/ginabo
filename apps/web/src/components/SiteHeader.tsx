@@ -106,25 +106,10 @@ export function SiteHeader() {
           ? "bg-white/75 backdrop-blur-2xl shadow-[0_8px_32px_rgba(120,37,124,0.08)] border-b border-white/50"
           : "bg-white/60 backdrop-blur-xl border-b border-white/30"
       }`}>
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6" style={{ height: 72 }}>
+        <div className="mx-auto grid grid-cols-3 items-center px-6 max-w-7xl" style={{ height: 72 }}>
 
-          {/* Left: Logo */}
-          <Link href="/" className="flex items-center shrink-0">
-            <Image
-              src="/LOGO_GINABO.png"
-              alt="Ginabo"
-              width={130}
-              height={44}
-              className="object-contain"
-              style={{ height: 44, width: "auto" }}
-              priority
-            />
-          </Link>
-
-          {/* Right: Nav Links + Konsultasi + User + Cart */}
-          <div className="flex items-center gap-1.5">
-
-            {/* Nav Links */}
+          {/* Left: Nav Links */}
+          <div className="flex items-center justify-start">
             <nav className="flex items-center gap-2" style={{ fontFamily: "var(--font-outfit), sans-serif" }}>
 
               {/* HOME link */}
@@ -234,7 +219,25 @@ export function SiteHeader() {
               </Link>
 
             </nav>
+          </div>
 
+          {/* Center: Logo */}
+          <div className="flex items-center justify-center">
+            <Link href="/" className="flex items-center shrink-0">
+              <Image
+                src="/LOGO_GINABO.png"
+                alt="Ginabo"
+                width={130}
+                height={44}
+                className="object-contain"
+                style={{ height: 44, width: "auto" }}
+                priority
+              />
+            </Link>
+          </div>
+
+          {/* Right: Actions */}
+          <div className="flex items-center justify-end gap-1.5">
             <SearchBar />
 
             <CurrencySwitcher />

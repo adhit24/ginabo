@@ -8,7 +8,6 @@ import { motion } from "framer-motion";
 import { HeroBanner } from "@/components/HeroBanner";
 import { Reveal } from "@/components/ui/Reveal";
 import { Marquee } from "@/components/ui/Marquee";
-import { useCart } from "@/components/cart/CartProvider";
 
 import { store, type GProduct } from "@/lib/adminStore";
 import { listActiveProducts, type CatalogProduct } from "@/lib/catalog";
@@ -77,23 +76,8 @@ function HomeProductCard({
   product: CatalogItem;
   onInfoClick: (name: string) => void;
 }) {
-  const { addItem } = useCart();
   const cleanName = product.name.replace(/\n/g, " ");
   const discountPct = product.originalPrice ? 50 : 0;
-
-  function handleAddToCart(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    addItem({
-      productId: product.slug,
-      slug: product.slug,
-      name: cleanName,
-      priceMinor: product.priceMinor,
-      currency: "IDR",
-      imageUrl: product.img,
-      weightGrams: 20,
-    }, 1);
-  }
 
   return (
     <motion.div variants={cardSlideUp} className="h-full">
@@ -137,19 +121,6 @@ function HomeProductCard({
               <span className="gnb-price-old">{product.originalPrice}</span>
             )}
           </div>
-
-          {/* Add to Cart CTA button */}
-          <button
-            onClick={handleAddToCart}
-            className="gnb-cart-btn mt-2.5 flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-[13.5px] font-bold text-white"
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-              <path d="M3 6h18"></path>
-              <path d="M16 10a4 4 0 0 1-8 0"></path>
-            </svg>
-            <span>Add to Cart</span>
-          </button>
         </div>
       </Link>
     </motion.div>
@@ -540,14 +511,14 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#f0f0f0]">
             {[
               {
-                icon: <Image src="/storeloc.png" alt="Store Locator" width={44} height={44} className="object-contain" />,
-                title: "Store Locator",
-                desc: "Temukan toko Ginabo terdekat, fisik di mall atau official store di marketplace.",
-                href: "/stores",
+                icon: <Image src="/storeloc.png" alt="Cara Order" width={44} height={44} className="object-contain" />,
+                title: "Cara Order",
+                desc: "Pelajari langkah mudah memesan produk Ginabo favoritmu secara online.",
+                href: "/faq",
               },
               {
-                icon: <Image src="/reseller.png" alt="Jadi Reseller" width={44} height={44} className="object-contain" />,
-                title: "Jadi Reseller",
+                icon: <Image src="/reseller.png" alt="Reseller" width={44} height={44} className="object-contain" />,
+                title: "Reseller",
                 desc: "Bergabung dan dapatkan keuntungan eksklusif bersama ribuan reseller Ginabo.",
                 href: "/reseller",
               },
@@ -555,7 +526,7 @@ export default function HomePage() {
                 icon: <Image src="/faq.png"      alt="FAQ"           width={44} height={44} className="object-contain" />,
                 title: "FAQ",
                 desc: "Temukan jawaban atas pertanyaan seputar produk, pengiriman, dan pembayaran.",
-                href: "/contact",
+                href: "/faq",
               },
             ].map(item => (
               <a

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "@/components/cart/CartProvider";
 
 export type ProductCardData = {
   slug: string;
@@ -15,27 +14,7 @@ export type ProductCardData = {
 };
 
 export function ProductCard({ product }: { product: ProductCardData }) {
-  const { addItem } = useCart();
-
   const isDiscounted = !!product.originalPrice;
-
-  function handleAddToCart(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Parse numeric price from label if possible
-    const numPrice = parseInt(product.price.replace(/[^0-9]/g, "")) || 90000;
-    
-    addItem({
-      productId: product.slug,
-      slug: product.slug,
-      name: product.name,
-      priceMinor: numPrice,
-      currency: "IDR",
-      imageUrl: product.img,
-      weightGrams: 20,
-    }, 1);
-  }
 
   return (
     <div className="gnb-flat-card group flex flex-col relative">
@@ -83,19 +62,6 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           )}
         </div>
       </div>
-
-      {/* Somethinc Signature Full Width Add To Cart Button */}
-      <button
-        onClick={handleAddToCart}
-        className="gnb-cart-btn mt-2.5 w-full flex items-center justify-center gap-1.5 rounded-2xl py-2.5 text-[12px] font-bold text-white"
-      >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-          <path d="M3 6h18"></path>
-          <path d="M16 10a4 4 0 0 1-8 0"></path>
-        </svg>
-        <span>Add to Cart</span>
-      </button>
     </div>
   );
 }

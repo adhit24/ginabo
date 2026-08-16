@@ -126,6 +126,25 @@ const DETAILED_USAGE_STEPS = [
   },
 ];
 
+const PRODUCT_FAQS = [
+  {
+    q: "Apakah produk ini aman untuk ibu hamil dan menyusui?",
+    a: "Ya, seluruh rangkaian produk Ginabo diformulasikan secara khusus menggunakan bahan aktif yang lembut, hypoallergenic, dan ramah terhadap kulit sensitif, sehingga aman digunakan oleh ibu hamil maupun menyusui. Jika Anda ragu, konsultasikan dengan dokter kandungan Anda.",
+  },
+  {
+    q: "Berapa lama hasil pemakaian mulai terlihat?",
+    a: "Kelembapan ekstra dan sensasi menenangkan kulit dapat dirasakan sejak pemakaian pertama. Untuk hasil mencerahkan dan menyamarkan noda hitam secara maksimal, disarankan menggunakan rutin pagi & malam selama 21 hari.",
+  },
+  {
+    q: "Bagaimana cara menggabungkan produk ini dengan produk eksfoliasi?",
+    a: "Formula pelembap dan serum kami bekerja sangat baik dengan bahan aktif eksfoliasi (seperti AHA/BHA). Gunakan pelembap Ginabo setelah produk eksfoliasi untuk menenangkan kulit dan mengunci kelembapan barrier.",
+  },
+  {
+    q: "Apakah produk ini sudah tersertifikasi resmi?",
+    a: "Benar. Seluruh produk Ginabo sudah teruji klinis secara dermatologis, non-comedogenic (tidak menyumbat pori-pori), berizin resmi BPOM (BPOM Certified NA18251900160), serta tersertifikasi Halal MUI.",
+  },
+];
+
 type IngredientItem = {
   name: string;
   desc: string;
@@ -175,12 +194,11 @@ export function ProductDetailClient({ product }: Props) {
   const catalog = useShopCatalog();
 
   const [activeImg, setActiveImg] = useState(0);
-  const [activeTab, setActiveTab] = useState<"details" | "how-to-use">("details");
+  const [activeTab, setActiveTab] = useState<"details" | "how-to-use" | "ingredients" | "faq">("details");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [ingredientsOpen, setIngredientsOpen] = useState(true);
 
   // Zoom magnifier states
   const [isZoomed, setIsZoomed] = useState(false);
@@ -558,16 +576,16 @@ export function ProductDetailClient({ product }: Props) {
               </motion.button>
             </div>
 
-            {/* ── 3. Tab DETAILS / HOW TO USE (13px mobile, 16px desktop, 10px 20px / 14px 34px padding) ── */}
+            {/* ── 3. Tab DETAILS / HOW TO USE / INGREDIENTS / FAQ (13px mobile, 16px desktop, 10px 20px / 14px 34px padding) ── */}
             <div className="pt-4 flex flex-col gap-4">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={() => setActiveTab("details")}
                   style={activeTab === "details" ? {
                     background: "linear-gradient(90deg, #78257C 0%, #A445B2 100%)",
                     boxShadow: "0 4px 14px rgba(120,37,124,0.35)",
                   } : {}}
-                  className={`rounded-full px-5 py-2.5 lg:px-[34px] lg:py-[14px] text-[13px] lg:text-[16px] font-bold uppercase tracking-wider transition ${
+                  className={`rounded-full px-4 py-2 lg:px-[26px] lg:py-[12px] text-[12.5px] lg:text-[15px] font-bold uppercase tracking-wider transition ${
                     activeTab === "details"
                       ? "text-white border-0"
                       : "bg-transparent text-[#707070] hover:text-[#1a1a1a]"
@@ -581,19 +599,47 @@ export function ProductDetailClient({ product }: Props) {
                     background: "linear-gradient(90deg, #78257C 0%, #A445B2 100%)",
                     boxShadow: "0 4px 14px rgba(120,37,124,0.35)",
                   } : {}}
-                  className={`rounded-full px-5 py-2.5 lg:px-[34px] lg:py-[14px] text-[13px] lg:text-[16px] font-bold uppercase tracking-wider transition ${
+                  className={`rounded-full px-4 py-2 lg:px-[26px] lg:py-[12px] text-[12.5px] lg:text-[15px] font-bold uppercase tracking-wider transition ${
                     activeTab === "how-to-use"
                       ? "text-white border-0"
                       : "bg-transparent text-[#707070] hover:text-[#1a1a1a]"
                   }`}
                 >
-                  HOW TO USE
+                  CARA PAKAI
+                </button>
+                <button
+                  onClick={() => setActiveTab("ingredients")}
+                  style={activeTab === "ingredients" ? {
+                    background: "linear-gradient(90deg, #78257C 0%, #A445B2 100%)",
+                    boxShadow: "0 4px 14px rgba(120,37,124,0.35)",
+                  } : {}}
+                  className={`rounded-full px-4 py-2 lg:px-[26px] lg:py-[12px] text-[12.5px] lg:text-[15px] font-bold uppercase tracking-wider transition ${
+                    activeTab === "ingredients"
+                      ? "text-white border-0"
+                      : "bg-transparent text-[#707070] hover:text-[#1a1a1a]"
+                  }`}
+                >
+                  KANDUNGAN
+                </button>
+                <button
+                  onClick={() => setActiveTab("faq")}
+                  style={activeTab === "faq" ? {
+                    background: "linear-gradient(90deg, #78257C 0%, #A445B2 100%)",
+                    boxShadow: "0 4px 14px rgba(120,37,124,0.35)",
+                  } : {}}
+                  className={`rounded-full px-4 py-2 lg:px-[26px] lg:py-[12px] text-[12.5px] lg:text-[15px] font-bold uppercase tracking-wider transition ${
+                    activeTab === "faq"
+                      ? "text-white border-0"
+                      : "bg-transparent text-[#707070] hover:text-[#1a1a1a]"
+                  }`}
+                >
+                  TANYA JAWAB
                 </button>
               </div>
 
-              {/* ── 4. Isi Tab DETAILS ── */}
+              {/* ── 4. Isi Tab DETAILS / CARA PAKAI / KANDUNGAN / TANYA JAWAB ── */}
               <div className="pt-2">
-                {activeTab === "details" ? (
+                {activeTab === "details" && (
                   <div className="flex flex-col gap-4">
                     {/* Paragraf Deskripsi: font-size:24px; line-height:1.6 (desktop) / 14px (mobile) */}
                     <p className="text-[14px] lg:text-[24px] lg:leading-[1.6] text-[#505050] font-normal">
@@ -619,7 +665,9 @@ export function ProductDetailClient({ product }: Props) {
                       <span className="font-bold text-[#1a1a1a]">{product.weightGrams ? `${product.weightGrams} gram` : "20 gram"}</span>
                     </div>
                   </div>
-                ) : (
+                )}
+
+                {activeTab === "how-to-use" && (
                   <div className="flex flex-col gap-4 text-[#505050]">
                     <h3 className="text-[16px] lg:text-[22px] font-bold text-[#1a1a1a]">
                       Langkah Penggunaan Rutin (AM / PM):
@@ -643,36 +691,9 @@ export function ProductDetailClient({ product }: Props) {
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
 
-            {/* ── 5. Section KANDUNGAN & BAHAN AKTIF ── */}
-            <div className="mt-4 pt-4 border-t border-[#EDEDED]">
-              <button
-                onClick={() => setIngredientsOpen(!ingredientsOpen)}
-                className="w-full flex items-center justify-between py-2 text-left group cursor-pointer"
-              >
-                <h3 className="text-[15px] lg:text-[20px] font-bold uppercase tracking-wide text-[#1a1a1a] group-hover:text-[#78257C] transition">
-                  KANDUNGAN & BAHAN AKTIF
-                </h3>
-                <svg
-                  className={`w-5 h-5 lg:w-6 lg:h-6 text-[#555555] transition-transform duration-300 ${ingredientsOpen ? "rotate-180" : ""}`}
-                  fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"
-                >
-                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-
-              <AnimatePresence>
-                {ingredientsOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.25, ease: EASE }}
-                    className="overflow-hidden pt-3 flex flex-col gap-3.5"
-                  >
-                    {/* Kartu bahan: Judul 14px/18px (#78257C), Deskripsi 12px/15px (#606060) */}
+                {activeTab === "ingredients" && (
+                  <div className="flex flex-col gap-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {activeIngredients.items.map((item, idx) => (
                         <div
@@ -689,14 +710,34 @@ export function ProductDetailClient({ product }: Props) {
                       ))}
                     </div>
 
-                    {/* Teks Full Ingredients: 12px/15px (#808080) leading-relaxed pt-1 */}
                     <div className="rounded-[8px] bg-[#F9F9F9] p-3.5 border border-[#EEEEEE] text-[12px] lg:text-[15px] text-[#808080] leading-relaxed pt-1">
                       <span className="font-bold text-[#303030]">Full Ingredients: </span>
                       <span>{activeIngredients.full}</span>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
-              </AnimatePresence>
+
+                {activeTab === "faq" && (
+                  <div className="flex flex-col gap-4 text-[#505050]">
+                    <h3 className="text-[16px] lg:text-[22px] font-bold text-[#1a1a1a]">
+                      Tanya Jawab Terkait Produk:
+                    </h3>
+                    <div className="flex flex-col gap-4">
+                      {PRODUCT_FAQS.map((faq, i) => (
+                        <div key={i} className="border-b border-[#F0F0F0] pb-3.5 last:border-b-0">
+                          <h4 className="text-[14px] lg:text-[17px] font-bold text-[#78257C] flex items-start gap-2">
+                            <span className="text-[#A855F7] font-extrabold">Q:</span>
+                            <span>{faq.q}</span>
+                          </h4>
+                          <p className="text-[13px] lg:text-[15px] text-[#505050] leading-relaxed mt-1.5 pl-5">
+                            {faq.a}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
           </div>
