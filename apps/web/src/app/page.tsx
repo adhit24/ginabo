@@ -175,7 +175,7 @@ export default function HomePage() {
         <Marquee
           items={marqueeItems}
           speed={28}
-          itemClassName="font-bold text-[13px] tracking-wide text-[#78257C]"
+          itemClassName="font-bold text-[14px] tracking-wide text-[#78257C]"
           separator="·"
         />
       </div>
@@ -193,7 +193,7 @@ export default function HomePage() {
           <Reveal>
             <div className="flex flex-col items-center mb-12">
               <span
-                className="inline-block text-[11px] font-semibold uppercase tracking-[0.25em] px-4 py-1.5 rounded-lg mb-4 text-white"
+                className="inline-block text-[12px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-lg mb-4 text-white"
                 style={{
                   background: "linear-gradient(135deg, #9333EA, #7C3AED)",
                   boxShadow: "0 2px 8px rgba(120,37,124,0.25)",
@@ -202,7 +202,7 @@ export default function HomePage() {
                 Katalog
               </span>
               <h2
-                className="text-center font-poppins font-extrabold leading-[1.1] text-[clamp(2rem,5vw,3.2rem)]"
+                className="text-center font-sans font-extrabold leading-[1.1] text-[clamp(2rem,5vw,3.2rem)]"
                 style={{
                   background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 40%, #A855F7 70%, #C084FC 100%)",
                   WebkitBackgroundClip: "text",
@@ -217,8 +217,8 @@ export default function HomePage() {
 
           <div className="flex gap-6 md:gap-10">
             {/* ── Sidebar (desktop) ── */}
-            <aside className="hidden md:block w-[200px] flex-shrink-0">
-              <div className="sticky top-24">
+            <aside className="hidden md:block w-[220px] flex-shrink-0">
+              <div className="sticky top-28">
                 <div
                   className="rounded-[20px] p-5"
                   style={{
@@ -227,17 +227,17 @@ export default function HomePage() {
                     boxShadow: "0 8px 32px rgba(20,15,50,0.25)",
                   }}
                 >
-                  <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: "#c4b5fd" }}>
+                  <h3 className="mb-4 text-[12px] font-extrabold uppercase tracking-[0.15em]" style={{ color: "#c4b5fd" }}>
                     Kategori
                   </h3>
-                  <ul className="flex flex-col gap-1">
+                  <ul className="flex flex-col gap-1.5">
                     {HOME_CATEGORIES.map(cat => (
                       <li key={cat.key}>
                         <button
                           onClick={() => setCatFilter(cat.key)}
-                          className={`w-full text-left px-3.5 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 ${
+                          className={`w-full text-left px-4 py-2.5 rounded-xl text-[14px] font-semibold transition-all duration-200 ${
                             catFilter === cat.key
-                              ? "text-white font-semibold shadow-md"
+                              ? "text-white font-bold shadow-md"
                               : "text-[#a5a0c8] hover:text-white hover:bg-white/10"
                           }`}
                           style={catFilter === cat.key ? {
@@ -262,13 +262,13 @@ export default function HomePage() {
                   {/* Mobile filter button */}
                   <button
                     onClick={() => setMobileFilterOpen(true)}
-                    className="md:hidden flex items-center gap-1.5 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-white transition hover:opacity-90"
+                    className="md:hidden flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[14px] font-semibold text-white transition hover:opacity-90"
                     style={{
                       background: "linear-gradient(135deg, #1e1b3a, #2d2556)",
                       boxShadow: "0 4px 12px rgba(20,15,50,0.25)",
                     }}
                   >
-                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="16" y2="12"/><line x1="4" y1="18" x2="12" y2="18"/>
                     </svg>
                     Filter
@@ -278,7 +278,7 @@ export default function HomePage() {
                   <div className="relative" ref={sortRef}>
                     <button
                       onClick={() => setSortOpen(v => !v)}
-                      className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-[13px] font-semibold text-white transition-all duration-300 hover:opacity-90"
+                      className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-[14px] font-semibold text-white transition-all duration-300 hover:opacity-90"
                       style={{
                         background: "linear-gradient(135deg, #1e1b3a, #2d2556)",
                         boxShadow: "0 4px 12px rgba(20,15,50,0.25)",
@@ -296,7 +296,7 @@ export default function HomePage() {
                         : "opacity-0 -translate-y-2 scale-[0.95] pointer-events-none"
                     }`}>
                       <div
-                        className="w-44 rounded-2xl overflow-hidden py-1.5"
+                        className="w-48 rounded-2xl overflow-hidden py-1.5"
                         style={{
                           background: "linear-gradient(135deg, #1e1b3a 0%, #2d2556 100%)",
                           border: "1px solid rgba(139,92,246,0.15)",
@@ -307,9 +307,9 @@ export default function HomePage() {
                           <button
                             key={o.key}
                             onClick={() => { setCatSort(o.key); setSortOpen(false); }}
-                            className={`w-full text-left px-4 py-2.5 text-[13px] font-medium transition-all duration-200 ${
+                            className={`w-full text-left px-4 py-2.5 text-[14px] font-medium transition-all duration-200 ${
                               catSort === o.key
-                                ? "text-white bg-gradient-to-r from-[#9333EA]/30 to-transparent"
+                                ? "text-white bg-gradient-to-r from-[#9333EA]/30 to-transparent font-semibold"
                                 : "text-white/70 hover:text-white hover:bg-white/5"
                             }`}
                           >
@@ -322,7 +322,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Search bar */}
-                <div className="relative max-w-[240px] flex-1">
+                <div className="relative max-w-[260px] flex-1">
                   <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a5a0c8]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <circle cx="11" cy="11" r="8" />
                     <path d="m21 21-4.35-4.35" strokeLinecap="round" />
@@ -332,7 +332,7 @@ export default function HomePage() {
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                     placeholder="Cari produk..."
-                    className="w-full rounded-xl py-2.5 pl-10 pr-4 text-[13px] font-medium text-white placeholder-[#a5a0c8]/60 outline-none transition-all duration-300 focus:ring-2 focus:ring-[#8b5cf6]/40"
+                    className="w-full rounded-xl py-2.5 pl-10 pr-4 text-[14px] font-medium text-white placeholder-[#a5a0c8]/60 outline-none transition-all duration-300 focus:ring-2 focus:ring-[#8b5cf6]/40"
                     style={{
                       background: "linear-gradient(135deg, #1e1b3a, #2d2556)",
                       boxShadow: "0 4px 12px rgba(20,15,50,0.25)",

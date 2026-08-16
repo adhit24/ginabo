@@ -92,9 +92,9 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40" suppressHydrationWarning>
 
       {/* ── Announcement Bar ── */}
-      <div className="bg-gradient-to-r from-[#A855F7] via-[#9333EA] to-[#C084FC] py-2 overflow-hidden">
+      <div className="bg-gradient-to-r from-[#A855F7] via-[#9333EA] to-[#C084FC] py-2.5 overflow-hidden">
         <div className="mx-auto flex max-w-7xl items-center justify-center px-4">
-          <p className="text-[11px] font-medium text-white/90 text-center transition-all duration-500 line-clamp-1">
+          <p className="text-[13px] font-semibold text-white text-center transition-all duration-500 line-clamp-1 tracking-wide">
             {announcements[annIdx]}
           </p>
         </div>
@@ -106,7 +106,7 @@ export function SiteHeader() {
           ? "bg-white/75 backdrop-blur-2xl shadow-[0_8px_32px_rgba(120,37,124,0.08)] border-b border-white/50"
           : "bg-white/60 backdrop-blur-xl border-b border-white/30"
       }`}>
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6" style={{ height: 68 }}>
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6" style={{ height: 72 }}>
 
           {/* Left: Logo */}
           <Link href="/" className="flex items-center shrink-0">
@@ -122,7 +122,7 @@ export function SiteHeader() {
           </Link>
 
           {/* Right: Nav Links + Konsultasi + User + Cart */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
 
             {/* Nav Links */}
             <nav className="flex items-center gap-2" style={{ fontFamily: "var(--font-outfit), sans-serif" }}>
@@ -130,7 +130,7 @@ export function SiteHeader() {
               {/* HOME link */}
               <Link
                 href="/"
-                className={`relative px-4 py-1.5 text-[13px] font-semibold tracking-wide rounded-full transition-all duration-300
+                className={`relative px-4 py-2 text-[14px] font-bold tracking-wide rounded-full transition-all duration-300
                   ${isHomeActive ? "text-white" : "text-[#4A1A5E] hover:text-[#78257C]"}`}
               >
                 {isHomeActive && (
@@ -143,7 +143,7 @@ export function SiteHeader() {
               <div className="relative" ref={infoRef}>
                 <button
                   onClick={() => { setInfoOpen(v => !v); }}
-                  className={`relative flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-semibold tracking-wide rounded-full transition-all duration-300
+                  className={`relative flex items-center gap-1.5 px-4 py-2 text-[14px] font-bold tracking-wide rounded-full transition-all duration-300
                     ${infoOpen || isInfoActive ? "text-white" : "text-[#4A1A5E] hover:text-[#78257C]"}`}
                 >
                   {(infoOpen || isInfoActive) && (
@@ -167,10 +167,10 @@ export function SiteHeader() {
                           <Link
                             href={item.href}
                             onClick={() => setInfoOpen(false)}
-                            className="group flex items-center gap-3 px-5 py-3 text-[13px] text-[#606060] transition-all duration-200 hover:bg-gradient-to-r hover:from-[#F3E8FF]/60 hover:to-transparent hover:text-[#78257C]"
+                            className="group flex items-center gap-3 px-5 py-3 text-[14px] text-[#555555] transition-all duration-200 hover:bg-gradient-to-r hover:from-[#F3E8FF]/60 hover:to-transparent hover:text-[#78257C] font-medium"
                             style={{ transitionDelay: infoOpen ? `${idx * 30}ms` : "0ms" }}
                           >
-                            <span className="h-1 w-1 rounded-full bg-gradient-to-r from-[#C084FC] to-[#A855F7] opacity-0 scale-0 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-[#C084FC] to-[#A855F7] opacity-0 scale-0 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100" />
                             {item.label}
                           </Link>
                         </li>
@@ -184,7 +184,7 @@ export function SiteHeader() {
               <div className="relative" ref={programRef}>
                 <button
                   onClick={() => { setProgramOpen(v => !v); }}
-                  className={`relative flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-semibold tracking-wide rounded-full transition-all duration-300
+                  className={`relative flex items-center gap-1.5 px-4 py-2 text-[14px] font-bold tracking-wide rounded-full transition-all duration-300
                     ${programOpen || isProgramActive ? "text-white" : "text-[#4A1A5E] hover:text-[#78257C]"}`}
                 >
                   {(programOpen || isProgramActive) && (
@@ -201,17 +201,17 @@ export function SiteHeader() {
                     ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
                     : "opacity-0 -translate-y-2 scale-[0.97] pointer-events-none"
                 }`}>
-                  <div className="w-48 rounded-2xl bg-white backdrop-blur-2xl shadow-[0_16px_48px_rgba(120,37,124,0.14)] border border-white/60 ring-1 ring-black/[0.03] overflow-hidden">
+                  <div className="w-52 rounded-2xl bg-white backdrop-blur-2xl shadow-[0_16px_48px_rgba(120,37,124,0.14)] border border-white/60 ring-1 ring-black/[0.03] overflow-hidden">
                     <ul className="flex flex-col py-2">
                       {programMenu.map((item, idx) => (
                         <li key={item.href}>
                           <Link
                             href={item.href}
                             onClick={() => setProgramOpen(false)}
-                            className="group flex items-center gap-3 px-5 py-3 text-[13px] text-[#606060] transition-all duration-200 hover:bg-gradient-to-r hover:from-[#F3E8FF]/60 hover:to-transparent hover:text-[#78257C]"
+                            className="group flex items-center gap-3 px-5 py-3 text-[14px] text-[#555555] transition-all duration-200 hover:bg-gradient-to-r hover:from-[#F3E8FF]/60 hover:to-transparent hover:text-[#78257C] font-medium"
                             style={{ transitionDelay: programOpen ? `${idx * 30}ms` : "0ms" }}
                           >
-                            <span className="h-1 w-1 rounded-full bg-gradient-to-r from-[#C084FC] to-[#A855F7] opacity-0 scale-0 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-[#C084FC] to-[#A855F7] opacity-0 scale-0 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100" />
                             {item.label}
                           </Link>
                         </li>
@@ -224,7 +224,7 @@ export function SiteHeader() {
               {/* Konsultasi */}
               <Link
                 href="/booking"
-                className={`relative px-4 py-1.5 text-[13px] font-semibold tracking-wide rounded-full transition-all duration-300
+                className={`relative px-4 py-2 text-[14px] font-bold tracking-wide rounded-full transition-all duration-300
                   ${isKonsultasiActive ? "text-white" : "text-[#4A1A5E] hover:text-[#78257C]"}`}
               >
                 {isKonsultasiActive && (

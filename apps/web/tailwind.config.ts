@@ -35,7 +35,6 @@ export default {
           400: "#B8A8D8",
           500: "#9A88C4",
         },
-        // warm neutral untuk memecah monoton ungu di halaman partner
         bone: {
           50:  "#FBF8F4",
           100: "#F4EEE6",
@@ -44,12 +43,15 @@ export default {
         ink: "#1C1A17",
       },
       fontFamily: {
-        sans:        ["var(--font-outfit)", "var(--font-poppins)", "Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
-        serif:       ["Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
-        display:     ["var(--font-fraunces)", "Georgia", "serif"],
+        sans:        ["var(--font-outfit)", "var(--font-jakarta)", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        futura:      ["var(--font-outfit)", "var(--font-montserrat)", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        avenir:      ["var(--font-jakarta)", "var(--font-outfit)", "sans-serif"],
+        serif:       ["var(--font-montserrat)", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        display:     ["var(--font-outfit)", "Georgia", "serif"],
         mono:        ["ui-monospace", "monospace"],
         poppins:     ["var(--font-poppins)", "sans-serif"],
         outfit:      ["var(--font-outfit)", "sans-serif"],
+        jakarta:     ["var(--font-jakarta)", "sans-serif"],
         staatliches: ["var(--font-staatliches)", "sans-serif"],
       },
       borderRadius: {
@@ -79,4 +81,3 @@ export default {
   },
   plugins: [typography],
 } satisfies Config;
-

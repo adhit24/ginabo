@@ -1,18 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --color-primary:    #5B4B8A;
+  --color-primary:    #78257C;
   --color-secondary:  #C6B7E2;
-  --color-accent:     #7A6AD8;
-  --color-bg:         #F8F7FB;
-  --color-text:       #2E2A3B;
-  --color-link:       #5B4B8A;
-  --radius:           10px;
-  --font-main:        'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-accent:     #9333EA;
+  --color-bg:         #FFFFFF;
+  --color-text:       #292929;
+  --color-link:       #78257C;
+  --radius:           8px;
+  --font-main:        var(--font-outfit), var(--font-jakarta), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading:     var(--font-outfit), var(--font-montserrat), -apple-system, BlinkMacSystemFont, sans-serif;
   --safe-top: env(safe-area-inset-top);
   --safe-bottom: env(safe-area-inset-bottom);
 }
@@ -30,7 +29,7 @@ body {
   color: var(--color-text);
   font-family: var(--font-main);
   font-size: 15px;
-  line-height: 1.55;
+  line-height: 1.6;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -38,7 +37,7 @@ body {
 
 @media (min-width: 768px) {
   body {
-    font-size: 15.5px;
+    font-size: 15px;
   }
 }
 
@@ -47,18 +46,19 @@ button, input, select, textarea {
 }
 
 :focus-visible {
-  outline: 2px solid rgba(122, 106, 216, 0.55);
+  outline: 2px solid rgba(120, 37, 124, 0.55);
   outline-offset: 2px;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-main);
+  font-family: var(--font-heading);
   font-weight: 700;
-  color: var(--color-text);
+  color: #292929;
+  letter-spacing: -0.015em;
 }
 
 a {
-  color: var(--color-link);
+  color: inherit;
 }
 
 /* ── Badge-bg (Figma gradient pattern) ── */
@@ -109,7 +109,7 @@ a {
 .social-icon:hover { transform: scale(1.25) rotate(-5deg); filter: brightness(1.3); }
 
 /* ── Subscribe ── */
-.subscribe-input { background: transparent; border: none; outline: none; width: 100%; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 17px; color: #876fc7; }
+.subscribe-input { background: transparent; border: none; outline: none; width: 100%; font-family: var(--font-heading); font-weight: 600; font-size: 16px; color: #876fc7; }
 .subscribe-input::placeholder { color: #876fc7; }
 .subscribe-btn { transition: filter 0.2s, transform 0.2s; cursor: pointer; }
 .subscribe-btn:hover { filter: brightness(1.18); transform: scale(1.04); }
@@ -120,9 +120,9 @@ a {
 
 /* ── Nav scrolled glass ── */
 .nav-scrolled {
-  box-shadow: 0 4px 28px rgba(102,93,172,0.18);
-  backdrop-filter: blur(10px);
-  background: rgba(255,250,250,0.92) !important;
+  box-shadow: 0 4px 28px rgba(120,37,124,0.14);
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.92) !important;
 }
 
 /* ── Scroll-to-top ── */
