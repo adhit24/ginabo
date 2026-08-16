@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 
 import { createAdminSessionToken, getAdminSessionCookieName } from "@/lib/auth";
 import { jsonError, jsonOk } from "@/lib/http";
-import { ADMIN_CREDS } from "@/lib/adminStore";
+import { getAdminCreds } from "@/lib/adminStore";
 
 export async function POST(req: Request) {
   try {
@@ -12,7 +12,8 @@ export async function POST(req: Request) {
     const { username, password } = body as { username?: string; password?: string };
 
     if (!username || !password) return jsonError("Invalid input", 400);
-    if (username !== ADMIN_CREDS.username || password !== ADMIN_CREDS.password) {
+    const creds = getAdminCreds();
+    if (username !== creds.username || password !== creds.password) {
       return jsonError("Username atau password salah", 401);
     }
 

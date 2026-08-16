@@ -13,6 +13,7 @@ export type OrderStatus =
 
 export type PaymentStatus =
   | 'pending'
+  | 'success'
   | 'paid'
   | 'failed'
   | 'expired'
@@ -42,10 +43,14 @@ export interface ProfileRow {
   id: string
   email: string
   full_name: string | null
+  phone_number: string | null
+  whatsapp_number?: string | null
   phone: string | null
   avatar_url: string | null
   skin_type: string | null
-  skin_concern: string[] | null
+  skin_concerns: string[] | null
+  skin_concern?: string[] | null
+  loyalty_points: number
   date_of_birth: string | null
   gender: 'male' | 'female' | 'other' | null
   is_reseller: boolean
@@ -75,8 +80,10 @@ export interface ProductRow {
   short_description: string | null
   category_id: string | null
   base_price: number
+  price?: number
   sale_price: number | null
   sku: string | null
+  stock_quantity: number
   stock: number
   weight_grams: number | null
   is_active: boolean
@@ -109,6 +116,8 @@ export interface ProductImageRow {
   product_id: string
   url: string
   alt_text: string | null
+  alt?: string | null
+  sort_order: number
   position: number
   is_primary: boolean
   created_at: string
@@ -134,6 +143,7 @@ export interface AddressRow {
 export interface OrderRow {
   id: string
   order_number: string
+  profile_id: string
   user_id: string
   status: OrderStatus
   subtotal: number
@@ -141,6 +151,11 @@ export interface OrderRow {
   discount_amount: number
   tax_amount: number
   total_amount: number
+  payment_fee: number
+  shipping_address: Record<string, unknown>
+  shipping_service: string | null
+  shipping_weight_grams: number | null
+  checkout_idempotency_key: string | null
   coupon_id: string | null
   shipping_address_id: string | null
   shipping_provider: string | null
@@ -172,13 +187,16 @@ export interface PaymentRow {
   midtrans_transaction_id: string | null
   payment_type: string | null
   status: PaymentStatus
-  gross_amount: number
+  midtrans_gross_amount: number
+  gross_amount?: number
   snap_token: string | null
   snap_redirect_url: string | null
   fraud_status: string | null
   settlement_time: string | null
   expiry_time: string | null
-  raw_response: Record<string, unknown> | null
+  raw_notification: Record<string, unknown> | null
+  raw_response?: Record<string, unknown> | null
+  provider_transaction_id: string | null
   created_at: string
   updated_at: string
 }

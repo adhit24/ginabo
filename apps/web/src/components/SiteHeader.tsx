@@ -7,7 +7,11 @@ import { usePathname } from "next/navigation";
 import { CartMini } from "@/components/cart/CartMini";
 import { CurrencySwitcher } from "@/components/currency/CurrencySwitcher";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { SearchBar } from "@/components/search/SearchBar";
 import { useRouter } from "next/navigation";
+
+const EASE = [0.25, 1, 0.5, 1] as const;
 
 const announcements = [
   "Gratis ongkir untuk pembelian di atas Rp 200.000 · Belanja Sekarang",
@@ -16,7 +20,6 @@ const announcements = [
 ];
 
 const infoMenu = [
-  { label: "Blog",                 href: "/blog" },
   { label: "FAQ",                  href: "/faq" },
   { label: "Kontak Kami",          href: "/contact" },
   { label: "Jadi Reseller",        href: "/reseller" },
@@ -41,6 +44,7 @@ export function SiteHeader() {
   const [mobileProgramOpen, setMobileProgramOpen] = useState(false);
   const [userOpen, setUserOpen]   = useState(false);
   const [scrolled, setScrolled]   = useState(false);
+  const [authModal, setAuthModal] = useState<{ open: boolean; tab: "login" | "signup" }>({ open: false, tab: "login" });
 
   const infoRef = useRef<HTMLDivElement>(null);
   const programRef = useRef<HTMLDivElement>(null);
@@ -71,6 +75,12 @@ export function SiteHeader() {
     logout();
     setUserOpen(false);
     router.push("/");
+  }
+
+  function openAuth(tab: "login" | "signup") {
+    setUserOpen(false);
+    setDrawerOpen(false);
+    setAuthModal({ open: true, tab });
   }
 
   const isHomeActive = pathname === "/";
@@ -115,7 +125,7 @@ export function SiteHeader() {
           <div className="flex items-center gap-1">
 
             {/* Nav Links */}
-            <nav className="flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            <nav className="flex items-center gap-2" style={{ fontFamily: "var(--font-outfit), sans-serif" }}>
 
               {/* HOME link */}
               <Link
@@ -225,6 +235,8 @@ export function SiteHeader() {
 
             </nav>
 
+            <SearchBar />
+
             <CurrencySwitcher />
 
             <div className="w-px h-5 bg-[#E9D5FF]/60 mx-2" />
@@ -284,14 +296,14 @@ export function SiteHeader() {
                     </>
                   ) : (
                     <div className="p-4 flex flex-col gap-2.5">
-                      <Link href="/auth/login" onClick={() => setUserOpen(false)}
+                      <button type="button" onClick={() => openAuth("login")}
                         className="block w-full rounded-xl border border-[#D8B4FE]/50 py-2.5 text-center text-[13px] font-semibold text-[#78257C] transition-all duration-200 hover:bg-[#F3E8FF]/40 hover:border-[#C084FC]/60">
                         Masuk
-                      </Link>
-                      <Link href="/auth/signup" onClick={() => setUserOpen(false)}
+                      </button>
+                      <button type="button" onClick={() => openAuth("signup")}
                         className="block w-full rounded-xl py-2.5 text-center text-[13px] font-bold text-white transition-all duration-300 bg-gradient-to-r from-[#9333EA] to-[#7C3AED] hover:shadow-[0_6px_20px_rgba(120,37,124,0.35)]">
                         Daftar Gratis
-                      </Link>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -341,15 +353,25 @@ export function SiteHeader() {
           />
         </Link>
 
-        {/* Right: currency + user + cart */}
+        {/* Right: search + currency + user + cart */}
         <div className="flex items-center gap-1.5">
+          <SearchBar />
           <CurrencySwitcher />
-          <Link href={user ? "/member" : "/auth/login"} className="flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-[#F3E8FF]/40">
-            <svg className="h-5 w-5 text-[#808080]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round" />
-            </svg>
-          </Link>
+          {user ? (
+            <Link href="/member" className="flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-[#F3E8FF]/40">
+              <svg className="h-5 w-5 text-[#808080]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round" />
+              </svg>
+            </Link>
+          ) : (
+            <button type="button" onClick={() => openAuth("login")} className="flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-[#F3E8FF]/40" aria-label="Masuk / Daftar">
+              <svg className="h-5 w-5 text-[#808080]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
           <CartMini />
         </div>
       </div>
@@ -539,25 +561,31 @@ export function SiteHeader() {
               </div>
             ) : (
               <div className="flex flex-col gap-2.5">
-                <Link
-                  href="/auth/login"
-                  onClick={() => setDrawerOpen(false)}
+                <button
+                  type="button"
+                  onClick={() => openAuth("login")}
                   className="block w-full rounded-lg border border-[#c084fc]/30 py-3 text-center text-[13px] font-semibold text-[#c084fc] transition-all duration-200 hover:bg-white/[0.06]"
                 >
                   Masuk
-                </Link>
-                <Link
-                  href="/auth/signup"
-                  onClick={() => setDrawerOpen(false)}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openAuth("signup")}
                   className="block w-full rounded-lg py-3 text-center text-[13px] font-bold text-white transition-all duration-300 bg-gradient-to-r from-[#8b5cf6] to-[#e879f9] hover:shadow-[0_6px_20px_rgba(139,92,246,0.35)]"
                 >
                   Daftar Gratis
-                </Link>
+                </button>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      <AuthModal
+        open={authModal.open}
+        initialTab={authModal.tab}
+        onClose={() => setAuthModal(a => ({ ...a, open: false }))}
+      />
     </header>
   );
 }

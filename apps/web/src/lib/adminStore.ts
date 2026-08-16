@@ -26,24 +26,30 @@ export interface GFlashItem {
   img: string;
 }
 
-// Credentials live in env vars (server-side only — never exposed to browser bundle)
-// Set ADMIN_USERNAME and ADMIN_PASSWORD in Vercel environment variables
-export const ADMIN_CREDS = {
-  username: typeof process !== "undefined" ? (process.env.ADMIN_USERNAME ?? "ginabo_admin") : "ginabo_admin",
-  password: typeof process !== "undefined" ? (process.env.ADMIN_PASSWORD ?? "ginabo2024") : "ginabo2024",
-};
+// Credentials live in env vars only (server-side, never exposed to the browser
+// bundle or committed to source). Set ADMIN_USERNAME and ADMIN_PASSWORD in
+// Vercel environment variables — there is no fallback, so login fails closed
+// if they're unset rather than accepting a guessable default.
+export function getAdminCreds() {
+  const username = process.env.ADMIN_USERNAME;
+  const password = process.env.ADMIN_PASSWORD;
+  if (!username || !password) {
+    throw new Error("ADMIN_USERNAME and ADMIN_PASSWORD are required");
+  }
+  return { username, password };
+}
 
 export const DEFAULT_PRODUCTS: GProduct[] = [
-  { id: "p1", name: "Hydra Moist\nGel Ultimate",      priceVal: "Rp 120.000", priceMinor: 120000, img: "/salmonfix.png", rating: "5.0", reviews: "127", tag: "DNA Salmon · 30ml" },
-  { id: "p2", name: "Bright & Care\nMoisture Cream",  priceVal: "Rp 75.000",  priceMinor: 75000,  img: "/moistfix.png",  rating: "5.0", reviews: "127", tag: "Moisturizer · 10g"  },
-  { id: "p3", name: "GlowAge Multi-\nActive Serum",   priceVal: "Rp 90.000",  priceMinor: 90000,  img: "/serumfix.png",  rating: "5.0", reviews: "127", tag: "Serum · 30ml"       },
+  { id: "p1", slug: "hydra-moist-gel",            name: "Hydra Moist\nGel",                priceVal: "Rp 89.000",  priceMinor: 89000,  img: "/salmonfix.png", rating: "5.0", reviews: "127", tag: "DNA Salmon · 30ml" },
+  { id: "p2", slug: "bright-care-moisture-cream", name: "Bright & Care\nMoisture Cream",  priceVal: "Rp 75.000",  priceMinor: 75000,  img: "/moistfix.png",  rating: "5.0", reviews: "127", tag: "Moisturizer · 10g"  },
+  { id: "p3", slug: "glowage-multi-active-serum", name: "GlowAge Multi-\nActive Serum",   priceVal: "Rp 90.000",  priceMinor: 90000,  img: "/serumfix.png",  rating: "5.0", reviews: "127", tag: "Serum · 30ml"       },
 ];
 
 export const DEFAULT_BUNDLES: GProduct[] = [
-  { id: "b1", name: "Ginabo Complete\nSkin Nutrition Set", priceVal: "Rp 287.999", priceMinor: 287999, originalPrice: "Rp 575.999", img: "/essential.png",    rating: "5.0", reviews: "127" },
-  { id: "b2", name: "Repair &\nGlow Set",                  priceVal: "Rp 207.999", priceMinor: 207999, originalPrice: "Rp 415.999", img: "/repair_glow.png",  rating: "5.0", reviews: "127" },
-  { id: "b3", name: "Daily Skin\nBarrier Set",              priceVal: "Rp 197.999", priceMinor: 197999, originalPrice: "Rp 395.999", img: "/skin_barrier.png", rating: "5.0", reviews: "127" },
-  { id: "b4", name: "Bright\nRenewal Set",                  priceVal: "Rp 169.999", priceMinor: 169999, originalPrice: "Rp 339.999", img: "/bright_renewal.png", rating: "5.0", reviews: "127" },
+  { id: "b1", slug: "ginabo-complete-skin",       name: "Ginabo Complete\nSkin Nutrition Set", priceVal: "Rp 287.999", priceMinor: 287999, originalPrice: "Rp 575.999", img: "/essential.png",    rating: "5.0", reviews: "127" },
+  { id: "b2", slug: "repair-glow-set",            name: "Repair &\nGlow Set",                  priceVal: "Rp 207.999", priceMinor: 207999, originalPrice: "Rp 415.999", img: "/repair_glow.png",  rating: "5.0", reviews: "127" },
+  { id: "b3", slug: "daily-barrier-routine-set",  name: "Daily Skin\nBarrier Set",              priceVal: "Rp 197.999", priceMinor: 197999, originalPrice: "Rp 395.999", img: "/skin_barrier.png", rating: "5.0", reviews: "127" },
+  { id: "b4", slug: "bright-renewal-set",         name: "Bright\nRenewal Set",                  priceVal: "Rp 169.999", priceMinor: 169999, originalPrice: "Rp 339.999", img: "/bright_renewal.png", rating: "5.0", reviews: "127" },
 ];
 
 export const DEFAULT_FLASH: GFlashItem[] = [

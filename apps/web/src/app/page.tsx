@@ -9,37 +9,15 @@ import { HeroBanner } from "@/components/HeroBanner";
 import { Reveal } from "@/components/ui/Reveal";
 import { Marquee } from "@/components/ui/Marquee";
 
-import { useCart } from "@/components/cart/CartProvider";
 import { store, type GProduct } from "@/lib/adminStore";
-
-// ── Figma Assets ──────────────────────────────────────────────────────────────
-const IMG_SPRITE    = "https://www.figma.com/api/mcp/asset/71dedf14-7a07-4680-8fde-41aadfebedf7"; // 3-product sprite
+import { listActiveProducts, type CatalogProduct } from "@/lib/catalog";
+import { ProductCard } from "@/components/ProductCard";
 
 // ── Static Data ───────────────────────────────────────────────────────────────
 const marqueeItems = [
   "BPOM", "Halal", "Dermatologist Tested", "No Parabens",
   "Barrier-First", "Gentle Formula", "AM & PM Routine", "2 Years Research",
 ];
-
-const productDescriptions: Record<string, string> = {
-  "Hydra Moist Gel Ultimate": "Gel 3-in-1: moisturizer, makeup prep & sleeping mask.",
-  "Bright & Care Moisture Cream": "Cream harian untuk kelembapan dan skin barrier.",
-  "GlowAge Multi- Active Serum": "Serum pencerah, pelembap & anti-aging harian.",
-  "Ginabo Complete Skin Nutrition Set": "Gel + Cream + Serum dalam satu paket lengkap.",
-  "Repair & Glow Set": "Paket Gel + Serum untuk hidrasi & pencerahan.",
-  "Daily Skin Barrier Set": "Paket Cream + Gel untuk barrier & kelembapan.",
-  "Bright Renewal Set": "Paket Cream + Serum untuk cerah & perawatan kulit.",
-};
-
-const productFullDescriptions: Record<string, string> = {
-  "Hydra Moist Gel Ultimate": "Moisturizer gel 30ml dengan fungsi 3-in-1 yang dapat digunakan sebagai moisturizer harian, makeup preparation, dan sleeping mask.",
-  "Bright & Care Moisture Cream": "Moisture cream untuk perawatan harian yang membantu melembapkan kulit, menjaga skin barrier, dan merawat tampilan kulit kusam.",
-  "GlowAge Multi- Active Serum": "Serum wajah 20ml untuk perawatan harian yang membantu mencerahkan kulit, meratakan warna kulit, menjaga kelembapan, dan membantu merawat tampilan tanda penuaan.",
-  "Ginabo Complete Skin Nutrition Set": "Dapatkan Hydra Moist Gel Ultimate, Bright & Care Moisture Cream, dan GlowAge Multi-Active Serum dalam satu paket lengkap untuk rutinitas perawatan kulit harian.",
-  "Repair & Glow Set": "Paket berisi Hydra Moist Gel Ultimate dan GlowAge Multi-Active Serum untuk hidrasi optimal dan pencerahan kulit secara alami.",
-  "Daily Skin Barrier Set": "Paket berisi Bright & Care Moisture Cream dan Hydra Moist Gel Ultimate untuk menjaga kelembapan dan memperkuat skin barrier setiap hari.",
-  "Bright Renewal Set": "Paket berisi Bright & Care Moisture Cream dan GlowAge Multi-Active Serum untuk mencerahkan dan merawat kulit secara menyeluruh.",
-};
 
 // ── Animation Variants ────────────────────────────────────────────────────────
 const EASE = [0.25, 1, 0.5, 1] as const;
@@ -64,135 +42,10 @@ function SectionLabel({ children, center }: { children: ReactNode; center?: bool
   );
 }
 
-function ProductCard({
-  name, rating, reviews, priceLabel, priceVal, originalPrice,
-  imgLeft, imgTop, img, priceMinor, productId, onInfoClick,
-}: {
-  name: string; rating: string; reviews: string; priceLabel?: string; priceVal: string;
-  originalPrice?: string; imgLeft?: string; imgTop?: string; img?: string;
-  priceMinor?: number; productId?: string; onInfoClick?: (name: string) => void;
-}) {
-  const { addItem } = useCart();
-  const discountPct = originalPrice && priceMinor
-    ? Math.round((1 - priceMinor / parseInt(originalPrice.replace(/\D/g, ""))) * 100)
-    : 0;
-  function handleAddToCart() {
-    addItem({
-      productId: productId ?? name,
-      slug:      productId ?? name,
-      name:      name.replace(/\n/g, " "),
-      priceMinor: priceMinor ?? 0,
-      currency:  "IDR",
-      imageUrl:  img ?? null,
-    });
-  }
-
-  return (
-    <motion.div
-      variants={cardSlideUp}
-      whileHover={{ y: -6, scale: 1.01 }}
-      transition={{ type: "spring", stiffness: 300, damping: 24 }}
-      className="group relative w-full flex flex-col cursor-pointer rounded-xl overflow-hidden"
-      style={{
-        background: "#ffffff",
-        border: "1px solid rgba(147,51,234,0.08)",
-        boxShadow: "0 4px 20px rgba(82,69,178,0.06)",
-      }}
-    >
-
-      {/* Product image */}
-      <div className="relative overflow-hidden rounded-lg mx-2.5 mt-2.5" style={{ aspectRatio: "4/3", background: "#faf5ff" }}>
-        {/* Info button */}
-        <button
-          onClick={(e) => { e.stopPropagation(); onInfoClick?.(name.replace(/\n/g, " ")); }}
-          className="absolute top-2 left-2 z-10 flex items-center gap-1.5 rounded-sm px-3 py-1 text-[10px] font-bold text-white backdrop-blur-sm transition-all hover:opacity-90"
-          style={{ background: "#4A1A5E" }}
-        >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-          Info
-        </button>
-        {img ? (
-          <img
-            src={img}
-            alt={name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <img
-            src={IMG_SPRITE}
-            alt={name}
-            className="absolute max-w-none pointer-events-none"
-            style={{ width: "303.75%", height: "113.33%", top: imgTop, left: imgLeft }}
-          />
-        )}
-      </div>
-
-      {/* Info section */}
-      <div className="flex flex-col gap-2 px-3 pt-3 pb-3 flex-1">
-        {/* Name + Discount badge */}
-        <div className="flex items-start justify-between gap-1.5">
-          <p className="font-bold text-[#4A1A5E] text-[13px] md:text-[14px] leading-snug whitespace-pre-line line-clamp-2">
-            {name}
-          </p>
-          {discountPct > 0 && (
-            <span className="flex-shrink-0 rounded-sm px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: "#ef4444" }}>
-              -{discountPct}%
-            </span>
-          )}
-        </div>
-
-        {/* Description */}
-        <p className="text-[11px] md:text-[12px] leading-relaxed text-[#5a4a6a] line-clamp-2">
-          {productDescriptions[name.replace(/\n/g, " ")] ?? "Skincare ringan untuk rutinitas harian."}
-        </p>
-
-        {/* Rating badge + sold count */}
-        <div className="flex items-center gap-1.5 mt-auto">
-          <div
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm"
-            style={{ background: "linear-gradient(135deg, #fbbf24, #f59e0b)" }}
-          >
-            <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="white">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-            <span className="text-white font-bold text-[10px]">{rating}</span>
-          </div>
-          <div
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm"
-            style={{ background: "#4A1A5E" }}
-          >
-            <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="white">
-              <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
-            </svg>
-            <span className="text-white font-bold text-[10px]">{reviews} terjual</span>
-          </div>
-        </div>
-
-        {/* Add to Cart button */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={handleAddToCart}
-          className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-[12px] font-bold text-white transition-all duration-300"
-          style={{
-            background: "linear-gradient(135deg, #9333EA, #7C3AED)",
-            boxShadow: "0 4px 14px rgba(147,51,234,0.25)",
-          }}
-        >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-          </svg>
-          {originalPrice && <span className="line-through text-white/50 text-[10px]">{originalPrice}</span>}
-          {priceLabel && <span>{priceLabel} </span>}{priceVal}
-        </motion.button>
-      </div>
-    </motion.div>
-  );
-}
-
 // ── CTA Card — simple hover scale ───────────────────────────────────────────
-function CTACard({ href, src, alt }: { href: string; src: string; alt: string }) {
+// `tint` recolors a lighter/off-palette source image (via mix-blend-color) so
+// it reads as the same purple depth as the other cards in the row.
+function CTACard({ href, src, alt, tint }: { href: string; src: string; alt: string; tint?: string }) {
   return (
     <Link
       href={href}
@@ -206,6 +59,12 @@ function CTACard({ href, src, alt }: { href: string; src: string; alt: string })
           className="object-cover object-center"
           sizes="(max-width:640px) 33vw, (max-width:1280px) calc((100vw - 64px) / 3), 420px"
         />
+        {tint && (
+          <div
+            className="absolute inset-0 mix-blend-color pointer-events-none"
+            style={{ backgroundColor: tint, opacity: 0.65 }}
+          />
+        )}
       </div>
     </Link>
   );
@@ -226,25 +85,24 @@ const HOME_SORT_OPTIONS = [
 ];
 
 type CatalogItem = {
-  id: string; name: string; priceVal: string; priceMinor: number;
+  id: string; slug: string; name: string; priceVal: string; priceMinor: number;
   priceLabel?: string; originalPrice?: string; img: string;
   rating: string; reviews: string; type: "single" | "bundle";
 };
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
-  const [products, setProducts] = useState<GProduct[]>([]);
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [bundles,  setBundles]  = useState<GProduct[]>([]);
   const [catFilter, setCatFilter] = useState("all");
   const [catSort, setCatSort]     = useState("newest");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [detailProduct, setDetailProduct] = useState<string | null>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setProducts(store.getProducts());
+    listActiveProducts().then(setProducts).catch(() => setProducts([]));
     setBundles(store.getBundles());
   }, []);
 
@@ -258,12 +116,15 @@ export default function HomePage() {
 
   const catalogItems = useMemo<CatalogItem[]>(() => {
     const singles: CatalogItem[] = products.map(p => ({
-      id: p.id, name: p.name, priceVal: p.priceVal, priceMinor: p.priceMinor,
-      priceLabel: p.priceLabel, img: p.img, rating: p.rating, reviews: p.reviews,
+      id: p.id, slug: p.slug, name: p.name,
+      priceVal: `Rp ${p.priceMinor.toLocaleString("id-ID")}`, priceMinor: p.priceMinor,
+      img: p.images[0]?.url ?? "",
+      rating: p.averageRating != null ? p.averageRating.toFixed(1) : "5.0",
+      reviews: String(p.reviewCount),
       type: "single",
     }));
     const bundleItems: CatalogItem[] = bundles.map(p => ({
-      id: p.id, name: p.name, priceVal: p.priceVal, priceMinor: p.priceMinor,
+      id: p.id, slug: p.slug || p.id, name: p.name, priceVal: p.priceVal, priceMinor: p.priceMinor,
       originalPrice: p.originalPrice, img: p.img, rating: p.rating, reviews: p.reviews,
       type: "bundle",
     }));
@@ -300,9 +161,9 @@ export default function HomePage() {
       <div className="w-full px-2 md:px-5 lg:px-8 xl:px-10 pt-2 md:pt-3 pb-3 md:pb-5">
         <div className="grid grid-cols-3 gap-2 md:gap-3 lg:gap-4">
 
-          <CTACard href="/skincheck" src="/coba_facescan.png"   alt="Cek Kulitmu Analisis AI"  />
-          <CTACard href="/reseller"  src="/jadi_reseller.png" alt="Jadi Reseller Ginabo"       />
-          <CTACard href="/about"     src="/belanja_tenang.png"    alt="Halal & BPOM Terdaftar"     />
+          <CTACard href="/skincheck" src="/analisawajah_edit.png" alt="Coba Analisa Wajah AI"  />
+          <CTACard href="/reseller"  src="/reseller_edit.png"     alt="Jadi Reseller Ginabo"   />
+          <CTACard href="/about"     src="/blanjatenang_edit.png" alt="Belanja Tenang - Halal & BPOM Terdaftar" tint="#6B4A8F" />
 
         </div>
       </div>
@@ -492,16 +353,14 @@ export default function HomePage() {
                 {filteredCatalog.map((p) => (
                   <ProductCard
                     key={p.id}
-                    productId={p.id}
-                    name={p.name}
-                    rating={p.rating}
-                    reviews={p.reviews}
-                    priceLabel={p.priceLabel}
-                    originalPrice={p.originalPrice}
-                    priceVal={p.priceVal}
-                    priceMinor={p.priceMinor}
-                    img={p.img}
-                    onInfoClick={setDetailProduct}
+                    product={{
+                      slug: p.slug,
+                      name: p.name.replace(/\n/g, " "),
+                      price: p.priceLabel ? `${p.priceLabel} ${p.priceVal}` : p.priceVal,
+                      originalPrice: p.originalPrice,
+                      img: p.img,
+                      rating: p.rating,
+                    }}
                   />
                 ))}
               </motion.div>
@@ -631,34 +490,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ── Product Detail Popup ── */}
-      {detailProduct && (
-        <>
-          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" onClick={() => setDetailProduct(null)} />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="fixed inset-0 z-50 m-auto h-fit w-[85vw] max-w-sm rounded-2xl p-5 sm:p-6"
-            style={{
-              background: "#ffffff",
-              border: "1px solid rgba(147,51,234,0.12)",
-              boxShadow: "0 24px 64px rgba(20,15,50,0.15)",
-            }}
-          >
-            <button
-              onClick={() => setDetailProduct(null)}
-              className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full text-[#4A1A5E]/50 transition hover:bg-[#faf5ff] hover:text-[#4A1A5E]"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-            </button>
-            <h3 className="text-lg font-bold" style={{ color: "#1e1b3a" }}>{detailProduct}</h3>
-            <p className="mt-3 text-[14px] leading-relaxed" style={{ color: "#2d2556" }}>
-              {productFullDescriptions[detailProduct] ?? "Informasi produk belum tersedia."}
-            </p>
-          </motion.div>
-        </>
-      )}
 
     </div>
   );

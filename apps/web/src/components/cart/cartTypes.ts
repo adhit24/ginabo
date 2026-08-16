@@ -5,6 +5,7 @@ export type CartItem = {
   priceMinor: number;
   currency: "IDR" | "USD";
   imageUrl: string | null;
+  weightGrams?: number | null;
   quantity: number;
 };
 

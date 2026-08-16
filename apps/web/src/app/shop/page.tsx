@@ -1,53 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
-import { store, type GProduct } from "@/lib/adminStore";
-import { useCart } from "@/components/cart/CartProvider";
-
-// ── Static product data ───────────────────────────────────────────────────────
-const STATIC_PRODUCTS = [
-  {
-    slug: "hydra-moist-gel-ultimate", name: "Hydra Moist Gel Ultimate",
-    category: "skincare", tag: "Multifungsi", rating: "4.9", reviews: "178",
-    price: "Rp 118.999", priceMinor: 118999, img: "/salmonfix.png",
-  },
-  {
-    slug: "bright-care-moisture-cream", name: "Bright & Care Moisture Cream",
-    category: "skincare", tag: "Barrier Care", rating: "4.9", reviews: "257",
-    price: "Rp 79.999", priceMinor: 79999, img: "/moistfix.png",
-  },
-  {
-    slug: "glowage-multi-active-serum", name: "GlowAge Multi-Active Serum",
-    category: "skincare", tag: "Best Seller", rating: "4.9", reviews: "387",
-    price: "Rp 89.999", priceMinor: 89999, img: "/serumfix.png",
-  },
-];
-
-const STATIC_BUNDLES = [
-  {
-    slug: "ginabo-complete-skin", name: "Ginabo Complete Skin Nutrition Set",
-    category: "bundling", tag: "50% OFF", rating: "5.0", reviews: "127",
-    price: "Rp 287.999", priceMinor: 287999, originalPrice: "Rp 575.999", img: "/essential.png",
-  },
-  {
-    slug: "repair-glow-set", name: "Repair & Glow Set",
-    category: "bundling", tag: "50% OFF", rating: "5.0", reviews: "89",
-    price: "Rp 207.999", priceMinor: 207999, originalPrice: "Rp 415.999", img: "/repair_glow.png",
-  },
-  {
-    slug: "daily-barrier-routine-set", name: "Daily Skin Barrier Set",
-    category: "bundling", tag: "50% OFF", rating: "5.0", reviews: "76",
-    price: "Rp 197.999", priceMinor: 197999, originalPrice: "Rp 395.999", img: "/skin_barrier.png",
-  },
-  {
-    slug: "bright-renewal-set", name: "Bright Renewal Set",
-    category: "bundling", tag: "50% OFF", rating: "5.0", reviews: "63",
-    price: "Rp 169.999", priceMinor: 169999, originalPrice: "Rp 339.999", img: "/bright_renewal.png",
-  },
-];
-
-type ShopProduct = typeof STATIC_PRODUCTS[0] & { originalPrice?: string };
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useShopCatalog } from "@/lib/useShopCatalog";
+import { ProductCard } from "@/components/ProductCard";
 
 const CATEGORIES = [
   { key: "all",      label: "Semua Produk" },
@@ -63,93 +20,18 @@ const SORT_OPTIONS = [
   { key: "price-hi", label: "Harga Tertinggi" },
 ];
 
-function StarRating({ rating }: { rating: string }) {
-  return (
-    <div className="flex items-center gap-1">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-      </svg>
-      <span className="text-[12px] text-[#808080]">{rating}</span>
-    </div>
-  );
-}
-
-function ProductCard({ product }: { product: ShopProduct }) {
-  const { addItem } = useCart();
-
-  function handleCart(e: React.MouseEvent) {
-    e.preventDefault();
-    addItem({
-      productId:  product.slug,
-      slug:       product.slug,
-      name:       product.name,
-      priceMinor: product.priceMinor,
-      currency:   "IDR",
-      imageUrl:   product.img,
-    });
-  }
-
-  return (
-    <Link href={`/shop/${product.slug}`} className="group flex flex-col bg-white rounded-[5px] border border-[#E2E2E2] overflow-hidden hover:shadow-[0_4px_20px_rgba(0,0,0,0.10)] transition-shadow">
-      {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-[#fafafa]">
-        <img
-          src={product.img}
-          alt={product.name}
-          className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
-        />
-        {product.tag && (
-          <span
-            className="absolute top-2 left-2 rounded-[3px] px-2 py-0.5 text-[10px] font-bold text-white"
-            style={{ background: product.tag.includes("OFF") ? "#e53e3e" : "#78257C" }}
-          >
-            {product.tag}
-          </span>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex flex-col gap-1.5 p-3 flex-1">
-        <p className="text-[11px] text-[#808080]">Ginabo</p>
-        <p className="text-[13px] font-semibold text-[#303030] leading-snug line-clamp-2">{product.name}</p>
-        <StarRating rating={product.rating} />
-        <div className="mt-auto pt-1">
-          {product.originalPrice && (
-            <p className="text-[11px] text-[#aaa] line-through">{product.originalPrice}</p>
-          )}
-          <p className="text-[14px] font-bold" style={{ color: "#78257C" }}>{product.price}</p>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
 export default function ShopPage() {
-  const [allProducts, setAllProducts] = useState<ShopProduct[]>([...STATIC_PRODUCTS, ...STATIC_BUNDLES]);
+  const allProducts = useShopCatalog();
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q") ?? "";
   const [category, setCategory]       = useState("all");
   const [sort, setSort]               = useState("newest");
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-
-  useEffect(() => {
-    const storeProds = store.getProducts().map(p => ({
-      slug: p.slug || p.id, name: p.name, category: "skincare",
-      tag: p.tag || "", rating: p.rating, reviews: p.reviews,
-      price: p.priceLabel ? `${p.priceLabel} ${p.priceVal}` : p.priceVal,
-      priceMinor: p.priceMinor, img: p.img ?? "",
-    }));
-    const storeBundles = store.getBundles().map(p => ({
-      slug: p.slug || p.id, name: p.name, category: "bundling",
-      tag: "Bundling", rating: p.rating, reviews: p.reviews,
-      price: p.priceVal, priceMinor: p.priceMinor, img: p.img ?? "",
-      originalPrice: p.originalPrice,
-    }));
-    const existingSlugs = new Set([...STATIC_PRODUCTS, ...STATIC_BUNDLES].map(p => p.slug));
-    const newProds = [...storeProds, ...storeBundles].filter(p => !existingSlugs.has(p.slug));
-    if (newProds.length > 0) setAllProducts(prev => [...prev, ...newProds]);
-  }, []);
 
   const filtered = allProducts
     .filter(p => category === "all" || p.category === category)
+    .filter(p => !searchQuery.trim() || p.name.toLowerCase().includes(searchQuery.trim().toLowerCase()))
     .sort((a, b) => {
       if (sort === "price-lo") return a.priceMinor - b.priceMinor;
       if (sort === "price-hi") return b.priceMinor - a.priceMinor;
@@ -217,16 +99,33 @@ export default function ShopPage() {
                 <span className="text-[13px] text-[#808080] hidden md:inline">{filtered.length} produk</span>
               </div>
 
-              {/* Sort */}
-              <select
-                value={sort}
-                onChange={e => setSort(e.target.value)}
-                className="border border-[#E2E2E2] rounded-[5px] px-3 py-1.5 text-[13px] text-[#303030] bg-white outline-none cursor-pointer"
-              >
-                {SORT_OPTIONS.map(o => (
-                  <option key={o.key} value={o.key}>{o.label}</option>
-                ))}
-              </select>
+              <div className="flex items-center gap-2">
+                {/* Search within shop */}
+                <div className="relative hidden sm:block">
+                  <svg width="14" height="14" fill="none" stroke="#808080" strokeWidth="2" viewBox="0 0 24 24" className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Cari produk..."
+                    className="w-40 rounded-[5px] border border-[#E2E2E2] py-1.5 pl-8 pr-3 text-[13px] text-[#303030] outline-none focus:border-[#78257C]"
+                  />
+                </div>
+
+                {/* Sort */}
+                <select
+                  value={sort}
+                  onChange={e => setSort(e.target.value)}
+                  className="border border-[#E2E2E2] rounded-[5px] px-3 py-1.5 text-[13px] text-[#303030] bg-white outline-none cursor-pointer"
+                >
+                  {SORT_OPTIONS.map(o => (
+                    <option key={o.key} value={o.key}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Product Grid */}
@@ -238,7 +137,11 @@ export default function ShopPage() {
 
             {filtered.length === 0 && (
               <div className="py-16 text-center text-[#808080]">
-                <p className="text-[15px]">Tidak ada produk dalam kategori ini.</p>
+                <p className="text-[15px]">
+                  {searchQuery.trim()
+                    ? <>Tidak ada produk untuk &ldquo;{searchQuery}&rdquo;.</>
+                    : "Tidak ada produk dalam kategori ini."}
+                </p>
               </div>
             )}
           </div>

@@ -69,8 +69,7 @@ export function SiteFooter() {
                 className="flex-1 bg-white/10 px-4 py-3 text-[13px] text-white placeholder-white/40 outline-none border-none"
               />
               <button
-                className="px-5 py-3 text-[13px] font-bold text-white flex-shrink-0 transition hover:opacity-90"
-                style={{ background: "#78257C" }}
+                className="px-5 py-3 text-[13px] font-bold text-white flex-shrink-0 transition hover:opacity-90 bg-gradient-brand"
               >
                 Subscribe
               </button>

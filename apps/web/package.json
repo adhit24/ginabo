@@ -17,9 +17,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@portabletext/react": "4.0.3",
     "@prisma/client": "^6.6.0",
-    "@sanity/client": "^7.24.0",
     "@supabase/supabase-js": "^2.108.1",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",

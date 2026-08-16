@@ -12,7 +12,7 @@
   --color-text:       #2E2A3B;
   --color-link:       #5B4B8A;
   --radius:           10px;
-  --font-main:        'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-main:        'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --safe-top: env(safe-area-inset-top);
   --safe-bottom: env(safe-area-inset-bottom);
 }

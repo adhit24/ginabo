@@ -44,7 +44,7 @@ export default {
         ink: "#1C1A17",
       },
       fontFamily: {
-        sans:        ["var(--font-poppins)", "Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        sans:        ["var(--font-outfit)", "var(--font-poppins)", "Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
         serif:       ["Montserrat", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
         display:     ["var(--font-fraunces)", "Georgia", "serif"],
         mono:        ["ui-monospace", "monospace"],
@@ -70,6 +70,7 @@ export default {
       backgroundImage: {
         "gradient-purple": "linear-gradient(135deg, #5B4B8A 0%, #7A6AD8 100%)",
         "gradient-hero":   "linear-gradient(135deg, #F8F7FB 0%, #EDE9F6 50%, #C6B7E2 100%)",
+        "gradient-brand":  "linear-gradient(135deg, #78257C 0%, #9333EA 100%)",
       },
       maxWidth: {
         "8xl": "1400px",

@@ -1,12 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { useCart } from "@/components/cart/CartProvider";
 import { AddressPicker } from "@/components/checkout/AddressPicker";
+import { PaymentMethodSelector, type PaymentMethod } from "@/components/checkout/PaymentMethodSelector";
+import JneShippingQuote from "@/components/shipping/JneShippingQuote";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
+import { authFetch } from "@/lib/supabase/client";
+import type { ShippingOption } from "@/lib/rajaongkir";
+import type { AddressRow } from "@/types/database";
+import { trackCustomerEvent } from "@/lib/analytics/events";
+
+const DEMO_PAYMENT_MODE = process.env.NEXT_PUBLIC_GINABO_DEMO_PAYMENT_MODE === "true";
 
 type CheckoutState =
   | { status: "idle" }
@@ -19,7 +27,20 @@ export default function CheckoutPage() {
   const { formatPrice } = useCurrency();
 
   const [addressId, setAddressId] = useState<string | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<AddressRow | null>(null);
+  const [shippingOption, setShippingOption] = useState<ShippingOption | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [checkoutIdempotencyKey] = useState(() => `checkout-${Date.now()}-${Math.random().toString(36).slice(2)}`);
   const [status, setStatus] = useState<CheckoutState>({ status: "idle" });
+  const packageWeight = useMemo(
+    () => Math.max(1000, cart.items.reduce((sum, item) => sum + (item.weightGrams ?? 100) * item.quantity, 0)),
+    [cart.items],
+  );
+  const handleAddressSelect = useCallback((id: string | null, address?: AddressRow) => {
+    setAddressId(id);
+    setSelectedAddress(address ?? null);
+    setShippingOption(null);
+  }, []);
 
   async function submit() {
     if (cart.items.length === 0) return;
@@ -28,19 +49,37 @@ export default function CheckoutPage() {
       return;
     }
     setStatus({ status: "submitting" });
+    trackCustomerEvent({ event_name: "checkout_started", metadata: { item_count: cart.items.length } });
     try {
-      const res = await fetch("/api/checkout", {
+      if (DEMO_PAYMENT_MODE) {
+        const orderNumber = `GNB-DEMO-${Date.now().toString().slice(-8)}`;
+        sessionStorage.setItem("ginabo_demo_payment", JSON.stringify({
+          orderNumber,
+          items: cart.items,
+          subtotal: totals.subtotalMinor,
+          shippingOption,
+          paymentMethod,
+          address: selectedAddress,
+          total: totals.subtotalMinor + (shippingOption?.cost ?? 0) + (paymentMethod?.fee ?? 0),
+        }));
+        clear();
+        router.push(`/checkout/payment?order=${orderNumber}`);
+        return;
+      }
+      const res = await authFetch("/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           items: cart.items.map((i) => ({
             product_id: i.productId,
             qty: i.quantity,
-            price: i.priceMinor,
-            name: i.name
+            variant_id: null,
           })),
           address_id: addressId,
-          shipping_cost: 0
+          shipping_courier: shippingOption?.courier_code ?? null,
+          shipping_service: shippingOption?.service ?? null,
+          payment_method: paymentMethod?.provider ?? null,
+          checkout_idempotency_key: checkoutIdempotencyKey,
         })
       });
       const json = (await res.json()) as {
@@ -53,14 +92,16 @@ export default function CheckoutPage() {
         return;
       }
       clear();
+      trackCustomerEvent({ event_name: "checkout_completed", metadata: { order_number: json.data.order_number } });
       router.push(`/order/${json.data.order_number}`);
     } catch (e) {
+      trackCustomerEvent({ event_name: "payment_failed", metadata: { stage: "checkout" } });
       setStatus({ status: "error", message: e instanceof Error ? e.message : String(e) });
     }
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-5 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
       <div className="rounded-2xl border border-gray-100 bg-white px-4 py-3">
         <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
@@ -95,13 +136,29 @@ export default function CheckoutPage() {
             <div className="flex-1">
               <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
                 <h2 className="mb-5 text-sm font-bold text-gray-900">Alamat Pengiriman</h2>
-                <AddressPicker selectedId={addressId} onSelect={setAddressId} />
+                <AddressPicker
+                  selectedId={addressId}
+                  onSelect={handleAddressSelect}
+                />
 
                 <div className="mt-6 border-t border-gray-100 pt-5">
-                  <h2 className="mb-2 text-sm font-bold text-gray-900">Metode Pembayaran</h2>
-                  <p className="rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-3 text-xs text-gray-500">
-                    Midtrans — QRIS, Virtual Account, Kartu Kredit. Kamu akan diarahkan ke halaman pembayaran setelah pesanan dibuat.
-                  </p>
+                  <h2 className="mb-3 text-sm font-bold text-gray-900">Jasa Pengiriman</h2>
+                  {selectedAddress ? (
+                    <JneShippingQuote
+                      city={selectedAddress.city}
+                      province={selectedAddress.province}
+                      weightGrams={packageWeight}
+                      onSelect={setShippingOption}
+                    />
+                  ) : (
+                    <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs text-gray-500">
+                      Pilih alamat pengiriman untuk menghitung ongkir otomatis.
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-6 border-t border-gray-100 pt-5">
+                  <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
                 </div>
 
                 {status.status === "error" && (
@@ -113,7 +170,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={submit}
-                  disabled={status.status === "submitting" || !addressId}
+                  disabled={status.status === "submitting" || !addressId || !shippingOption || !paymentMethod}
                   className="mt-6 w-full rounded-xl bg-brand-700 py-3.5 text-sm font-bold text-white transition hover:bg-brand-800 disabled:opacity-50"
                 >
                   {status.status === "submitting" ? "Memproses..." : "Buat Pesanan"}
@@ -154,11 +211,15 @@ export default function CheckoutPage() {
                   </div>
                   <div className="mt-1 flex items-center justify-between">
                     <span className="text-xs text-gray-500">Ongkir</span>
-                    <span className="text-xs font-semibold text-green-600">Gratis</span>
+                    <span className="text-xs font-semibold text-gray-700">{shippingOption ? formatPrice(shippingOption.cost) : "Pilih kurir"}</span>
+                  </div>
+                  <div className="mt-1 flex items-center justify-between">
+                    <span className="text-xs text-gray-500">Biaya pembayaran</span>
+                    <span className="text-xs font-semibold text-gray-700">{paymentMethod ? formatPrice(paymentMethod.fee) : "Pilih metode"}</span>
                   </div>
                   <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
                     <span className="text-sm font-bold text-gray-900">Total</span>
-                    <span className="text-base font-extrabold text-brand-700">{formatPrice(totals.subtotalMinor)}</span>
+                    <span className="text-base font-extrabold text-brand-700">{formatPrice(totals.subtotalMinor + (shippingOption?.cost ?? 0) + (paymentMethod?.fee ?? 0))}</span>
                   </div>
                 </div>
               </div>

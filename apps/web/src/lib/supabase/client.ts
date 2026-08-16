@@ -33,3 +33,12 @@ export function createClient() {
 
   return _browserClient
 }
+
+/** Attach the browser session token to authenticated Route Handler requests. */
+export async function authFetch(input: string, init: RequestInit = {}): Promise<Response> {
+  const client = createClient()
+  const { data: { session } } = await client.auth.getSession()
+  const headers = new Headers(init.headers)
+  if (session?.access_token) headers.set('Authorization', `Bearer ${session.access_token}`)
+  return fetch(input, { ...init, headers })
+}

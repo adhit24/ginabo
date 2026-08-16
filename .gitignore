@@ -63,6 +63,10 @@ node_modules/
 .env.local
 .env*.local
 
+# Local Supabase CLI metadata and dev logs
+supabase/.temp/
+apps/web/dev-server*.log
+
 # OS
 .DS_Store
 Thumbs.db

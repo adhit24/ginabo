@@ -11,7 +11,8 @@ export function resolveCommandCenterProvider(
   source: string | undefined,
   providers: CommandCenterProviders = { demo: getDemoCommandCenterData, live: getLiveCommandCenterData },
 ): CommandCenterProvider {
-  if (!source || source === "demo") return providers.demo;
+  if (source === "demo") return providers.demo;
+  if (!source || source === "live") return providers.live;
   if (source === "live") return providers.live;
   throw new Error(`Unsupported COMMAND_CENTER_DATA_SOURCE: ${source}`);
 }
