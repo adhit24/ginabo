@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/components/cart/CartProvider";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { useShopCatalog, ShopProduct } from "@/lib/useShopCatalog";
+import { ProductCard } from "@/components/ProductCard";
 import { trackCustomerEvent } from "@/lib/analytics/events";
 
 const EASE = [0.25, 1, 0.5, 1] as const;
@@ -718,61 +719,16 @@ export function ProductDetailClient({ product }: Props) {
             {/* Horizontal Product Cards Grid */}
             <div className="relative">
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
-                {related.map((item, idx) => (
-                  <div
-                    key={item.slug}
-                    className="flex flex-col rounded-[10px] border border-[#E5E5E5] bg-white p-3.5 hover:shadow-lg transition relative group"
-                  >
-                    {/* Discount badge */}
-                    <span className="absolute top-3 right-3 z-10 rounded-[4px] bg-[#FCE4EC] text-[#E91E63] px-2 py-0.5 text-[11px] font-bold">
-                      {idx === 0 ? "21% Off" : idx === 1 ? "31% Off" : idx === 2 ? "18% Off" : "31% Off"}
-                    </span>
-
-                    {/* Best Seller pill */}
-                    <span className="absolute top-3 left-3 z-10 rounded-[4px] bg-[#E0F2FE] text-[#0284C7] px-2 py-0.5 text-[10px] font-bold">
-                      Best Seller
-                    </span>
-
-                    {/* Product Image */}
-                    <Link href={`/shop/${item.slug}`} className="relative aspect-square w-full rounded-[8px] bg-[#FAF8FC] overflow-hidden my-3 block">
-                      <Image
-                        src={item.img || "/product-serum-1.png"}
-                        alt={item.name}
-                        fill
-                        className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
-                        sizes="260px"
-                      />
-                    </Link>
-
-                    {/* Product Info */}
-                    <div className="flex flex-col flex-1 gap-1">
-                      <Link href={`/shop/${item.slug}`} className="line-clamp-2 text-[14px] lg:text-[15px] font-bold text-[#1a1a1a] hover:text-[#8E51B8] transition leading-snug">
-                        {item.name}
-                      </Link>
-                      <div className="flex items-baseline gap-2 mt-auto pt-2">
-                        <span className="text-[15px] lg:text-[16px] font-extrabold text-[#E01E2B]">
-                          {item.price}
-                        </span>
-                        {item.originalPrice && (
-                          <span className="text-[12px] text-[#9CA3AF] line-through">
-                            {item.originalPrice}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Card Add To Cart Button */}
-                    <button
-                      onClick={() => handleAddRelatedToCart(item)}
-                      className="mt-2.5 w-full flex items-center justify-center gap-1.5 rounded-[8px] bg-[#8B7FF0] hover:bg-[#786ce0] py-2.5 text-[13px] font-bold text-white transition shadow-none"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" />
-                      </svg>
-                      <span>Add to Cart</span>
-                    </button>
-                  </div>
-                ))}
+                {related.map((item, idx) => {
+                  const tag = idx === 0 ? "21% Off" : idx === 1 ? "31% Off" : idx === 2 ? "18% Off" : "31% Off";
+                  const productWithTag = {
+                    ...item,
+                    tag,
+                  };
+                  return (
+                    <ProductCard key={item.slug} product={productWithTag} />
+                  );
+                })}
               </div>
 
               {/* Right Chevron arrow */}

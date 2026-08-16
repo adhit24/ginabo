@@ -79,8 +79,6 @@ function HomeProductCard({
 }) {
   const { addItem } = useCart();
   const cleanName = product.name.replace(/\n/g, " ");
-  const desc = productDescriptions[cleanName] ?? "Skincare ringan untuk nutrisi dan hidrasi kulit harian.";
-  const isBundle = product.type === "bundle";
   const discountPct = product.originalPrice ? 50 : 0;
 
   function handleAddToCart(e: React.MouseEvent) {
@@ -97,35 +95,18 @@ function HomeProductCard({
     }, 1);
   }
 
-  function handleInfo(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    onInfoClick(cleanName);
-  }
-
   return (
     <motion.div variants={cardSlideUp} className="h-full">
       <Link
         href={`/shop/${product.slug}`}
-        className="group flex flex-col h-full rounded-[24px] bg-white p-4 border border-[#f0e6f6] shadow-[0_6px_24px_rgba(120,37,124,0.06)] hover:shadow-[0_16px_40px_rgba(120,37,124,0.14)] transition-all duration-300 hover:-translate-y-1.5 cursor-pointer"
+        className="gnb-flat-card group flex flex-col h-full cursor-pointer"
       >
         {/* Top Image Container */}
-        <div className="relative aspect-[4/3] w-full rounded-[18px] overflow-hidden bg-[#FAF8FC]">
-          {/* Info pill on top left */}
-          <button
-            onClick={handleInfo}
-            className="absolute top-3 left-3 z-10 flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold text-white bg-[#1e1b3a]/75 backdrop-blur-md hover:bg-[#1e1b3a] transition"
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-            </svg>
-            <span>Info</span>
-          </button>
-
+        <div className="gnb-img-wrap relative aspect-[4/3] w-full bg-transparent">
           {/* Discount badge if available */}
           {discountPct > 0 && (
-            <span className="absolute top-3 right-3 z-10 rounded-md bg-[#EF4444] px-2 py-0.5 text-[11px] font-bold text-white shadow-xs">
-              -{discountPct}%
+            <span className="absolute top-3 right-3 z-10 gnb-discount-badge text-[11px] font-bold text-white shadow-xs select-none">
+              {discountPct}% Off
             </span>
           )}
 
@@ -133,7 +114,6 @@ function HomeProductCard({
             <img
               src={product.img}
               alt={cleanName}
-              className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-xs text-gray-400">
@@ -144,48 +124,32 @@ function HomeProductCard({
 
         {/* Product Details */}
         <div className="flex flex-1 flex-col gap-2 pt-3 pb-1">
+          <span className="gnb-best-seller-badge">Best Seller</span>
+          
           <h3 className="text-[16px] md:text-[17px] font-bold text-[#1e1b3a] leading-tight line-clamp-2 group-hover:text-[#7C3AED] transition">
             {cleanName}
           </h3>
 
-          <p className="text-[12px] leading-relaxed text-[#6b7280] line-clamp-2">
-            {desc}
-          </p>
-
-          {/* Stats: Rating + Sold */}
-          <div className="flex items-center gap-2 mt-auto pt-1">
-            <div className="inline-flex items-center gap-1 rounded-md bg-[#FEF3C7] px-2 py-0.5 text-[11px] font-bold text-[#D97706]">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="#D97706">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-              <span>{product.rating}</span>
-            </div>
-
-            <div className="inline-flex items-center gap-1 rounded-md bg-[#1e1b3a] px-2 py-0.5 text-[11px] font-semibold text-white">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" />
-              </svg>
-              <span>{product.reviews} terjual</span>
-            </div>
+          {/* Pricing Row */}
+          <div className="gnb-price-row mt-auto pt-2">
+            <span className="gnb-price-now">{product.priceVal}</span>
+            {product.originalPrice && (
+              <span className="gnb-price-old">{product.originalPrice}</span>
+            )}
           </div>
 
-          {/* Add to Cart / Price CTA button */}
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          {/* Add to Cart CTA button */}
+          <button
             onClick={handleAddToCart}
-            className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-[13.5px] font-bold text-white shadow-[0_4px_14px_rgba(139,92,246,0.35)] transition-all bg-gradient-to-r from-[#8b5cf6] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#6D28D9]"
+            className="gnb-cart-btn mt-2.5 flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-[13.5px] font-bold text-white"
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" />
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+              <path d="M3 6h18"></path>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
             </svg>
-            {product.originalPrice && (
-              <span className="line-through text-white/60 text-[11.5px] font-normal">
-                {product.originalPrice}
-              </span>
-            )}
-            <span>{product.priceVal}</span>
-          </motion.button>
+            <span>Add to Cart</span>
+          </button>
         </div>
       </Link>
     </motion.div>

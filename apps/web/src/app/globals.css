@@ -164,3 +164,110 @@ a {
   .social-icon,
   .nav-link { transition: none !important; }
 }
+
+/* ════════════════════════════════════════════
+    GINABO PRODUCT CARD REDESIGN (Somethinc style)
+   ════════════════════════════════════════════ */
+.gnb-flat-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.gnb-flat-card .gnb-img-wrap {
+  position: relative !important;
+  background: transparent !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.gnb-flat-card .gnb-img-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 20px !important;
+  padding: 0 !important;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.gnb-flat-card .gnb-img-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  border: 2px solid transparent;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
+  pointer-events: none;
+}
+
+.gnb-flat-card:hover {
+  transform: translateY(-6px) !important;
+}
+.gnb-flat-card:hover .gnb-img-wrap {
+  box-shadow: 0 18px 34px rgba(139, 92, 246, 0.28) !important;
+}
+.gnb-flat-card:hover .gnb-img-wrap::after {
+  border-color: rgba(139, 92, 246, 0.55);
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12);
+}
+.gnb-flat-card:hover .gnb-img-wrap img {
+  transform: scale(1.08) !important;
+}
+
+.gnb-best-seller-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  background: #DCEEFB;
+  color: #1477B8;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+
+.gnb-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 4px 0;
+}
+.gnb-price-now {
+  color: #E11D48;
+  font-size: 18px;
+  font-weight: 800;
+}
+.gnb-price-old {
+  color: #9CA3AF;
+  font-size: 13px;
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.gnb-discount-badge {
+  background: #F94A8C !important;
+  border-radius: 9999px !important;
+  padding: 4px 10px !important;
+}
+
+.gnb-cart-btn {
+  background: #8B5CF6 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  transition: transform 0.2s ease, background 0.2s ease !important;
+}
+.gnb-cart-btn:hover {
+  background: #7C3AED !important;
+}
+.gnb-flat-card:hover .gnb-cart-btn {
+  transform: translateY(-1px) !important;
+}
+
