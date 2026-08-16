@@ -48,7 +48,7 @@ const demoProducts: CatalogProduct[] = [
   },
   {
     id: "p1",
-    slug: "hydra-moist-gel-ultimate",
+    slug: "hydra-moist-gel",
     name: "Hydra Moist Gel Ultimate",
     description: "Gel 3-in-1: moisturizer, makeup prep & sleeping mask.",
     priceMinor: 120000,
@@ -136,11 +136,14 @@ export async function listActiveProducts(): Promise<CatalogProduct[]> {
     console.error("Failed to fetch products from db", e);
   }
 
-  // Always merge with demo/default products so that they are guaranteed to exist statically
+  // Only merge default SINGLE products (not bundles) into the products list
   const merged = [...dbProducts];
   for (const demo of demoProducts) {
-    if (!merged.some((p) => p.slug === demo.slug)) {
-      merged.push(demo);
+    const isBundle = demo.slug.includes("set") || demo.slug.includes("complete") || demo.slug.includes("bundle") || demo.id.startsWith("b");
+    if (!isBundle) {
+      if (!merged.some((p) => p.slug === demo.slug)) {
+        merged.push(demo);
+      }
     }
   }
   return merged;
@@ -162,7 +165,7 @@ export async function getProductBySlug(slug: string): Promise<CatalogProduct | n
     console.error("Failed to get product from db", e);
   }
 
-  // Fallback to local demo/default products
+  // Fallback to local demo/default products (both singles and bundles)
   const demo = demoProducts.find((p) => p.slug === slug);
   return demo || null;
 }

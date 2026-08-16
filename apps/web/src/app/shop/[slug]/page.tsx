@@ -6,7 +6,13 @@ import { ProductDetailClient } from "./ProductDetailClient";
 
 export async function generateStaticParams() {
   const products = await listActiveProducts();
-  return products.map((p: { slug: string }) => ({ slug: p.slug }));
+  const bundles = [
+    { slug: "ginabo-complete-skin" },
+    { slug: "repair-glow-set" },
+    { slug: "daily-barrier-routine-set" },
+    { slug: "bright-renewal-set" }
+  ];
+  return [...products, ...bundles].map((p: { slug: string }) => ({ slug: p.slug }));
 }
 
 export default async function ProductDetailPage({ params }: { params: { slug: string } }) {

@@ -40,7 +40,7 @@ export function getAdminCreds() {
 }
 
 export const DEFAULT_PRODUCTS: GProduct[] = [
-  { id: "p1", slug: "hydra-moist-gel-ultimate",   name: "Hydra Moist\nGel Ultimate",       priceVal: "Rp 120.000", priceMinor: 120000, img: "/Hydra_Moist_Gel_Ultimate.png", rating: "5.0", reviews: "127", tag: "DNA Salmon · 30ml" },
+  { id: "p1", slug: "hydra-moist-gel",            name: "Hydra Moist\nGel Ultimate",       priceVal: "Rp 120.000", priceMinor: 120000, img: "/Hydra_Moist_Gel_Ultimate.png", rating: "5.0", reviews: "127", tag: "DNA Salmon · 30ml" },
   { id: "p2", slug: "bright-care-moisture-cream", name: "Bright & Care\nMoisture Cream",  priceVal: "Rp 75.000",  priceMinor: 75000,  img: "/Bright&Care_Moisture_Cream.png",  rating: "5.0", reviews: "127", tag: "Moisturizer · 10g"  },
   { id: "p3", slug: "glowage-multi-active-serum", name: "GlowAge Multi-\nActive Serum",   priceVal: "Rp 90.000",  priceMinor: 90000,  img: "/Hydra_Moist_Gel_Ultimate&Bright_Care_Moisture_Cream.png",  rating: "5.0", reviews: "127", tag: "Serum · 30ml"       },
 ];
