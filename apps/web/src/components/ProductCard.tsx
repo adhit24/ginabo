@@ -34,11 +34,20 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       className="group flex flex-col overflow-hidden rounded-[10px] border border-brand-100 bg-white transition-shadow hover:shadow-[0_4px_20px_rgba(91,75,138,0.10)]"
     >
       <div className="relative aspect-square overflow-hidden bg-brand-50">
-        <img
-          src={product.img}
-          alt={product.name}
-          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-        />
+        {product.img ? (
+          <img
+            src={product.img}
+            alt={product.name}
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              e.currentTarget.nextElementSibling?.classList.remove("hidden");
+            }}
+          />
+        ) : null}
+        <div className={`flex h-full w-full items-center justify-center text-[12px] text-gray-300 ${product.img ? "hidden" : ""}`}>
+          Belum ada foto
+        </div>
         {product.tag && (
           <span
             className={`absolute left-2 top-2 rounded-[3px] px-2 py-0.5 text-[10px] font-bold text-white ${
