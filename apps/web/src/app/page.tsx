@@ -110,7 +110,7 @@ function HomeProductCard({
         <div className="flex flex-1 flex-col gap-2 pt-3 pb-1">
           <span className="gnb-best-seller-badge">Best Seller</span>
           
-          <h3 className="text-[16px] md:text-[17px] font-bold text-[#1e1b3a] leading-tight line-clamp-2 group-hover:text-[#7C3AED] transition">
+          <h3 className="text-[13.5px] md:text-[17px] font-bold text-[#1e1b3a] leading-tight line-clamp-2 group-hover:text-[#7C3AED] transition">
             {cleanName}
           </h3>
 
@@ -407,7 +407,7 @@ export default function HomePage() {
                   <>
                     {/* Row 1: Singles (3 products) */}
                     <div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5 md:gap-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 md:gap-6">
                         {filteredCatalog
                           .filter((p) => p.type === "single")
                           .map((p) => (
@@ -422,7 +422,7 @@ export default function HomePage() {
 
                     {/* Row 2: Bundles (4 products) */}
                     <div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                         {filteredCatalog
                           .filter((p) => p.type === "bundle")
                           .map((p) => (
@@ -436,7 +436,7 @@ export default function HomePage() {
                     </div>
                   </>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                     {filteredCatalog.map((p) => (
                       <HomeProductCard
                         key={p.id}

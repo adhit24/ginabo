@@ -245,14 +245,24 @@ a {
 }
 .gnb-price-now {
   color: #E11D48;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 800;
+}
+@media (min-width: 768px) {
+  .gnb-price-now {
+    font-size: 18px;
+  }
 }
 .gnb-price-old {
   color: #9CA3AF;
-  font-size: 13px;
+  font-size: 11px;
   text-decoration: line-through;
   font-weight: 500;
+}
+@media (min-width: 768px) {
+  .gnb-price-old {
+    font-size: 13px;
+  }
 }
 
 .gnb-discount-badge {
