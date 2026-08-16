@@ -221,7 +221,7 @@ a {
   box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12);
 }
 .gnb-flat-card:hover .gnb-img-wrap img {
-  transform: scale(1.46) !important;
+  transform: scale(1.20) !important;
 }
 
 .gnb-best-seller-badge {
