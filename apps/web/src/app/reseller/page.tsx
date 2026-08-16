@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { TIERS, TIER_ORDER, fmtRp, partnerPrice, useResellerTier } from "@/components/reseller/ResellerTierProvider";
@@ -52,81 +53,6 @@ function waLink() {
 
 // ─── SVG ICON COMPONENTS ─────────────────────────────────────────────────────
 const icons = {
-  money: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-    </svg>
-  ),
-  megaphone: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 11l18-5v12L3 13v-2z" /><path d="M11.6 16.8a3 3 0 0 1-5.8-1.6" />
-    </svg>
-  ),
-  star: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  ),
-  heart: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" />
-    </svg>
-  ),
-  shieldCheck: (
-    <svg className="h-[17px] w-[17px]" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3l7 3v6c0 4.4-3 8-7 9-4-1-7-4.6-7-9V6z" /><path d="M9 12l2 2 4-4" />
-    </svg>
-  ),
-  percent: (
-    <svg className="h-[17px] w-[17px]" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <line x1="19" y1="5" x2="5" y2="19" /><circle cx="7.5" cy="7.5" r="2.5" /><circle cx="16.5" cy="16.5" r="2.5" />
-    </svg>
-  ),
-  headset: (
-    <svg className="h-[17px] w-[17px]" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 15v-3a8 8 0 0 1 16 0v3" /><rect x="2" y="14" width="4" height="6" rx="1.6" /><rect x="18" y="14" width="4" height="6" rx="1.6" />
-    </svg>
-  ),
-  users: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-    </svg>
-  ),
-  trending: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3 17l6-6 4 4 7-7" /><path d="M14 8h6v6" />
-    </svg>
-  ),
-  clock: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" />
-    </svg>
-  ),
-  box: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M4 7h16v11H4z" /><path d="M4 11h16" /><circle cx="8" cy="14.5" r="1.2" />
-    </svg>
-  ),
-  sports: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" /><path d="M4.93 4.93l14.14 14.14" /><path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
-    </svg>
-  ),
-  gift: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <polyline points="20 12 20 22 4 22 4 12" /><rect x="2" y="7" width="20" height="5" /><line x1="12" y1="22" x2="12" y2="7" /><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
-    </svg>
-  ),
-  plane: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M17.8 19.2 16 11l3.5-3.5a1.5 1.5 0 0 0-2.1-2.1L14 9 5.8 7.2a.5.5 0 0 0-.4.9l6 4-2.5 2.5H5l-1.6 1.6 3 1 1 3L8 21v-4.9l2.5-2.5 4 6a.5.5 0 0 0 .9-.4z" />
-    </svg>
-  ),
-  award: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="8" r="6" /><path d="M8.2 13.5 7 22l5-3 5 3-1.2-8.5" />
-    </svg>
-  ),
   check: (
     <svg className="mt-0.5 h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden="true">
       <polyline points="20 6 9 17 4 12" />
@@ -147,24 +73,18 @@ const icons = {
 
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 
-const heroFacts = [
-  { icon: icons.shieldCheck, label: "Produk Berkualitas" },
-  { icon: icons.percent, label: "Margin Menarik" },
-  { icon: icons.headset, label: "Dukungan Sepenuh Hati" },
-];
-
 const stats = [
-  { value: "500+", label: "Reseller aktif", icon: icons.users },
-  { value: "40%", label: "Margin hingga", icon: icons.trending },
-  { value: "1×24 Jam", label: "Approval cepat", icon: icons.clock },
-  { value: "Rp0", label: "Biaya pendaftaran", icon: icons.box },
+  { value: "500+", label: "Reseller aktif" },
+  { value: "40%", label: "Margin hingga" },
+  { value: "1×24 Jam", label: "Approval cepat" },
+  { value: "Rp0", label: "Biaya pendaftaran" },
 ];
 
 const benefits = [
-  { icon: icons.money, title: "Margin yang sehat", desc: "Dapatkan margin hingga 40% di setiap penjualan dengan harga grosir terbaik." },
-  { icon: icons.megaphone, title: "Marketing support", desc: "Kami sediakan materi promosi, konten digital, dan tips jualan siap pakai." },
-  { icon: icons.star, title: "Partner rewards", desc: "Raih poin dan benefit eksklusif seiring pertumbuhan performa bisnismu." },
-  { icon: icons.heart, title: "Support berkelanjutan", desc: "Tim kami siap mendampingi kamu di setiap langkah perjalanan bisnismu." },
+  { title: "Margin yang sehat", desc: "Dapatkan margin hingga 40% di setiap penjualan dengan harga grosir terbaik." },
+  { title: "Marketing support", desc: "Kami sediakan materi promosi, konten digital, dan tips jualan siap pakai." },
+  { title: "Partner rewards", desc: "Raih poin dan benefit eksklusif seiring pertumbuhan performa bisnismu." },
+  { title: "Support berkelanjutan", desc: "Tim kami siap mendampingi kamu di setiap langkah perjalanan bisnismu." },
 ];
 
 const tierVisuals = {
@@ -202,14 +122,6 @@ const steps = [
   { n: "2", title: "Verifikasi", desc: "Tim kami verifikasi data kamu (1×24 jam)." },
   { n: "3", title: "Starter Order", desc: "Pilih tier dan lakukan starter order." },
   { n: "4", title: "Grow", desc: "Mulai jualan dan dapatkan support untuk bertumbuh." },
-];
-
-const rewardCategories = [
-  { icon: icons.star, title: "Poin Penjualan", desc: "Kumpulkan poin dari setiap transaksi." },
-  { icon: icons.money, title: "Cashback", desc: "Dapatkan cashback sesuai pencapaian target." },
-  { icon: icons.gift, title: "Bonus Exclusive", desc: "Bonus tambahan di event spesial & launching." },
-  { icon: icons.plane, title: "Trip & Gathering", desc: "Kesempatan ikut trip & gathering eksklusif." },
-  { icon: icons.award, title: "Hadiah Eksklusif", desc: "Raih hadiah menarik dari Ginabo." },
 ];
 
 const products = [
@@ -287,83 +199,43 @@ export default function ResellerProgramPage() {
   return (
     <div className="bg-white text-[#2a2a2a]">
 
-      {/* ══ 1. HERO — full-bleed banner-hero.png ═════════════════════════════ */}
-      <section
-        aria-labelledby="hero-heading"
-        className="relative flex min-h-[400px] items-center overflow-hidden bg-cover bg-[right_center] px-6 py-[210px] md:aspect-[1916/821] md:bg-[right_center] md:py-0 md:[background-size:150%_auto] md:[background-position:72%_top] lg:bg-cover lg:bg-[right_center]"
-        style={{ backgroundColor: "#c3a7d8", backgroundImage: "url(/hero/banner-hero.png)" }}
-      >
-        <div className="relative mx-auto flex w-full max-w-6xl flex-wrap items-center gap-6 px-5">
-          <div className="w-full min-w-[320px] md:w-[42%] md:max-w-[520px]">
-            <span
-              className="inline-flex items-center gap-2 rounded-full px-[18px] py-[9px] text-[13px] font-bold"
-              style={{ background: "rgba(255,255,255,.78)", color: "#6D28D9" }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9.5" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-              </svg>
-              Program Reseller Ginabo
-            </span>
-            <h1
-              id="hero-heading"
-              className="mt-3 text-[clamp(30px,3.9vw,52px)] font-extrabold leading-[1.1] tracking-[-.02em]"
-              style={{ color: "#241338" }}
-            >
-              Bangun bisnis<br /><span style={{ color: "#7C3AED" }}>beauty-mu</span><br />bersama Ginabo.
-            </h1>
-            <p className="mt-3 max-w-[400px] text-[clamp(12px,1.12vw,15px)] font-medium leading-[1.7]" style={{ color: "#5b4b72" }}>
-              Dapatkan produk berkualitas, margin menarik, dan dukungan penuh untuk tumbuh bersama Ginabo di seluruh Indonesia.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/reseller/register"
-                className="inline-flex min-h-[42px] items-center gap-2.5 rounded-2xl px-6 text-[14.5px] font-bold text-white transition hover:opacity-90"
-                style={{ background: "linear-gradient(135deg,#6D28D9,#9333EA)", boxShadow: "0 12px 30px rgba(109,40,217,.34)" }}
-              >
-                Gabung Jadi Reseller
-                <span className="flex h-6 w-6 items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,.22)" }}>
-                  {icons.arrowRight}
-                </span>
-              </Link>
-              <a
-                href="#program"
-                className="inline-flex min-h-[42px] items-center gap-2.5 rounded-2xl bg-white px-6 text-[14.5px] font-bold"
-                style={{ color: "#6D28D9", boxShadow: "0 8px 22px rgba(60,29,105,.12)" }}
-              >
-                Pelajari Program
-                <span className="flex h-6 w-6 items-center justify-center rounded-full" style={{ background: "#F1E9FD" }}>
-                  {icons.arrowRight}
-                </span>
-              </a>
-            </div>
-            <ul className="mt-6 flex flex-wrap items-center gap-x-[22px] gap-y-3">
-              {heroFacts.map((f, i) => (
-                <li key={f.label} className="flex items-center gap-2.5">
-                  {i > 0 && <span className="hidden h-[34px] w-px sm:block" style={{ background: "rgba(109,40,217,.18)" }} />}
-                  <span className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full" style={{ border: "1px solid rgba(109,40,217,.28)", color: "#6D28D9" }}>
-                    {f.icon}
-                  </span>
-                  <span className="text-[13px] font-medium leading-[1.35]" style={{ color: "#4a3b60" }}>{f.label}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="ml-auto grid w-full grid-cols-2 gap-2.5 md:flex md:w-[210px] md:flex-col">
-            {stats.map((s) => (
-              <div key={s.label} className="flex items-center gap-3.5 rounded-2xl bg-white px-4 py-3" style={{ boxShadow: "0 12px 30px rgba(60,29,105,.14)" }}>
-                <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-xl" style={{ background: "#F4EEFD" }}>
-                  {s.icon}
-                </span>
-                <span>
-                  <b className="block text-[19px] font-extrabold leading-[1.1]" style={{ color: "#241338" }}>{s.value}</b>
-                  <span className="block whitespace-nowrap text-[12px] font-medium" style={{ color: "#7b6b90" }}>{s.label}</span>
-                </span>
-              </div>
-            ))}
-          </div>
+      {/* ══ 1. HERO — plain banner, same treatment as homepage HeroBanner ═══ */}
+      <h1 className="sr-only">Program Reseller Ginabo</h1>
+      <div className="w-full md:px-5 lg:px-8 xl:px-10 md:pt-3">
+        <div className="relative aspect-[3/1] w-full overflow-hidden md:rounded-2xl">
+          <Image
+            src="/hero/banner-hero.png"
+            alt="Bangun bisnis beauty-mu bersama Ginabo — Program Reseller Ginabo"
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
         </div>
-      </section>
+      </div>
+
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3 px-5 py-5">
+        <Link
+          href="/reseller/register"
+          className="inline-flex min-h-[42px] items-center gap-2.5 rounded-2xl px-6 text-[14.5px] font-bold text-white transition hover:opacity-90"
+          style={{ background: "linear-gradient(135deg,#6D28D9,#9333EA)", boxShadow: "0 12px 30px rgba(109,40,217,.34)" }}
+        >
+          Gabung Jadi Reseller
+          <span className="flex h-6 w-6 items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,.22)" }}>
+            {icons.arrowRight}
+          </span>
+        </Link>
+        <a
+          href="#program"
+          className="inline-flex min-h-[42px] items-center gap-2.5 rounded-2xl bg-white px-6 text-[14.5px] font-bold"
+          style={{ color: "#6D28D9", boxShadow: "0 8px 22px rgba(60,29,105,.12)" }}
+        >
+          Pelajari Program
+          <span className="flex h-6 w-6 items-center justify-center rounded-full" style={{ background: "#F1E9FD" }}>
+            {icons.arrowRight}
+          </span>
+        </a>
+      </div>
 
       {/* ══ 2. STATS BAR ═════════════════════════════════════════════════════ */}
       <section aria-label="Statistik program" style={{ background: "linear-gradient(135deg, #9333EA 0%, #7C3AED 100%)" }}>
@@ -384,7 +256,7 @@ export default function ResellerProgramPage() {
       </section>
 
       {/* ══ 3. BENEFITS ══════════════════════════════════════════════════════ */}
-      <section id="benefit" aria-labelledby="benefits-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
+      <section id="benefit" aria-labelledby="benefits-heading" className="py-10 md:py-14" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading id="benefits-heading" label="Benefit Partner" title="Lebih dari sekadar menjual skincare" />
 
@@ -398,20 +270,12 @@ export default function ResellerProgramPage() {
                 key={b.title}
                 variants={fadeUp}
                 whileHover={{ y: -4 }}
-                className="group flex flex-col gap-3 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                className="flex flex-col gap-1.5 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                 style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
                 role="listitem"
               >
-                <div
-                  className="flex h-11 w-11 items-center justify-center rounded-xl text-white transition-transform group-hover:scale-105"
-                  style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
-                >
-                  {b.icon}
-                </div>
-                <div>
-                  <h3 className="text-[14px] font-extrabold" style={{ color: "#4A1A5E" }}>{b.title}</h3>
-                  <p className="mt-1.5 text-[12.5px] leading-relaxed text-[#5a4a6a]">{b.desc}</p>
-                </div>
+                <h3 className="text-[14px] font-extrabold" style={{ color: "#4A1A5E" }}>{b.title}</h3>
+                <p className="text-[12.5px] leading-relaxed text-[#5a4a6a]">{b.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -419,7 +283,7 @@ export default function ResellerProgramPage() {
       </section>
 
       {/* ══ 4. PROFIT SIMULATOR ══════════════════════════════════════════════ */}
-      <section aria-labelledby="simulator-heading" className="pb-16 md:pb-24" style={{ background: "#ffffff" }}>
+      <section aria-labelledby="simulator-heading" className="pb-10 md:pb-14" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <Reveal
             className="grid items-center gap-6 rounded-3xl p-6 md:grid-cols-[1fr_1fr_1fr] md:p-9"
@@ -465,7 +329,7 @@ export default function ResellerProgramPage() {
       </section>
 
       {/* ══ 5. TIERS ═════════════════════════════════════════════════════════ */}
-      <section id="tier" aria-labelledby="tiers-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
+      <section id="tier" aria-labelledby="tiers-heading" className="py-10 md:py-14" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading
             id="tiers-heading"
@@ -540,7 +404,7 @@ export default function ResellerProgramPage() {
       </section>
 
       {/* ══ 6. HOW IT WORKS ══════════════════════════════════════════════════ */}
-      <section id="program" aria-labelledby="steps-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
+      <section id="program" aria-labelledby="steps-heading" className="py-10 md:py-14" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading id="steps-heading" label="Cara Gabung" title="4 langkah mudah jadi partner" />
 
@@ -571,54 +435,8 @@ export default function ResellerProgramPage() {
         </div>
       </section>
 
-      {/* ══ 7. REWARD & BENEFIT PROGRESSION ══════════════════════════════════ */}
-      <section aria-labelledby="rewards-heading" className="py-16 md:py-20" style={{ background: "linear-gradient(160deg,#2A1244,#1E0D33)" }}>
-        <div className="mx-auto max-w-6xl px-5">
-          <SectionHeading
-            tone="dark"
-            id="rewards-heading"
-            label="Reward & Benefit"
-            title="Bisnismu tumbuh. Benefit-mu ikut bertumbuh."
-          />
-
-          <Reveal className="mx-auto mb-10 flex max-w-2xl flex-wrap items-center gap-2">
-            <span className="rounded-full px-4 py-1.5 text-[12px] font-bold text-white" style={{ background: "linear-gradient(135deg,#8B5CF6,#A855F7)" }}>Starter</span>
-            <span className="h-0.5 flex-1" style={{ background: "linear-gradient(90deg,#8B5CF6,#A855F7)" }} />
-            <span className="rounded-full px-4 py-1.5 text-[12px] font-bold text-white" style={{ background: "linear-gradient(135deg,#8B5CF6,#A855F7)" }}>Growth</span>
-            <span className="h-0.5 flex-1" style={{ background: "linear-gradient(90deg,#A855F7,#C79A3A)" }} />
-            <span className="rounded-full px-4 py-1.5 text-[12px] font-bold text-[#2A1244]" style={{ background: "linear-gradient(135deg,#C79A3A,#E0B75A)" }}>Premier</span>
-            <span className="h-0.5 flex-1" style={{ background: "linear-gradient(90deg,#C79A3A,rgba(255,255,255,.25))" }} />
-            <span className="rounded-full border border-white/25 px-4 py-1.5 text-[12px] font-bold text-white/75">Elite</span>
-          </Reveal>
-
-          <motion.div
-            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
-            className="grid grid-cols-2 gap-3.5 lg:grid-cols-5"
-          >
-            {rewardCategories.map((r) => (
-              <motion.div key={r.title} variants={fadeUp} className="rounded-[15px] p-5" style={{ background: "rgba(255,255,255,.045)", border: "1px solid rgba(255,255,255,.11)" }}>
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg text-white" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
-                  {r.icon}
-                </span>
-                <b className="mt-3.5 block text-[13.5px] font-bold text-white">{r.title}</b>
-                <p className="mt-1.5 text-[11.5px] leading-relaxed text-white/60">{r.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ══ 8. PRODUCTS — banner-produk.png ══════════════════════════════════ */}
-      <section aria-labelledby="products-heading" className="px-[34px] py-11" style={{ background: "linear-gradient(160deg,#F3EDFC,#EDE4FA)" }}>
-        <h2 id="products-heading" className="sr-only">Skincare berkualitas, mudah dijual</h2>
-        <Reveal className="mx-auto max-w-6xl">
-          {/* eslint-disable-next-line @next/next/no-img-element -- single full-bleed marketing banner with baked-in copy, not a next/image candidate */}
-          <img src="/hero/banner-produk.png" alt="Skincare berkualitas, mudah dijual: GlowAge Multi Active Serum, Bright & Care Moisture Cream, Hydra Moist Gel Ultimate" width={1928} height={816} className="h-auto w-full object-contain" />
-        </Reveal>
-      </section>
-
       {/* ══ 9. PRICE COMPARISON ══════════════════════════════════════════════ */}
-      <section aria-labelledby="price-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
+      <section aria-labelledby="price-heading" className="py-10 md:py-14" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading id="price-heading" label="Harga Partner" title="Selisih harga yang jadi keuntunganmu" desc={`Contoh perhitungan untuk tier ${picked.short} (margin ${Math.round(picked.rate * 100)}%).`} />
 
@@ -649,7 +467,7 @@ export default function ResellerProgramPage() {
       </section>
 
       {/* ══ 10. TESTIMONIALS ═════════════════════════════════════════════════ */}
-      <section aria-labelledby="testimonials-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
+      <section aria-labelledby="testimonials-heading" className="py-10 md:py-14" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading
             center={false}
@@ -697,7 +515,7 @@ export default function ResellerProgramPage() {
       </section>
 
       {/* ══ 11. FAQ ══════════════════════════════════════════════════════════ */}
-      <section id="faq" aria-labelledby="faq-heading" className="pb-16 md:pb-24" style={{ background: "#ffffff" }}>
+      <section id="faq" aria-labelledby="faq-heading" className="pb-10 md:pb-14" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading
             center={false}
@@ -743,7 +561,7 @@ export default function ResellerProgramPage() {
       {/* ══ 12. FINAL CTA ════════════════════════════════════════════════════ */}
       <section
         aria-labelledby="cta-heading"
-        className="relative overflow-hidden py-16 md:py-20"
+        className="relative overflow-hidden py-12 md:py-16"
         style={{ background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 55%, #8b5cf6 100%)" }}
       >
         <div
