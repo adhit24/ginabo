@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ClientsSection } from "@/components/ui/testimonial-card";
+import ResellerBenefitCard from "@/components/ui/reseller-benefit-card";
 import { useState } from "react";
 import { TIERS, TIER_ORDER, fmtRp, partnerPrice, useResellerTier } from "@/components/reseller/ResellerTierProvider";
 
@@ -129,11 +130,23 @@ const stats = [
   { value: "Rp0", label: "Biaya pendaftaran" },
 ];
 
-const benefits = [
-  { title: "Margin yang sehat", desc: "Dapatkan margin hingga 40% di setiap penjualan dengan harga grosir terbaik." },
-  { title: "Marketing support", desc: "Kami sediakan materi promosi, konten digital, dan tips jualan siap pakai." },
-  { title: "Partner rewards", desc: "Raih poin dan benefit eksklusif seiring pertumbuhan performa bisnismu." },
-  { title: "Support berkelanjutan", desc: "Tim kami siap mendampingi kamu di setiap langkah perjalanan bisnismu." },
+const benefitCards = [
+  {
+    imageSrc: "/images/reseller/margin.webp",
+    alt: "Margin Keuntungan Reseller Ginabo",
+  },
+  {
+    imageSrc: "/images/reseller/marketing-support.webp",
+    alt: "Dukungan Marketing Reseller Ginabo",
+  },
+  {
+    imageSrc: "/images/reseller/partner-rewards.webp",
+    alt: "Reward Partner Reseller Ginabo",
+  },
+  {
+    imageSrc: "/images/reseller/support.webp",
+    alt: "Support Berkelanjutan Reseller Ginabo",
+  },
 ];
 
 const tierVisuals = {
@@ -410,29 +423,19 @@ export default function ResellerProgramPage() {
       </section>
 
       {/* ══ 3. BENEFITS ══════════════════════════════════════════════════════ */}
-      <section id="benefit" aria-labelledby="benefits-heading" className="py-10 md:py-14" style={{ background: "#ffffff" }}>
-        <div className="mx-auto max-w-6xl px-5">
+      <section id="benefit" aria-labelledby="benefits-heading" className="py-12 md:py-16 bg-white">
+        <div className="mx-auto max-w-7xl px-5">
           <SectionHeading id="benefits-heading" label="Benefit Partner" title="Lebih dari sekadar menjual skincare" />
 
-          <motion.div
-            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
-            className="grid grid-cols-2 gap-3 lg:grid-cols-4"
-            role="list"
-          >
-            {benefits.map((b) => (
-              <motion.div
-                key={b.title}
-                variants={fadeUp}
-                whileHover={{ y: -4 }}
-                className="flex flex-col gap-1.5 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-                style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
-                role="listitem"
-              >
-                <h3 className="text-[14px] font-extrabold" style={{ color: "#4A1A5E" }}>{b.title}</h3>
-                <p className="text-[12.5px] leading-relaxed text-[#5a4a6a]">{b.desc}</p>
-              </motion.div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 md:gap-8 justify-items-center">
+            {benefitCards.map((card) => (
+              <ResellerBenefitCard
+                key={card.imageSrc}
+                imageSrc={card.imageSrc}
+                alt={card.alt}
+              />
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
