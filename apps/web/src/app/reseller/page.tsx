@@ -424,10 +424,10 @@ export default function ResellerProgramPage() {
 
       {/* ══ 3. BENEFITS ══════════════════════════════════════════════════════ */}
       <section id="benefit" aria-labelledby="benefits-heading" className="py-12 md:py-16 bg-white">
-        <div className="mx-auto max-w-7xl px-5">
+        <div className="mx-auto max-w-5xl px-5">
           <SectionHeading id="benefits-heading" label="Benefit Partner" title="Lebih dari sekadar menjual skincare" />
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 justify-items-center">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 justify-items-center">
             {benefitCards.map((card) => (
               <ResellerBenefitCard
                 key={card.imageSrc}
