@@ -427,7 +427,7 @@ export default function ResellerProgramPage() {
         <div className="mx-auto max-w-7xl px-5">
           <SectionHeading id="benefits-heading" label="Benefit Partner" title="Lebih dari sekadar menjual skincare" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 md:gap-8 justify-items-center">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 justify-items-center">
             {benefitCards.map((card) => (
               <ResellerBenefitCard
                 key={card.imageSrc}
