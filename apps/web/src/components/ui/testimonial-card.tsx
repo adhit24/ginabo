@@ -53,9 +53,9 @@ const StickyTestimonialCard = ({ testimonial, index }: { testimonial: Testimonia
   return (
     <motion.div
       style={{
-        "--sticky-top": `${70 + index * 20}px`, // Compact stack offset for both mobile and desktop
-      } as React.CSSProperties}
-      className="sticky top-[var(--sticky-top)] w-full"
+        top: `${70 + index * 20}px`, // Applied directly via inline style for bulletproof cross-browser/mobile support
+      }}
+      className="sticky w-full z-10"
     >
       <div className={cn(
         "p-4 md:p-6 rounded-xl md:rounded-2xl shadow-lg flex flex-col h-auto w-full",
