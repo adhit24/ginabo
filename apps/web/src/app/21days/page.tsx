@@ -94,35 +94,7 @@ export default function Journey21Page() {
   return (
     <div className={`${playfair.variable} ${plusJakarta.variable} bg-[#fcf9f8] text-[#1c1b1b] min-h-screen selection:bg-[#3a1078]/10 selection:text-[#3a1078]`}>
       
-      {/* ─── 1. STICKY HEADER ───────────────────────────────────────────────── */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#fcf9f8]/85 backdrop-blur-md border-b border-[#ccc3d3]/30">
-        <div className="max-w-[1280px] mx-auto px-6 md:px-10 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold font-serif text-[#3a1078]">Ginabo</span>
-            <span className="bg-[#3a1078]/10 text-[#3a1078] text-[9px] font-bold tracking-[0.15em] px-2 py-0.5 rounded-full uppercase">21 DAYS</span>
-          </Link>
 
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#cara-kerja" className="text-xs font-semibold uppercase tracking-[0.1em] text-[#4a4451] hover:text-[#3a1078] transition-colors">Cara Kerja</a>
-            <a href="#produk" className="text-xs font-semibold uppercase tracking-[0.1em] text-[#4a4451] hover:text-[#3a1078] transition-colors">Produk</a>
-            <a href="#timeline" className="text-xs font-semibold uppercase tracking-[0.1em] text-[#4a4451] hover:text-[#3a1078] transition-colors">Timeline</a>
-            <a href="#testimoni" className="text-xs font-semibold uppercase tracking-[0.1em] text-[#4a4451] hover:text-[#3a1078] transition-colors">Testimoni</a>
-            <a href="#faq" className="text-xs font-semibold uppercase tracking-[0.1em] text-[#4a4451] hover:text-[#3a1078] transition-colors">FAQ</a>
-          </nav>
-
-          <div>
-            <a 
-              href="#join-section" 
-              className="bg-[#3a1078] hover:opacity-90 transition-opacity text-white text-xs font-bold uppercase tracking-[0.1em] px-6 h-10 rounded-full inline-flex items-center"
-            >
-              Gabung Program
-            </a>
-          </div>
-        </div>
-      </header>
-
-      {/* spacer to prevent content shift */}
-      <div className="h-20" />
 
       {/* ─── 2. HERO SECTION ────────────────────────────────────────────────── */}
       <section className="max-w-[1280px] mx-auto px-6 md:px-10 py-16 md:py-24">
@@ -633,55 +605,7 @@ export default function Journey21Page() {
         </div>
       </section>
 
-      {/* ─── 9. FOOTER ──────────────────────────────────────────────────────── */}
-      <footer className="bg-white border-t border-[#ccc3d3]/30 py-16">
-        <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-            
-            <div className="space-y-4">
-              <span className="text-lg font-bold font-serif text-[#3a1078]">Ginabo</span>
-              <p className="text-xs text-[#71717a] leading-relaxed">
-                Program skincare 21 hari yang fokus memberikan nutrisi mendalam secara bertahap & aman bagi skin barrier Anda.
-              </p>
-            </div>
 
-            <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3a1078] mb-4">Navigasi</h4>
-              <ul className="space-y-2 text-xs">
-                <li><a href="#cara-kerja" className="text-[#71717a] hover:text-[#3a1078]">Cara Kerja</a></li>
-                <li><a href="#produk" className="text-[#71717a] hover:text-[#3a1078]">Produk</a></li>
-                <li><a href="#timeline" className="text-[#71717a] hover:text-[#3a1078]">Timeline</a></li>
-                <li><a href="#testimoni" className="text-[#71717a] hover:text-[#3a1078]">Testimoni</a></li>
-                <li><a href="#faq" className="text-[#71717a] hover:text-[#3a1078]">FAQ</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3a1078] mb-4">Kebijakan</h4>
-              <ul className="space-y-2 text-xs">
-                <li><Link href="/privacy" className="text-[#71717a] hover:text-[#3a1078]">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="text-[#71717a] hover:text-[#3a1078]">Terms & Conditions</Link></li>
-                <li><Link href="/legal" className="text-[#71717a] hover:text-[#3a1078]">Refund Policy</Link></li>
-              </ul>
-            </div>
-
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3a1078] mb-4">Ikuti Kami</h4>
-              <div className="flex gap-4">
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-[#71717a] hover:text-[#3a1078] text-sm">Instagram</a>
-                <a href="https://tiktok.com" target="_blank" rel="noreferrer" className="text-[#71717a] hover:text-[#3a1078] text-sm">TikTok</a>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer" className="text-[#71717a] hover:text-[#3a1078] text-sm">YouTube</a>
-              </div>
-            </div>
-
-          </div>
-
-          <div className="pt-8 border-t border-[#ccc3d3]/20 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] text-[#71717a]">
-            <p>© 2024 Ginabo. All rights reserved.</p>
-            <p>Made with ❤️ for healthy skin.</p>
-          </div>
-        </div>
-      </footer>
 
     </div>
   );
