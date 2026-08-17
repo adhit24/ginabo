@@ -153,7 +153,7 @@ export const ClientsSection = ({
         </div>
 
         {/* Right Column: Sticky cards stack with bottom padding to cleanly scroll away */}
-        <div className="relative flex flex-col gap-6 w-full pb-[40vh] lg:pb-[50vh]">
+        <div className="relative flex flex-col gap-6 w-full pb-12 lg:pb-[50vh]">
           {testimonials.map((testimonial, index) => (
             <StickyTestimonialCard
               key={testimonial.name}
