@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ClientsSection } from "@/components/ui/testimonial-card";
+import { useState } from "react";
+import { TIERS, TIER_ORDER, fmtRp, partnerPrice, useResellerTier } from "@/components/reseller/ResellerTierProvider";
 
 // ─── MOTION TOKENS ────────────────────────────────────────────────────────────
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -16,10 +18,11 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.06, delayChildren: 0.04 } },
 };
 
-function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+function Reveal({ children, delay = 0, className = "", style }: { children: React.ReactNode; delay?: number; className?: string; style?: React.CSSProperties }) {
   return (
     <motion.div
       className={className}
+      style={style}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-60px" }}
@@ -33,11 +36,11 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
   );
 }
 
-function SectionLabel({ children, center = false }: { children: React.ReactNode; center?: boolean }) {
+function SectionLabel({ children, tone = "light" }: { children: React.ReactNode; tone?: "light" | "dark" }) {
   return (
     <span
-      className={`mb-4 inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white ${center ? "" : ""}`}
-      style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
+      className="mb-4 inline-block rounded-lg px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-white"
+      style={tone === "light" ? { background: "linear-gradient(135deg, #9333EA, #7C3AED)" } : { background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.25)" }}
     >
       {children}
     </span>
@@ -51,66 +54,6 @@ function waLink() {
 
 // ─── SVG ICON COMPONENTS ─────────────────────────────────────────────────────
 const icons = {
-  money: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-    </svg>
-  ),
-  confused: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" /><path d="M8 15s1.5-2 4-2 4 2 4 2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" />
-    </svg>
-  ),
-  noSignal: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <line x1="1" y1="1" x2="23" y2="23" /><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" /><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" /><path d="M10.71 5.05A16 16 0 0 1 22.56 9" /><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" /><path d="M8.53 16.11a6 6 0 0 1 6.95 0" /><line x1="12" y1="20" x2="12.01" y2="20" />
-    </svg>
-  ),
-  alone: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-    </svg>
-  ),
-  margin: (
-    <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-    </svg>
-  ),
-  star: (
-    <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  ),
-  graduation: (
-    <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" />
-    </svg>
-  ),
-  gift: (
-    <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <polyline points="20 12 20 22 4 22 4 12" /><rect x="2" y="7" width="20" height="5" /><line x1="12" y1="22" x2="12" y2="7" /><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
-    </svg>
-  ),
-  sports: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" /><path d="M4.93 4.93l14.14 14.14" /><path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
-    </svg>
-  ),
-  zap: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </svg>
-  ),
-  globe: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-    </svg>
-  ),
-  chat: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
-  ),
   check: (
     <svg className="mt-0.5 h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden="true">
       <polyline points="20 6 9 17 4 12" />
@@ -127,85 +70,113 @@ const icons = {
       <path d="M12 2C6.477 2 2 6.478 2 12c0 1.88.516 3.637 1.41 5.142L2 22l4.978-1.388A9.945 9.945 0 0 0 12 22c5.522 0 10-4.478 10-10S17.522 2 12 2zm.003 18a7.965 7.965 0 0 1-4.075-1.114l-.292-.173-3.03.845.852-3.042-.19-.305A7.965 7.965 0 0 1 4 12C4 7.582 7.582 4 12 4s8 4.582 8 8-3.582 8-8 8z" />
     </svg>
   ),
+  shieldCheck: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 3l7 3v6c0 4.4-3 8-7 9-4-1-7-4.6-7-9V6z" /><path d="M9 12l2 2 4-4" />
+    </svg>
+  ),
+  percent: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="19" y1="5" x2="5" y2="19" /><circle cx="7.5" cy="7.5" r="2.5" /><circle cx="16.5" cy="16.5" r="2.5" />
+    </svg>
+  ),
+  headset: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 15v-3a8 8 0 0 1 16 0v3" /><rect x="2" y="14" width="4" height="6" rx="1.6" /><rect x="18" y="14" width="4" height="6" rx="1.6" />
+    </svg>
+  ),
+  users: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+    </svg>
+  ),
+  trending: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 17l6-6 4 4 7-7" /><path d="M14 8h6v6" />
+    </svg>
+  ),
+  clock: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" />
+    </svg>
+  ),
+  box: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 7h16v11H4z" /><path d="M4 11h16" /><circle cx="8" cy="14.5" r="1.2" />
+    </svg>
+  ),
 };
 
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 
-const stats = [
-  { value: "40%", label: "Margin per produk" },
-  { value: "500+", label: "Partner aktif" },
-  { value: "1×24 jam", label: "Approval cepat" },
-  { value: "Rp 0", label: "Biaya pendaftaran" },
+const heroFacts = [
+  { icon: icons.shieldCheck, label: "Produk Berkualitas" },
+  { icon: icons.percent, label: "Margin Menarik" },
+  { icon: icons.headset, label: "Dukungan Sepenuh Hati" },
 ];
 
-const problems = [
-  { icon: icons.money,    text: "Modal besar, tapi tidak yakin produknya laku" },
-  { icon: icons.confused, text: "Bingung harus mulai jualan dari mana" },
-  { icon: icons.noSignal, text: "Tidak punya sistem atau pengalaman online" },
-  { icon: icons.alone,    text: "Jualan sendirian tanpa dukungan tim" },
+const heroStats = [
+  { value: "500+", label: "Reseller aktif", icon: icons.users },
+  { value: "40%", label: "Margin hingga", icon: icons.trending },
+  { value: "1×24 Jam", label: "Approval cepat", icon: icons.clock },
+  { value: "Rp0", label: "Biaya pendaftaran", icon: icons.box },
+];
+
+const stats = [
+  { value: "500+", label: "Reseller aktif" },
+  { value: "40%", label: "Margin hingga" },
+  { value: "1×24 Jam", label: "Approval cepat" },
+  { value: "Rp0", label: "Biaya pendaftaran" },
 ];
 
 const benefits = [
-  { icon: icons.margin,     title: "Margin Lebar",          desc: "Harga khusus partner sampai 40% per produk. Untung jelas di setiap penjualan." },
-  { icon: icons.star,       title: "Reward Penjualan",      desc: "Bonus & challenge tiap bulan, quartal, dan tahun untuk performa terbaikmu." },
-  { icon: icons.graduation, title: "Training Gratis",       desc: "Product knowledge & teknik closing, bahkan kalau kamu belum pernah jualan." },
-  { icon: icons.gift,       title: "Materi Siap Pakai",     desc: "Foto produk, caption, dan konten promosi siap posting. Kamu tinggal jual." },
+  { title: "Margin yang sehat", desc: "Dapatkan margin hingga 40% di setiap penjualan dengan harga grosir terbaik." },
+  { title: "Marketing support", desc: "Kami sediakan materi promosi, konten digital, dan tips jualan siap pakai." },
+  { title: "Partner rewards", desc: "Raih poin dan benefit eksklusif seiring pertumbuhan performa bisnismu." },
+  { title: "Support berkelanjutan", desc: "Tim kami siap mendampingi kamu di setiap langkah perjalanan bisnismu." },
 ];
 
-const tiers = [
-  {
-    level: "BRONZE",
+const tierVisuals = {
+  starter: {
     bg: "#ffffff",
-    borderColor: "#e8d5c0",
-    laba: "Rp 3,5 jt",
-    sub: "/bulan",
-    grad: "linear-gradient(135deg, #CD7F32, #e8a853)",
-    perks: ["Harga partner Bronze", "Materi promosi digital", "Onboarding awal"],
-    cta: "Mulai dari Bronze",
+    border: "#ECE5F7",
+    labelColor: "#7C3AED",
+    grad: "linear-gradient(135deg, #9333EA, #7C3AED)",
+    perks: ["Akses harga grosir", "Materi promosi dasar", "Support komunitas"],
+    cta: "Pilih Starter",
     featured: false,
   },
-  {
-    level: "SILVER",
-    bg: "linear-gradient(160deg, #7C3AED 0%, #9333EA 100%)",
-    borderColor: "transparent",
-    laba: "Rp 10 jt",
-    sub: "/bulan",
+  growth: {
+    bg: "linear-gradient(160deg, #7C3AED 0%, #6D28D9 100%)",
+    border: "transparent",
+    labelColor: "#fff",
     grad: "linear-gradient(135deg, #9333EA, #8b5cf6)",
-    perks: ["Semua benefit Bronze", "Training penjualan lanjutan", "Priority support & coaching"],
-    cta: "Pilih Silver",
+    perks: ["Akses harga grosir", "Materi promosi lengkap", "Priority support", "Undangan training eksklusif"],
+    cta: "Pilih Growth",
     featured: true,
   },
-  {
-    level: "GOLD",
-    bg: "#ffffff",
-    borderColor: "#ead49a",
-    laba: "Rp 25 jt",
-    sub: "/bulan",
-    grad: "linear-gradient(135deg, #B8860B, #f5c518)",
-    perks: ["Semua benefit Silver", "Business coaching eksklusif", "Reward terbesar", "Early access produk baru"],
-    cta: "Naik ke Gold",
+  premier: {
+    bg: "#FFFDF8",
+    border: "#F0E3C8",
+    labelColor: "#B98A2E",
+    grad: "linear-gradient(135deg, #B98A2E, #E0B75A)",
+    perks: ["Akses harga grosir terbaik", "Materi & konten premium", "Account manager", "Bonus & reward eksklusif"],
+    cta: "Pilih Premier",
     featured: false,
   },
-];
+} as const;
 
 const steps = [
-  { n: "1", title: "Daftar",   desc: "Isi form singkat. Verifikasi dalam 1×24 jam." },
-  { n: "2", title: "Approval", desc: "Dapat harga partner & katalog lengkap." },
-  { n: "3", title: "Jual",     desc: "Pakai materi promosi siap pakai dari kami." },
-  { n: "4", title: "Profit",   desc: "Margin tiap penjualan plus reward performa." },
+  { n: "1", title: "Daftar", desc: "Isi formulir pendaftaran secara online." },
+  { n: "2", title: "Verifikasi", desc: "Tim kami verifikasi data kamu (1×24 jam)." },
+  { n: "3", title: "Starter Order", desc: "Pilih tier dan lakukan starter order." },
+  { n: "4", title: "Grow", desc: "Mulai jualan dan dapatkan support untuk bertumbuh." },
 ];
 
 const products = [
-  { name: "GlowAge Multi-Active Serum",   img: "/serumfix.png",  tag: "BESTSELLER", badge: "#7C3AED" },
-  { name: "Bright & Care Moisture Cream", img: "/moistfix.png",  tag: "FAVORIT",    badge: "#9333EA" },
-  { name: "Hydra Moist Gel Ultimate",     img: "/salmonfix.png", tag: "BARU",       badge: "#8b5cf6" },
-];
-
-const ecosystem = [
-  { icon: icons.sports, title: "Sports & Campus Marketing", desc: "Aktivasi komunitas kampus & olahraga sebagai jalur distribusi organik." },
-  { icon: icons.zap,    title: "Energy Activation",         desc: "Event offline & online yang mendorong penjualanmu di berbagai kanal." },
-  { icon: icons.globe,  title: "Website & Landing Page",    desc: "Infrastruktur digital yang bantu kamu closing lebih profesional." },
-  { icon: icons.chat,   title: "Community & Content",       desc: "Konten siap pakai dan grup partner aktif untuk sharing strategi." },
+  { name: "GlowAge Multi Active Serum", retail: 85000 },
+  { name: "Bright & Care Moisture Cream", retail: 95000 },
+  { name: "Hydra Moist Gel Ultimate", retail: 120000 },
 ];
 
 const statsData = [
@@ -287,6 +258,15 @@ const testimonialsData = [
   },
 ];
 
+const faqs = [
+  { q: "Apakah ada biaya pendaftaran menjadi partner?", a: "Tidak ada. Pendaftaran partner Ginabo gratis. Kamu hanya perlu melakukan starter order sesuai tier yang dipilih." },
+  { q: "Apakah bisa upgrade tier?", a: "Bisa kapan saja. Upgrade otomatis ditawarkan saat akumulasi pembelianmu mencapai ambang tier berikutnya." },
+  { q: "Berapa minimal starter order?", a: "Starter Partner mulai dari Rp3,5 juta, Growth Rp10 juta, dan Premier Rp25 juta." },
+  { q: "Bagaimana cara mendapatkan reward?", a: "Setiap transaksi menghasilkan poin. Poin dan pencapaian target menentukan cashback, bonus, serta undangan trip dan gathering." },
+  { q: "Berapa lama proses verifikasi?", a: "Maksimal 1×24 jam pada hari kerja. Tim kami menghubungi kamu lewat WhatsApp setelah data diverifikasi." },
+  { q: "Apakah ada wilayah penjualan tertentu?", a: "Tidak ada pembatasan wilayah untuk Starter dan Growth. Premier Partner bisa mengajukan hak wilayah tertentu." },
+];
+
 // ─── REUSABLE ─────────────────────────────────────────────────────────────────
 
 function SectionHeading({
@@ -295,21 +275,23 @@ function SectionHeading({
   desc,
   center = true,
   id,
+  tone = "light",
 }: {
   label: string;
   title: React.ReactNode;
   desc?: string;
   center?: boolean;
   id?: string;
+  tone?: "light" | "dark";
 }) {
   return (
     <Reveal className={`mb-8 max-w-2xl ${center ? "mx-auto text-center" : ""}`}>
-      <SectionLabel center={center}>{label}</SectionLabel>
-      <h2 id={id} className="text-2xl font-extrabold leading-tight md:text-[2rem]" style={{ color: "#4A1A5E" }}>
+      <SectionLabel tone={tone}>{label}</SectionLabel>
+      <h2 id={id} className="text-2xl font-extrabold leading-tight md:text-[2rem]" style={{ color: tone === "dark" ? "#fff" : "#4A1A5E" }}>
         {title}
       </h2>
       {desc && (
-        <p className="mt-3 text-[15px] leading-relaxed text-[#5a4a6a]">
+        <p className={`mt-3 text-[15px] leading-relaxed ${tone === "dark" ? "text-white/70" : "text-[#5a4a6a]"}`}>
           {desc}
         </p>
       )}
@@ -320,49 +302,110 @@ function SectionHeading({
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
 
 export default function ResellerProgramPage() {
+  const [sales, setSales] = useState(10);
+  const [openFaq, setOpenFaq] = useState<Record<number, boolean>>({});
+  const salesRp = sales * 1_000_000;
+  const profitRp = salesRp * 0.35;
+
+  const { tier, setTier, picked } = useResellerTier();
+
   return (
     <div className="bg-white text-[#2a2a2a]">
 
-      {/* ══ 1. HERO / PROBLEM ════════════════════════════════════════════════ */}
-      <section aria-labelledby="problem-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
-        <div className="mx-auto max-w-6xl px-5">
-          <div className="grid items-center gap-8 md:grid-cols-[0.85fr_1fr] md:gap-12">
-            <Reveal>
-              <SectionLabel>Kamu Pernah Merasa Ini?</SectionLabel>
-              <h2 id="problem-heading" className="text-2xl font-extrabold leading-tight md:text-[2rem]" style={{ color: "#4A1A5E" }}>
-                Bukan salahmu. <span className="text-[#9333EA]">Sistemnya yang belum ada.</span>
-              </h2>
-              <p className="mt-3 text-[15px] leading-relaxed text-[#5a4a6a]">
-                Kebanyakan orang gagal bisnis bukan karena malas, tapi karena tidak ada yang menunjukkan jalan dan sistemnya. Di sini, kamu tidak mulai sendirian.
+      {/* ══ 1. HERO — banner-hero.png background with copy overlay ══════════ */}
+      <div className="w-full md:px-5 lg:px-8 xl:px-10 md:pt-3">
+        <section
+          aria-labelledby="hero-heading"
+          className="relative min-h-[560px] w-full overflow-hidden sm:min-h-[520px] md:aspect-[3/1] md:min-h-0 md:rounded-2xl"
+          style={{ backgroundColor: "#c3a7d8" }}
+        >
+          <Image
+            src="/hero/banner-hero.png"
+            alt=""
+            fill
+            priority
+            className="object-cover object-[72%_top] md:object-center"
+            sizes="100vw"
+          />
+          <div
+            className="absolute inset-0 md:hidden"
+            style={{ background: "linear-gradient(180deg, rgba(195,167,216,0) 40%, rgba(195,167,216,.94) 62%, #c3a7d8 78%)" }}
+            aria-hidden="true"
+          />
+
+          <div className="absolute inset-0 flex items-end px-6 pb-7 sm:px-9 md:items-center md:pb-0 md:px-12">
+            <div className="w-full max-w-[420px]">
+              <span
+                className="inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[11px] font-bold sm:px-[18px] sm:py-[9px] sm:text-[13px]"
+                style={{ background: "rgba(255,255,255,.78)", color: "#6D28D9" }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9.5" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                </svg>
+                Program Reseller Ginabo
+              </span>
+              <h1
+                id="hero-heading"
+                className="mt-2.5 text-[22px] font-extrabold leading-[1.12] tracking-[-.02em] sm:mt-3 sm:text-[32px] lg:text-[44px]"
+                style={{ color: "#241338" }}
+              >
+                Bangun bisnis<br /><span style={{ color: "#7C3AED" }}>beauty-mu</span><br />bersama Ginabo.
+              </h1>
+              <p className="mt-2 max-w-[360px] text-[11px] font-medium leading-[1.6] sm:mt-3 sm:text-[13.5px]" style={{ color: "#5b4b72" }}>
+                Dapatkan produk berkualitas, margin menarik, dan dukungan penuh untuk tumbuh bersama Ginabo di seluruh Indonesia.
               </p>
-            </Reveal>
-
-            <motion.ul
-              initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
-              className="flex flex-col gap-2.5"
-            >
-              {problems.map((p) => (
-                <motion.li
-                  key={p.text}
-                  variants={fadeUp}
-                  className="flex items-center gap-3.5 rounded-xl px-4 py-3"
-                  style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 2px 12px rgba(120,37,124,0.04)" }}
+              <div className="mt-3.5 flex flex-col gap-2 sm:mt-5 sm:flex-row sm:flex-wrap sm:gap-3">
+                <Link
+                  href="/reseller/register"
+                  className="inline-flex min-h-[48px] w-full items-center justify-between gap-1.5 rounded-xl px-6 text-[15px] font-semibold text-white transition hover:opacity-90 sm:rounded-2xl md:w-[260px] md:min-h-[50px] md:text-[17.5px]"
+                  style={{ background: "linear-gradient(135deg,#6D28D9,#9333EA)", boxShadow: "0 12px 30px rgba(109,40,217,.34)" }}
                 >
-                  <span
-                    className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-white"
-                    style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
-                  >
-                    {p.icon}
+                  Gabung Jadi Reseller
+                  <span className="flex h-4 w-4 flex-none items-center justify-center rounded-full sm:h-6 sm:w-6" style={{ background: "rgba(255,255,255,.22)" }}>
+                    {icons.arrowRight}
                   </span>
-                  <span className="text-[13.5px] font-semibold text-[#4A1A5E]">{p.text}</span>
-                </motion.li>
-              ))}
-            </motion.ul>
+                </Link>
+                <a
+                  href="#program"
+                  className="inline-flex min-h-[48px] w-full items-center justify-between gap-1.5 rounded-xl bg-white px-6 text-[15px] font-semibold sm:rounded-2xl md:w-[260px] md:min-h-[50px] md:text-[17.5px]"
+                  style={{ color: "#6D28D9", boxShadow: "0 8px 22px rgba(60,29,105,.12)" }}
+                >
+                  Pelajari Program
+                  <span className="flex h-4 w-4 flex-none items-center justify-center rounded-full sm:h-6 sm:w-6" style={{ background: "#F1E9FD" }}>
+                    {icons.arrowRight}
+                  </span>
+                </a>
+              </div>
+              <ul className="mt-3.5 hidden flex-wrap items-center gap-x-4 gap-y-2 sm:flex sm:gap-x-[22px] sm:gap-y-3 sm:mt-5">
+                {heroFacts.map((f) => (
+                  <li key={f.label} className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full sm:h-[34px] sm:w-[34px]" style={{ border: "1px solid rgba(109,40,217,.28)", color: "#6D28D9" }}>
+                      {f.icon}
+                    </span>
+                    <span className="text-[10.5px] font-medium leading-[1.3] sm:text-[13px]" style={{ color: "#4a3b60" }}>{f.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* ══ 2. STATS BAR ─ social proof ───────────────────────────────────────── */}
+          <div className="absolute inset-y-0 right-3 hidden flex-col justify-center gap-2 sm:right-6 sm:flex sm:gap-2.5 lg:right-10">
+            {heroStats.map((s) => (
+              <div key={s.label} className="flex items-center gap-2.5 rounded-xl bg-white px-3 py-2 sm:gap-3.5 sm:rounded-2xl sm:px-4 sm:py-3" style={{ boxShadow: "0 12px 30px rgba(60,29,105,.14)" }}>
+                <span className="flex h-8 w-8 flex-none items-center justify-center rounded-lg sm:h-[38px] sm:w-[38px] sm:rounded-xl" style={{ background: "#F4EEFD" }}>
+                  {s.icon}
+                </span>
+                <span>
+                  <b className="block text-[14px] font-extrabold leading-[1.1] sm:text-[19px]" style={{ color: "#241338" }}>{s.value}</b>
+                  <span className="block whitespace-nowrap text-[9.5px] font-medium sm:text-[12px]" style={{ color: "#7b6b90" }}>{s.label}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {/* ══ 2. STATS BAR ═════════════════════════════════════════════════════ */}
       <section aria-label="Statistik program" style={{ background: "linear-gradient(135deg, #9333EA 0%, #7C3AED 100%)" }}>
         <div className="mx-auto max-w-6xl px-5">
           <motion.dl
@@ -380,121 +423,158 @@ export default function ResellerProgramPage() {
         </div>
       </section>
 
-      {/* ══ 4. BENEFITS ─ bento rapat ────────────────────────────────────────── */}
-      <section aria-labelledby="benefits-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
+      {/* ══ 3. BENEFITS ══════════════════════════════════════════════════════ */}
+      <section id="benefit" aria-labelledby="benefits-heading" className="py-10 md:py-14" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
-          <SectionHeading
-            id="benefits-heading"
-            label="Kenapa Ginabo Partner"
-            title="Benefit nyata, bukan janji manis"
-          />
+          <SectionHeading id="benefits-heading" label="Benefit Partner" title="Lebih dari sekadar menjual skincare" />
 
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
             className="grid grid-cols-2 gap-3 lg:grid-cols-4"
             role="list"
           >
-            {benefits.map((b, i) => (
+            {benefits.map((b) => (
               <motion.div
                 key={b.title}
                 variants={fadeUp}
                 whileHover={{ y: -4 }}
-                className="group flex flex-col gap-3 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                className="flex flex-col gap-1.5 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                 style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
                 role="listitem"
               >
-                <div
-                  className="flex h-11 w-11 items-center justify-center rounded-xl text-white transition-transform group-hover:scale-105"
-                  style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
-                >
-                  {b.icon}
-                </div>
-                <div>
-                  <h3 className="text-[14px] font-extrabold" style={{ color: "#4A1A5E" }}>{b.title}</h3>
-                  <p className="mt-1.5 text-[12.5px] leading-relaxed text-[#5a4a6a]">{b.desc}</p>
-                </div>
+                <h3 className="text-[14px] font-extrabold" style={{ color: "#4A1A5E" }}>{b.title}</h3>
+                <p className="text-[12.5px] leading-relaxed text-[#5a4a6a]">{b.desc}</p>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
-      {/* ══ 5. TIERS ─ kalkulasi profit ──────────────────────────────────────── */}
-      <section aria-labelledby="tiers-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
+      {/* ══ 4. PROFIT SIMULATOR ══════════════════════════════════════════════ */}
+      <section aria-labelledby="simulator-heading" className="pb-10 md:pb-14" style={{ background: "#ffffff" }}>
+        <div className="mx-auto max-w-6xl px-5">
+          <Reveal
+            className="grid items-center gap-6 rounded-3xl p-6 md:grid-cols-[1fr_1fr_1fr] md:p-9"
+            style={{ background: "linear-gradient(120deg,#F7F3FE,#F1E9FD)" }}
+          >
+            <div>
+              <SectionLabel>Simulator profit</SectionLabel>
+              <h2 id="simulator-heading" className="text-2xl font-extrabold leading-tight md:text-[1.7rem]" style={{ color: "#4A1A5E" }}>
+                Seberapa besar potensi bisnis kamu?
+              </h2>
+              <p className="mt-3 text-[14px] leading-relaxed text-[#5a4a6a]">Atur estimasi penjualanmu dan lihat potensi keuntungan.</p>
+            </div>
+
+            <div className="rounded-2xl bg-white p-6 shadow-[0_10px_26px_rgba(60,29,105,0.07)]">
+              <p className="text-[12px] font-medium text-[#8b7aa8]">Estimasi penjualan per bulan</p>
+              <p className="mt-1.5 mb-4 text-[27px] font-extrabold" style={{ color: "#7C3AED" }}>{fmtRp(salesRp)}</p>
+              <input
+                type="range"
+                min={1}
+                max={50}
+                step={1}
+                value={sales}
+                onChange={(e) => setSales(Number(e.target.value))}
+                className="w-full accent-[#7C3AED]"
+                aria-label="Estimasi penjualan per bulan (juta rupiah)"
+              />
+              <div className="mt-2 flex justify-between text-[11px] font-medium text-[#a294b5]">
+                <span>Rp1 jt</span>
+                <span>Rp50 jt+</span>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-white p-6 shadow-[0_10px_26px_rgba(60,29,105,0.07)]">
+              <p className="text-[12px] font-medium text-[#8b7aa8]">Estimasi profit bersih</p>
+              <p className="mt-1.5 text-[34px] font-extrabold leading-none" style={{ color: "#6D28D9" }}>{fmtRp(profitRp)}</p>
+              <p className="mb-3.5 mt-1 text-[14px] font-semibold text-[#9d8ab8]">/ bulan</p>
+              <span className="inline-block rounded-lg px-3 py-1.5 text-[11.5px] font-semibold" style={{ background: "#F1E9FD", color: "#7C3AED" }}>
+                Margin rata-rata 35%
+              </span>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ══ 5. TIERS ═════════════════════════════════════════════════════════ */}
+      <section id="tier" aria-labelledby="tiers-heading" className="py-10 md:py-14" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading
             id="tiers-heading"
-            label="Potensi Penghasilan"
-            title="Berapa yang bisa kamu hasilkan?"
-            desc="Pilih tier sesuai targetmu. Semakin aktif, semakin besar yang kamu raih."
+            label="Pilih Tier Partner"
+            title="Pilih cara kamu memulai"
+            desc="Semua tier bebas upgrade kapan saja sesuai pertumbuhan bisnismu."
           />
 
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
             className="grid items-stretch gap-4 md:grid-cols-3"
           >
-            {tiers.map((t) => (
-              <motion.article
-                key={t.level}
-                variants={fadeUp}
-                whileHover={{ y: -6 }}
-                className={`relative flex flex-col gap-4 overflow-hidden rounded-2xl p-5 transition-shadow md:p-6 ${t.featured ? "md:-my-2 md:py-8" : ""}`}
-                style={{
-                  background: t.bg,
-                  border: t.featured ? "none" : `1.5px solid ${t.borderColor}`,
-                  boxShadow: t.featured ? "0 16px 44px rgba(147,51,234,0.32)" : "0 4px 20px rgba(120,37,124,0.06)",
-                }}
-              >
-                {t.featured && (
-                  <div className="absolute right-4 top-4 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur">
-                    TERPOPULER
-                  </div>
-                )}
-
-                <div className="self-start rounded-lg px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white" style={{ background: t.grad }}>
-                  {t.level} PARTNER
-                </div>
-
-                <div>
-                  <p className={`text-[11px] font-semibold uppercase tracking-wide ${t.featured ? "text-white/65" : "text-[#5a4a6a]"}`}>
-                    Potensi laba
-                  </p>
-                  <p className={`mt-0.5 flex items-baseline gap-1 ${t.featured ? "text-white" : ""}`} style={!t.featured ? { color: "#4A1A5E" } : undefined}>
-                    <span className="text-[28px] font-extrabold leading-none">{t.laba}</span>
-                    <span className={`text-[13px] font-medium ${t.featured ? "text-white/60" : "text-[#5a4a6a]"}`}>{t.sub}</span>
-                  </p>
-                </div>
-
-                <ul className="flex flex-col gap-2">
-                  {t.perks.map((p) => (
-                    <li key={p} className={`flex items-start gap-2 text-[13px] font-medium ${t.featured ? "text-white/90" : "text-[#5a4a6a]"}`}>
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: t.featured ? "#fff" : "#9333EA" }} />
-                      {p}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href="/reseller/register"
-                  className="mt-auto block min-h-[44px] rounded-xl py-3 text-center text-[13px] font-bold transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9333EA]"
-                  style={t.featured ? { background: "#fff", color: "#7C3AED" } : { background: t.grad, color: "#fff" }}
+            {TIER_ORDER.map((key) => {
+              const t = TIERS[key];
+              const v = tierVisuals[key];
+              return (
+                <motion.article
+                  key={key}
+                  variants={fadeUp}
+                  whileHover={{ y: -6 }}
+                  className={`relative flex flex-col gap-4 overflow-hidden rounded-2xl p-5 transition-shadow md:p-6 ${v.featured ? "md:-my-2 md:py-8" : ""}`}
+                  style={{
+                    background: v.bg,
+                    border: v.featured ? "none" : `1.5px solid ${v.border}`,
+                    boxShadow: v.featured ? "0 16px 44px rgba(147,51,234,0.32)" : "0 4px 20px rgba(120,37,124,0.06)",
+                  }}
                 >
-                  {t.cta}
-                </Link>
-              </motion.article>
-            ))}
-          </motion.div>
+                  {v.featured && (
+                    <div className="absolute right-4 top-4 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur">
+                      MOST POPULAR
+                    </div>
+                  )}
 
-          <p className="mt-4 text-center text-[11.5px] text-[#5a4a6a]">
-            *Estimasi berdasarkan rata-rata partner aktif. Hasil aktual bergantung pada usaha masing-masing.
-          </p>
+                  <div className="self-start rounded-lg px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white" style={{ background: v.grad }}>
+                    {t.short.toUpperCase()} PARTNER
+                  </div>
+
+                  <div>
+                    <p className={`text-[11px] font-semibold uppercase tracking-wide ${v.featured ? "text-white/65" : "text-[#5a4a6a]"}`}>
+                      Modal mulai dari
+                    </p>
+                    <p className={`mt-0.5 text-[28px] font-extrabold leading-none ${v.featured ? "text-white" : ""}`} style={!v.featured ? { color: "#4A1A5E" } : undefined}>
+                      {t.modal}
+                    </p>
+                    <p className={`mt-1.5 text-[13px] font-semibold ${v.featured ? "text-white/85" : "text-[#4a3b60]"}`}>
+                      {t.margin}
+                    </p>
+                  </div>
+
+                  <ul className="flex flex-col gap-2">
+                    {v.perks.map((p) => (
+                      <li key={p} className={`flex items-start gap-2 text-[13px] font-medium ${v.featured ? "text-white/90" : "text-[#5a4a6a]"}`}>
+                        <span className={v.featured ? "text-white" : "text-[#7C3AED]"}>{icons.check}</span>
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link
+                    href="/reseller/register"
+                    onClick={() => setTier(key)}
+                    className="mt-auto block min-h-[44px] rounded-xl py-3 text-center text-[13px] font-bold transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9333EA]"
+                    style={v.featured ? { background: "#fff", color: "#6D28D9" } : { background: v.grad, color: "#fff" }}
+                  >
+                    {v.cta}
+                  </Link>
+                </motion.article>
+              );
+            })}
+          </motion.div>
         </div>
       </section>
 
-      {/* ══ 6. HOW IT WORKS ─ langkah rapat ──────────────────────────────────── */}
-      <section aria-labelledby="steps-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
+      {/* ══ 6. HOW IT WORKS ══════════════════════════════════════════════════ */}
+      <section id="program" aria-labelledby="steps-heading" className="py-10 md:py-14" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
-          <SectionHeading id="steps-heading" label="Cara Gabung" title="4 langkah, mulai hari ini" />
+          <SectionHeading id="steps-heading" label="Cara Gabung" title="4 langkah mudah jadi partner" />
 
           <motion.ol
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
@@ -523,108 +603,34 @@ export default function ResellerProgramPage() {
         </div>
       </section>
 
-      {/* ══ 7. PRODUCTS ─ row rapat ──────────────────────────────────────────── */}
-      <section aria-labelledby="products-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
+      {/* ══ 9. PRICE COMPARISON ══════════════════════════════════════════════ */}
+      <section aria-labelledby="price-heading" className="py-10 md:py-14" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
-          <SectionHeading id="products-heading" label="Yang Kamu Jual" title="Skincare berkualitas, mudah dijual" />
+          <SectionHeading id="price-heading" label="Harga Partner" title="Selisih harga yang jadi keuntunganmu" desc={`Contoh perhitungan untuk tier ${picked.short} (margin ${Math.round(picked.rate * 100)}%).`} />
 
-          <motion.div
-            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
-            className="grid gap-4 sm:grid-cols-3"
-          >
-            {products.map((p) => (
-              <motion.article
-                key={p.name}
-                variants={fadeUp}
-                whileHover={{ y: -6 }}
-                className="overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-                style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
-              >
-                <div className="relative aspect-square" style={{ background: "#faf5ff" }}>
-                  <Image src={p.img} alt={p.name} fill className="object-cover" sizes="(min-width: 640px) 33vw, 100vw" />
-                  <span className="absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-extrabold text-white" style={{ background: p.badge }}>
-                    {p.tag}
-                  </span>
+          <Reveal className="overflow-hidden rounded-2xl" style={{ border: "1px solid #F1ECF9" }}>
+            <div className="overflow-x-auto">
+              <div className="min-w-[560px]">
+                <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr] bg-[#F9F6FE] text-[11px] font-bold uppercase tracking-wider text-[#8b7aa8]">
+                  <span className="px-5 py-3.5">Produk</span>
+                  <span className="px-4 py-3.5">Marketplace</span>
+                  <span className="px-4 py-3.5">Harga partner</span>
+                  <span className="px-4 py-3.5">Profit / pcs</span>
                 </div>
-                <div className="p-4">
-                  <h3 className="text-[13px] font-extrabold" style={{ color: "#4A1A5E" }}>{p.name}</h3>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {["BPOM RI", "Halal", "Cruelty Free"].map((b) => (
-                      <span key={b} className="rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "#F3E8FF", color: "#7C3AED", border: "1px solid rgba(147,51,234,0.15)" }}>
-                        {b}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </motion.article>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ══ 8. REWARDS + ECOSYSTEM ─ digabung, rapat ─────────────────────────── */}
-      <section aria-labelledby="rewards-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
-        <div className="mx-auto max-w-6xl px-5">
-          <SectionHeading
-            id="rewards-heading"
-            label="Reward & Dukungan"
-            title="Semakin aktif, semakin banyak reward"
-          />
-
-          <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
-            {/* Reward highlight */}
-            <Reveal>
-              <div
-                className="flex h-full flex-col gap-4 rounded-2xl p-6 text-white"
-                style={{ background: "linear-gradient(135deg, #9333EA 0%, #7C3AED 100%)", boxShadow: "0 14px 40px rgba(147,51,234,0.28)" }}
-              >
-                <span className="self-start rounded-lg border border-white/25 bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
-                  Reward Teratas
-                </span>
-                <div>
-                  <h3 className="text-[19px] font-extrabold leading-snug">Top Partner Rewards</h3>
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-white/75">
-                    Reward eksklusif dari performa terbaikmu. Bulanan, quartal, dan tahunan.
-                  </p>
-                </div>
-                <ul className="grid gap-2 sm:grid-cols-2">
-                  {["Bonus tunai bulanan", "Liburan & experience", "Sertifikasi partner", "Komisi referral"].map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-[12.5px] font-medium text-white/90">
-                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-auto rounded-xl bg-white/10 p-3 text-[11.5px] leading-relaxed text-white/70">
-                  Reward diumumkan tiap awal bulan di grup komunitas partner resmi.
-                </div>
+                {products.map((p, i) => {
+                  const partner = partnerPrice(p.retail, tier);
+                  return (
+                    <div key={p.name} className={`grid grid-cols-[1.6fr_1fr_1fr_1fr] items-center border-t border-[#F4F0FA] ${i % 2 === 1 ? "bg-[#FDFCFF]" : ""}`}>
+                      <span className="px-5 py-4 text-[13px] font-semibold text-[#241338]">{p.name}</span>
+                      <span className="px-4 py-4 text-[13px] font-medium text-[#8b7aa8] line-through">{fmtRp(p.retail)}</span>
+                      <span className="px-4 py-4 text-[13px] font-bold text-[#241338]">{fmtRp(partner)}</span>
+                      <span className="px-4 py-4 text-[13px] font-bold text-[#7C3AED]">+ {fmtRp(p.retail - partner)}</span>
+                    </div>
+                  );
+                })}
               </div>
-            </Reveal>
-
-            {/* Ecosystem support */}
-            <motion.div
-              initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
-              className="grid grid-cols-2 gap-3"
-            >
-              {ecosystem.map((e) => (
-                <motion.div
-                  key={e.title}
-                  variants={fadeUp}
-                  className="flex flex-col gap-2 rounded-2xl p-5"
-                  style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
-                >
-                  <span
-                    className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-white"
-                    style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
-                  >
-                    {e.icon}
-                  </span>
-                  <h3 className="text-[13px] font-extrabold leading-snug" style={{ color: "#4A1A5E" }}>{e.title}</h3>
-                  <p className="text-[12px] leading-relaxed text-[#5a4a6a]">{e.desc}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -641,55 +647,51 @@ export default function ResellerProgramPage() {
         secondaryActionHref={waLink()}
       />
 
-      {/* ══ 10. FINAL CTA ────────────────────────────────────────────────────── */}
-      <section
-        aria-labelledby="cta-heading"
-        className="relative overflow-hidden py-16 md:py-20"
-        style={{ background: "linear-gradient(135deg, #7C3AED 0%, #9333EA 55%, #8b5cf6 100%)" }}
-      >
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
-          style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "40px 40px" }}
-          aria-hidden="true"
-        />
-        <div className="relative mx-auto max-w-xl px-5 text-center">
-          <Reveal>
-            <span className="mb-4 inline-block rounded-lg border border-white/25 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur">
-              Slot Partner Terbuka
-            </span>
-            <h2 id="cta-heading" className="mb-3 text-[26px] font-extrabold leading-tight text-white md:text-[34px]">
-              Mulai bisnismu hari ini, bukan nanti
-            </h2>
-            <p className="mb-7 text-[14px] leading-relaxed text-white/80">
-              Gratis daftar, sistemnya sudah ada, dan tim kami bantu dari awal sampai kamu bisa jalan sendiri.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-                <Link
-                  href="/reseller/register"
-                  className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-white px-7 py-3.5 text-[14px] font-extrabold shadow-lg transition hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                  style={{ color: "#7C3AED" }}
+      {/* ══ 11. FAQ ══════════════════════════════════════════════════════════ */}
+      <section id="faq" aria-labelledby="faq-heading" className="pb-10 md:pb-14" style={{ background: "#ffffff" }}>
+        <div className="mx-auto max-w-6xl px-5">
+          <SectionHeading
+            center={false}
+            id="faq-heading"
+            label="FAQ"
+            title="Pertanyaan yang sering ditanyakan"
+          />
+
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
+            className="grid gap-3 md:grid-cols-2"
+          >
+            {faqs.map((f, i) => (
+              <motion.div
+                key={f.q}
+                variants={fadeUp}
+                className="rounded-xl p-4"
+                style={{ background: "#FCFBFE", border: "1px solid #F1ECF9" }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenFaq((prev) => ({ ...prev, [i]: !prev[i] }))}
+                  aria-expanded={!!openFaq[i]}
+                  className="flex w-full items-center justify-between gap-3.5 text-left"
                 >
-                  Daftar Sekarang
-                </Link>
+                  <span className="text-[13px] font-bold text-[#3b2b52]">{f.q}</span>
+                  <span
+                    className="flex h-6.5 w-6.5 flex-none items-center justify-center rounded-full text-[15px] font-bold leading-none"
+                    style={{ background: "#fff", border: "1px solid #EDE4FA", color: "#7C3AED" }}
+                  >
+                    {openFaq[i] ? "−" : "+"}
+                  </span>
+                </button>
+                {openFaq[i] && (
+                  <p className="mt-2.5 text-[12.5px] leading-relaxed text-[#7b6b90]">{f.a}</p>
+                )}
               </motion.div>
-              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-                <a
-                  href={waLink()}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-7 py-3.5 text-[14px] font-bold text-white backdrop-blur transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                >
-                  {icons.whatsapp}
-                  Tanya via WhatsApp
-                </a>
-              </motion.div>
-            </div>
-          </Reveal>
+            ))}
+          </motion.div>
         </div>
       </section>
 
-      {/* ══ STICKY MOBILE CTA BAR ─ konversi ─────────────────────────────────── */}
+      {/* ══ STICKY MOBILE CTA BAR ════════════════════════════════════════════ */}
       <motion.div
         initial={{ y: 80 }}
         animate={{ y: 0 }}
@@ -717,7 +719,7 @@ export default function ResellerProgramPage() {
         </Link>
       </motion.div>
 
-      {/* ══ FLOATING JOIN ─ desktop saja ─────────────────────────────────────── */}
+      {/* ══ FLOATING JOIN ─ desktop saja ═════════════════════════════════════ */}
       <motion.a
         href="/reseller/register"
         initial={{ opacity: 0, scale: 0.75, y: 20 }}
