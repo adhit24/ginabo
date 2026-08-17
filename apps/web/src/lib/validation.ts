@@ -73,7 +73,8 @@ export const resellerApplicationSchema = z.object({
 export const journey21ApplicationSchema = z.object({
   name: z.string().min(2).max(120),
   phone: z.string().min(8).max(30),
-  email: z.string().email().optional().or(z.literal(""))
+  email: z.string().email().optional().or(z.literal("")),
+  skinConcern: z.string().optional()
 });
 
 export const addressSchema = z.object({

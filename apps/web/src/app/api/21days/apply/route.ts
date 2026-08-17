@@ -28,7 +28,8 @@ export async function POST(req: Request) {
         "",
         `Nama: ${parsed.data.name}`,
         `Phone: ${parsed.data.phone}`,
-        parsed.data.email ? `Email: ${parsed.data.email}` : null
+        parsed.data.email ? `Email: ${parsed.data.email}` : null,
+        parsed.data.skinConcern ? `Skin Concern: ${parsed.data.skinConcern}` : null
       ]
         .filter(Boolean)
         .join("\n"),
