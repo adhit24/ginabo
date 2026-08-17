@@ -48,56 +48,50 @@ const StatCard = ({ value, label }: Stat) => (
   </Card>
 );
 
-// A sticky testimonial card for the stacking effect (sticky only on lg screens).
-const StickyTestimonialCard = ({ testimonial, index }: { testimonial: Testimonial; index: number }) => {
+// A clean testimonial card with hover effects
+const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
   return (
-    <motion.div
-      style={{
-        "--sticky-top": `${80 + index * 32}px`, // Adjusted offset for modern layouts & overlap spacing
-      } as React.CSSProperties}
-      className="relative lg:sticky lg:top-[var(--sticky-top)] w-full"
-    >
-      <div className={cn(
-        "p-6 rounded-2xl shadow-lg flex flex-col h-auto w-full",
-        "bg-white border border-slate-200/80 text-[#1a1a1a]"
-      )}>
-        {/* Top section: Image and Author */}
-        <div className="flex items-center gap-4">
-          <div
-            className="w-14 h-14 rounded-xl bg-cover bg-center flex-shrink-0"
-            style={{ backgroundImage: `url(${testimonial.avatarSrc})` }}
-            aria-label={`Photo of ${testimonial.name}`}
-          />
-          <div className="flex-grow">
-            <p className="font-semibold text-lg text-[#4A1A5E]">{testimonial.name}</p>
-            <p className="text-sm text-slate-500">{testimonial.title}</p>
-          </div>
+    <div className={cn(
+      "p-6 rounded-2xl shadow-sm flex flex-col h-auto w-full",
+      "bg-white border border-slate-100 text-[#1a1a1a]",
+      "transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+    )}>
+      {/* Top section: Image and Author */}
+      <div className="flex items-center gap-4">
+        <div
+          className="w-14 h-14 rounded-xl bg-cover bg-center flex-shrink-0"
+          style={{ backgroundImage: `url(${testimonial.avatarSrc})` }}
+          aria-label={`Photo of ${testimonial.name}`}
+        />
+        <div className="flex-grow">
+          <p className="font-semibold text-lg text-[#4A1A5E]">{testimonial.name}</p>
+          <p className="text-sm text-slate-500">{testimonial.title}</p>
         </div>
-
-        {/* Middle section: Rating */}
-        <div className="flex items-center gap-2 my-4">
-          <span className="font-bold text-base text-slate-800">{testimonial.rating.toFixed(1)}</span>
-          <div className="flex">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star
-                key={i}
-                className={cn(
-                  "h-4 w-4",
-                  i < Math.floor(testimonial.rating)
-                    ? "text-yellow-400 fill-yellow-400"
-                    : "text-slate-200"
-                )}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom section: Quote */}
-        {testimonial.quote && (
-          <p className="text-base text-slate-600 italic leading-relaxed">&ldquo;{testimonial.quote}&rdquo;</p>
-        )}
       </div>
-    </motion.div>
+
+      {/* Middle section: Rating */}
+      <div className="flex items-center gap-2 my-4">
+        <span className="font-bold text-base text-slate-800">{testimonial.rating.toFixed(1)}</span>
+        <div className="flex">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Star
+              key={i}
+              className={cn(
+                "h-4 w-4",
+                i < Math.floor(testimonial.rating)
+                  ? "text-yellow-400 fill-yellow-400"
+                  : "text-slate-200"
+              )}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom section: Quote */}
+      {testimonial.quote && (
+        <p className="text-base text-slate-600 italic leading-relaxed">&ldquo;{testimonial.quote}&rdquo;</p>
+      )}
+    </div>
   );
 };
 
@@ -115,9 +109,6 @@ export const ClientsSection = ({
   secondaryActionHref,
   className,
 }: ClientsSectionProps) => {
-  // Calculate a height for the scroll container to ensure all cards can stack
-  const scrollContainerHeight = `calc(100vh + ${testimonials.length * 100}px)`;
-
   return (
     <section className={cn("w-full bg-white text-slate-800 py-20 md:py-28", className)}>
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start px-4">
@@ -155,17 +146,11 @@ export const ClientsSection = ({
           </div>
         </div>
 
-        {/* Right Column: Container for the sticky card stack */}
-        <div 
-          className="relative flex flex-col gap-6 h-auto lg:h-[var(--scroll-height)]" 
-          style={{ 
-            "--scroll-height": scrollContainerHeight 
-          } as React.CSSProperties}
-        >
-          {testimonials.map((testimonial, index) => (
-            <StickyTestimonialCard
+        {/* Right Column: Normal scrolling list of cards */}
+        <div className="relative flex flex-col gap-6 w-full">
+          {testimonials.map((testimonial) => (
+            <TestimonialCard
               key={testimonial.name}
-              index={index}
               testimonial={testimonial}
             />
           ))}
