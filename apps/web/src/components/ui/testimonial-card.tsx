@@ -48,41 +48,41 @@ const StatCard = ({ value, label }: Stat) => (
   </Card>
 );
 
-// A sticky testimonial card for the stacking effect (sticky only on lg screens).
+// A sticky testimonial card for the stacking effect (sticky on both mobile and desktop).
 const StickyTestimonialCard = ({ testimonial, index }: { testimonial: Testimonial; index: number }) => {
   return (
     <motion.div
       style={{
-        "--sticky-top": `${80 + index * 28}px`, // Staggered top position for clean stacking
+        "--sticky-top": `${70 + index * 20}px`, // Compact stack offset for both mobile and desktop
       } as React.CSSProperties}
-      className="relative lg:sticky lg:top-[var(--sticky-top)] w-full"
+      className="sticky top-[var(--sticky-top)] w-full"
     >
       <div className={cn(
-        "p-6 rounded-2xl shadow-lg flex flex-col h-auto w-full",
+        "p-4 md:p-6 rounded-xl md:rounded-2xl shadow-lg flex flex-col h-auto w-full",
         "bg-white border border-slate-200/80 text-[#1a1a1a]"
       )}>
         {/* Top section: Image and Author */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 md:gap-4">
           <div
-            className="w-14 h-14 rounded-xl bg-cover bg-center flex-shrink-0"
+            className="w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-xl bg-cover bg-center flex-shrink-0"
             style={{ backgroundImage: `url(${testimonial.avatarSrc})` }}
             aria-label={`Photo of ${testimonial.name}`}
           />
           <div className="flex-grow">
-            <p className="font-semibold text-lg text-[#4A1A5E]">{testimonial.name}</p>
-            <p className="text-sm text-slate-500">{testimonial.title}</p>
+            <p className="font-semibold text-sm md:text-lg text-[#4A1A5E]">{testimonial.name}</p>
+            <p className="text-xs md:text-sm text-slate-500">{testimonial.title}</p>
           </div>
         </div>
 
         {/* Middle section: Rating */}
-        <div className="flex items-center gap-2 my-4">
-          <span className="font-bold text-base text-slate-800">{testimonial.rating.toFixed(1)}</span>
+        <div className="flex items-center gap-2 my-2 md:my-4">
+          <span className="font-bold text-xs md:text-base text-slate-800">{testimonial.rating.toFixed(1)}</span>
           <div className="flex">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star
                 key={i}
                 className={cn(
-                  "h-4 w-4",
+                  "h-3 md:h-4 w-3 md:w-4",
                   i < Math.floor(testimonial.rating)
                     ? "text-yellow-400 fill-yellow-400"
                     : "text-slate-200"
@@ -94,7 +94,7 @@ const StickyTestimonialCard = ({ testimonial, index }: { testimonial: Testimonia
 
         {/* Bottom section: Quote */}
         {testimonial.quote && (
-          <p className="text-base text-slate-600 italic leading-relaxed">&ldquo;{testimonial.quote}&rdquo;</p>
+          <p className="text-xs md:text-base text-slate-600 italic leading-relaxed">&ldquo;{testimonial.quote}&rdquo;</p>
         )}
       </div>
     </motion.div>
@@ -153,7 +153,7 @@ export const ClientsSection = ({
         </div>
 
         {/* Right Column: Sticky cards stack with bottom padding to cleanly scroll away */}
-        <div className="relative flex flex-col gap-6 w-full pb-0 lg:pb-[50vh]">
+        <div className="relative flex flex-col gap-6 w-full pb-[40vh] lg:pb-[50vh]">
           {testimonials.map((testimonial, index) => (
             <StickyTestimonialCard
               key={testimonial.name}
