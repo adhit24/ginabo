@@ -33,8 +33,8 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
       whileInView="visible"
       viewport={{ once: true, margin: "-100px" }}
       variants={{
-        hidden: { opacity: 0, y: 30 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE, delay } },
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE, delay } },
       }}
     >
       {children}
@@ -42,7 +42,7 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
   );
 }
 
-// ─── WHATSAPP LINK HELPERS ───────────────────────────────────────────────────
+// ─── WHATSAPP LINK HELPER ────────────────────────────────────────────────────
 function waLink() {
   const text = "Halo Ginabo, saya tertarik bergabung dengan program 21 Days Journey. Boleh info lebih lanjut?";
   return `https://wa.me/6285199264835?text=${encodeURIComponent(text)}`;
@@ -51,6 +51,10 @@ function waLink() {
 export default function Journey21Page() {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
+  
+  // Bento interactive states
+  const [activeProduct, setActiveProduct] = useState<"serum" | "cream">("serum");
+  const [activeWeek, setActiveWeek] = useState<1 | 2 | 3>(1);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -75,116 +79,96 @@ export default function Journey21Page() {
   const faqs = [
     {
       q: "Apakah aman untuk kulit sensitif?",
-      a: "Sangat aman. Kedua produk utama diformulasikan dengan konsentrasi bahan aktif yang terkalibrasi untuk memperkuat skin barrier dan meminimalisir iritasi, serta bebas dari pewangi buatan."
+      a: "Sangat aman. Kedua produk Ginabo diformulasikan dengan konsentrasi bahan aktif terkalibrasi untuk memperkuat skin barrier dan bebas dari wewangian buatan."
     },
     {
       q: "Kapan hasil mulai terlihat?",
-      a: "Adaptasi hidrasi biasanya terasa sejak minggu pertama pemakaian. Perbaikan tekstur kulit dan skin barrier yang lebih kuat terlihat secara bertahap dalam 14 hingga 21 hari pemakaian konsisten."
+      a: "Hidrasi intensif terasa sejak minggu pertama. Perbaikan tekstur kulit dan skin barrier yang lebih kuat terlihat secara bertahap dalam 14 hingga 21 hari pemakaian konsisten."
     },
     {
-      q: "Bolehkah digunakan bersamaan dengan produk lain?",
-      a: "Selama program 21 hari, kami menyarankan untuk tidak mencampurkan (layering) dengan bahan aktif keras dari brand lain (seperti retinol dosis tinggi atau AHA/BHA kuat) agar Anda bisa mengevaluasi hasil Ginabo secara objektif."
+      q: "Bolehkah digunakan bersama produk lain?",
+      a: "Disarankan untuk tidak mencampurnya dengan bahan aktif keras lain (seperti retinol dosis tinggi atau AHA/BHA kuat) agar Anda dapat menilai efektivitas program ini secara objektif."
     },
     {
-      q: "Bagaimana jika ada reaksi di awal pemakaian?",
-      a: "Reaksi ringan seperti penyesuaian hidrasi adalah wajar. Anda memiliki akses ke komunitas eksklusif Ginabo untuk berkonsultasi langsung dengan tim pendamping kami selama program berlangsung."
+      q: "Bagaimana jika ada reaksi di awal?",
+      a: "Reaksi adaptasi ringan adalah wajar. Anda mendapatkan akses konsultasi langsung gratis dengan tim pendamping eksklusif kami selama program berlangsung."
     }
   ];
 
   return (
-    <div className={`${playfair.variable} ${plusJakarta.variable} bg-[#fcf9f8] text-[#1c1b1b] min-h-screen selection:bg-[#3a1078]/10 selection:text-[#3a1078]`}>
+    <div className={`${playfair.variable} ${plusJakarta.variable} bg-[#fcf9f8] text-[#1c1b1b] min-h-screen selection:bg-[#3a1078]/10 selection:text-[#3a1078] pb-16`}>
       
-
-
-      {/* ─── 2. HERO SECTION ────────────────────────────────────────────────── */}
-      <section className="max-w-[1280px] mx-auto px-6 md:px-10 py-16 md:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      {/* ─── 1. HERO SECTION (Asymmetric, Compact) ────────────────────────── */}
+      <section className="max-w-[1280px] mx-auto px-6 md:px-10 py-12 md:py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
-          {/* Left Hero Column */}
-          <div className="lg:col-span-7 space-y-6">
-            <span className="inline-block bg-[#3a1078]/10 text-[#3a1078] px-4 py-1.5 rounded-full text-[11px] font-bold tracking-widest uppercase">
-              PROGRAM 21 HARI
+          {/* Left Column - Copy */}
+          <div className="lg:col-span-7 space-y-5">
+            <span className="inline-block bg-[#3a1078]/10 text-[#3a1078] px-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">
+              PROGRAM 21 HARI GINABO
             </span>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif text-[#3a1078] leading-tight">
-              Kulit lebih sehat, kuat, & terawat konsisten.
+            <h1 className="text-3xl md:text-5xl font-bold font-serif text-[#3a1078] leading-tight">
+              Kulit Sehat & Kuat,<br />Terawat Konsisten.
             </h1>
             
-            <p className="text-base md:text-lg text-[#4a4451] leading-relaxed max-w-xl">
-              Program skincare 21 hari dengan 2 produk barrier-first untuk memperbaiki skin barrier, hidrasi, dan kecerahan alami.
+            <p className="text-sm md:text-base text-[#4a4451] leading-relaxed max-w-lg">
+              Rutin 2 langkah praktis pagi & malam dengan formula barrier-first untuk hidrasi mendalam dan tekstur kulit yang lebih halus dalam 21 hari.
             </p>
 
-            <div className="flex flex-wrap gap-2.5 pt-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-[#4a4451] bg-[#f0eded]">
-                ✓ Barrier-first
+            <div className="flex flex-wrap gap-2 pt-1">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-[#4a4451] bg-[#f0eded]">
+                ✓ Barrier-First
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-[#4a4451] bg-[#f0eded]">
-                ✓ Rutin 2 langkah
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-[#4a4451] bg-[#f0eded]">
+                ✓ Rutin 2 Langkah
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-[#4a4451] bg-[#f0eded]">
-                ✓ Cocok pemula
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-[#4a4451] bg-[#f0eded]">
+                ✓ Cocok Sensitif
               </span>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 py-6 border-y border-[#ccc3d3]/30 max-w-md">
-              <div>
-                <span className="text-[10px] uppercase tracking-wider text-[#71717a] font-semibold">Durasi</span>
-                <p className="text-lg font-bold text-[#3a1078] mt-0.5">21 Hari</p>
-              </div>
-              <div>
-                <span className="text-[10px] uppercase tracking-wider text-[#71717a] font-semibold">Rutin</span>
-                <p className="text-lg font-bold text-[#3a1078] mt-0.5">2 Langkah</p>
-              </div>
-              <div>
-                <span className="text-[10px] uppercase tracking-wider text-[#71717a] font-semibold">Untuk</span>
-                <p className="text-lg font-bold text-[#3a1078] mt-0.5">Semua Kulit</p>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row gap-3 pt-3">
               <a 
-                href="#join-section" 
-                className="bg-[#3a1078] text-white px-8 py-4 rounded-full text-xs font-bold uppercase tracking-wider text-center hover:opacity-95 transition-opacity"
+                href="#action-section" 
+                className="bg-[#3a1078] text-white px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider text-center hover:opacity-95 transition-opacity"
               >
-                Gabung Program Sekarang
+                Ikut Journey Sekarang
               </a>
               <a 
                 href={waLink()}
                 target="_blank"
                 rel="noreferrer"
-                className="border border-[#3a1078] text-[#3a1078] px-8 py-4 rounded-full text-xs font-bold uppercase tracking-wider text-center hover:bg-[#3a1078]/5 transition-colors flex items-center justify-center gap-2"
+                className="border border-[#3a1078] text-[#3a1078] px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider text-center hover:bg-[#3a1078]/5 transition-colors flex items-center justify-center gap-2"
               >
-                Chat WhatsApp
+                Tanya WhatsApp
               </a>
             </div>
           </div>
 
-          {/* Right Hero Column */}
+          {/* Right Column - Hero Visual */}
           <div className="lg:col-span-5 relative flex justify-center">
-            <div className="relative w-full max-w-[450px] aspect-[4/5] rounded-3xl overflow-hidden shadow-sm border border-[#ccc3d3]/20 bg-white">
+            <div className="relative w-full max-w-[400px] aspect-[4/4.5] rounded-2xl overflow-hidden shadow-sm border border-[#ccc3d3]/20 bg-white">
               <Image 
                 src="/GlowAge_Multi_Active_Serum&Bright_Care_Moisture_Cream.png"
-                alt="Ginabo 21-Day Products Bundle"
+                alt="Ginabo 21-Day Products"
                 fill
-                className="object-contain p-6"
+                className="object-contain p-5"
                 priority
                 unoptimized
               />
               
-              {/* Garansi Badge */}
-              <div className="absolute top-4 right-4 bg-[#c5a059] text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm">
+              <div className="absolute top-3 right-3 bg-[#c5a059] text-white px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest shadow-sm">
                 Garansi 21 Hari
               </div>
 
-              {/* Yang kamu dapatkan overlay card */}
-              <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-purple-100/50 shadow-sm">
-                <span className="text-[10px] uppercase tracking-widest text-[#c5a059] font-bold">Yang Kamu Dapatkan</span>
-                <h3 className="text-sm font-bold text-[#3a1078] mt-1 mb-2">Paket Lengkap Perjalanan Kulit</h3>
-                <ul className="grid grid-cols-2 gap-2 text-xs text-[#4a4451]">
-                  <li className="flex items-center gap-1.5">✓ 2 Produk Full Size</li>
-                  <li className="flex items-center gap-1.5">✓ Guide Pemakaian</li>
-                  <li className="flex items-center gap-1.5">✓ Tracker Progress</li>
-                  <li className="flex items-center gap-1.5">✓ Komunitas Support</li>
+              <div className="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-sm rounded-xl p-4 border border-purple-100/50 shadow-sm">
+                <span className="text-[9px] uppercase tracking-widest text-[#c5a059] font-bold">Benefit Program</span>
+                <ul className="grid grid-cols-2 gap-1.5 text-[11px] text-[#4a4451] mt-2">
+                  <li>✓ 2 Produk Full Size</li>
+                  <li>✓ Panduan Harian</li>
+                  <li>✓ Progress Tracker</li>
+                  <li>✓ Support Group</li>
                 </ul>
               </div>
             </div>
@@ -193,411 +177,282 @@ export default function Journey21Page() {
         </div>
       </section>
 
-      {/* ─── 3. CARA KERJA SECTION ──────────────────────────────────────────── */}
-      <section id="cara-kerja" className="bg-[#f0eded]/40 py-24 border-y border-[#ccc3d3]/10">
-        <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-[11px] font-bold text-[#c5a059] tracking-[0.2em] uppercase">Langkah Program</span>
-            <h2 className="text-3xl md:text-4xl font-bold font-serif text-[#3a1078] mt-2">Cara Kerja Program 21 Hari</h2>
-            <p className="text-sm text-[#71717a] mt-3">Skema sederhana untuk membangun kebiasaan merawat wajah secara konsisten harian.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { num: "1", title: "Daftar", desc: "Isi data diri singkat & pilih concern utamamu di form pendaftaran." },
-              { num: "2", title: "Pakai 21 Hari", desc: "Gunakan 2 langkah rutin Ginabo pagi dan malam secara teratur." },
-              { num: "3", title: "Upload Progress", desc: "Kirim foto dan bagikan update berkala di grup untuk evaluasi bersama." }
-            ].map((step) => (
-              <div 
-                key={step.num} 
-                className="bg-white rounded-2xl p-8 border border-[#7b7482]/10 shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300"
-                style={{ boxShadow: "0 10px 30px rgba(58, 16, 120, 0.02)" }}
-              >
-                <div className="w-12 h-12 rounded-full bg-[#3a1078]/10 text-[#3a1078] flex items-center justify-center text-lg font-bold mb-6 group-hover:bg-[#3a1078] group-hover:text-white transition-colors">
-                  {step.num}
-                </div>
-                <h3 className="text-lg font-bold text-[#3a1078] mb-2">{step.title}</h3>
-                <p className="text-sm text-[#71717a] leading-relaxed">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 4. PRODUK & MANFAAT ────────────────────────────────────────────── */}
-      <section id="produk" className="max-w-[1280px] mx-auto px-6 md:px-10 py-24">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-[11px] font-bold text-[#c5a059] tracking-[0.2em] uppercase">Formulasi Utama</span>
-          <h2 className="text-3xl md:text-4xl font-bold font-serif text-[#3a1078] mt-2">2 Produk, 2 Langkah, Hasil Maksimal</h2>
-          <p className="text-sm text-[#71717a] mt-3">Produk inti yang dirancang saling melengkapi untuk mengunci kelembapan dan menutrisi kulit secara aman.</p>
+      {/* ─── 2. THE 21-DAY BLUEPRINT (Bento Grid) ─────────────────────────── */}
+      <section className="max-w-[1280px] mx-auto px-6 md:px-10 py-12">
+        <div className="text-center max-w-xl mx-auto mb-10">
+          <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#3a1078]">Blue Print Program 21 Hari</h2>
+          <p className="text-xs text-[#71717a] mt-2">Cara kerja, produk, dan ekspektasi progress Anda yang disatukan secara padat.</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        {/* Bento Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* Product 1: GlowAge Serum */}
-          <div className="bg-white rounded-2xl border border-[#7b7482]/10 shadow-sm overflow-hidden flex flex-col md:flex-row">
-            <div className="w-full md:w-[45%] bg-[#f0eded]/50 p-6 flex items-center justify-center relative">
-              <div className="relative w-full aspect-square max-w-[200px]">
+          {/* Card A: Product Spotlight (Interactive Tab) */}
+          <div className="lg:col-span-7 bg-white p-6 rounded-2xl border border-[#7b7482]/10 shadow-sm flex flex-col justify-between">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#c5a059]">1. Detail Produk</span>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setActiveProduct("serum")}
+                  className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase transition-all duration-300 ${activeProduct === "serum" ? "bg-[#3a1078] text-white" : "bg-[#f0eded] text-[#4a4451]"}`}
+                >
+                  Serum (Langkah 1)
+                </button>
+                <button 
+                  onClick={() => setActiveProduct("cream")}
+                  className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase transition-all duration-300 ${activeProduct === "cream" ? "bg-[#3a1078] text-white" : "bg-[#f0eded] text-[#4a4451]"}`}
+                >
+                  Moist Cream (Langkah 2)
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center flex-1">
+              {/* Product Image */}
+              <div className="md:col-span-5 flex justify-center bg-[#fcf9f8] p-4 rounded-xl relative aspect-square max-h-[180px]">
                 <Image 
-                  src="/GlowAge_Multi_Active_Serum.png" 
-                  alt="GlowAge Multi-Active Serum"
-                  fill 
+                  src={activeProduct === "serum" ? "/GlowAge_Multi_Active_Serum.png" : "/Bright&Care_Moisture_Cream.png"}
+                  alt={activeProduct === "serum" ? "GlowAge Serum" : "Bright Care Cream"}
+                  fill
                   className="object-contain"
                   unoptimized
                 />
               </div>
-              <span className="absolute top-4 left-4 bg-[#3a1078] text-white text-[9px] font-bold tracking-widest px-2.5 py-1 rounded-full uppercase">Langkah 1</span>
-            </div>
-            <div className="w-full md:w-[55%] p-8 flex flex-col justify-center space-y-4">
-              <div>
-                <h3 className="text-xl font-bold text-[#3a1078]">GlowAge Multi-Active Serum</h3>
-                <p className="text-xs text-[#71717a] mt-0.5">Hydration & Texture Renewal</p>
-              </div>
-              <p className="text-xs text-[#71717a] leading-relaxed">
-                Membantu memperbaiki tekstur kulit yang tidak rata serta menjaga kekuatan skin barrier secara optimal.
-              </p>
-              <div className="space-y-2 pt-2 border-t border-[#7b7482]/10 text-xs">
-                <div>
-                  <span className="font-semibold text-[#3a1078]">Fungsi utama:</span>
-                  <p className="text-[#71717a] mt-0.5">Memperbaiki barrier & meratakan tekstur kulit.</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-[#3a1078]">Tekstur:</span>
-                  <p className="text-[#71717a] mt-0.5">Ringan, cepat meresap, bebas lengket.</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-[#3a1078]">Key ingredients:</span>
-                  <p className="text-[#71717a] mt-0.5">Ceramide NP, 5% Niacinamide, Panthenol, Centella.</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-[#3a1078]">Cocok untuk:</span>
-                  <p className="text-[#71717a] mt-0.5">Semua jenis kulit, kusam, tekstur kasar.</p>
+
+              {/* Product Details */}
+              <div className="md:col-span-7 space-y-3">
+                <h3 className="text-base font-bold text-[#3a1078]">
+                  {activeProduct === "serum" ? "GlowAge Multi-Active Serum" : "Bright & Care Moisture Cream"}
+                </h3>
+                <p className="text-xs text-[#71717a] leading-relaxed">
+                  {activeProduct === "serum" 
+                    ? "Membantu memperbaiki tekstur kulit yang tidak rata serta menjaga kekuatan skin barrier secara optimal." 
+                    : "Mengunci kelembapan alami secara mendalam serta membantu menenangkan kulit yang rentan mengalami kemerahan."}
+                </p>
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[10px] text-[#4a4451]">
+                  <div>
+                    <span className="font-bold text-[#3a1078]">Tekstur:</span>
+                    <p className="text-[#71717a] mt-0.5">{activeProduct === "serum" ? "Watery, cepat meresap" : "Cream lembut, ringan"}</p>
+                  </div>
+                  <div>
+                    <span className="font-bold text-[#3a1078]">Bahan Utama:</span>
+                    <p className="text-[#71717a] mt-0.5">{activeProduct === "serum" ? "Ceramide, Niacinamide" : "Allantoin, Squalane, Panthenol"}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Product 2: Bright & Care Moisture Cream */}
-          <div className="bg-white rounded-2xl border border-[#7b7482]/10 shadow-sm overflow-hidden flex flex-col md:flex-row">
-            <div className="w-full md:w-[45%] bg-[#f0eded]/50 p-6 flex items-center justify-center relative">
-              <div className="relative w-full aspect-square max-w-[200px]">
-                <Image 
-                  src="/Bright&Care_Moisture_Cream.png" 
-                  alt="Bright & Care Moisture Cream"
-                  fill 
-                  className="object-contain"
-                  unoptimized
-                />
+          {/* Card B: Weekly Progress Timeline (Interactive Stepper) */}
+          <div className="lg:col-span-5 bg-white p-6 rounded-2xl border border-[#7b7482]/10 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#c5a059]">2. Ekspektasi Hasil</span>
+                <span className="text-[10px] font-semibold text-[#71717a]">Pilih Minggu</span>
               </div>
-              <span className="absolute top-4 left-4 bg-[#3a1078] text-white text-[9px] font-bold tracking-widest px-2.5 py-1 rounded-full uppercase">Langkah 2</span>
+
+              {/* Weeks Toggles */}
+              <div className="flex justify-between gap-1 mb-4 bg-[#f0eded]/50 p-1 rounded-full">
+                {[1, 2, 3].map((wk) => (
+                  <button 
+                    key={wk}
+                    onClick={() => setActiveWeek(wk as 1 | 2 | 3)}
+                    className={`flex-1 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 ${activeWeek === wk ? "bg-[#3a1078] text-white shadow-sm" : "text-[#71717a] hover:text-[#3a1078]"}`}
+                  >
+                    W{wk}
+                  </button>
+                ))}
+              </div>
+
+              {/* Target Week Content */}
+              <div className="space-y-3 min-h-[110px] flex flex-col justify-center">
+                <h4 className="text-sm font-bold text-[#3a1078]">
+                  {activeWeek === 1 && "Minggu 1: Adaptasi & Hidrasi"}
+                  {activeWeek === 2 && "Minggu 2: Perbaikan & Kekenyalan"}
+                  {activeWeek === 3 && "Minggu 3: Stabil & Glowing Maksimal"}
+                </h4>
+                <ul className="text-xs text-[#71717a] space-y-1.5 pl-4 list-disc">
+                  {activeWeek === 1 && (
+                    <>
+                      <li>Kulit terasa lebih kenyal & lembap sepanjang hari.</li>
+                      <li>Kemerahan ringan mulai mereda dan terkalibrasi.</li>
+                    </>
+                  )}
+                  {activeWeek === 2 && (
+                    <>
+                      <li>Kekuatan skin barrier mulai terasa stabil.</li>
+                      <li>Tekstur area kasar perlahan menjadi lebih rata.</li>
+                    </>
+                  )}
+                  {activeWeek === 3 && (
+                    <>
+                      <li>Warna kulit tampak cerah merata & segar alami.</li>
+                      <li>Kulit terlindungi penuh dari risiko dehidrasi harian.</li>
+                    </>
+                  )}
+                </ul>
+              </div>
             </div>
-            <div className="w-full md:w-[55%] p-8 flex flex-col justify-center space-y-4">
-              <div>
-                <h3 className="text-xl font-bold text-[#3a1078]">Bright & Care Moisture Cream</h3>
-                <p className="text-xs text-[#71717a] mt-0.5">Moisture Lock & Calming</p>
+          </div>
+
+          {/* Card C: The 2-Step Daily Ritual (Ritual Harian) */}
+          <div className="lg:col-span-4 bg-[#3a1078] text-white p-6 rounded-2xl shadow-sm flex flex-col justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#c5a059]">3. Ritual Harian</span>
+            <div className="space-y-4 my-6">
+              <div className="flex gap-3">
+                <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold shrink-0">AM</span>
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider">Pagi Hari</h4>
+                  <p className="text-[11px] text-white/80 mt-1">Serum (Langkah 1) + Moisture Cream (Langkah 2) untuk perlindungan harian.</p>
+                </div>
               </div>
-              <p className="text-xs text-[#71717a] leading-relaxed">
-                Mengunci kelembapan alami secara mendalam serta membantu menenangkan kulit yang rentan mengalami kemerahan.
-              </p>
-              <div className="space-y-2 pt-2 border-t border-[#7b7482]/10 text-xs">
+              <div className="flex gap-3">
+                <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold shrink-0">PM</span>
                 <div>
-                  <span className="font-semibold text-[#3a1078]">Fungsi utama:</span>
-                  <p className="text-[#71717a] mt-0.5">Mengunci hidrasi & menenangkan inflamasi.</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-[#3a1078]">Tekstur:</span>
-                  <p className="text-[#71717a] mt-0.5">Cream ringan, lembut, nyaman di kulit.</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-[#3a1078]">Key ingredients:</span>
-                  <p className="text-[#71717a] mt-0.5">Ceramide, Panthenol, Allantoin, Squalane.</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-[#3a1078]">Cocok untuk:</span>
-                  <p className="text-[#71717a] mt-0.5">Kulit kering, sensitif, mudah memerah.</p>
+                  <h4 className="text-xs font-bold uppercase tracking-wider">Malam Hari</h4>
+                  <p className="text-[11px] text-white/80 mt-1">Gunakan 2 langkah yang sama sebelum tidur untuk menutrisi kulit semalaman.</p>
                 </div>
               </div>
             </div>
+            <span className="text-[9px] text-[#c5a059] uppercase font-bold tracking-widest">Waktu Pemakaian: 5 Menit</span>
+          </div>
+
+          {/* Card D: Komitmen & Aturan Main */}
+          <div className="lg:col-span-8 bg-white p-6 rounded-2xl border border-[#7b7482]/10 shadow-sm flex flex-col justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#c5a059] border-b border-slate-100 pb-2">4. Aturan Main</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
+              <div className="flex gap-3">
+                <span className="text-sm font-bold text-[#3a1078]">01</span>
+                <div>
+                  <h4 className="text-xs font-bold text-[#3a1078]">Konsistensi</h4>
+                  <p className="text-[11px] text-[#71717a] mt-0.5">Disiplin pagi & malam selama 21 hari tanpa terlewat.</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-sm font-bold text-[#3a1078]">02</span>
+                <div>
+                  <h4 className="text-xs font-bold text-[#3a1078]">Foto Progress</h4>
+                  <p className="text-[11px] text-[#71717a] mt-0.5">Ambil foto berkala setiap minggu untuk memantau perubahan.</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-sm font-bold text-[#3a1078]">03</span>
+                <div>
+                  <h4 className="text-xs font-bold text-[#3a1078]">Batasi Layering</h4>
+                  <p className="text-[11px] text-[#71717a] mt-0.5">Hindari mencampur dengan bahan aktif keras brand lain.</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-sm font-bold text-[#3a1078]">04</span>
+                <div>
+                  <h4 className="text-xs font-bold text-[#3a1078]">Evaluasi Grup</h4>
+                  <p className="text-[11px] text-[#71717a] mt-0.5">Diskusikan keluhan kulit langsung dengan pendamping.</p>
+                </div>
+              </div>
+            </div>
+            <span className="text-[9px] text-[#71717a]">Evaluasi gratis dipandu tim expert.</span>
           </div>
 
         </div>
       </section>
 
-      {/* ─── 5. TIMELINE HASIL SECTION ──────────────────────────────────────── */}
-      <section id="timeline" className="bg-[#f0eded]/40 py-24 border-y border-[#ccc3d3]/10">
-        <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-[11px] font-bold text-[#c5a059] tracking-[0.2em] uppercase">Ekspektasi Progres</span>
-            <h2 className="text-3xl md:text-4xl font-bold font-serif text-[#3a1078] mt-2">Timeline Hasil (Ekspektasi Realistis)</h2>
-            <p className="text-sm text-[#71717a] mt-3">Perubahan kulit wajah yang sehat membutuhkan waktu dan konsistensi yang nyata.</p>
-          </div>
-
-          <div className="max-w-4xl mx-auto relative pl-8 md:pl-0 md:flex md:gap-6">
-            
-            {/* progress line for desktop */}
-            <div className="hidden md:block absolute top-[15px] left-8 right-8 h-0.5 bg-[#ccc3d3]/40 z-0" />
-
-            {[
-              {
-                week: "Minggu 1",
-                title: "Adaptasi & Hidrasi",
-                items: ["Kulit terasa lebih lembap", "Kemerahan mulai berkurang", "Tekstur terasa sedikit lebih halus"]
-              },
-              {
-                week: "Minggu 2",
-                title: "Perbaikan & Kuat",
-                items: ["Skin barrier mulai terasa stabil", "Kulit terasa kenyal & sehat", "Noda ringan perlahan memudar"]
-              },
-              {
-                week: "Minggu 3",
-                title: "Stabil & Glowing",
-                items: ["Warna kulit cerah merata", "Hidrasi terkunci optimal", "Kulit tampak bersih, sehat, & glowing"]
-              }
-            ].map((milestone, idx) => (
-              <div key={milestone.week} className="relative z-10 md:flex-1 md:text-center pb-8 md:pb-0">
-                
-                {/* timeline point */}
-                <div className="absolute -left-10 md:left-1/2 md:-translate-x-1/2 top-0 md:top-[-10px] w-6 h-6 rounded-full bg-[#3a1078] border-4 border-white flex items-center justify-center" />
-                
-                <div className="md:mt-8 bg-white p-6 rounded-2xl border border-[#7b7482]/10 shadow-sm inline-block w-full text-left">
-                  <span className="text-[10px] font-bold text-[#c5a059] tracking-wider uppercase">{milestone.week}</span>
-                  <h3 className="text-base font-bold text-[#3a1078] mt-1 mb-3">{milestone.title}</h3>
-                  <ul className="space-y-2 text-xs text-[#71717a]">
-                    {milestone.items.map((item, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="text-[#3a1078] mt-0.5">✓</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))}
-
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 6. BUKTI NYATA (SOCIAL PROOF) ──────────────────────────────────── */}
-      <section id="testimoni" className="max-w-[1280px] mx-auto px-6 md:px-10 py-24">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-[11px] font-bold text-[#c5a059] tracking-[0.2em] uppercase">Testimoni Nyata</span>
-          <h2 className="text-3xl md:text-4xl font-bold font-serif text-[#3a1078] mt-2">Bukti Nyata dari Mereka</h2>
-          <p className="text-sm text-[#71717a] mt-3">Hasil pemakaian rutin dari anggota komunitas 21 Days Journey Ginabo.</p>
-        </div>
-
+      {/* ─── 3. ACTION SECTION (Bukti Nyata + Form Registrasi Side-by-Side) ──── */}
+      <section id="action-section" className="max-w-[1280px] mx-auto px-6 md:px-10 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Column 1: Before After Image Slider */}
-          <div className="lg:col-span-4 bg-white p-6 rounded-2xl border border-[#7b7482]/10 shadow-sm">
-            <h3 className="text-sm font-bold text-[#3a1078] mb-4 text-center uppercase tracking-wider">Geser Progres (21 Hari)</h3>
-            <div 
-              className="relative aspect-square w-full overflow-hidden rounded-2xl cursor-ew-resize select-none"
-              onMouseMove={handleMouseMove}
-              onTouchMove={handleTouchMove}
-            >
-              {/* Before Image (Left side base) */}
-              <div className="absolute inset-0 bg-[#fcece9]">
-                <Image 
-                  src="/product-serum-bg.png" 
-                  alt="Sebelum" 
-                  fill 
-                  className="object-contain filter grayscale opacity-70 p-4" 
-                  unoptimized
-                />
-                <span className="absolute bottom-3 left-3 bg-black/60 text-white text-[9px] font-bold px-2 py-0.5 rounded">Hari 1: Kusam & Kemerahan</span>
-              </div>
+          {/* Left Column: Visual Proof & UGC */}
+          <div className="lg:col-span-6 space-y-6">
+            <div className="bg-white p-5 rounded-2xl border border-[#7b7482]/10 shadow-sm">
+              <span className="text-[9px] font-bold text-[#c5a059] tracking-widest uppercase block mb-3 text-center">Geser & Bandingkan</span>
               
-              {/* After Image (Right side overlay) */}
+              {/* Slider Component */}
               <div 
-                className="absolute inset-0 bg-[#f5fbf7]" 
-                style={{ clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)` }}
+                className="relative aspect-[4/3] w-full overflow-hidden rounded-xl cursor-ew-resize select-none bg-slate-50"
+                onMouseMove={handleMouseMove}
+                onTouchMove={handleTouchMove}
               >
-                <Image 
-                  src="/product-serum-bg.png" 
-                  alt="Sesudah" 
-                  fill 
-                  className="object-contain p-4" 
-                  unoptimized
-                />
-                <span className="absolute bottom-3 right-3 bg-[#3a1078] text-white text-[9px] font-bold px-2 py-0.5 rounded">Hari 21: Sehat & Glowing</span>
-              </div>
-              
-              {/* Slider Bar */}
-              <div 
-                className="absolute top-0 bottom-0 w-0.5 bg-white shadow-md"
-                style={{ left: `${sliderPosition}%` }}
-              >
-                <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-white shadow-md flex items-center justify-center text-[#3a1078] font-bold text-xs">
-                  ↔
+                {/* Before Image */}
+                <div className="absolute inset-0 bg-[#fcece9]">
+                  <Image 
+                    src="/product-serum-bg.png" 
+                    alt="Sebelum" 
+                    fill 
+                    className="object-contain filter grayscale opacity-70 p-4" 
+                    unoptimized
+                  />
+                  <span className="absolute bottom-2 left-2 bg-black/60 text-white text-[8px] font-bold px-2 py-0.5 rounded">Hari 1: Kusam</span>
+                </div>
+                
+                {/* After Image */}
+                <div 
+                  className="absolute inset-0 bg-[#f5fbf7]" 
+                  style={{ clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)` }}
+                >
+                  <Image 
+                    src="/product-serum-bg.png" 
+                    alt="Sesudah" 
+                    fill 
+                    className="object-contain p-4" 
+                    unoptimized
+                  />
+                  <span className="absolute bottom-2 right-2 bg-[#3a1078] text-white text-[8px] font-bold px-2 py-0.5 rounded">Hari 21: Glowing</span>
+                </div>
+                
+                {/* Slider Handle */}
+                <div 
+                  className="absolute top-0 bottom-0 w-0.5 bg-white shadow"
+                  style={{ left: `${sliderPosition}%` }}
+                >
+                  <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-white shadow flex items-center justify-center text-[#3a1078] font-bold text-[10px]">
+                    ↔
+                  </div>
                 </div>
               </div>
-            </div>
-            <p className="text-[10px] text-center text-[#71717a] mt-4">Arahkan kursor atau sentuh gambar untuk melihat perubahan detail.</p>
-          </div>
 
-          {/* Column 2: Testimonial Cards */}
-          <div className="lg:col-span-4 space-y-6">
-            <div className="bg-white p-6 rounded-2xl border border-[#7b7482]/10 shadow-sm space-y-3">
-              <div className="flex text-[#c5a059]">★★★★★</div>
-              <p className="text-xs text-[#71717a] leading-relaxed italic">
-                &ldquo;Kulit saya terasa jauh lebih lembap dan kemerahan berkurang secara bertahap dalam satu minggu pemakaian konsisten.&rdquo;
-              </p>
-              <div>
-                <span className="text-xs font-bold text-[#3a1078]">Anisa, 24 tahun</span>
-                <p className="text-[10px] text-[#71717a]">Kulit Sensitif</p>
+              {/* Single Testimonial Quote */}
+              <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
+                <div className="flex text-[#c5a059] text-xs">★★★★★</div>
+                <p className="text-xs text-[#71717a] leading-relaxed italic">
+                  &ldquo;Rutin 2 langkah ini sangat membantu menjaga kelembapan kulit saya yang tadinya kering di area pipi. Kemerahan berkurang bertahap.&rdquo;
+                </p>
+                <span className="text-[11px] font-bold text-[#3a1078] block">Dita, 27 tahun (Kulit Sensitif)</span>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-[#7b7482]/10 shadow-sm space-y-3">
-              <div className="flex text-[#c5a059]">★★★★★</div>
-              <p className="text-xs text-[#71717a] leading-relaxed italic">
-                &ldquo;Rutin 2 langkah ini sangat membantu menjaga kelembapan kulit saya yang tadinya kering di area pipi. Suka sekali dengan teksturnya.&rdquo;
-              </p>
-              <div>
-                <span className="text-xs font-bold text-[#3a1078]">Dita, 27 tahun</span>
-                <p className="text-[10px] text-[#71717a]">Kulit Kombinasi</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Column 3: UGC Video Section */}
-          <div className="lg:col-span-4 bg-white p-6 rounded-2xl border border-[#7b7482]/10 shadow-sm flex flex-col items-center">
-            <h3 className="text-sm font-bold text-[#3a1078] mb-4 text-center uppercase tracking-wider">Video Pengalaman</h3>
-            <div className="relative w-full aspect-video rounded-xl bg-slate-100 overflow-hidden group">
-              <Image 
-                src="/product-bundle.png" 
-                alt="UGC Video Thumbnail" 
-                fill 
-                className="object-cover opacity-90 transition group-hover:scale-105"
-                unoptimized
-              />
-              <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-white/90 text-[#3a1078] flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 cursor-pointer">
-                  <svg className="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+            {/* UGC Video Preview (Compact Card) */}
+            <div className="bg-white p-4 rounded-xl border border-[#7b7482]/10 shadow-sm flex items-center gap-4">
+              <div className="relative w-24 h-16 rounded bg-slate-100 overflow-hidden shrink-0">
+                <Image 
+                  src="/product-bundle.png" 
+                  alt="UGC Video" 
+                  fill 
+                  className="object-cover opacity-90"
+                  unoptimized
+                />
+                <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-full bg-white/90 text-[#3a1078] flex items-center justify-center shadow">
+                    <svg className="w-2.5 h-2.5 fill-current ml-0.5" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
                 </div>
               </div>
-            </div>
-            <p className="text-xs text-center text-[#71717a] mt-4 font-semibold">Lihat pengalaman jujur mereka langsung dari komunitas Ginabo.</p>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ─── 7. RULES & FAQ SECTION ─────────────────────────────────────────── */}
-      <section id="faq" className="bg-[#f0eded]/40 py-24 border-y border-[#ccc3d3]/10">
-        <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            
-            {/* Rules column */}
-            <div className="space-y-6">
               <div>
-                <span className="text-[11px] font-bold text-[#c5a059] tracking-[0.2em] uppercase">Panduan Dasar</span>
-                <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#3a1078] mt-2">Aturan Main Program</h2>
-                <p className="text-xs text-[#71717a] mt-2">Patuhi komitmen berikut untuk mendapatkan hasil perbaikan kulit yang maksimal.</p>
-              </div>
-
-              <div className="space-y-4">
-                {[
-                  {
-                    title: "Komitmen 21 Hari",
-                    desc: "Wajib melakukan pemakaian rutin pagi & malam secara disiplin tanpa terputus."
-                  },
-                  {
-                    title: "Foto Progress Berjangka",
-                    desc: "Dokumentasikan progres kulit wajah Anda setiap minggu sesuai instruksi tracker."
-                  },
-                  {
-                    title: "Kejujuran & Evaluasi",
-                    desc: "Sampaikan reaksi kulit Anda apa adanya agar tim pendamping dapat memberikan tips yang tepat."
-                  },
-                  {
-                    title: "Dukungan Komunitas",
-                    desc: "Saling mendukung, berbagi cerita, dan berkonsultasi di grup eksklusif program."
-                  }
-                ].map((rule, idx) => (
-                  <div key={idx} className="flex gap-4 p-4 rounded-xl bg-white border border-[#7b7482]/10">
-                    <div className="w-8 h-8 rounded-full bg-[#3a1078]/10 text-[#3a1078] flex items-center justify-center font-bold text-sm shrink-0">
-                      {idx + 1}
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-semibold text-[#3a1078]">{rule.title}</h4>
-                      <p className="text-xs text-[#71717a] mt-1">{rule.desc}</p>
-                    </div>
-                  </div>
-                ))}
+                <h4 className="text-xs font-bold text-[#3a1078]">Video Review Komunitas</h4>
+                <p className="text-[10px] text-[#71717a] mt-0.5">Lihat pengalaman nyata langsung dari ribuan peserta program.</p>
               </div>
             </div>
+          </div>
 
-            {/* FAQ column */}
-            <div className="space-y-6">
+          {/* Right Column: Sign Up Form Card */}
+          <div className="lg:col-span-6">
+            <div className="bg-white p-6 rounded-2xl border border-[#7b7482]/10 shadow-sm space-y-4">
               <div>
-                <span className="text-[11px] font-bold text-[#c5a059] tracking-[0.2em] uppercase">Tanya Jawab</span>
-                <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#3a1078] mt-2">Pertanyaan Umum</h2>
-                <p className="text-xs text-[#71717a] mt-2">Informasi penting yang sering ditanyakan seputar pendaftaran & penggunaan.</p>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#c5a059] block">Formulir Program</span>
+                <h3 className="text-xl font-bold text-[#3a1078] mt-1">Gabung 21 Days Journey</h3>
+                <p className="text-xs text-[#71717a] mt-1">Isi formulir pendaftaran untuk memulai program secara gratis. Anda hanya perlu berkomitmen menggunakan 2 produk Ginabo terpilih secara teratur.</p>
               </div>
 
-              <div className="space-y-2 bg-white p-6 rounded-2xl border border-[#7b7482]/10 shadow-sm">
-                {faqs.map((faq, index) => (
-                  <div key={index} className="border-b border-[#7b7482]/10 last:border-b-0 py-3.5">
-                    <button 
-                      className="flex justify-between items-center w-full text-left font-semibold text-sm text-[#3a1078] hover:text-[#c5a059] transition-colors"
-                      onClick={() => toggleFaq(index)}
-                    >
-                      <span>{faq.q}</span>
-                      <span className="text-[#c5a059] ml-2">{faqOpen === index ? '−' : '+'}</span>
-                    </button>
-                    
-                    <AnimatePresence>
-                      {faqOpen === index && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1, transition: { duration: 0.25, ease: EASE } }}
-                          exit={{ height: 0, opacity: 0, transition: { duration: 0.2, ease: EASE } }}
-                          className="overflow-hidden"
-                        >
-                          <p className="mt-2 text-xs text-[#71717a] leading-relaxed">
-                            {faq.a}
-                          </p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 8. FINAL CTA (REGISTRATION FORM) ───────────────────────────────── */}
-      <section id="join-section" className="max-w-[1280px] mx-auto px-6 md:px-10 py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
-          <div className="space-y-6">
-            <span className="inline-block bg-[#3a1078]/10 text-[#3a1078] px-4 py-1.5 rounded-full text-[11px] font-bold tracking-widest uppercase">
-              Mulai Journey
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold font-serif text-[#3a1078] leading-tight">
-              Siap mulai perjalanan 21 hari kulit sehatmu?
-            </h2>
-            <p className="text-sm text-[#71717a] leading-relaxed max-w-md">
-              Lengkapi formulir pendaftaran di samping untuk segera terdaftar dalam program Ginabo 21 Days Journey. Pendampingan eksklusif menanti Anda.
-            </p>
-            
-            <div className="bg-[#f0eded]/50 p-6 rounded-2xl border border-[#7b7482]/10 space-y-2">
-              <span className="text-xs font-bold text-[#3a1078] block">Informasi Pendaftaran</span>
-              <p className="text-xs text-[#71717a] leading-relaxed">
-                Pendaftaran tidak dipungut biaya admin tambahan. Anda hanya perlu berkomitmen mengikuti program dengan menggunakan 2 produk Ginabo terpilih secara teratur.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex justify-center">
-            <div className="w-full max-w-[500px]">
               <JoinForm />
             </div>
           </div>
@@ -605,7 +460,42 @@ export default function Journey21Page() {
         </div>
       </section>
 
+      {/* ─── 4. FAQ SECTION (Accordion) ─────────────────────────────────── */}
+      <section className="max-w-[1000px] mx-auto px-6 py-12">
+        <div className="text-center mb-8">
+          <span className="text-[10px] font-bold text-[#c5a059] tracking-wider uppercase">Pertanyaan Umum</span>
+          <h2 className="text-xl md:text-2xl font-bold font-serif text-[#3a1078] mt-1">Sering Ditanyakan (FAQ)</h2>
+        </div>
 
+        <div className="bg-white p-5 rounded-2xl border border-[#7b7482]/10 shadow-sm space-y-2">
+          {faqs.map((faq, index) => (
+            <div key={index} className="border-b border-[#7b7482]/10 last:border-b-0 py-3">
+              <button 
+                className="flex justify-between items-center w-full text-left font-semibold text-xs md:text-sm text-[#3a1078] hover:text-[#c5a059] transition-colors"
+                onClick={() => toggleFaq(index)}
+              >
+                <span>{faq.q}</span>
+                <span className="text-[#c5a059] ml-2">{faqOpen === index ? '−' : '+'}</span>
+              </button>
+              
+              <AnimatePresence>
+                {faqOpen === index && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1, transition: { duration: 0.2, ease: EASE } }}
+                    exit={{ height: 0, opacity: 0, transition: { duration: 0.15, ease: EASE } }}
+                    className="overflow-hidden"
+                  >
+                    <p className="mt-2 text-xs text-[#71717a] leading-relaxed">
+                      {faq.a}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
+        </div>
+      </section>
 
     </div>
   );
