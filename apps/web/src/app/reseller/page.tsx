@@ -229,20 +229,6 @@ const testimonialsData = [
     rating: 5.0,
   },
   {
-    name: "Diana Putri",
-    title: "Freelancer, Makassar",
-    quote: "Kerja fleksibel dari rumah tapi hasil maksimal. Komunitas reseller Ginabo sangat suportif, kita saling berbagi tips cara jualan yang efektif lewat TikTok Live setiap minggunya.",
-    avatarSrc: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&auto=format&fit=crop&q=80",
-    rating: 4.8,
-  },
-  {
-    name: "Farhan Bashir",
-    title: "Mahasiswa & Content Creator, Malang",
-    quote: "Ginabo menyediakan semua landing page dan tools yang saya butuhkan. Sangat membantu anak muda yang ingin memulai bisnis digital dengan modal minim.",
-    avatarSrc: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80",
-    rating: 4.9,
-  },
-  {
     name: "Rina Herawati",
     title: "Mantan Karyawan, Tangerang",
     quote: "Setelah resign, saya fokus jalani kemitraan Ginabo. Sekarang omzet bulanan sudah melebihi gaji bulanan saya dulu waktu kerja kantoran. Sangat bersyukur bisa mandiri secara finansial.",
