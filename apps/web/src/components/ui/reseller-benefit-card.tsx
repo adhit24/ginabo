@@ -27,6 +27,9 @@ export default function ResellerBenefitCard({
         stiffness: 220,
         damping: 18,
       }}
+      style={{
+        x: "var(--shift-x, 0px)",
+      }}
       className={cn("relative w-full aspect-[3/4] cursor-pointer select-none", className)}
     >
       <Image

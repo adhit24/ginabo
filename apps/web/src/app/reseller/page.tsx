@@ -151,8 +151,10 @@ const benefitCards = [
 
 const tierVisuals = {
   starter: {
-    bg: "#ffffff",
-    border: "#ECE5F7",
+    bg: "linear-gradient(160deg, #ffffff 0%, #f6f1fd 55%, #efe6fb 100%)",
+    border: "#e3d6f7",
+    shadow: "0 10px 30px rgba(124, 58, 237, 0.12)",
+    glowColor: "rgba(167, 139, 250, 0.55)",
     labelColor: "#7C3AED",
     grad: "linear-gradient(135deg, #9333EA, #7C3AED)",
     perks: ["Akses harga grosir", "Materi promosi dasar", "Support komunitas"],
@@ -160,8 +162,10 @@ const tierVisuals = {
     featured: false,
   },
   growth: {
-    bg: "linear-gradient(160deg, #7C3AED 0%, #6D28D9 100%)",
+    bg: "linear-gradient(160deg, #8b5cf6 0%, #7c3aed 45%, #6d28d9 100%)",
     border: "transparent",
+    shadow: "0 20px 50px rgba(124, 58, 237, 0.45)",
+    glowColor: "rgba(255, 255, 255, 0.35)",
     labelColor: "#fff",
     grad: "linear-gradient(135deg, #9333EA, #8b5cf6)",
     perks: ["Akses harga grosir", "Materi promosi lengkap", "Priority support", "Undangan training eksklusif"],
@@ -169,8 +173,10 @@ const tierVisuals = {
     featured: true,
   },
   premier: {
-    bg: "#FFFDF8",
-    border: "#F0E3C8",
+    bg: "linear-gradient(160deg, #fffdf7 0%, #fff6e0 55%, #fdecc4 100%)",
+    border: "#f0d99a",
+    shadow: "0 10px 30px rgba(202, 138, 4, 0.18)",
+    glowColor: "rgba(250, 204, 21, 0.55)",
     labelColor: "#B98A2E",
     grad: "linear-gradient(135deg, #B98A2E, #E0B75A)",
     perks: ["Akses harga grosir terbaik", "Materi & konten premium", "Account manager", "Bonus & reward eksklusif"],
@@ -423,16 +429,30 @@ export default function ResellerProgramPage() {
       </section>
 
       {/* ══ 3. BENEFITS ══════════════════════════════════════════════════════ */}
-      <section id="benefit" aria-labelledby="benefits-heading" className="py-12 md:py-16 bg-white">
+      <section id="benefit" aria-labelledby="benefits-heading" className="py-12 md:py-16 bg-white overflow-hidden">
+        <style dangerouslySetInnerHTML={{ __html: `
+          .benefit-card-0 { --shift-x: 7.5px; }
+          .benefit-card-1 { --shift-x: -7.5px; }
+          .benefit-card-2 { --shift-x: 7.5px; }
+          .benefit-card-3 { --shift-x: -7.5px; }
+
+          @media (min-width: 1024px) {
+            .benefit-card-0 { --shift-x: 22.5px; }
+            .benefit-card-1 { --shift-x: 7.5px; }
+            .benefit-card-2 { --shift-x: -7.5px; }
+            .benefit-card-3 { --shift-x: -22.5px; }
+          }
+        `}} />
         <div className="mx-auto max-w-5xl px-5">
           <SectionHeading id="benefits-heading" label="Benefit Partner" title="Lebih dari sekadar menjual skincare" />
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 justify-items-center">
-            {benefitCards.map((card) => (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-0 justify-items-center">
+            {benefitCards.map((card, index) => (
               <ResellerBenefitCard
                 key={card.imageSrc}
                 imageSrc={card.imageSrc}
                 alt={card.alt}
+                className={`benefit-card-${index}`}
               />
             ))}
           </div>
@@ -511,48 +531,60 @@ export default function ResellerProgramPage() {
                   style={{
                     background: v.bg,
                     border: v.featured ? "none" : `1.5px solid ${v.border}`,
-                    boxShadow: v.featured ? "0 16px 44px rgba(147,51,234,0.32)" : "0 4px 20px rgba(120,37,124,0.06)",
+                    boxShadow: v.shadow,
                   }}
                 >
-                  {v.featured && (
-                    <div className="absolute right-4 top-4 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur">
-                      MOST POPULAR
+                  {/* Ambient Glow Blob */}
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full blur-[40px] opacity-55 z-0"
+                    style={{
+                      background: `radial-gradient(circle, ${v.glowColor} 0%, transparent 70%)`,
+                    }}
+                  />
+
+                  {/* Wrapper content to ensure z-index is higher than absolute glow blob */}
+                  <div className="relative z-10 flex flex-col gap-4 h-full flex-grow">
+                    {v.featured && (
+                      <div className="absolute right-0 top-0 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur z-20">
+                        MOST POPULAR
+                      </div>
+                    )}
+
+                    <div className="self-start rounded-lg px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white" style={{ background: v.grad }}>
+                      {t.short.toUpperCase()} PARTNER
                     </div>
-                  )}
 
-                  <div className="self-start rounded-lg px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white" style={{ background: v.grad }}>
-                    {t.short.toUpperCase()} PARTNER
+                    <div>
+                      <p className={`text-[11px] font-semibold uppercase tracking-wide ${v.featured ? "text-white/65" : "text-[#5a4a6a]"}`}>
+                        Modal mulai dari
+                      </p>
+                      <p className={`mt-0.5 text-[28px] font-extrabold leading-none ${v.featured ? "text-white" : ""}`} style={!v.featured ? { color: "#4A1A5E" } : undefined}>
+                        {t.modal}
+                      </p>
+                      <p className={`mt-1.5 text-[13px] font-semibold ${v.featured ? "text-white/85" : "text-[#4a3b60]"}`}>
+                        {t.margin}
+                      </p>
+                    </div>
+
+                    <ul className="flex flex-col gap-2">
+                      {v.perks.map((p) => (
+                        <li key={p} className={`flex items-start gap-2 text-[13px] font-medium ${v.featured ? "text-white/90" : "text-[#5a4a6a]"}`}>
+                          <span className={v.featured ? "text-white" : "text-[#7C3AED]"}>{icons.check}</span>
+                          {p}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Link
+                      href="/reseller/register"
+                      onClick={() => setTier(key)}
+                      className="mt-auto block min-h-[44px] rounded-xl py-3 text-center text-[13px] font-bold transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9333EA]"
+                      style={v.featured ? { background: "#fff", color: "#6D28D9" } : { background: v.grad, color: "#fff" }}
+                    >
+                      {v.cta}
+                    </Link>
                   </div>
-
-                  <div>
-                    <p className={`text-[11px] font-semibold uppercase tracking-wide ${v.featured ? "text-white/65" : "text-[#5a4a6a]"}`}>
-                      Modal mulai dari
-                    </p>
-                    <p className={`mt-0.5 text-[28px] font-extrabold leading-none ${v.featured ? "text-white" : ""}`} style={!v.featured ? { color: "#4A1A5E" } : undefined}>
-                      {t.modal}
-                    </p>
-                    <p className={`mt-1.5 text-[13px] font-semibold ${v.featured ? "text-white/85" : "text-[#4a3b60]"}`}>
-                      {t.margin}
-                    </p>
-                  </div>
-
-                  <ul className="flex flex-col gap-2">
-                    {v.perks.map((p) => (
-                      <li key={p} className={`flex items-start gap-2 text-[13px] font-medium ${v.featured ? "text-white/90" : "text-[#5a4a6a]"}`}>
-                        <span className={v.featured ? "text-white" : "text-[#7C3AED]"}>{icons.check}</span>
-                        {p}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Link
-                    href="/reseller/register"
-                    onClick={() => setTier(key)}
-                    className="mt-auto block min-h-[44px] rounded-xl py-3 text-center text-[13px] font-bold transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9333EA]"
-                    style={v.featured ? { background: "#fff", color: "#6D28D9" } : { background: v.grad, color: "#fff" }}
-                  >
-                    {v.cta}
-                  </Link>
                 </motion.article>
               );
             })}
