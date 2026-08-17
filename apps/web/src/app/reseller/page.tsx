@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { ClientsSection } from "@/components/ui/testimonial-card";
 
 // ─── MOTION TOKENS ────────────────────────────────────────────────────────────
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -207,18 +208,82 @@ const ecosystem = [
   { icon: icons.chat,   title: "Community & Content",       desc: "Konten siap pakai dan grup partner aktif untuk sharing strategi." },
 ];
 
-const testimonials = [
+const statsData = [
+  { value: "1.500+", label: "Reseller Aktif" },
+  { value: "Rp 15M+", label: "Omzet Partner" },
+  { value: "4.9", label: "Rating Kepuasan" },
+];
+
+const testimonialsData = [
   {
-    name: "Aisyah R.",
-    role: "Partner Ginabo, Surabaya",
-    stars: 5,
-    text: "Dalam 2 bulan sudah balik modal dan mulai untung konsisten. Sistem partner-nya benar-benar membantu, support tim responsif banget.",
+    name: "Aisyah Rahmawati",
+    title: "Ibu Rumah Tangga, Surabaya",
+    quote: "Sebagai ibu rumah tangga, saya terbantu sekali dengan program reseller Ginabo. Tanpa perlu stok barang banyak, dalam 2 bulan sudah bisa balik modal dan sekarang punya penghasilan tambahan tetap.",
+    avatarSrc: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80",
+    rating: 5.0,
   },
   {
-    name: "Rizky A.",
-    role: "Partner Ginabo, Bandung",
-    stars: 5,
-    text: "Training dan materi promonya lengkap. Tidak perlu bingung cara jual, tinggal ikuti sistemnya, hasilnya langsung terasa.",
+    name: "Rizky Aditya",
+    title: "Mahasiswa, Bandung",
+    quote: "Awalnya iseng cari tambahan uang saku. Training dan materi promosi dari Ginabo lengkap banget, tinggal copy-paste dan sebar di sosmed, pesanan langsung mengalir deras.",
+    avatarSrc: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=300&auto=format&fit=crop&q=80",
+    rating: 4.8,
+  },
+  {
+    name: "Dewi Lestari",
+    title: "Karyawan Swasta, Yogyakarta",
+    quote: "Awalnya ragu karena sibuk kerja kantor, tapi sistem dropship Ginabo memudahkan saya. Margin keuntungannya tebal dan produknya sangat mudah dijual karena kualitasnya premium.",
+    avatarSrc: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80",
+    rating: 4.9,
+  },
+  {
+    name: "Budi Santoso",
+    title: "Pemilik Toko Kosmetik, Semarang",
+    quote: "Menambahkan produk Ginabo ke toko fisik saya adalah keputusan terbaik. Pelanggan menyukai hasil serumnya, repeat order tinggi sekali dan mendongkrak omzet toko.",
+    avatarSrc: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80",
+    rating: 5.0,
+  },
+  {
+    name: "Siti Aminah",
+    title: "Beauty Blogger Pemula, Medan",
+    quote: "Produk Ginabo sangat disukai followers saya. Selain formulanya aman dan BPOM, reward performa bulanan untuk reseller membuat saya makin semangat promosi.",
+    avatarSrc: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=300&auto=format&fit=crop&q=80",
+    rating: 4.7,
+  },
+  {
+    name: "Hendrata Wijaya",
+    title: "Wirausaha, Jakarta",
+    quote: "Saya gabung sebagai Stockist Ginabo di Jakarta. Kecepatan pengiriman dan support marketing dari pusat sangat membantu kami para partner di daerah berkembang dengan pesat.",
+    avatarSrc: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80",
+    rating: 5.0,
+  },
+  {
+    name: "Diana Putri",
+    title: "Freelancer, Makassar",
+    quote: "Kerja fleksibel dari rumah tapi hasil maksimal. Komunitas reseller Ginabo sangat suportif, kita saling berbagi tips cara jualan yang efektif lewat TikTok Live setiap minggunya.",
+    avatarSrc: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&auto=format&fit=crop&q=80",
+    rating: 4.8,
+  },
+  {
+    name: "Farhan Bashir",
+    title: "Mahasiswa & Content Creator, Malang",
+    quote: "Ginabo menyediakan semua landing page dan tools yang saya butuhkan. Sangat membantu anak muda yang ingin memulai bisnis digital dengan modal minim.",
+    avatarSrc: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80",
+    rating: 4.9,
+  },
+  {
+    name: "Rina Herawati",
+    title: "Mantan Karyawan, Tangerang",
+    quote: "Setelah resign, saya fokus jalani kemitraan Ginabo. Sekarang omzet bulanan sudah melebihi gaji bulanan saya dulu waktu kerja kantoran. Sangat bersyukur bisa mandiri secara finansial.",
+    avatarSrc: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80",
+    rating: 5.0,
+  },
+  {
+    name: "Adi Wijaya",
+    title: "Salon Owner, Denpasar",
+    quote: "Kami menyediakan produk Ginabo di jaringan salon kami. Respon pelanggan luar biasa puas karena produknya cocok untuk berbagai jenis kulit sensitif dan memberikan efek glowing alami.",
+    avatarSrc: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=300&auto=format&fit=crop&q=80",
+    rating: 4.9,
   },
 ];
 
@@ -564,52 +629,17 @@ export default function ResellerProgramPage() {
       </section>
 
       {/* ══ 9. TESTIMONIALS ──────────────────────────────────────────────────── */}
-      <section aria-labelledby="testimonials-heading" className="py-16 md:py-24" style={{ background: "#ffffff" }}>
-        <div className="mx-auto max-w-6xl px-5">
-          <SectionHeading
-            id="testimonials-heading"
-            center={false}
-            label="Cerita Partner"
-            title={<>Mereka sudah mulai, <span className="text-[#9333EA]">kamu kapan?</span></>}
-          />
-
-          <motion.div
-            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
-            className="grid gap-4 md:grid-cols-2"
-          >
-            {testimonials.map((t) => (
-              <motion.article
-                key={t.name}
-                variants={fadeUp}
-                className="flex flex-col gap-3.5 rounded-2xl p-6"
-                style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
-              >
-                <div className="flex gap-1" aria-label={`Rating ${t.stars} dari 5 bintang`}>
-                  {[...Array(5)].map((_, si) => (
-                    <svg key={si} className="h-4 w-4" fill={si < t.stars ? "#9333EA" : "#E9D5FF"} viewBox="0 0 24 24" aria-hidden="true">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                  ))}
-                </div>
-                <blockquote className="text-[13.5px] leading-relaxed text-[#5a4a6a]">&ldquo;{t.text}&rdquo;</blockquote>
-                <footer className="flex items-center gap-3 border-t pt-3.5" style={{ borderColor: "rgba(147,51,234,0.1)" }}>
-                  <div
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[13px] font-extrabold text-white"
-                    style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}
-                    aria-hidden="true"
-                  >
-                    {t.name[0]}
-                  </div>
-                  <div>
-                    <cite className="not-italic text-[13px] font-extrabold" style={{ color: "#4A1A5E" }}>{t.name}</cite>
-                    <p className="text-[11px] text-[#5a4a6a]">{t.role}</p>
-                  </div>
-                </footer>
-              </motion.article>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+      <ClientsSection
+        tagLabel="Cerita Partner"
+        title="Mereka sudah mulai, kamu kapan?"
+        description="Lebih dari 1.500 partner telah bergabung dan mengembangkan bisnis kecantikan mereka bersama Ginabo. Dapatkan kemudahan sistem dan margin keuntungan maksimal."
+        stats={statsData}
+        testimonials={testimonialsData}
+        primaryActionLabel="Daftar Sekarang"
+        secondaryActionLabel="Tanya WhatsApp"
+        primaryActionHref="/reseller/register"
+        secondaryActionHref={waLink()}
+      />
 
       {/* ══ 10. FINAL CTA ────────────────────────────────────────────────────── */}
       <section
