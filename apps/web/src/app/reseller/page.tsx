@@ -18,6 +18,10 @@ const stagger = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.06, delayChildren: 0.04 } },
 };
+const popIn = {
+  hidden: { opacity: 0, scale: 0.4 },
+  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 260, damping: 18 } },
+};
 
 function Reveal({ children, delay = 0, className = "", style }: { children: React.ReactNode; delay?: number; className?: string; style?: React.CSSProperties }) {
   return (
@@ -154,6 +158,7 @@ const tierVisuals = {
     bg: "linear-gradient(160deg, #ffffff 0%, #f6f1fd 55%, #efe6fb 100%)",
     border: "#e3d6f7",
     shadow: "0 10px 30px rgba(124, 58, 237, 0.12)",
+    hoverShadow: "0 18px 42px rgba(124, 58, 237, 0.22)",
     glowColor: "rgba(167, 139, 250, 0.55)",
     labelColor: "#7C3AED",
     grad: "linear-gradient(135deg, #9333EA, #7C3AED)",
@@ -165,6 +170,7 @@ const tierVisuals = {
     bg: "linear-gradient(160deg, #8b5cf6 0%, #7c3aed 45%, #6d28d9 100%)",
     border: "transparent",
     shadow: "0 20px 50px rgba(124, 58, 237, 0.45)",
+    hoverShadow: "0 28px 64px rgba(124, 58, 237, 0.58)",
     glowColor: "rgba(255, 255, 255, 0.35)",
     labelColor: "#fff",
     grad: "linear-gradient(135deg, #9333EA, #8b5cf6)",
@@ -176,6 +182,7 @@ const tierVisuals = {
     bg: "linear-gradient(160deg, #fffdf7 0%, #fff6e0 55%, #fdecc4 100%)",
     border: "#f0d99a",
     shadow: "0 10px 30px rgba(202, 138, 4, 0.18)",
+    hoverShadow: "0 18px 42px rgba(202, 138, 4, 0.30)",
     glowColor: "rgba(250, 204, 21, 0.55)",
     labelColor: "#B98A2E",
     grad: "linear-gradient(135deg, #B98A2E, #E0B75A)",
@@ -526,8 +533,9 @@ export default function ResellerProgramPage() {
                 <motion.article
                   key={key}
                   variants={fadeUp}
-                  whileHover={{ y: -6 }}
-                  className={`relative flex flex-col gap-4 overflow-hidden rounded-2xl p-5 transition-shadow md:p-6 ${v.featured ? "md:-my-2 md:py-8" : ""}`}
+                  whileHover={{ y: -8, boxShadow: v.hoverShadow }}
+                  transition={{ duration: 0.25, ease: EASE }}
+                  className={`group relative flex flex-col gap-4 overflow-hidden rounded-2xl p-5 md:p-6 ${v.featured ? "md:-my-2 md:py-8" : ""}`}
                   style={{
                     background: v.bg,
                     border: v.featured ? "none" : `1.5px solid ${v.border}`,
@@ -546,7 +554,12 @@ export default function ResellerProgramPage() {
                   {/* Wrapper content to ensure z-index is higher than absolute glow blob */}
                   <div className="relative z-10 flex flex-col gap-4 h-full flex-grow">
                     {v.featured && (
-                      <div className="absolute right-0 top-0 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur z-20">
+                      <div
+                        className="absolute right-0 top-0 z-20 flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur"
+                      >
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path d="M12 2l2.9 6.6L22 9.6l-5 4.9 1.2 7L12 18l-6.2 3.5 1.2-7-5-4.9 7.1-1L12 2z" />
+                        </svg>
                         MOST POPULAR
                       </div>
                     )}
@@ -559,18 +572,29 @@ export default function ResellerProgramPage() {
                       <p className={`text-[11px] font-semibold uppercase tracking-wide ${v.featured ? "text-white/65" : "text-[#5a4a6a]"}`}>
                         Modal mulai dari
                       </p>
-                      <p className={`mt-0.5 text-[28px] font-extrabold leading-none ${v.featured ? "text-white" : ""}`} style={!v.featured ? { color: "#4A1A5E" } : undefined}>
+                      <motion.p
+                        variants={popIn}
+                        className={`mt-0.5 text-[28px] font-extrabold leading-none ${v.featured ? "text-white" : ""}`}
+                        style={!v.featured ? { color: "#4A1A5E" } : undefined}
+                      >
                         {t.modal}
-                      </p>
+                      </motion.p>
                       <p className={`mt-1.5 text-[13px] font-semibold ${v.featured ? "text-white/85" : "text-[#4a3b60]"}`}>
                         {t.margin}
                       </p>
                     </div>
 
-                    <ul className="flex flex-col gap-2">
+                    <ul className="flex flex-col gap-2.5">
                       {v.perks.map((p) => (
-                        <li key={p} className={`flex items-start gap-2 text-[13px] font-medium ${v.featured ? "text-white/90" : "text-[#5a4a6a]"}`}>
-                          <span className={v.featured ? "text-white" : "text-[#7C3AED]"}>{icons.check}</span>
+                        <li key={p} className={`flex items-center gap-2.5 text-[13px] font-medium ${v.featured ? "text-white/90" : "text-[#5a4a6a]"}`}>
+                          <span
+                            className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
+                            style={{ background: v.featured ? "rgba(255,255,255,0.18)" : "#F1E9FD" }}
+                          >
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={v.featured ? "#fff" : "#7C3AED"} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          </span>
                           {p}
                         </li>
                       ))}
@@ -579,10 +603,11 @@ export default function ResellerProgramPage() {
                     <Link
                       href="/reseller/register"
                       onClick={() => setTier(key)}
-                      className="mt-auto block min-h-[44px] rounded-xl py-3 text-center text-[13px] font-bold transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9333EA]"
+                      className="mt-auto flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl py-3 text-center text-[13px] font-bold transition duration-200 hover:opacity-90 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9333EA]"
                       style={v.featured ? { background: "#fff", color: "#6D28D9" } : { background: v.grad, color: "#fff" }}
                     >
                       {v.cta}
+                      <span className="transition-transform duration-200 group-hover:translate-x-1">{icons.arrowRight}</span>
                     </Link>
                   </div>
                 </motion.article>
@@ -592,35 +617,70 @@ export default function ResellerProgramPage() {
         </div>
       </section>
 
-      {/* ══ 6. HOW IT WORKS ══════════════════════════════════════════════════ */}
+      {/* ══ 6. HOW IT WORKS — TIMELINE RAIL ═════════════════════════════════ */}
       <section id="program" aria-labelledby="steps-heading" className="py-10 md:py-14" style={{ background: "#ffffff" }}>
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading id="steps-heading" label="Cara Gabung" title="4 langkah mudah jadi partner" />
 
-          <motion.ol
-            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
-            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-          >
-            {steps.map((s) => (
-              <motion.li
-                key={s.n}
-                variants={fadeUp}
-                className="flex items-start gap-3.5 rounded-2xl p-5"
-                style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
-              >
-                <span
-                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-[15px] font-extrabold text-white"
-                  style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)", boxShadow: "0 0 16px rgba(147,51,234,0.4)" }}
+          <div className="relative mt-2 md:mt-10">
+            {/* Connecting rail — desktop horizontal, drawn on scroll */}
+            <motion.div
+              aria-hidden="true"
+              className="absolute top-5 left-[12.5%] right-[12.5%] hidden h-[2px] origin-left md:block"
+              style={{ background: "linear-gradient(90deg, rgba(124,58,237,0.05), rgba(124,58,237,0.4) 50%, rgba(124,58,237,0.05))" }}
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 1.1, ease: EASE, delay: 0.1 }}
+            />
+            {/* Connecting rail — mobile vertical, drawn on scroll */}
+            <motion.div
+              aria-hidden="true"
+              className="absolute left-5 top-2 bottom-2 w-[2px] origin-top md:hidden"
+              style={{ background: "linear-gradient(180deg, rgba(124,58,237,0.4), rgba(124,58,237,0.05))" }}
+              initial={{ scaleY: 0 }}
+              whileInView={{ scaleY: 1 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 1.1, ease: EASE, delay: 0.1 }}
+            />
+
+            <motion.ol
+              initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
+              className="relative grid gap-5 md:grid-cols-4 md:gap-5"
+            >
+              {steps.map((s) => (
+                <motion.li
+                  key={s.n}
+                  variants={fadeUp}
+                  className="relative flex items-start gap-4 md:flex-col md:items-center md:gap-0 md:text-center"
                 >
-                  {s.n}
-                </span>
-                <div>
-                  <h3 className="text-[14px] font-extrabold" style={{ color: "#4A1A5E" }}>{s.title}</h3>
-                  <p className="mt-1 text-[12.5px] leading-relaxed text-[#5a4a6a]">{s.desc}</p>
-                </div>
-              </motion.li>
-            ))}
-          </motion.ol>
+                  <motion.span
+                    variants={popIn}
+                    className="relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-[15px] font-extrabold text-white ring-4 ring-white"
+                    style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)", boxShadow: "0 0 0 4px rgba(124,58,237,0.1), 0 4px 16px rgba(147,51,234,0.4)" }}
+                  >
+                    {s.n}
+                  </motion.span>
+
+                  <motion.div
+                    whileHover={{ y: -4 }}
+                    transition={{ duration: 0.2, ease: EASE }}
+                    className="min-w-0 flex-1 rounded-2xl p-5 md:mt-5 md:w-full"
+                    style={{ background: "linear-gradient(135deg, #ffffff, #faf5ff)", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
+                  >
+                    <span
+                      className="mb-2 inline-block rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest"
+                      style={{ background: "#F1E9FD", color: "#7C3AED" }}
+                    >
+                      Langkah {s.n}
+                    </span>
+                    <h3 className="text-[14px] font-extrabold" style={{ color: "#4A1A5E" }}>{s.title}</h3>
+                    <p className="mt-1 text-[12.5px] leading-relaxed text-[#5a4a6a]">{s.desc}</p>
+                  </motion.div>
+                </motion.li>
+              ))}
+            </motion.ol>
+          </div>
         </div>
       </section>
 
@@ -629,29 +689,51 @@ export default function ResellerProgramPage() {
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading id="price-heading" label="Harga Partner" title="Selisih harga yang jadi keuntunganmu" desc={`Contoh perhitungan untuk tier ${picked.short} (margin ${Math.round(picked.rate * 100)}%).`} />
 
-          <Reveal className="overflow-hidden rounded-2xl" style={{ border: "1px solid #F1ECF9" }}>
-            <div className="overflow-x-auto">
-              <div className="min-w-[560px]">
-                <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr] bg-[#F9F6FE] text-[11px] font-bold uppercase tracking-wider text-[#8b7aa8]">
-                  <span className="px-5 py-3.5">Produk</span>
-                  <span className="px-4 py-3.5">Marketplace</span>
-                  <span className="px-4 py-3.5">Harga partner</span>
-                  <span className="px-4 py-3.5">Profit / pcs</span>
-                </div>
-                {products.map((p, i) => {
-                  const partner = partnerPrice(p.retail, tier);
-                  return (
-                    <div key={p.name} className={`grid grid-cols-[1.6fr_1fr_1fr_1fr] items-center border-t border-[#F4F0FA] ${i % 2 === 1 ? "bg-[#FDFCFF]" : ""}`}>
-                      <span className="px-5 py-4 text-[13px] font-semibold text-[#241338]">{p.name}</span>
-                      <span className="px-4 py-4 text-[13px] font-medium text-[#8b7aa8] line-through">{fmtRp(p.retail)}</span>
-                      <span className="px-4 py-4 text-[13px] font-bold text-[#241338]">{fmtRp(partner)}</span>
-                      <span className="px-4 py-4 text-[13px] font-bold text-[#7C3AED]">+ {fmtRp(p.retail - partner)}</span>
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger}
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {products.map((p) => {
+              const partner = partnerPrice(p.retail, tier);
+              const profit = p.retail - partner;
+              return (
+                <motion.div
+                  key={p.name}
+                  variants={fadeUp}
+                  whileHover={{ y: -5 }}
+                  transition={{ duration: 0.2, ease: EASE }}
+                  className="relative flex flex-col gap-3.5 overflow-hidden rounded-2xl p-5"
+                  style={{ background: "#ffffff", border: "1px solid rgba(147,51,234,0.1)", boxShadow: "0 4px 20px rgba(120,37,124,0.06)" }}
+                >
+                  {/* Ambient glow blob for brand consistency with tier cards */}
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -top-8 -right-8 h-28 w-28 rounded-full opacity-40 blur-[36px]"
+                    style={{ background: "radial-gradient(circle, #C084FC 0%, transparent 70%)" }}
+                  />
+
+                  <h3 className="relative text-[13.5px] font-bold leading-snug text-[#241338]">{p.name}</h3>
+
+                  <div className="relative flex items-center gap-2">
+                    <div className="min-w-0 flex-1 rounded-xl bg-[#F9F6FE] px-3 py-2.5">
+                      <p className="text-[9.5px] font-bold uppercase tracking-wider text-[#a294b5]">Marketplace</p>
+                      <p className="mt-0.5 truncate text-[13px] font-semibold text-[#8b7aa8] line-through">{fmtRp(p.retail)}</p>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          </Reveal>
+                    <span className="flex-shrink-0 text-[#c4b5e0]">{icons.arrowRight}</span>
+                    <div className="min-w-0 flex-1 rounded-xl px-3 py-2.5" style={{ background: "linear-gradient(135deg, #9333EA, #7C3AED)" }}>
+                      <p className="text-[9.5px] font-bold uppercase tracking-wider text-white/70">Harga partner</p>
+                      <p className="mt-0.5 truncate text-[13px] font-extrabold text-white">{fmtRp(partner)}</p>
+                    </div>
+                  </div>
+
+                  <div className="relative flex items-center justify-between rounded-xl px-3.5 py-2.5" style={{ background: "#F1E9FD" }}>
+                    <span className="text-[11px] font-semibold text-[#5a4a6a]">Profit per pcs</span>
+                    <span className="text-[14px] font-extrabold" style={{ color: "#7C3AED" }}>+ {fmtRp(profit)}</span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
         </div>
       </section>
 
