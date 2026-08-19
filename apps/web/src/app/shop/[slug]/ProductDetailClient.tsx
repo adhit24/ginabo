@@ -282,7 +282,7 @@ export function ProductDetailClient({ product }: Props) {
 
   function handleAddRelatedToCart(item: ShopProduct) {
     addItem({
-      productId: item.slug,
+      productId: item.id,
       slug: item.slug,
       name: item.name,
       priceMinor: item.priceMinor,

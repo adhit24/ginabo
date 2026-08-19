@@ -1,13 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useCart } from "@/components/cart/CartProvider";
+import { useCurrency } from "@/components/currency/CurrencyProvider";
+import { ProductQuickViewModal, type QuickViewProduct } from "@/components/product/ProductQuickViewModal";
+import { AddedToCartModal, type AddedCartItem } from "@/components/cart/AddedToCartModal";
 
 export type ProductCardData = {
+  id?: string;
   slug: string;
   name: string;
   price: string;
+  priceMinor?: number;
   originalPrice?: string;
+  originalPriceMinor?: number;
   img: string;
   rating?: string;
   tag?: string;
@@ -15,10 +23,34 @@ export type ProductCardData = {
 
 export function ProductCard({ product }: { product: ProductCardData }) {
   const isDiscounted = !!product.originalPrice;
+  const { addItem } = useCart();
+  const { formatPrice } = useCurrency();
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
+  const [addedItem, setAddedItem] = useState<AddedCartItem | null>(null);
+
+  const quickViewProduct: QuickViewProduct = {
+    productId: product.id ?? product.slug,
+    slug: product.slug,
+    name: product.name,
+    priceMinor: product.priceMinor ?? 0,
+    originalPriceMinor:
+      product.originalPriceMinor ?? (product.originalPrice ? Number(product.originalPrice.replace(/\D/g, "")) || undefined : undefined),
+    currency: "IDR",
+    imageUrl: product.img || null,
+  };
+
+  function handleAddToCart(item: QuickViewProduct, quantity: number) {
+    addItem(
+      { productId: item.productId, slug: item.slug, name: item.name, priceMinor: item.priceMinor, currency: item.currency, imageUrl: item.imageUrl },
+      quantity
+    );
+    setQuickViewOpen(false);
+    setAddedItem({ ...item, quantity });
+  }
 
   return (
     <div className="gnb-flat-card group flex flex-col relative">
-      
+
       {/* Top Right: Discount Pill */}
       {isDiscounted && (
         <span className="absolute top-2.5 right-2.5 z-10 gnb-discount-badge text-[10px] font-bold text-white shadow-xs select-none">
@@ -45,8 +77,8 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       {/* Product Info */}
       <div className="flex flex-col flex-1 gap-1 pt-3">
         <span className="gnb-best-seller-badge">Best Seller</span>
-        <Link 
-          href={`/shop/${product.slug}`} 
+        <Link
+          href={`/shop/${product.slug}`}
           className="line-clamp-2 text-[13.5px] font-bold text-[#231F20] hover:text-[#8E51B8] transition leading-snug"
         >
           {product.name}
@@ -61,7 +93,29 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             </span>
           )}
         </div>
+
+        <button
+          type="button"
+          onClick={() => setQuickViewOpen(true)}
+          className="gnb-cart-btn mt-2.5 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-[6px] px-3 py-2 text-[12px] font-bold text-white"
+        >
+          <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 01-8 0" />
+          </svg>
+          Add to Cart
+        </button>
       </div>
+
+      <ProductQuickViewModal
+        open={quickViewOpen}
+        product={quickViewProduct}
+        onClose={() => setQuickViewOpen(false)}
+        onAddToCart={handleAddToCart}
+        formatPrice={formatPrice}
+      />
+      <AddedToCartModal open={!!addedItem} item={addedItem} onClose={() => setAddedItem(null)} formatPrice={formatPrice} />
     </div>
   );
 }

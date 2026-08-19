@@ -1,7 +1,7 @@
 "use client";
 
 export type PaymentMethod = {
-  group: "bank_transfer" | "virtual_account" | "e_wallet";
+  group: "bank_transfer" | "virtual_account" | "e_wallet" | "credit_card" | "qris";
   provider: string;
   label: string;
   fee: number;

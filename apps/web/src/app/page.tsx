@@ -8,6 +8,10 @@ import { motion } from "framer-motion";
 import { HeroBanner } from "@/components/HeroBanner";
 import { Reveal } from "@/components/ui/Reveal";
 import { Marquee } from "@/components/ui/Marquee";
+import { useCart } from "@/components/cart/CartProvider";
+import { useCurrency } from "@/components/currency/CurrencyProvider";
+import { ProductQuickViewModal, type QuickViewProduct } from "@/components/product/ProductQuickViewModal";
+import { AddedToCartModal, type AddedCartItem } from "@/components/cart/AddedToCartModal";
 
 import { store, type GProduct } from "@/lib/adminStore";
 import { listActiveProducts, type CatalogProduct } from "@/lib/catalog";
@@ -29,17 +33,6 @@ const staggerContainer = {
 const cardSlideUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } },
-};
-
-const productDescriptions: Record<string, string> = {
-  "GlowAge Multi Active Serum": "Serum pencerah, pelembap & anti-aging harian.",
-  "GlowAge Multi-Active Serum": "Serum pencerah, pelembap & anti-aging harian.",
-  "Bright & Care Moisture Cream": "Cream harian untuk kelembapan dan skin barrier.",
-  "Hydra Moist Gel Ultimate": "Gel 3-in-1: moisturizer, makeup prep & sleeping mask.",
-  "Ginabo Complete Skin Nutrition Set": "Gel + Cream + Serum dalam satu paket lengkap.",
-  "Repair & Glow Set": "Kombinasi serum dan cream untuk regenerasi kulit.",
-  "Daily Skin Barrier Set": "Perawatan barrier intensif harian.",
-  "Bright Renewal Set": "Perawatan fokus mencerahkan kulit kusam.",
 };
 
 // ── CTA Card — simple hover scale ───────────────────────────────────────────
@@ -71,58 +64,70 @@ function CTACard({ href, src, alt, tint }: { href: string; src: string; alt: str
 // ── Home Product Card (Exact match to Image 2) ───────────────────────────────
 function HomeProductCard({
   product,
-  onInfoClick,
+  onQuickView,
 }: {
   product: CatalogItem;
-  onInfoClick: (name: string) => void;
+  onQuickView: (product: CatalogItem) => void;
 }) {
   const cleanName = product.name.replace(/\n/g, " ");
   const discountPct = product.originalPrice ? 50 : 0;
 
   return (
     <motion.div variants={cardSlideUp} className="h-full">
-      <Link
-        href={`/shop/${product.slug}`}
-        className="gnb-flat-card group flex flex-col h-full cursor-pointer"
-      >
-        {/* Top Image Container */}
-        <div className="gnb-img-wrap relative aspect-[4/3] w-full bg-transparent">
-          {/* Discount badge if available */}
-          {discountPct > 0 && (
-            <span className="absolute top-3 right-3 z-10 gnb-discount-badge text-[11px] font-bold text-white shadow-xs select-none">
-              {discountPct}% Off
-            </span>
-          )}
+      <div className="gnb-flat-card group flex h-full flex-col">
+        <Link href={`/shop/${product.slug}`} className="flex flex-col cursor-pointer">
+          {/* Top Image Container */}
+          <div className="gnb-img-wrap relative aspect-[4/3] w-full bg-transparent">
+            {/* Discount badge if available */}
+            {discountPct > 0 && (
+              <span className="absolute top-3 right-3 z-10 gnb-discount-badge text-[11px] font-bold text-white shadow-xs select-none">
+                {discountPct}% Off
+              </span>
+            )}
 
-          {product.img ? (
-            <img
-              src={product.img}
-              alt={cleanName}
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-xs text-gray-400">
-              Belum ada foto
-            </div>
-          )}
-        </div>
-
-        {/* Product Details */}
-        <div className="flex flex-1 flex-col gap-2 pt-3 pb-1">
-          <span className="gnb-best-seller-badge">Best Seller</span>
-          
-          <h3 className="text-[13.5px] md:text-[17px] font-bold text-[#1e1b3a] leading-tight line-clamp-2 group-hover:text-[#7C3AED] transition">
-            {cleanName}
-          </h3>
-
-          {/* Pricing Row */}
-          <div className="gnb-price-row mt-auto pt-2">
-            <span className="gnb-price-now">{product.priceVal}</span>
-            {product.originalPrice && (
-              <span className="gnb-price-old">{product.originalPrice}</span>
+            {product.img ? (
+              <img
+                src={product.img}
+                alt={cleanName}
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-xs text-gray-400">
+                Belum ada foto
+              </div>
             )}
           </div>
-        </div>
-      </Link>
+
+          {/* Product Details */}
+          <div className="flex flex-1 flex-col gap-2 pt-3 pb-1">
+            <span className="gnb-best-seller-badge">Best Seller</span>
+
+            <h3 className="text-[13.5px] md:text-[17px] font-bold text-[#1e1b3a] leading-tight line-clamp-2 group-hover:text-[#7C3AED] transition">
+              {cleanName}
+            </h3>
+
+            {/* Pricing Row */}
+            <div className="gnb-price-row mt-auto pt-2">
+              <span className="gnb-price-now">{product.priceVal}</span>
+              {product.originalPrice && (
+                <span className="gnb-price-old">{product.originalPrice}</span>
+              )}
+            </div>
+          </div>
+        </Link>
+
+        <button
+          type="button"
+          onClick={() => onQuickView(product)}
+          className="gnb-cart-btn mt-2.5 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-[6px] px-3 py-2 text-[12px] font-bold text-white"
+        >
+          <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 01-8 0" />
+          </svg>
+          Add to Cart
+        </button>
+      </div>
     </motion.div>
   );
 }
@@ -156,8 +161,11 @@ export default function HomePage() {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [detailProduct, setDetailProduct] = useState<string | null>(null);
+  const [quickViewProduct, setQuickViewProduct] = useState<CatalogItem | null>(null);
+  const [addedItem, setAddedItem] = useState<AddedCartItem | null>(null);
   const sortRef = useRef<HTMLDivElement>(null);
+  const { addItem } = useCart();
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     listActiveProducts().then(setProducts).catch(() => setProducts([]));
@@ -414,7 +422,7 @@ export default function HomePage() {
                             <HomeProductCard
                               key={p.id}
                               product={p}
-                              onInfoClick={setDetailProduct}
+                              onQuickView={setQuickViewProduct}
                             />
                           ))}
                       </div>
@@ -429,7 +437,7 @@ export default function HomePage() {
                             <HomeProductCard
                               key={p.id}
                               product={p}
-                              onInfoClick={setDetailProduct}
+                              onQuickView={setQuickViewProduct}
                             />
                           ))}
                       </div>
@@ -441,7 +449,7 @@ export default function HomePage() {
                       <HomeProductCard
                         key={p.id}
                         product={p}
-                        onInfoClick={setDetailProduct}
+                        onQuickView={setQuickViewProduct}
                       />
                     ))}
                   </div>
@@ -509,35 +517,34 @@ export default function HomePage() {
         </>
       )}
 
-      {/* ── Product Detail Quick Info Modal ── */}
-      {detailProduct && (
-        <>
-          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" onClick={() => setDetailProduct(null)} />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="fixed inset-0 z-50 m-auto h-fit w-[85vw] max-w-md rounded-2xl p-6"
-            style={{
-              background: "#ffffff",
-              border: "1px solid rgba(147,51,234,0.15)",
-              boxShadow: "0 24px 64px rgba(20,15,50,0.2)",
-            }}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-bold text-[#1e1b3a]">{detailProduct}</h3>
-              <button
-                onClick={() => setDetailProduct(null)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition"
-              >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-            <p className="text-[13.5px] leading-relaxed text-[#555555]">
-              {productDescriptions[detailProduct] ?? "Informasi produk lengkap tersedia di halaman detail produk."}
-            </p>
-          </motion.div>
-        </>
-      )}
+      {/* ── Product Quick View + Added-to-Cart Modals ── */}
+      <ProductQuickViewModal
+        open={!!quickViewProduct}
+        product={
+          quickViewProduct && {
+            productId: quickViewProduct.id,
+            slug: quickViewProduct.slug,
+            name: quickViewProduct.name,
+            priceMinor: quickViewProduct.priceMinor,
+            originalPriceMinor: quickViewProduct.originalPrice
+              ? Number(quickViewProduct.originalPrice.replace(/\D/g, "")) || undefined
+              : undefined,
+            currency: "IDR",
+            imageUrl: quickViewProduct.img || null,
+          }
+        }
+        onClose={() => setQuickViewProduct(null)}
+        onAddToCart={(item, quantity) => {
+          addItem(
+            { productId: item.productId, slug: item.slug, name: item.name, priceMinor: item.priceMinor, currency: item.currency, imageUrl: item.imageUrl },
+            quantity
+          );
+          setQuickViewProduct(null);
+          setAddedItem({ ...item, quantity });
+        }}
+        formatPrice={formatPrice}
+      />
+      <AddedToCartModal open={!!addedItem} item={addedItem} onClose={() => setAddedItem(null)} formatPrice={formatPrice} />
 
       {/* ════════════════════════════════════════════
           7. INFO STRIP (3 blok)

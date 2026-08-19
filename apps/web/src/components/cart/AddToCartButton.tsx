@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState } from "react";
 
 import { useCart } from "@/components/cart/CartProvider";
-import { CartToast } from "@/components/cart/CartToast";
+import { AddedToCartModal, type AddedCartItem } from "@/components/cart/AddedToCartModal";
+import { useCurrency } from "@/components/currency/CurrencyProvider";
 
 export function AddToCartButton({
   product
@@ -18,7 +19,8 @@ export function AddToCartButton({
   };
 }) {
   const { state, addItem } = useCart();
-  const [showToast, setShowToast] = useState(false);
+  const { formatPrice } = useCurrency();
+  const [addedItem, setAddedItem] = useState<AddedCartItem | null>(null);
 
   const existingQty = useMemo(
     () => state.items.find((i) => i.productId === product.productId)?.quantity ?? 0,
@@ -27,14 +29,12 @@ export function AddToCartButton({
 
   function handleClick() {
     addItem(product, 1);
-    setShowToast(true);
+    setAddedItem({ ...product, quantity: 1 });
   }
-
-  const handleDone = useCallback(() => setShowToast(false), []);
 
   return (
     <>
-      <CartToast show={showToast} onDone={handleDone} />
+      <AddedToCartModal open={!!addedItem} item={addedItem} onClose={() => setAddedItem(null)} formatPrice={formatPrice} />
       <button
         type="button"
         onClick={handleClick}

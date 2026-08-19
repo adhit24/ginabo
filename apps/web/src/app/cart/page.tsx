@@ -6,8 +6,11 @@ import { useCart } from "@/components/cart/CartProvider";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
 
 export default function CartPage() {
-  const { state, updateQuantity, removeItem, totals } = useCart();
+  const { state, updateQuantity, removeItem, toggleSelected, setAllSelected, selectedItems, selectedTotals } = useCart();
   const { formatPrice } = useCurrency();
+
+  const allSelected = state.items.length > 0 && selectedItems.length === state.items.length;
+  const selectedCount = selectedItems.reduce((s, i) => s + i.quantity, 0);
 
   return (
     <div className="min-h-screen bg-white font-sans antialiased text-[#231F20]">
@@ -58,59 +61,81 @@ export default function CartPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
+
             {/* List of items (8 cols) */}
             <div className="lg:col-span-8 flex flex-col gap-3">
-              {state.items.map((item) => (
-                <div key={item.productId} className="flex gap-4 rounded-[6px] border border-[#EDEDED] bg-white p-4 items-center">
-                  <div className="relative size-20 flex-shrink-0 overflow-hidden rounded-[4px] bg-[#FAF8FC] border border-[#F0F0F0]">
-                    {item.imageUrl ? (
-                      <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-2" sizes="80px" />
-                    ) : (
-                      <div className="grid h-full place-items-center text-xs text-gray-400">No image</div>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <Link href={`/shop/${item.slug}`} className="text-[14px] font-bold text-[#231F20] hover:text-[#8E51B8] transition line-clamp-1">
-                          {item.name}
-                        </Link>
-                        <div className="mt-0.5 text-[13.5px] font-bold text-[#E91E63]">{formatPrice(item.priceMinor)}</div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeItem(item.productId)}
-                        className="text-[12px] font-medium text-[#A0A0A0] hover:text-red-500 transition"
-                      >
-                        Hapus
-                      </button>
+              <label className="flex items-center gap-3 rounded-[6px] border border-[#EDEDED] bg-white px-4 py-3">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={(e) => setAllSelected(e.target.checked)}
+                  className="h-4 w-4 accent-[#8E51B8]"
+                />
+                <span className="text-[13px] font-bold text-[#231F20]">Pilih Semua Produk</span>
+              </label>
+
+              {state.items.map((item) => {
+                const checked = selectedItems.some((i) => i.productId === item.productId);
+                return (
+                  <div key={item.productId} className="flex gap-3 rounded-[6px] border border-[#EDEDED] bg-white p-4 items-center">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleSelected(item.productId)}
+                      className="h-4 w-4 shrink-0 accent-[#8E51B8]"
+                    />
+                    <div className="relative size-20 flex-shrink-0 overflow-hidden rounded-[4px] bg-[#FAF8FC] border border-[#F0F0F0]">
+                      {item.imageUrl ? (
+                        <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-2" sizes="80px" />
+                      ) : (
+                        <div className="grid h-full place-items-center text-xs text-gray-400">No image</div>
+                      )}
                     </div>
-                    <div className="mt-3 flex items-center justify-between gap-4">
-                      <div className="inline-flex items-center rounded-[4px] border border-[#E0E0E0] bg-white">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <Link href={`/shop/${item.slug}`} className="text-[14px] font-bold text-[#231F20] hover:text-[#8E51B8] transition line-clamp-1">
+                            {item.name}
+                          </Link>
+                          <div className="mt-0.5 text-[13.5px] font-bold text-[#E91E63]">{formatPrice(item.priceMinor)}</div>
+                        </div>
                         <button
                           type="button"
-                          onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                          className="flex h-7 w-7 items-center justify-center text-[15px] text-[#707070] hover:bg-[#F5F5F5] transition"
+                          onClick={() => removeItem(item.productId)}
+                          aria-label="Hapus dari keranjang"
+                          className="relative -m-2 flex h-8 w-8 items-center justify-center rounded-full text-[#A0A0A0] transition hover:bg-red-50 hover:text-red-500"
                         >
-                          −
-                        </button>
-                        <div className="min-w-7 text-center text-[12.5px] font-semibold text-[#231F20]">{item.quantity}</div>
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                          className="flex h-7 w-7 items-center justify-center text-[15px] text-[#707070] hover:bg-[#F5F5F5] transition"
-                        >
-                          +
+                          <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+                          </svg>
                         </button>
                       </div>
-                      <div className="text-[14px] font-bold text-[#231F20]">
-                        {formatPrice(item.quantity * item.priceMinor)}
+                      <div className="mt-3 flex items-center justify-between gap-4">
+                        <div className="inline-flex items-center rounded-[4px] border border-[#E0E0E0] bg-white">
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                            className="flex h-7 w-7 items-center justify-center text-[15px] text-[#707070] hover:bg-[#F5F5F5] transition"
+                          >
+                            −
+                          </button>
+                          <div className="min-w-7 text-center text-[12.5px] font-semibold text-[#231F20]">{item.quantity}</div>
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                            className="flex h-7 w-7 items-center justify-center text-[15px] text-[#707070] hover:bg-[#F5F5F5] transition"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <div className="text-[14px] font-bold text-[#231F20]">
+                          {formatPrice(item.quantity * item.priceMinor)}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Order Summary (4 cols) */}
@@ -120,8 +145,8 @@ export default function CartPage() {
               </h3>
               <div className="flex flex-col gap-2.5 text-[13px] mb-4">
                 <div className="flex items-center justify-between text-[#707070]">
-                  <span>Total Produk ({state.items.reduce((s, i) => s + i.quantity, 0)})</span>
-                  <span>{formatPrice(totals.subtotalMinor)}</span>
+                  <span>Produk Dipilih ({selectedCount})</span>
+                  <span>{formatPrice(selectedTotals.subtotalMinor)}</span>
                 </div>
                 <div className="flex items-center justify-between text-[#707070]">
                   <span>Ongkos Kirim</span>
@@ -129,14 +154,30 @@ export default function CartPage() {
                 </div>
                 <div className="flex items-center justify-between font-bold text-[#231F20] text-[15px] pt-3 border-t border-[#EDEDED]">
                   <span>Subtotal</span>
-                  <span className="text-[#E91E63]">{formatPrice(totals.subtotalMinor)}</span>
+                  <span className="text-[#E91E63]">{formatPrice(selectedTotals.subtotalMinor)}</span>
                 </div>
               </div>
+              {selectedItems.length === 0 ? (
+                <button
+                  type="button"
+                  disabled
+                  className="inline-flex w-full cursor-not-allowed items-center justify-center rounded-[6px] bg-[#E0D5EA] px-5 py-3 text-[13.5px] font-bold text-white"
+                >
+                  Pilih Produk Dahulu
+                </button>
+              ) : (
+                <Link
+                  href="/checkout"
+                  className="inline-flex w-full items-center justify-center rounded-[6px] bg-[#8E51B8] hover:bg-[#78257C] px-5 py-3 text-[13.5px] font-bold text-white transition shadow-none"
+                >
+                  Lanjut ke Checkout ({selectedCount})
+                </Link>
+              )}
               <Link
-                href="/checkout"
-                className="inline-flex w-full items-center justify-center rounded-[6px] bg-[#8E51B8] hover:bg-[#78257C] px-5 py-3 text-[13.5px] font-bold text-white transition shadow-none"
+                href="/shop"
+                className="mt-3 block text-center text-[12.5px] font-medium text-[#707070] hover:text-[#8E51B8] transition"
               >
-                Lanjut ke Checkout
+                Lanjutkan Belanja
               </Link>
             </div>
 
