@@ -87,7 +87,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
     snap_redirect_url: string | null
     payment_type: string | null
     settlement_time: string | null
-    fraud_status: string | null
+    midtrans_fraud_status: string | null
   }
 
   type AddressRecord = {
@@ -168,7 +168,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
         snap_redirect_url,
         payment_type,
         settlement_time,
-        fraud_status
+        midtrans_fraud_status
       )
     `,
     )

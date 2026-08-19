@@ -56,10 +56,10 @@ type OrderProjection = Pick<
     | 'midtrans_transaction_id'
     | 'payment_type'
     | 'status'
-    | 'gross_amount'
+    | 'midtrans_gross_amount'
     | 'snap_token'
     | 'snap_redirect_url'
-    | 'fraud_status'
+    | 'midtrans_fraud_status'
     | 'settlement_time'
     | 'created_at'
   >[]
@@ -132,10 +132,10 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
       midtrans_transaction_id,
       payment_type,
       status,
-      gross_amount,
+      midtrans_gross_amount,
       snap_token,
       snap_redirect_url,
-      fraud_status,
+      midtrans_fraud_status,
       settlement_time,
       created_at
     )
@@ -186,10 +186,10 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
           id: latestPayment.id,
           payment_type: latestPayment.payment_type,
           status: latestPayment.status,
-          gross_amount: latestPayment.gross_amount,
+          gross_amount: latestPayment.midtrans_gross_amount,
           snap_token: latestPayment.snap_token,
           snap_redirect_url: latestPayment.snap_redirect_url,
-          fraud_status: latestPayment.fraud_status,
+          fraud_status: latestPayment.midtrans_fraud_status,
           settlement_time: latestPayment.settlement_time,
           midtrans_transaction_id: latestPayment.midtrans_transaction_id,
         }

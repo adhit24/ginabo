@@ -11,47 +11,82 @@ type Props = {
   onConfirm: (method: PaymentMethod) => void;
 };
 
-const otherBanks: PaymentMethod[] = [
-  { group: "virtual_account", provider: "mandiri_va", label: "Mandiri VA", fee: 4000 },
-  { group: "virtual_account", provider: "bni_va", label: "BNI VA", fee: 4000 },
-  { group: "virtual_account", provider: "bri_va", label: "BRI VA", fee: 4000 },
-  { group: "virtual_account", provider: "mega_va", label: "Bank Mega VA", fee: 3500 },
-  { group: "virtual_account", provider: "bsi_va", label: "BSI VA", fee: 3000 },
-  { group: "virtual_account", provider: "maybank_va", label: "Maybank VA", fee: 3000 },
+type BankOption = PaymentMethod & { logo: string };
+
+const otherBanks: BankOption[] = [
+  { group: "virtual_account", provider: "mandiri_va", label: "Mandiri VA", fee: 4000, logo: "/payment-logos/mandiri.svg" },
+  { group: "virtual_account", provider: "bni_va", label: "BNI VA", fee: 4000, logo: "/payment-logos/bni.svg" },
+  { group: "virtual_account", provider: "bri_va", label: "BRI VA", fee: 4000, logo: "/payment-logos/bri.svg" },
+  { group: "virtual_account", provider: "mega_va", label: "Bank Mega VA", fee: 3500, logo: "/payment-logos/mega.svg" },
+  { group: "virtual_account", provider: "bsi_va", label: "BSI VA", fee: 3000, logo: "/payment-logos/bsi.svg" },
+  { group: "virtual_account", provider: "maybank_va", label: "Maybank VA", fee: 3000, logo: "/payment-logos/maybank.svg" },
 ];
+
+function CreditCardIcon() {
+  return (
+    <svg width="20" height="20" fill="none" stroke="#8E51B8" strokeWidth="1.8" viewBox="0 0 24 24">
+      <rect x="2.5" y="5" width="19" height="14" rx="2.2" />
+      <path strokeLinecap="round" d="M2.5 9.5h19" />
+      <path strokeLinecap="round" d="M6 14.5h4" />
+    </svg>
+  );
+}
+
+function QrisIcon() {
+  return (
+    <svg width="20" height="20" fill="none" stroke="#8E51B8" strokeWidth="1.8" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="6" height="6" rx="1" />
+      <rect x="15" y="3" width="6" height="6" rx="1" />
+      <rect x="3" y="15" width="6" height="6" rx="1" />
+      <path strokeLinecap="round" d="M15 15h2.5M20.5 15H21M15 18.5h2M18.5 18v3M21 18.5v2.5M15 21h1.5" />
+    </svg>
+  );
+}
 
 const primaryRows: { method: PaymentMethod; icon: ReactNode; expandable?: boolean }[] = [
   {
     method: { group: "virtual_account", provider: "bca_va", label: "Virtual Account BCA", fee: 4000 },
-    icon: <RowIcon label="BCA" />,
+    icon: <LogoIcon src="/payment-logos/bca.svg" alt="BCA" />,
   },
   {
     method: { group: "virtual_account", provider: "mandiri_va", label: "VA Bank Lain", fee: 4000 },
-    icon: <RowIcon label="VA" />,
+    icon: <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-[6px] border border-[#EDEDED] bg-[#FAF8FC]">
+      <svg width="18" height="18" fill="none" stroke="#8E51B8" strokeWidth="1.8" viewBox="0 0 24 24">
+        <rect x="3" y="10" width="18" height="9" rx="1.5" /><path strokeLinecap="round" d="M12 3 3 8h18L12 3ZM7 13v3M12 13v3M17 13v3" />
+      </svg>
+    </span>,
     expandable: true,
   },
   {
     method: { group: "credit_card", provider: "credit_card", label: "Credit Card", fee: 0 },
-    icon: <RowIcon label="CC" />,
+    icon: (
+      <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-[6px] border border-[#EDEDED] bg-[#FAF8FC]">
+        <CreditCardIcon />
+      </span>
+    ),
   },
   {
     method: { group: "e_wallet", provider: "shopeepay", label: "ShopeePay", fee: 0 },
-    icon: <RowIcon label="SP" />,
+    icon: <LogoIcon src="/payment-logos/shopeepay.svg" alt="ShopeePay" />,
   },
   {
     method: { group: "e_wallet", provider: "gopay", label: "GoPay", fee: 1000 },
-    icon: <RowIcon label="GP" />,
+    icon: <LogoIcon src="/payment-logos/gopay.svg" alt="GoPay" />,
   },
   {
     method: { group: "qris", provider: "qris", label: "QRIS", fee: 0 },
-    icon: <RowIcon label="QR" />,
+    icon: (
+      <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-[6px] border border-[#EDEDED] bg-[#FAF8FC]">
+        <QrisIcon />
+      </span>
+    ),
   },
 ];
 
-function RowIcon({ label }: { label: string }) {
+function LogoIcon({ src, alt }: { src: string; alt: string }) {
   return (
-    <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-[6px] border border-[#EDEDED] bg-[#FAF8FC] text-[10px] font-extrabold text-[#8E51B8]">
-      {label}
+    <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-[6px] border border-[#EDEDED] bg-[#FAF8FC] p-1.5">
+      <img src={src} alt={alt} className="max-h-full max-w-full object-contain" />
     </span>
   );
 }
@@ -146,13 +181,16 @@ export function PaymentMethodModal({ open, onClose, value, onConfirm }: Props) {
                       <button
                         key={bank.provider}
                         type="button"
-                        onClick={() => setDraft(bank)}
-                        className={`rounded-[6px] border px-3 py-2 text-left text-[12px] font-semibold transition ${
-                          bankSelected ? "border-[#8E51B8] bg-[#FAF5FC] text-[#8E51B8]" : "border-[#EDEDED] text-[#231F20] hover:border-[#D8C7E8]"
+                        onClick={() => setDraft({ group: bank.group, provider: bank.provider, label: bank.label, fee: bank.fee })}
+                        className={`flex items-center gap-2 rounded-[6px] border px-3 py-2 text-left transition ${
+                          bankSelected ? "border-[#8E51B8] bg-[#FAF5FC]" : "border-[#EDEDED] hover:border-[#D8C7E8]"
                         }`}
                       >
-                        {bank.label}
-                        <span className="block text-[10px] font-medium text-[#707070]">{feeLabel(bank.fee)}</span>
+                        <img src={bank.logo} alt={bank.label} className="h-5 max-w-[36px] shrink-0 object-contain" />
+                        <span className="min-w-0">
+                          <span className={`block truncate text-[12px] font-semibold ${bankSelected ? "text-[#8E51B8]" : "text-[#231F20]"}`}>{bank.label}</span>
+                          <span className="block text-[10px] font-medium text-[#707070]">{feeLabel(bank.fee)}</span>
+                        </span>
                       </button>
                     );
                   })}

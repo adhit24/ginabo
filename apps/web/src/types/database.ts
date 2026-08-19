@@ -191,7 +191,7 @@ export interface PaymentRow {
   gross_amount?: number
   snap_token: string | null
   snap_redirect_url: string | null
-  fraud_status: string | null
+  midtrans_fraud_status: string | null
   settlement_time: string | null
   expiry_time: string | null
   raw_notification: Record<string, unknown> | null

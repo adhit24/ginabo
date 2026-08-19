@@ -291,7 +291,7 @@ export async function POST(req: NextRequest) {
       midtrans_gross_amount: totalAmount,
       snap_token: snapToken,
       snap_redirect_url: snapRedirectUrl,
-      fraud_status: null,
+      midtrans_fraud_status: null,
       settlement_time: null,
       expiry_time: null,
       raw_notification: null,

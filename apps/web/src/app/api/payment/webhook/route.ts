@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
       payment_type: notification.payment_type,
       status: transition.paymentStatus,
       midtrans_gross_amount: grossAmount,
-      fraud_status: notification.fraud_status ?? null,
+      midtrans_fraud_status: notification.fraud_status ?? null,
       settlement_time: notification.settlement_time ?? null,
       raw_notification: notification as unknown as Record<string, unknown>,
     } as never)
