@@ -8,6 +8,7 @@ import { useCart } from "@/components/cart/CartProvider";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { useShopCatalog, ShopProduct } from "@/lib/useShopCatalog";
 import { ProductCard } from "@/components/ProductCard";
+import { FlowButton } from "@/components/ui/flow-button";
 import { trackCustomerEvent } from "@/lib/analytics/events";
 
 const EASE = [0.25, 1, 0.5, 1] as const;
@@ -546,34 +547,20 @@ export function ProductDetailClient({ product }: Props) {
               </div>
             </div>
 
-            {/* ── 2. Tombol Add to Cart: 10px rounded, #8B7FF0, 14px/16px, w-full lg:w-[480px] max-w-full ── */}
+            {/* ── 2. Tombol Add to Cart: w-full lg:w-[480px] max-w-full ── */}
             <div className="pt-2">
-              <motion.button
-                onClick={handleAddToCart}
-                disabled={product.stockQty === 0}
-                whileTap={{ scale: 0.99 }}
-                className={`relative w-full lg:w-[480px] max-w-full flex items-center justify-center gap-2.5 rounded-[10px] py-3 lg:py-3.5 px-4 text-[14px] lg:text-[16px] font-bold text-white shadow-md transition-all ${
-                  added
-                    ? "bg-emerald-600"
-                    : product.stockQty === 0
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-[#8B7FF0] hover:bg-[#786ce0]"
-                }`}
-              >
-                {added ? (
-                  <>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
-                    <span>Berhasil Ditambahkan ke Keranjang</span>
-                  </>
-                ) : (
-                  <>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
-                    </svg>
-                    <span>{product.stockQty === 0 ? "Stok Habis" : "Add to Cart"}</span>
-                  </>
-                )}
-              </motion.button>
+              {added ? (
+                <div className="flex w-full items-center justify-center gap-2.5 rounded-[10px] bg-emerald-600 py-3 px-4 text-[14px] font-bold text-white shadow-md lg:w-[480px] lg:py-3.5 lg:text-[16px]">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                  <span>Berhasil Ditambahkan ke Keranjang</span>
+                </div>
+              ) : product.stockQty === 0 ? (
+                <div className="flex w-full cursor-not-allowed items-center justify-center gap-2.5 rounded-[10px] bg-gray-400 py-3 px-4 text-[14px] font-bold text-white shadow-md lg:w-[480px] lg:py-3.5 lg:text-[16px]">
+                  <span>Stok Habis</span>
+                </div>
+              ) : (
+                <FlowButton type="button" onClick={handleAddToCart} text="Add to Cart" className="w-full lg:w-[480px]" />
+              )}
             </div>
 
             {/* ── 3. Tab DETAILS / HOW TO USE / INGREDIENTS / FAQ (13px mobile, 16px desktop, 10px 20px / 14px 34px padding) ── */}

@@ -7,6 +7,7 @@ import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { FlowButton } from "@/components/ui/flow-button";
 import { Card, CardContent } from "@/components/ui/card";
 
 // --- Type Definitions for props ---
@@ -143,11 +144,9 @@ export const ClientsSection = ({
             )}
 
             {primaryActionHref ? (
-              <Button size="lg" className="rounded-full bg-[#9333EA] text-white hover:bg-[#7C3AED]" asChild>
-                <Link href={primaryActionHref}>{primaryActionLabel}</Link>
-              </Button>
+              <FlowButton href={primaryActionHref} text={primaryActionLabel} />
             ) : (
-              <Button size="lg" className="rounded-full bg-[#9333EA] text-white hover:bg-[#7C3AED]">{primaryActionLabel}</Button>
+              <FlowButton text={primaryActionLabel} />
             )}
           </div>
         </div>

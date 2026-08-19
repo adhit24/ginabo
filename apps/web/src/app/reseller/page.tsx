@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ClientsSection } from "@/components/ui/testimonial-card";
 import ResellerBenefitCard from "@/components/ui/reseller-benefit-card";
+import { FlowButton } from "@/components/ui/flow-button";
 import { useState } from "react";
 import { TIERS, TIER_ORDER, fmtRp, partnerPrice, useResellerTier } from "@/components/reseller/ResellerTierProvider";
 
@@ -367,16 +368,7 @@ export default function ResellerProgramPage() {
                 Dapatkan produk berkualitas, margin menarik, dan dukungan penuh untuk tumbuh bersama Ginabo di seluruh Indonesia.
               </p>
               <div className="mt-3.5 flex flex-col gap-2 sm:mt-5 sm:flex-row sm:flex-wrap sm:gap-3">
-                <Link
-                  href="/reseller/register"
-                  className="inline-flex min-h-[48px] w-full items-center justify-between gap-1.5 rounded-xl px-6 text-[15px] font-semibold text-white transition hover:opacity-90 sm:rounded-2xl md:w-[260px] md:min-h-[50px] md:text-[17.5px]"
-                  style={{ background: "linear-gradient(135deg,#6D28D9,#9333EA)", boxShadow: "0 12px 30px rgba(109,40,217,.34)" }}
-                >
-                  Gabung Jadi Reseller
-                  <span className="flex h-4 w-4 flex-none items-center justify-center rounded-full sm:h-6 sm:w-6" style={{ background: "rgba(255,255,255,.22)" }}>
-                    {icons.arrowRight}
-                  </span>
-                </Link>
+                <FlowButton href="/reseller/register" text="Gabung Jadi Reseller" className="w-full md:w-auto" />
                 <a
                   href="#program"
                   className="inline-flex min-h-[48px] w-full items-center justify-between gap-1.5 rounded-xl bg-white px-6 text-[15px] font-semibold sm:rounded-2xl md:w-[260px] md:min-h-[50px] md:text-[17.5px]"

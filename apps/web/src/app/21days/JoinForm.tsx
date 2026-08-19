@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { FlowButton } from "@/components/ui/flow-button";
 
 type State =
   | { status: "idle" }
@@ -149,13 +150,11 @@ export function JoinForm() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-        <button
+        <FlowButton
           type="submit"
           disabled={!canSubmit}
-          className="flex min-h-11 items-center justify-center rounded-full bg-[#3a1078] px-6 py-2.5 text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {state.status === "submitting" ? "Mengirim..." : "Gabung Program"}
-        </button>
+          text={state.status === "submitting" ? "Mengirim..." : "Gabung Program"}
+        />
 
         <a
           href={waLink()}

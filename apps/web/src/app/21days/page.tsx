@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
+import { FlowButton } from "@/components/ui/flow-button";
 import { JoinForm } from "./JoinForm";
 
 // ─── FONTS DEFINITION ────────────────────────────────────────────────────────
@@ -129,12 +130,7 @@ export default function Journey21Page() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-3">
-              <a 
-                href="#action-section" 
-                className="bg-[#3a1078] text-white px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider text-center hover:opacity-95 transition-opacity"
-              >
-                Ikut Journey Sekarang
-              </a>
+              <FlowButton href="#action-section" text="Ikut Journey Sekarang" className="uppercase tracking-wider text-xs" />
               <a 
                 href={waLink()}
                 target="_blank"

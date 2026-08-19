@@ -7,6 +7,7 @@ import { useCart } from "@/components/cart/CartProvider";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { ProductQuickViewModal, type QuickViewProduct } from "@/components/product/ProductQuickViewModal";
 import { AddedToCartModal, type AddedCartItem } from "@/components/cart/AddedToCartModal";
+import { FlowButton } from "@/components/ui/flow-button";
 
 export type ProductCardData = {
   id?: string;
@@ -94,18 +95,13 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           )}
         </div>
 
-        <button
+        <FlowButton
           type="button"
           onClick={() => setQuickViewOpen(true)}
-          className="gnb-cart-btn mt-2.5 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-[6px] px-3 py-2 text-[12px] font-bold text-white"
-        >
-          <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <path d="M16 10a4 4 0 01-8 0" />
-          </svg>
-          Add to Cart
-        </button>
+          text="Add to Cart"
+          size="compact"
+          className="mt-2.5 w-full"
+        />
       </div>
 
       <ProductQuickViewModal
