@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
+import { FlowButton } from "@/components/ui/flow-button";
 
 export default function CartPage() {
   const { state, updateQuantity, removeItem, toggleSelected, setAllSelected, selectedItems, selectedTotals } = useCart();
@@ -33,14 +34,7 @@ export default function CartPage() {
             </h1>
             <p className="text-[13px] text-[#707070] mt-0.5">Review pesananmu sebelum melanjutkan ke pembayaran.</p>
           </div>
-          {state.items.length > 0 && (
-            <Link
-              href="/checkout"
-              className="inline-flex items-center justify-center rounded-[6px] bg-[#8E51B8] hover:bg-[#78257C] px-6 py-2.5 text-[13px] font-bold text-white transition shadow-none sm:w-auto"
-            >
-              Checkout Sekarang
-            </Link>
-          )}
+          {state.items.length > 0 && <FlowButton href="/checkout" text="Checkout Sekarang" />}
         </div>
 
         {state.items.length === 0 ? (
@@ -52,12 +46,7 @@ export default function CartPage() {
             </div>
             <div className="text-[16px] font-bold text-[#231F20]">Shopping bag kamu masih kosong</div>
             <p className="text-[13px] text-[#707070] mt-1">Temukan produk favoritmu dan nikmati promo spesial hari ini.</p>
-            <Link 
-              href="/shop" 
-              className="mt-4 inline-flex rounded-[6px] bg-[#8E51B8] hover:bg-[#78257C] px-6 py-2.5 text-[13px] font-bold text-white transition"
-            >
-              Mulai Belanja
-            </Link>
+            <FlowButton href="/shop" text="Mulai Belanja" className="mt-4" />
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -158,20 +147,9 @@ export default function CartPage() {
                 </div>
               </div>
               {selectedItems.length === 0 ? (
-                <button
-                  type="button"
-                  disabled
-                  className="inline-flex w-full cursor-not-allowed items-center justify-center rounded-[6px] bg-[#E0D5EA] px-5 py-3 text-[13.5px] font-bold text-white"
-                >
-                  Pilih Produk Dahulu
-                </button>
+                <FlowButton text="Pilih Produk Dahulu" disabled className="w-full" />
               ) : (
-                <Link
-                  href="/checkout"
-                  className="inline-flex w-full items-center justify-center rounded-[6px] bg-[#8E51B8] hover:bg-[#78257C] px-5 py-3 text-[13.5px] font-bold text-white transition shadow-none"
-                >
-                  Lanjut ke Checkout ({selectedCount})
-                </Link>
+                <FlowButton href="/checkout" text={`Lanjut ke Checkout (${selectedCount})`} className="w-full" />
               )}
               <Link
                 href="/shop"

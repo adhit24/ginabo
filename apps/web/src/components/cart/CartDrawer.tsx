@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "./CartProvider";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
+import { FlowButton } from "@/components/ui/flow-button";
 import { FREE_SHIPPING_THRESHOLD_MINOR } from "@/lib/constants";
 
 export function CartDrawer() {
@@ -69,9 +70,7 @@ export function CartDrawer() {
                 <path d="M16 10a4 4 0 01-8 0" />
               </svg>
               <p className="text-sm text-gray-500">Keranjang belanja Anda kosong.</p>
-              <button onClick={closeCart} className="rounded-lg bg-gradient-brand px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90">
-                Mulai Belanja
-              </button>
+              <FlowButton onClick={closeCart} text="Mulai Belanja" />
             </div>
           ) : (
             <div className="divide-y divide-brand-100">
@@ -153,13 +152,7 @@ export function CartDrawer() {
               >
                 Lihat Keranjang
               </Link>
-              <Link
-                href="/checkout"
-                onClick={closeCart}
-                className="flex w-full items-center justify-center rounded-lg bg-gradient-brand py-2.5 text-sm font-bold text-white shadow-brand transition hover:opacity-90"
-              >
-                Checkout Sekarang
-              </Link>
+              <FlowButton href="/checkout" onClick={closeCart} text="Checkout Sekarang" className="w-full" />
             </div>
           </div>
         )}

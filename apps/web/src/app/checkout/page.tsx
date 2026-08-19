@@ -10,6 +10,7 @@ import { AddressModal } from "@/components/checkout/AddressModal";
 import { ShippingMethodModal } from "@/components/checkout/ShippingMethodModal";
 import { PaymentMethodModal } from "@/components/checkout/PaymentMethodModal";
 import type { PaymentMethod } from "@/components/checkout/PaymentMethodSelector";
+import { FlowButton } from "@/components/ui/flow-button";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { authFetch } from "@/lib/supabase/client";
 import type { ShippingOption } from "@/lib/rajaongkir";
@@ -164,9 +165,7 @@ export default function CheckoutPage() {
               <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 01-8 0" />
             </svg>
             <p className="text-[14px] text-gray-500">Tidak ada produk yang dipilih untuk checkout.</p>
-            <Link href="/cart" className="rounded-[6px] bg-[#8E51B8] hover:bg-[#78257C] px-6 py-2.5 text-[13px] font-bold text-white transition">
-              Kembali ke Shopping Bag
-            </Link>
+            <FlowButton href="/cart" text="Kembali ke Shopping Bag" />
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -352,14 +351,13 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                <button
+                <FlowButton
                   type="button"
                   onClick={submit}
                   disabled={status.status === "submitting" || !addressId || !shippingOption || !paymentMethod}
-                  className="mt-5 w-full rounded-[6px] bg-[#8E51B8] hover:bg-[#78257C] py-3.5 text-[14px] font-bold text-white transition disabled:opacity-50 shadow-none"
-                >
-                  {status.status === "submitting" ? "Memproses..." : "Pay Now"}
-                </button>
+                  text={status.status === "submitting" ? "Memproses..." : "Pay Now"}
+                  className="mt-5 w-full"
+                />
 
                 <p className="mt-3 text-center text-[11px] leading-relaxed text-[#A0A0A0]">
                   Dengan checkout, kamu menyetujui <Link href="/terms" className="text-[#8E51B8] hover:underline">Syarat & Ketentuan</Link> dan <Link href="/privacy" className="text-[#8E51B8] hover:underline">Kebijakan Privasi</Link>.

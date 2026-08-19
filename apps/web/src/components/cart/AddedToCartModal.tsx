@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Modal } from "@/components/ui/Modal";
+import { FlowButton } from "@/components/ui/flow-button";
 import { useCart } from "@/components/cart/CartProvider";
 import { listActiveProducts, type CatalogProduct } from "@/lib/catalog";
 
@@ -75,13 +76,7 @@ export function AddedToCartModal({ open, item, onClose, formatPrice }: Props) {
           >
             Lanjut Belanja
           </button>
-          <Link
-            href="/cart"
-            onClick={onClose}
-            className="inline-flex flex-1 items-center justify-center rounded-[6px] bg-[#8E51B8] px-5 py-2.5 text-[13px] font-bold text-white transition hover:bg-[#78257C]"
-          >
-            Lihat Keranjang
-          </Link>
+          <FlowButton href="/cart" onClick={onClose} text="Lihat Keranjang" className="flex-1" />
         </div>
       }
     >
