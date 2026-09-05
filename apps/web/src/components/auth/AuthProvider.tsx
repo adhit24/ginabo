@@ -91,13 +91,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        fetchAndSetUser(session.user).catch(() => {
-          setUser(toAppUser(session.user));
-        });
+        fetchAndSetUser(session.user)
+          .catch(() => setUser(toAppUser(session.user)))
+          .finally(() => setIsLoading(false));
       } else {
         setUser(null);
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -127,7 +127,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: name.trim(), phone_number: phone.trim() || null } },
+      options: {
+        data: { full_name: name.trim(), phone_number: phone.trim() || null },
+        // Runtime origin, not a hardcoded domain — resolves to the shadow
+        // origin on shadow and the live origin on live, automatically.
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
 
     if (error) {
