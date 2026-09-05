@@ -34,7 +34,16 @@ interface CheckoutBody {
 // ─── Route Handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  // 1. Parse body
+  // 1. Authenticate first, before any request-body validation is attempted.
+  const supabase = await createServerSupabaseClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) return jsonError('Silakan login terlebih dahulu', 401)
+
+  // 2. Parse body
   let body: CheckoutBody
   try {
     body = (await req.json()) as CheckoutBody
@@ -52,15 +61,6 @@ export async function POST(req: NextRequest) {
 
   if (!address_id) return jsonError('address_id diperlukan', 400)
   if (!shipping_courier || !shipping_service) return jsonError('Layanan pengiriman wajib dipilih', 400)
-
-  // 2. Authenticate
-  const supabase = await createServerSupabaseClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-
-  if (authError || !user) return jsonError('Silakan login terlebih dahulu', 401)
 
   // 3. Fetch profile for customer details
   const profiles = supabase.from('profiles') as any
