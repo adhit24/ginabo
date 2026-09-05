@@ -16,6 +16,7 @@ export type ShopProduct = {
   priceMinor: number;
   img: string;
   originalPrice?: string;
+  stockQty?: number;
 };
 
 export const STATIC_BUNDLES: ShopProduct[] = [
@@ -65,6 +66,7 @@ export function useShopCatalog(): ShopProduct[] {
           price: `Rp ${p.priceMinor.toLocaleString("id-ID")}`,
           priceMinor: p.priceMinor,
           img: p.images[0]?.url ?? "",
+          stockQty: p.stockQty,
         }));
 
         const storeBundles = store.getBundles().map(p => ({

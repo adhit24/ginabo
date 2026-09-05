@@ -20,10 +20,14 @@ export type ProductCardData = {
   img: string;
   rating?: string;
   tag?: string;
+  stockQty?: number;
 };
 
 export function ProductCard({ product }: { product: ProductCardData }) {
   const isDiscounted = !!product.originalPrice;
+  // stockQty is only populated for real DB-backed products; bundles/undefined
+  // are treated as available since their stock isn't tracked in `products`.
+  const isOutOfStock = product.stockQty === 0;
   const { addItem } = useCart();
   const { formatPrice } = useCurrency();
   const [quickViewOpen, setQuickViewOpen] = useState(false);
@@ -95,13 +99,23 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           )}
         </div>
 
-        <FlowButton
-          type="button"
-          onClick={() => setQuickViewOpen(true)}
-          text="Add to Cart"
-          size="compact"
-          className="mt-2.5 w-full"
-        />
+        {isOutOfStock ? (
+          <button
+            type="button"
+            disabled
+            className="mt-2.5 w-full cursor-not-allowed rounded-full bg-gray-200 py-2 text-[13px] font-semibold text-gray-500"
+          >
+            Stok Habis
+          </button>
+        ) : (
+          <FlowButton
+            type="button"
+            onClick={() => setQuickViewOpen(true)}
+            text="Add to Cart"
+            size="compact"
+            className="mt-2.5 w-full"
+          />
+        )}
       </div>
 
       <ProductQuickViewModal

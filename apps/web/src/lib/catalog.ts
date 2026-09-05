@@ -121,65 +121,51 @@ const demoProducts: CatalogProduct[] = [
 ];
 
 export async function listActiveProducts(): Promise<CatalogProduct[]> {
-  let dbProducts: CatalogProduct[] = [];
-  try {
-    const { data, error } = await supabase
-      .from("products")
-      .select(`*, product_images(url, alt_text, sort_order)`)
-      .eq("is_active", true)
-      .order("created_at", { ascending: false });
+  const { data, error } = await supabase
+    .from("products")
+    .select(`*, product_images(url, alt_text, sort_order)`)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
 
-    if (data && data.length > 0) {
-      dbProducts = (data as Record<string, unknown>[]).map((item) => {
-        const prod = mapCatalogProduct(item);
-        // Force local custom images to override database paths
-        const demo = demoProducts.find((d) => d.slug === prod.slug);
-        if (demo) {
-          prod.images = demo.images;
-        }
-        return prod;
-      });
-    }
-  } catch (e) {
-    console.error("Failed to fetch products from db", e);
+  if (error) {
+    console.error("Failed to fetch products from db", error);
+    // A real DB/network failure — return an empty list rather than silently
+    // substituting hardcoded demo products, so the DB stays the sole source
+    // of truth and an outage is visible instead of masked.
+    return [];
   }
 
-  // Only merge default SINGLE products (not bundles) into the products list
-  const merged = [...dbProducts];
-  for (const demo of demoProducts) {
-    const isBundle = demo.slug.includes("set") || demo.slug.includes("complete") || demo.slug.includes("bundle") || demo.id.startsWith("b");
-    if (!isBundle) {
-      if (!merged.some((p) => p.slug === demo.slug)) {
-        merged.push(demo);
-      }
-    }
-  }
-  return merged;
+  const dbProducts = ((data ?? []) as Record<string, unknown>[]).map((item) => mapCatalogProduct(item));
+
+  // Bundle "products" (Ginabo Complete Skin Nutrition Set, etc.) have no row
+  // in `products` — they only exist as this hardcoded catalog entry so their
+  // detail pages can still resolve via getProductBySlug's fallback below.
+  // They are intentionally not part of the DB-driven product list.
+  return dbProducts;
 }
 
 export async function getProductBySlug(slug: string): Promise<CatalogProduct | null> {
-  try {
-    const { data, error } = await supabase
-      .from("products")
-      .select(`*, product_images(url, alt_text, sort_order)`)
-      .eq("slug", slug)
-      .eq("is_active", true)
-      .single();
+  const { data, error } = await supabase
+    .from("products")
+    .select(`*, product_images(url, alt_text, sort_order)`)
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .single();
 
-    if (data) {
-      const prod = mapCatalogProduct(data as Record<string, unknown>);
-      // Force local custom images to override database paths
-      const demo = demoProducts.find((d) => d.slug === prod.slug);
-      if (demo) {
-        prod.images = demo.images;
-      }
-      return prod;
-    }
-  } catch (e) {
-    console.error("Failed to get product from db", e);
+  if (data) {
+    return mapCatalogProduct(data as Record<string, unknown>);
   }
 
-  // Fallback to local demo/default products (both singles and bundles)
+  // No matching active row in `products` — this is expected for bundle
+  // slugs (which are never stored as real product rows) and for genuinely
+  // nonexistent/inactive slugs. A real fetch error (not just "no rows") is
+  // logged but still falls through to the same lookup, since a bundle slug
+  // always needs it regardless of DB health.
+  if (error && error.code !== "PGRST116") {
+    console.error("Failed to get product from db", error);
+  }
+
   const demo = demoProducts.find((p) => p.slug === slug);
-  return demo || null;
+  const isBundle = demo?.id.startsWith("b");
+  return isBundle ? demo! : null;
 }
