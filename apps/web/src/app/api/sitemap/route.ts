@@ -4,7 +4,7 @@ import type { ProductRow } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
-const BASE_URL = "https://ginabo.id";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://ginabo.id";
 
 const STATIC_PAGES = [
   { path: "/", priority: "1.0", changefreq: "daily" },

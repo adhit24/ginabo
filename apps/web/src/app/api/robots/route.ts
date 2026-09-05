@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 export function GET() {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://ginabo.id";
   const body = `User-agent: *
 Allow: /
 
@@ -18,7 +19,7 @@ Allow: /_next/static/
 Allow: /images/
 Allow: /fonts/
 
-Sitemap: https://ginabo.id/sitemap.xml`;
+Sitemap: ${baseUrl}/sitemap.xml`;
 
   return new NextResponse(body, {
     headers: {
