@@ -12,7 +12,7 @@ FROM information_schema.columns
 WHERE table_schema = 'public'
   AND (
     (table_name = 'orders' AND column_name IN ('payment_fee', 'shipping_weight_grams', 'checkout_idempotency_key', 'inventory_decremented_at'))
-    OR (table_name = 'payments' AND column_name IN ('provider_transaction_id', 'midtrans_gross_amount', 'raw_notification', 'snap_token', 'snap_redirect_url'))
+    OR (table_name = 'payments' AND column_name IN ('provider_transaction_id', 'gross_amount', 'invoice_number', 'checkout_url', 'raw_notification'))
     OR table_name = 'customer_events'
   )
 ORDER BY table_name, column_name;

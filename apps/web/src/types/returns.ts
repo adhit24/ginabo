@@ -218,7 +218,7 @@ export interface RefundRow {
   profile_id: string
   method: RefundMethod
   amount: number
-  midtrans_refund_id: string | null
+  provider_refund_id: string | null
   wallet_transaction_id: string | null
   coupon_id: string | null
   voucher_code: string | null

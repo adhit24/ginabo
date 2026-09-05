@@ -38,7 +38,7 @@ Saat Anda menggunakan layanan GINABO, kami dapat mengumpulkan alamat IP, jenis p
   },
   {
     title: "3. Layanan dan Teknologi Pihak Ketiga",
-    body: `GINABO dapat menggunakan layanan pihak ketiga untuk mendukung operasional platform, termasuk namun tidak terbatas pada Google Analytics, Google Ads, Meta Ads, TikTok Ads, Midtrans, Xendit, payment gateway lainnya, cloud hosting provider, email service provider, serta CRM dan marketing automation platform.
+    body: `GINABO dapat menggunakan layanan pihak ketiga untuk mendukung operasional platform, termasuk namun tidak terbatas pada Google Analytics, Google Ads, Meta Ads, TikTok Ads, DOKU, payment gateway lainnya, cloud hosting provider, email service provider, serta CRM dan marketing automation platform.
 
 Masing-masing penyedia layanan memiliki kebijakan privasi tersendiri.`,
   },

@@ -112,7 +112,7 @@ export function PaymentMethodSelector({ value, onChange }: Props) {
         <div className="mt-4 rounded-xl border border-gray-200 bg-white p-3 sm:p-4">
           <div className="mb-3 flex items-center justify-between gap-3">
             <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Pilih bank Virtual Account</p>
-            <span className="text-[10px] text-gray-400">Biaya jasa Midtrans</span>
+            <span className="text-[10px] text-gray-400">Biaya jasa DOKU</span>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
             {virtualAccounts.map((provider) => <ProviderCard key={provider.id} provider={provider} selected={value?.provider === provider.id} onClick={() => selectProvider("virtual_account", provider)} />)}
@@ -124,7 +124,7 @@ export function PaymentMethodSelector({ value, onChange }: Props) {
         <div className="mt-4 rounded-xl border border-gray-200 bg-white p-3 sm:p-4">
           <div className="mb-3 flex items-center justify-between gap-3">
             <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Pilih e-wallet</p>
-            <span className="text-[10px] text-gray-400">Biaya jasa Midtrans</span>
+            <span className="text-[10px] text-gray-400">Biaya jasa DOKU</span>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
             {eWallets.map((provider) => <ProviderCard key={provider.id} provider={provider} selected={value?.provider === provider.id} onClick={() => selectProvider("e_wallet", provider)} />)}

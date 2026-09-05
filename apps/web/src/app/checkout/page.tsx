@@ -125,7 +125,7 @@ export default function CheckoutPage() {
       });
       const json = (await res.json()) as {
         ok: boolean;
-        data?: { order_number: string; snap_token: string; redirect_url: string };
+        data?: { order_number: string; redirect_url?: string };
         error?: { message: string };
       };
       if (!json.ok || !json.data) {
@@ -134,7 +134,12 @@ export default function CheckoutPage() {
       }
       removeItems(cartItems.map((i) => i.productId));
       trackCustomerEvent({ event_name: "checkout_completed", metadata: { order_number: json.data.order_number } });
-      router.push(`/order/${json.data.order_number}`);
+      const targetUrl = json.data.redirect_url;
+      if (targetUrl) {
+        window.location.href = targetUrl;
+      } else {
+        router.push(`/order/${json.data.order_number}`);
+      }
     } catch (e) {
       trackCustomerEvent({ event_name: "payment_failed", metadata: { stage: "checkout" } });
       setStatus({ status: "error", message: e instanceof Error ? e.message : String(e) });

@@ -1,18 +1,15 @@
-// POST /api/checkout — creates order + Midtrans Snap transaction
-// Replaces the legacy Prisma-based checkout with Supabase + Midtrans Snap.
+// POST /api/checkout — creates order + DOKU Checkout transaction
+// Supabase + DOKU Checkout
 
 import { NextRequest } from 'next/server'
 import { jsonError, jsonOk } from '@/lib/http'
 import { generateOrderNumber } from '@/lib/ids'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server'
-import { createSnapTransaction, isMidtransProduction } from '@/lib/midtrans'
+import { createDokuCheckoutSession, isDokuProduction, type DokuLineItem } from '@/lib/doku'
 import { calculateShippingCost, getCities, isRajaOngkirConfigured } from '@/lib/rajaongkir'
 import { calculateServerCheckoutTotal, normalizeCheckoutRequestItems, priceCheckoutItems, type ServerProduct, type ServerVariant } from '@/lib/checkout/checkoutService'
-import type { MidtransCustomerDetails, MidtransItemDetail } from '@/types/midtrans'
 import type {
   OrderRow,
-  OrderItemRow,
-  PaymentRow,
   CouponRow,
 } from '@/types/database'
 
@@ -158,12 +155,15 @@ export async function POST(req: NextRequest) {
   if (checkout_idempotency_key) {
     const { data: existingOrder } = await adminAny.from('orders').select('id, order_number').eq('profile_id', user.id).eq('checkout_idempotency_key', checkout_idempotency_key).maybeSingle()
     if (existingOrder) {
-      const { data: existingPayment } = await adminAny.from('payments').select('snap_token, snap_redirect_url').eq('order_id', existingOrder.id).maybeSingle()
-      if (existingPayment) return jsonOk({ order_number: existingOrder.order_number, snap_token: existingPayment.snap_token, redirect_url: existingPayment.snap_redirect_url, is_production: isMidtransProduction })
+      const { data: existingPayment } = await adminAny.from('payments').select('checkout_url, payment_url').eq('order_id', existingOrder.id).maybeSingle()
+      if (existingPayment) {
+        const redirectUrl = existingPayment.checkout_url || existingPayment.payment_url || ''
+        return jsonOk({ order_number: existingOrder.order_number, redirect_url: redirectUrl, is_production: isDokuProduction })
+      }
     }
   }
 
-  // 9. Insert order — cast payload to bypass strict Insert generic
+  // 9. Insert order
 
   const orderNumber = generateOrderNumber()
 
@@ -216,64 +216,57 @@ export async function POST(req: NextRequest) {
     return jsonError('Gagal menyimpan item pesanan', 500, itemsError.message)
   }
 
-  // 10. Build Midtrans payload
-  const [firstName, ...rest] = customerName.split(' ')
-  const customerDetails: MidtransCustomerDetails = {
-    first_name: firstName,
-    last_name: rest.join(' ') || undefined,
-    email: customerEmail,
-    phone: customerPhone,
-    shipping_address: {
-      first_name: address.recipient_name,
-      phone: address.phone,
-      address: address.address_line1,
-      city: address.city,
-      postal_code: address.postal_code,
-      country_code: 'IDN',
-    },
-  }
-
-  const midtransItems: MidtransItemDetail[] = [
+  // 10. Build DOKU line items payload
+  const dokuItems: DokuLineItem[] = [
     ...items.map((item) => ({
-      id: item.variantId ?? item.productId,
+      name: `${item.productName}${item.variantName ? ` - ${item.variantName}` : ''}`.slice(0, 100),
       price: item.unitPrice,
       quantity: item.quantity,
-      name: `${item.productName}${item.variantName ? ` - ${item.variantName}` : ''}`.slice(0, 50),
     })),
     ...(shippingCost > 0
-      ? [{ id: 'SHIPPING', price: shippingCost, quantity: 1, name: 'Ongkos Kirim' }]
+      ? [{ name: 'Ongkos Kirim', price: shippingCost, quantity: 1 }]
       : []),
     ...(paymentFee > 0
-      ? [{ id: 'PAYMENT_FEE', price: paymentFee, quantity: 1, name: 'Biaya layanan pembayaran' }]
+      ? [{ name: 'Biaya Layanan Pembayaran', price: paymentFee, quantity: 1 }]
       : []),
     ...(discountAmount > 0
-      ? [{ id: 'DISCOUNT', price: -discountAmount, quantity: 1, name: 'Diskon' }]
+      ? [{ name: 'Diskon', price: -discountAmount, quantity: 1 }]
       : []),
   ]
 
-  // 11. Call Midtrans Snap
-  let snapToken: string
-  let snapRedirectUrl: string
+  // 11. Create DOKU Checkout Session
+  let checkoutUrl: string
+  let invoiceNumber: string
+  let dokuRawResponse: Record<string, unknown>
 
   try {
-    const snap = await createSnapTransaction(
+    const dokuSession = await createDokuCheckoutSession({
       orderNumber,
       totalAmount,
-      customerDetails,
-      midtransItems,
-    )
-    snapToken = snap.token
-    snapRedirectUrl = snap.redirect_url
+      customer: {
+        id: user.id,
+        name: customerName,
+        email: customerEmail,
+        phone: customerPhone,
+      },
+      items: dokuItems,
+      callbackUrl: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/finish?order=${orderNumber}`,
+    })
+    checkoutUrl = dokuSession.checkoutUrl
+    invoiceNumber = dokuSession.invoiceNumber
+    dokuRawResponse = dokuSession.rawResponse
   } catch (e) {
     await adminAny.from('payments').insert({
       order_id: order.id,
-      midtrans_order_id: orderNumber,
-      midtrans_gross_amount: totalAmount,
+      invoice_number: orderNumber,
+      provider: 'doku',
+      gross_amount: totalAmount,
+      currency: 'IDR',
       status: 'failed',
       raw_notification: null,
     })
     return jsonError(
-      'Gagal menghubungi payment gateway',
+      'Gagal menghubungi payment gateway (DOKU Checkout)',
       502,
       e instanceof Error ? e.message : String(e),
     )
@@ -284,16 +277,14 @@ export async function POST(req: NextRequest) {
     .from('payments')
     .insert({
       order_id: order.id,
-      midtrans_order_id: orderNumber,
-      midtrans_transaction_id: null,
-      payment_type: null,
+      provider: 'doku',
+      invoice_number: invoiceNumber,
+      checkout_url: checkoutUrl,
+      payment_url: checkoutUrl,
+      gross_amount: totalAmount,
+      currency: 'IDR',
       status: 'pending',
-      midtrans_gross_amount: totalAmount,
-      snap_token: snapToken,
-      snap_redirect_url: snapRedirectUrl,
-      midtrans_fraud_status: null,
-      settlement_time: null,
-      expiry_time: null,
+      raw_response: dokuRawResponse,
       raw_notification: null,
     } as never)
 
@@ -312,8 +303,7 @@ export async function POST(req: NextRequest) {
 
   return jsonOk({
     order_number: orderNumber,
-    snap_token: snapToken,
-    redirect_url: snapRedirectUrl,
-    is_production: isMidtransProduction,
+    redirect_url: checkoutUrl,
+    is_production: isDokuProduction,
   })
 }

@@ -7,7 +7,7 @@ const SECURITY_HEADERS = [
   {
     key: 'Permissions-Policy',
     value:
-      'camera=(), microphone=(), geolocation=(self), payment=(self "https://app.midtrans.com" "https://app.sandbox.midtrans.com")',
+      'camera=(), microphone=(), geolocation=(self), payment=(self "https://checkout.doku.com" "https://checkout-sandbox.doku.com" "https://api.doku.com" "https://api-sandbox.doku.com")',
   },
   {
     key: 'Strict-Transport-Security',

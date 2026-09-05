@@ -344,7 +344,7 @@ export function generateVoucherCode(): string {
 
 /**
  * Create + execute a refund for a return.
- * - original_payment: records a pending Midtrans refund (settled via webhook/manual).
+ * - original_payment: records a pending gateway refund (settled via webhook/manual).
  * - store_credit: credits the customer wallet atomically (via wallet_credit RPC) — completes immediately.
  * - voucher: mints a single-use coupon for the refund amount — completes immediately.
  *

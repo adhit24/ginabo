@@ -1,4 +1,4 @@
-export type PaymentProvider = "MANUAL" | "STRIPE" | "MIDTRANS" | "XENDIT";
+export type PaymentProvider = "MANUAL" | "DOKU" | "STRIPE" | "XENDIT";
 
 export type PaymentCreateResult =
   | { type: "manual"; instructions: string }
@@ -11,5 +11,5 @@ export async function createProviderPayment(opts: {
   if (opts.provider === "MANUAL") {
     return { type: "manual", instructions: `Pembayaran manual untuk order ${opts.order.orderNumber}. Admin akan menghubungi untuk konfirmasi.` };
   }
-  return { type: "manual", instructions: `Provider ${opts.provider} belum dikonfigurasi.` };
+  return { type: "manual", instructions: `Provider ${opts.provider} dikelola via server API route.` };
 }

@@ -1,8 +1,8 @@
 import type { OrderStatus, PaymentStatus } from "@/types/database";
 
-export function parseMidtransAmount(value: string): number {
-  const amount = Number(value);
-  if (!Number.isSafeInteger(amount) || amount < 0) throw new Error("gross_amount tidak valid");
+export function parsePaymentAmount(value: string | number): number {
+  const amount = typeof value === "number" ? value : Number(value);
+  if (!Number.isSafeInteger(amount) || amount < 0) throw new Error("Nominal pembayaran tidak valid");
   return amount;
 }
 
@@ -10,14 +10,36 @@ export function amountsMatch(expected: number, received: number): boolean {
   return Number.isSafeInteger(expected) && Number.isSafeInteger(received) && expected === received;
 }
 
-export function resolvePaymentTransition(transactionStatus: string, fraudStatus?: string): { orderStatus: OrderStatus | null; paymentStatus: PaymentStatus } {
-  if (transactionStatus === "settlement" || (transactionStatus === "capture" && (fraudStatus === "accept" || !fraudStatus))) {
+export function resolvePaymentTransition(
+  transactionStatus: string,
+  fraudStatus?: string,
+): { orderStatus: OrderStatus | null; paymentStatus: PaymentStatus } {
+  const status = transactionStatus.toLowerCase().trim();
+
+  // DOKU payment success states
+  if (
+    ["success", "paid", "settled", "settlement"].includes(status) ||
+    (status === "capture" && (fraudStatus === "accept" || !fraudStatus))
+  ) {
     return { orderStatus: "paid", paymentStatus: "success" };
   }
-  if (transactionStatus === "capture" && fraudStatus === "challenge") return { orderStatus: null, paymentStatus: "challenge" };
-  if (transactionStatus === "pending") return { orderStatus: "pending", paymentStatus: "pending" };
-  if (["deny", "failure"].includes(transactionStatus)) return { orderStatus: "cancelled", paymentStatus: "failed" };
-  if (["cancel", "expire"].includes(transactionStatus)) return { orderStatus: "cancelled", paymentStatus: "expired" };
+
+  if (status === "capture" && fraudStatus === "challenge") {
+    return { orderStatus: null, paymentStatus: "challenge" };
+  }
+
+  if (status === "pending") {
+    return { orderStatus: "pending", paymentStatus: "pending" };
+  }
+
+  if (["deny", "failure", "failed"].includes(status)) {
+    return { orderStatus: "cancelled", paymentStatus: "failed" };
+  }
+
+  if (["cancel", "cancelled", "expire", "expired"].includes(status)) {
+    return { orderStatus: "cancelled", paymentStatus: "expired" };
+  }
+
   return { orderStatus: null, paymentStatus: "pending" };
 }
 

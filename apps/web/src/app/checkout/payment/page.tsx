@@ -41,7 +41,7 @@ export default function DemoPaymentPage() {
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-600">Ginabo Pay</p>
           <h1 className="mt-1 text-2xl font-extrabold text-gray-900">Selesaikan pembayaran</h1>
-          <p className="mt-1 text-sm text-gray-500">Simulasi halaman pembayaran Midtrans untuk trial alur checkout.</p>
+          <p className="mt-1 text-sm text-gray-500">Simulasi halaman pembayaran DOKU Checkout untuk trial alur checkout.</p>
         </div>
         <span className={`rounded-full px-3 py-1.5 text-xs font-bold ${paid ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
           {paid ? "BERHASIL" : "MENUNGGU PEMBAYARAN"}
@@ -67,7 +67,7 @@ export default function DemoPaymentPage() {
               <p className="font-bold text-gray-900">{payment.paymentMethod?.label ?? "Belum dipilih"}</p>
               <span className="text-xs font-semibold text-brand-700">Jasa {formatPrice(payment.paymentMethod?.fee ?? 0)}</span>
             </div>
-            <p className="mt-2 text-xs text-gray-500">Pada integrasi nyata, halaman ini akan digantikan oleh Snap Midtrans.</p>
+            <p className="mt-2 text-xs text-gray-500">Pada integrasi nyata, halaman ini akan digantikan oleh DOKU Checkout.</p>
           </div>
 
           {!paid ? (

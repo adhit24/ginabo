@@ -14,7 +14,7 @@ export const checkoutItemSchema = z.object({
 export const checkoutSchema = z.object({
   customer: customerInputSchema,
   items: z.array(checkoutItemSchema).min(1),
-  paymentProvider: z.enum(["MANUAL", "STRIPE", "MIDTRANS", "XENDIT"]).default("MANUAL")
+  paymentProvider: z.enum(["MANUAL", "DOKU", "STRIPE", "XENDIT"]).default("DOKU")
 });
 
 export const adminLoginSchema = z.object({

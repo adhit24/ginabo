@@ -183,20 +183,19 @@ export interface OrderItemRow {
 export interface PaymentRow {
   id: string
   order_id: string
-  midtrans_order_id: string | null
-  midtrans_transaction_id: string | null
+  provider: string | null
+  invoice_number: string | null
+  provider_transaction_id: string | null
   payment_type: string | null
   status: PaymentStatus
-  midtrans_gross_amount: number
-  gross_amount?: number
-  snap_token: string | null
-  snap_redirect_url: string | null
-  midtrans_fraud_status: string | null
+  gross_amount: number
+  currency: string
+  checkout_url: string | null
+  payment_url: string | null
   settlement_time: string | null
   expiry_time: string | null
   raw_notification: Record<string, unknown> | null
   raw_response?: Record<string, unknown> | null
-  provider_transaction_id: string | null
   created_at: string
   updated_at: string
 }

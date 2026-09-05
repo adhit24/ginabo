@@ -83,11 +83,11 @@ export default async function OrderDetailPage({ params }: PageProps) {
   type PaymentRecord = {
     id: string
     status: PaymentStatus
-    snap_token: string | null
-    snap_redirect_url: string | null
+    provider?: string | null
+    checkout_url?: string | null
+    payment_url?: string | null
     payment_type: string | null
     settlement_time: string | null
-    midtrans_fraud_status: string | null
   }
 
   type AddressRecord = {
@@ -164,11 +164,11 @@ export default async function OrderDetailPage({ params }: PageProps) {
       payments(
         id,
         status,
-        snap_token,
-        snap_redirect_url,
+        provider,
+        checkout_url,
+        payment_url,
         payment_type,
-        settlement_time,
-        midtrans_fraud_status
+        settlement_time
       )
     `,
     )
@@ -356,9 +356,9 @@ export default async function OrderDetailPage({ params }: PageProps) {
 
         {/* CTA row */}
         <div className="flex flex-wrap gap-3">
-          {isPendingPayment && latestPayment?.snap_token && (
+          {isPendingPayment && (latestPayment?.checkout_url || latestPayment?.payment_url) && (
             <PayButton
-              snapToken={latestPayment.snap_token}
+              paymentUrl={latestPayment.checkout_url || latestPayment.payment_url}
               orderNumber={order.order_number}
             />
           )}

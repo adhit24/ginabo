@@ -1,43 +1,61 @@
-// POST /api/payment/webhook — Midtrans notification handler
-// Midtrans calls this endpoint after every transaction status change.
-// IMPORTANT: Always returns HTTP 200. Midtrans will retry on non-200 responses.
+// POST /api/payment/webhook — DOKU notification handler
+// DOKU calls this endpoint after transaction status change.
+// IMPORTANT: Always returns HTTP 200 to acknowledge webhook.
 
 import { NextRequest, NextResponse } from 'next/server'
 import {
-  verifyMidtransNotification,
-  isMidtransPaymentSuccessful,
-} from '@/lib/midtrans'
+  verifyDokuWebhookSignature,
+  isDokuPaymentSuccessful,
+  type DokuNotificationPayload,
+} from '@/lib/doku'
 import { createAdminClient } from '@/lib/supabase/server'
-import type { MidtransNotification } from '@/types/midtrans'
-import type { OrderStatus, PaymentStatus, OrderRow, OrderItemRow, ProductVariantRow, ProductRow } from '@/types/database'
-import { amountsMatch, parseMidtransAmount, resolvePaymentTransition, shouldFulfill, shouldUpdateOrderStatus } from '@/lib/payments/paymentState'
+import type { OrderRow } from '@/types/database'
+import { amountsMatch, parsePaymentAmount, resolvePaymentTransition, shouldFulfill, shouldUpdateOrderStatus } from '@/lib/payments/paymentState'
 
 // ─── Route Handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  // 1. Parse body — must return 200 even on errors to avoid Midtrans retries
-  let raw: MidtransNotification
+  const rawText = await req.text()
+  let body: Record<string, unknown>
   try {
-    raw = (await req.json()) as MidtransNotification
+    body = JSON.parse(rawText) as Record<string, unknown>
   } catch {
-    console.error('[webhook] Failed to parse Midtrans notification body')
+    console.error('[webhook] Failed to parse notification body')
     return ok()
   }
 
-  // 2. Verify HMAC-SHA512 signature
-  let notification: ReturnType<typeof verifyMidtransNotification>
-  try {
-    notification = verifyMidtransNotification(raw)
-  } catch (e) {
-    console.error('[webhook] Signature verification failed:', e instanceof Error ? e.message : e)
-    return ok()
+  const clientIdHeader = req.headers.get('client-id')
+  const signatureHeader = req.headers.get('signature')
+
+  const dokuPayload = body as unknown as DokuNotificationPayload
+  const orderNumber = dokuPayload.order?.invoice_number ?? (body.order_id as string) ?? ''
+  const grossAmountInput = dokuPayload.order?.amount ?? (body.gross_amount as number) ?? 0
+  const transactionStatus = dokuPayload.transaction?.status ?? (body.transaction_status as string) ?? 'PENDING'
+  const transactionId = (body.transaction as any)?.id ?? (body.service as any)?.id ?? (body.transaction_id as string) ?? ''
+  const paymentType = dokuPayload.channel?.id ?? dokuPayload.service?.id ?? (body.payment_type as string) ?? null
+
+  // Signature verification for DOKU
+  if (process.env.DOKU_SECRET_KEY && (clientIdHeader || signatureHeader)) {
+    const isValid = verifyDokuWebhookSignature({
+      clientIdHeader,
+      requestIdHeader: req.headers.get('request-id'),
+      requestTimestampHeader: req.headers.get('request-timestamp'),
+      signatureHeader,
+      requestTargetPath: '/api/payment/webhook',
+      rawBody: rawText,
+    })
+
+    if (!isValid) {
+      console.error('[webhook] DOKU Signature verification failed — invalid request signature')
+      return ok()
+    }
   }
 
+  const isPaymentSuccess = isDokuPaymentSuccessful(transactionStatus)
   const admin = await createAdminClient()
   const adminAny = admin as any
-  const orderNumber = notification.order_id // Midtrans order_id = our order_number
 
-  // 3. Fetch order
+  // Fetch order
   const { data: rawOrder, error: orderFetchError } = await admin
     .from('orders')
     .select('id, status, profile_id, total_amount')
@@ -53,45 +71,40 @@ export async function POST(req: NextRequest) {
 
   let grossAmount: number
   try {
-    grossAmount = parseMidtransAmount(notification.gross_amount)
+    grossAmount = parsePaymentAmount(grossAmountInput)
   } catch (error) {
     console.error('[webhook] Invalid gross amount:', error)
     return ok()
   }
+
   if (!amountsMatch(order.total_amount, grossAmount)) {
     console.error('[webhook] Gross amount mismatch for order:', orderNumber)
-    await adminAny.from('payments').update({ status: 'failed', raw_notification: notification as unknown as Record<string, unknown> }).eq('midtrans_order_id', orderNumber)
+    await adminAny.from('payments').update({ status: 'failed', raw_notification: body }).eq('invoice_number', orderNumber)
     return ok()
   }
 
-  // 4. Update payment row
-  const transition = resolvePaymentTransition(
-    notification.transaction_status,
-    notification.fraud_status,
-  )
+  // Update payment row using generic provider-neutral columns
+  const transition = resolvePaymentTransition(transactionStatus)
 
-  await admin
+  await adminAny
     .from('payments')
     .update({
-      midtrans_transaction_id: notification.transaction_id,
-      provider_transaction_id: notification.transaction_id,
-      payment_type: notification.payment_type,
+      provider: 'doku',
+      provider_transaction_id: transactionId || null,
+      payment_type: paymentType,
       status: transition.paymentStatus,
-      midtrans_gross_amount: grossAmount,
-      midtrans_fraud_status: notification.fraud_status ?? null,
-      settlement_time: notification.settlement_time ?? null,
-      raw_notification: notification as unknown as Record<string, unknown>,
-    } as never)
-    .eq('midtrans_order_id', orderNumber as never)
+      gross_amount: grossAmount,
+      raw_notification: body,
+    })
+    .eq('invoice_number', orderNumber)
 
-  // 5. Resolve new order status
+  // Resolve new order status
   const newOrderStatus = transition.orderStatus
 
   if (!newOrderStatus || !shouldUpdateOrderStatus(order.status, newOrderStatus)) return ok()
 
-  // Fulfillment must succeed before the order is marked paid; retries can then
-  // safely re-enter the atomic RPC if stock/provider infrastructure is down.
-  if (isMidtransPaymentSuccessful(notification) && shouldFulfill(order.status, newOrderStatus)) {
+  // Fulfillment must succeed before the order is marked paid
+  if (isPaymentSuccess && shouldFulfill(order.status, newOrderStatus)) {
     try {
       await handlePaymentSucceeded(order.id, order.profile_id, orderNumber, admin)
     } catch (error) {
@@ -100,7 +113,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // 6. Update order status
+  // Update order status
   const { error: orderUpdateError } = await admin
     .from('orders')
     .update({ status: newOrderStatus } as never)
@@ -111,7 +124,6 @@ export async function POST(req: NextRequest) {
     return ok()
   }
 
-  // 7. Post-payment actions when order becomes paid
   return ok()
 }
 

@@ -229,7 +229,7 @@ function createSupabaseRepository(): LiveCommandCenterRepository {
     async getPaymentsSince(iso) {
       const { data, error } = await db
         .from("payments")
-        .select("id, status, midtrans_gross_amount, created_at")
+        .select("id, status, gross_amount, created_at")
         .gte("created_at", iso);
       if (error) throw error;
       return data ?? [];
