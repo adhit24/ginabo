@@ -1,10 +1,11 @@
 // Browser Supabase client — singleton for client components
-// Uses @supabase/supabase-js with localStorage-backed session (default browser auth)
+// Uses @supabase/ssr so the session lives in cookies (readable by middleware
+// and Server Components), not just in localStorage.
 
-import { createClient as _createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
 
-let _browserClient: ReturnType<typeof _createClient<Database>> | null = null
+let _browserClient: ReturnType<typeof createBrowserClient<Database>> | null = null
 
 /**
  * Returns a singleton Supabase browser client typed against the Ginabo schema.
@@ -22,14 +23,7 @@ export function createClient() {
     )
   }
 
-  _browserClient = _createClient<Database>(url, anonKey, {
-    auth: {
-      persistSession: true,
-      storageKey: 'ginabo-auth',
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-    },
-  })
+  _browserClient = createBrowserClient<Database>(url, anonKey)
 
   return _browserClient
 }

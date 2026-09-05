@@ -1,9 +1,28 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AuthModal } from "@/components/auth/AuthModal";
 
-export default function SignupPage() {
+function SignupPageInner() {
   const router = useRouter();
-  return <AuthModal open initialTab="signup" onClose={() => router.push("/")} />;
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
+
+  return (
+    <AuthModal
+      open
+      initialTab="signup"
+      redirectTo={next && next.startsWith("/") ? next : "/member"}
+      onClose={() => router.push("/")}
+    />
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupPageInner />
+    </Suspense>
+  );
 }

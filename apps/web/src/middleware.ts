@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
 import { getAdminSessionCookieName, verifyAdminSessionToken } from "@/lib/auth";
 import { MAINTENANCE_HTML } from "@/lib/maintenancePage";
@@ -53,14 +54,38 @@ function redirectTo(req: NextRequest, pathname: string, preserveNext = true) {
   return NextResponse.redirect(url);
 }
 
-// ─── Supabase session detection (cookie-based, no @supabase/ssr required) ───
+// ─── Supabase session detection (real session via @supabase/ssr) ───────────
 
 /**
- * Returns true when the auth status flag cookie is present.
- * Set by AuthProvider on login, cleared on logout.
+ * Validates the Supabase session cookie against the Auth server and returns
+ * a response with any refreshed session cookies attached. `user` is null
+ * when there is no session or it failed validation.
  */
-function hasSupabaseSession(req: NextRequest): boolean {
-  return !!req.cookies.get("ginabo-auth-status")?.value;
+async function getSupabaseUser(req: NextRequest) {
+  let response = NextResponse.next({ request: req });
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) return { user: null, response };
+
+  const supabase = createServerClient(url, anonKey, {
+    cookies: {
+      getAll() {
+        return req.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
+        response = NextResponse.next({ request: req });
+        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+      },
+    },
+  });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return { user, response };
 }
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
@@ -109,10 +134,11 @@ export async function middleware(req: NextRequest) {
 
   // 4. Member / customer area — Supabase session check
   if (startsWith(pathname, MEMBER_PATHS)) {
-    if (!hasSupabaseSession(req)) {
+    const { user, response } = await getSupabaseUser(req);
+    if (!user) {
       return redirectTo(req, "/auth/login");
     }
-    return NextResponse.next();
+    return response;
   }
 
   return NextResponse.next();

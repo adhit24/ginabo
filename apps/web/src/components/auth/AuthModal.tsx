@@ -11,6 +11,9 @@ interface AuthModalProps {
   open: boolean;
   onClose: () => void;
   initialTab?: AuthTab;
+  initialError?: string;
+  /** Path to send the user to after a successful login/signup. Defaults to /member. */
+  redirectTo?: string;
 }
 
 const inputStyle = { background: "rgba(255,255,255,0.06)", borderColor: "rgba(139,92,246,0.2)" };
@@ -44,7 +47,7 @@ function GoogleIcon() {
 const EMPTY_LOGIN = { email: "", password: "" };
 const EMPTY_SIGNUP = { name: "", email: "", phone: "", password: "", confirm: "" };
 
-export function AuthModal({ open, onClose, initialTab = "login" }: AuthModalProps) {
+export function AuthModal({ open, onClose, initialTab = "login", initialError, redirectTo = "/member" }: AuthModalProps) {
   const { login, signup, signInWithGoogle } = useAuth();
   const router = useRouter();
 
@@ -52,27 +55,31 @@ export function AuthModal({ open, onClose, initialTab = "login" }: AuthModalProp
   const [loginForm, setLoginForm] = useState(EMPTY_LOGIN);
   const [signupForm, setSignupForm] = useState(EMPTY_SIGNUP);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialError ?? "");
+  const [successMessage, setSuccessMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     if (open) {
       setTab(initialTab);
-      setError("");
+      setError(initialError ?? "");
+      setSuccessMessage("");
     } else {
       setLoginForm(EMPTY_LOGIN);
       setSignupForm(EMPTY_SIGNUP);
       setShowPassword(false);
       setShowConfirm(false);
       setError("");
+      setSuccessMessage("");
       setLoading(false);
     }
-  }, [open, initialTab]);
+  }, [open, initialTab, initialError]);
 
   function switchTab(next: AuthTab) {
     setTab(next);
     setError("");
+    setSuccessMessage("");
   }
 
   function handleGoogle() {
@@ -83,13 +90,18 @@ export function AuthModal({ open, onClose, initialTab = "login" }: AuthModalProp
     e.preventDefault();
     setError("");
     setLoading(true);
-    const result = await login(loginForm.email, loginForm.password);
-    setLoading(false);
-    if (result.ok) {
-      onClose();
-      router.push("/member");
-    } else {
-      setError(result.error ?? "Login gagal.");
+    try {
+      const result = await login(loginForm.email, loginForm.password);
+      if (result.ok) {
+        onClose();
+        router.push(redirectTo);
+      } else {
+        setError(result.error ?? "Login gagal.");
+      }
+    } catch {
+      setError("Tidak dapat terhubung ke server. Periksa koneksi internet kamu dan coba lagi.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -101,13 +113,22 @@ export function AuthModal({ open, onClose, initialTab = "login" }: AuthModalProp
       return;
     }
     setLoading(true);
-    const result = await signup(signupForm.name, signupForm.email, signupForm.phone, signupForm.password);
-    setLoading(false);
-    if (result.ok) {
-      onClose();
-      router.push("/member");
-    } else {
-      setError(result.error ?? "Pendaftaran gagal.");
+    try {
+      const result = await signup(signupForm.name, signupForm.email, signupForm.phone, signupForm.password);
+      if (result.needsEmailConfirmation) {
+        setSuccessMessage("Akun berhasil dibuat. Silakan cek email kamu untuk mengonfirmasi akun sebelum login.");
+        setSignupForm(EMPTY_SIGNUP);
+        setTab("login");
+      } else if (result.ok) {
+        onClose();
+        router.push(redirectTo);
+      } else {
+        setError(result.error ?? "Pendaftaran gagal.");
+      }
+    } catch {
+      setError("Tidak dapat terhubung ke server. Periksa koneksi internet kamu dan coba lagi.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -173,6 +194,12 @@ export function AuthModal({ open, onClose, initialTab = "login" }: AuthModalProp
           </div>
         )}
 
+        {successMessage && (
+          <div className="mb-5 rounded-lg px-4 py-3 text-sm font-medium text-emerald-300" style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)" }}>
+            {successMessage}
+          </div>
+        )}
+
         {/* Google */}
         <button
           type="button"
@@ -226,7 +253,6 @@ export function AuthModal({ open, onClose, initialTab = "login" }: AuthModalProp
               disabled={loading}
               className="mt-2 inline-flex min-h-11 items-center justify-center rounded-lg py-3 text-sm font-extrabold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
               style={{ background: "linear-gradient(135deg, #8b5cf6, #e879f9)", boxShadow: "0 4px 16px rgba(139,92,246,0.35)" }}
-              onDoubleClick={() => router.push("/admin/login")}
             >
               {loading ? "Memproses..." : "Masuk"}
             </button>

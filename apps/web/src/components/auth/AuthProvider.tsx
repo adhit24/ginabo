@@ -24,7 +24,7 @@ interface AuthContextValue {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
-  signup: (name: string, email: string, phone: string, password: string) => Promise<{ ok: boolean; error?: string }>;
+  signup: (name: string, email: string, phone: string, password: string) => Promise<{ ok: boolean; error?: string; needsEmailConfirmation?: boolean }>;
   logout: () => void;
   signInWithGoogle: () => void;
   changePassword: (newPassword: string) => Promise<{ ok: boolean; error?: string }>;
@@ -91,13 +91,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        // Set flag cookie so middleware can detect auth server-side
-        document.cookie = `ginabo-auth-status=1; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
         fetchAndSetUser(session.user).catch(() => {
           setUser(toAppUser(session.user));
         });
       } else {
-        document.cookie = "ginabo-auth-status=; path=/; max-age=0";
         setUser(null);
       }
       setIsLoading(false);
@@ -140,12 +137,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { ok: false, error: error.message };
     }
 
-    if (data.user) {
+    if (!data.user) return { ok: false, error: "Pendaftaran gagal. Silakan coba lagi." };
+
+    // No session yet means the project requires email confirmation before
+    // sign-in — there's no authenticated client to upsert the profile with,
+    // and nothing to redirect into yet.
+    if (!data.session) {
+      return { ok: true, needsEmailConfirmation: true };
+    }
+
+    try {
+      // A DB trigger (handle_new_user) already created the profiles row from
+      // auth.users metadata — it never sets phone_number, so fill that in here.
+      // This is a plain UPDATE (not upsert) because the row is guaranteed to
+      // already exist: an upsert's INSERT ... ON CONFLICT DO UPDATE still
+      // requires an INSERT policy even when it resolves as an update, which
+      // profiles does not grant to regular users.
       const profile = buildProfileUpsert({ id: data.user.id, email, name, phone });
       const { error: profileError } = await supabase
         .from("profiles")
-        .upsert(profile as never, { onConflict: "id" });
+        .update({ full_name: profile.full_name, phone_number: profile.phone_number } as never)
+        .eq("id", profile.id);
       if (profileError) return { ok: false, error: "Akun dibuat, tetapi data profil belum tersimpan. Silakan login ulang." };
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : "Nomor WhatsApp tidak valid." };
     }
 
     return { ok: true };

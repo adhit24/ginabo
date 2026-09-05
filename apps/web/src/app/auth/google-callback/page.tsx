@@ -29,21 +29,31 @@ function GoogleCallbackInner() {
         return;
       }
 
-      const profile = buildProfileUpsert({
-        id: data.user.id,
-        email: data.user.email ?? "",
-        name: data.user.user_metadata?.full_name ?? data.user.email?.split("@")[0] ?? "User",
-        phone: data.user.user_metadata?.phone_number ?? null,
-      });
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .upsert(profile as never, { onConflict: "id" });
-      if (profileError) {
+      try {
+        // handle_new_user already created the row from auth.users metadata —
+        // update it, don't upsert (see AuthProvider.signup for why upsert fails RLS).
+        const profile = buildProfileUpsert({
+          id: data.user.id,
+          email: data.user.email ?? "",
+          name: data.user.user_metadata?.full_name ?? data.user.email?.split("@")[0] ?? "User",
+          phone: data.user.user_metadata?.phone_number ?? null,
+        });
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({ full_name: profile.full_name, phone_number: profile.phone_number } as never)
+          .eq("id", profile.id);
+        if (profileError) {
+          router.replace("/auth/login?error=profile_failed");
+          return;
+        }
+      } catch {
         router.replace("/auth/login?error=profile_failed");
         return;
       }
 
       router.replace("/member");
+    }).catch(() => {
+      router.replace("/auth/login?error=google_failed");
     });
   }, [searchParams, router]);
 

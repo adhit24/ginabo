@@ -1,8 +1,10 @@
 // Server-side Supabase clients — for Server Components, Route Handlers, and Server Actions
-// Uses @supabase/supabase-js with cookie forwarding for session hydration
+// Uses @supabase/ssr so the session is read from (and refreshed via) cookies —
+// the same cookies the browser client and middleware read/write.
 
+import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
-import { cookies, headers } from 'next/headers'
+import { cookies } from 'next/headers'
 import type { Database } from '@/types/database'
 
 function getRequiredEnv(name: string): string {
@@ -20,34 +22,26 @@ function getRequiredEnv(name: string): string {
  *   const { data } = await supabase.from('products').select('*')
  */
 export async function createServerSupabaseClient() {
-  const headerStore = await headers()
   const cookieStore = await cookies()
 
   const url = getRequiredEnv('NEXT_PUBLIC_SUPABASE_URL')
   const anonKey = getRequiredEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY')
 
-  // Extract the session token from the auth cookie set by the browser client
-  const authCookieName = `sb-${new URL(url).hostname.split('.')[0]}-auth-token`
-  const sessionCookie = cookieStore.get(authCookieName)?.value ?? null
-  const authHeader = headerStore.get('authorization')
-  const bearerFromHeader = authHeader?.toLowerCase().startsWith('bearer ')
-    ? authHeader.slice('bearer '.length)
-    : null
-  const bearerFromCookie = sessionCookie ? _extractAccessToken(sessionCookie) : null
-  const token = bearerFromHeader ?? bearerFromCookie ?? ''
-
-  const client = createClient<Database>(url, anonKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-    },
-    global: {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+  return createServerClient<Database>(url, anonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+        } catch {
+          // Called from a Server Component render — cookies() is read-only there.
+          // Middleware refreshes the session cookie on every request instead.
+        }
+      },
     },
   })
-
-  return client
 }
 
 /**
@@ -65,25 +59,4 @@ export function createAdminClient() {
       autoRefreshToken: false,
     },
   })
-}
-
-/**
- * Parses a JSON-encoded Supabase session cookie and returns the access_token.
- * Returns an empty string if parsing fails (unauthenticated request).
- */
-function _extractAccessToken(rawCookie: string): string {
-  try {
-    const parsed = JSON.parse(decodeURIComponent(rawCookie)) as unknown
-    if (
-      parsed !== null &&
-      typeof parsed === 'object' &&
-      'access_token' in parsed &&
-      typeof (parsed as Record<string, unknown>).access_token === 'string'
-    ) {
-      return (parsed as { access_token: string }).access_token
-    }
-    return ''
-  } catch {
-    return ''
-  }
 }
