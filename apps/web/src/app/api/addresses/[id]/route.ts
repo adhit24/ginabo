@@ -67,7 +67,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     .select()
     .single()
 
-  if (error || !data) return jsonError('Alamat tidak ditemukan', 404, error?.message)
+  if (error || !data) return jsonError('Alamat tidak ditemukan', 404)
 
   return jsonOk(data as AddressRow)
 }
