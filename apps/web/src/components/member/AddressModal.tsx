@@ -9,6 +9,7 @@ interface AddressModalProps {
   open: boolean;
   onClose: () => void;
   onSaved: (address: AddressRow) => void;
+  editingAddress?: AddressRow | null;
 }
 
 const inputCls = "w-full rounded-lg border px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none transition focus:ring-2 focus:ring-[#8b5cf6]/40";
@@ -16,7 +17,8 @@ const inputStyle = { background: "rgba(255,255,255,0.06)", borderColor: "rgba(13
 const labelCls = "mb-1.5 block text-xs font-semibold text-white/70";
 const EMPTY_DETAILS = { label: "", recipient_name: "", phone: "", address_line1: "", address_line2: "", city: "", province: "", postal_code: "" };
 
-export function AddressModal({ open, onClose, onSaved }: AddressModalProps) {
+export function AddressModal({ open, onClose, onSaved, editingAddress }: AddressModalProps) {
+  const isEditing = !!editingAddress;
   const [step, setStep] = useState<"search" | "details">("search");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GeocodeResult[]>([]);
@@ -32,8 +34,22 @@ export function AddressModal({ open, onClose, onSaved }: AddressModalProps) {
     if (!open) {
       setStep("search"); setQuery(""); setResults([]); setLocateError("");
       setDetails(EMPTY_DETAILS); setSaveError("");
+      return;
     }
-  }, [open]);
+    if (editingAddress) {
+      setStep("details");
+      setDetails({
+        label: editingAddress.label ?? "",
+        recipient_name: editingAddress.recipient_name,
+        phone: editingAddress.phone,
+        address_line1: editingAddress.address_line1,
+        address_line2: editingAddress.address_line2 ?? "",
+        city: editingAddress.city,
+        province: editingAddress.province,
+        postal_code: editingAddress.postal_code,
+      });
+    }
+  }, [open, editingAddress]);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -77,7 +93,9 @@ export function AddressModal({ open, onClose, onSaved }: AddressModalProps) {
     }
     setSaving(true);
     try {
-      const res = await authFetch("/api/addresses", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...details, is_default: false }) });
+      const res = isEditing
+        ? await authFetch(`/api/addresses/${editingAddress.id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(details) })
+        : await authFetch("/api/addresses", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...details, is_default: false }) });
       const json = await res.json() as { ok: boolean; data?: AddressRow; error?: { message: string } };
       if (!json.ok || !json.data) { setSaveError(json.error?.message ?? "Gagal menyimpan alamat."); return; }
       onSaved(json.data); onClose();
@@ -89,7 +107,7 @@ export function AddressModal({ open, onClose, onSaved }: AddressModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center sm:px-4" onClick={onClose}>
       <div className="flex max-h-[92vh] w-full flex-col overflow-y-auto rounded-t-2xl p-5 sm:max-w-md sm:rounded-2xl sm:p-6" style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.2)", boxShadow: "0 8px 32px rgba(20,15,50,0.4)" }} onClick={e => e.stopPropagation()}>
-        <div className="mb-4 flex items-center justify-between"><h3 className="text-base font-bold text-white">Tambah Alamat</h3><button type="button" onClick={onClose} className="text-xl text-white/50" aria-label="Tutup">×</button></div>
+        <div className="mb-4 flex items-center justify-between"><h3 className="text-base font-bold text-white">{isEditing ? "Edit Alamat" : "Tambah Alamat"}</h3><button type="button" onClick={onClose} className="text-xl text-white/50" aria-label="Tutup">×</button></div>
         {step === "search" ? (
           <div className="flex flex-col gap-3">
             <input autoFocus className={inputCls} style={inputStyle} placeholder="Cari nama jalan / kelurahan / kota" value={query} onChange={e => setQuery(e.target.value)} />

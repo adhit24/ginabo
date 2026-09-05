@@ -126,6 +126,10 @@ export default function MemberPage() {
   const [addresses, setAddresses] = useState<AddressRow[]>([]);
   const [addressesLoading, setAddressesLoading] = useState(true);
   const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<AddressRow | null>(null);
+  const [deletingAddressId, setDeletingAddressId] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarError, setAvatarError] = useState("");
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -140,7 +144,24 @@ export default function MemberPage() {
     finally { setAddressesLoading(false); }
   }
 
-  function handleAddressSaved(address: AddressRow) { setAddresses(prev => [address, ...prev]); }
+  function handleAddressSaved() { void loadAddresses(); }
+
+  function openAddAddress() { setEditingAddress(null); setAddressModalOpen(true); }
+  function openEditAddress(address: AddressRow) { setEditingAddress(address); setAddressModalOpen(true); }
+  function closeAddressModal() { setAddressModalOpen(false); setEditingAddress(null); }
+
+  async function confirmDeleteAddress() {
+    if (!deletingAddressId) return;
+    setDeleteLoading(true); setDeleteError("");
+    try {
+      const res = await authFetch(`/api/addresses/${deletingAddressId}`, { method: "DELETE" });
+      const json = await res.json() as { ok: boolean; error?: { message: string } };
+      if (!json.ok) { setDeleteError(json.error?.message ?? "Gagal menghapus alamat."); return; }
+      setDeletingAddressId(null);
+      await loadAddresses();
+    } catch { setDeleteError("Gagal menghapus alamat."); }
+    finally { setDeleteLoading(false); }
+  }
 
   function closePwModal() {
     setPwModalOpen(false);
@@ -465,9 +486,20 @@ export default function MemberPage() {
               <div>
                 <h2 className="mb-1 text-base font-bold text-white">Alamat Pengiriman</h2>
                 <div className="mb-6 h-px" style={{ background: "rgba(139,92,246,0.15)" }} />
-                {addressesLoading ? <p className="text-sm text-white/40">Memuat...</p> : addresses.length === 0 ? <div className="rounded-xl p-10 text-center" style={{ background: "rgba(139,92,246,0.06)", border: "1px dashed rgba(139,92,246,0.25)" }}><p className="text-sm text-white/40">Belum ada alamat tersimpan</p><button type="button" onClick={() => setAddressModalOpen(true)} className="mt-4 rounded-xl px-6 py-2.5 text-sm font-semibold text-white/70" style={{ border: "1px solid rgba(139,92,246,0.3)" }}>+ Tambah Alamat</button></div> : <div className="flex flex-col gap-3">
-                  {addresses.map(addr => <div key={addr.id} className="rounded-lg px-4 py-3" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(139,92,246,0.12)" }}><div className="flex flex-wrap items-center gap-2"><span className="text-sm font-semibold text-white">{addr.recipient_name}</span>{addr.is_default && <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-white" style={{ background: "rgba(139,92,246,0.3)" }}>Utama</span>}{addr.label && <span className="text-[11px] text-white/40">{addr.label}</span>}</div><p className="mt-0.5 text-xs text-white/50">{addr.phone}</p><p className="mt-0.5 text-xs leading-5 text-white/50">{addr.address_line1}{addr.address_line2 ? `, ${addr.address_line2}` : ""}, {addr.city}, {addr.province} {addr.postal_code}</p></div>)}
-                  <button type="button" onClick={() => setAddressModalOpen(true)} className="self-start text-xs font-bold text-[#c084fc]">+ Tambah Alamat Baru</button>
+                {deleteError && <p className="mb-3 text-xs text-red-400/90">{deleteError}</p>}
+                {addressesLoading ? <p className="text-sm text-white/40">Memuat...</p> : addresses.length === 0 ? <div className="rounded-xl p-10 text-center" style={{ background: "rgba(139,92,246,0.06)", border: "1px dashed rgba(139,92,246,0.25)" }}><p className="text-sm text-white/40">Belum ada alamat tersimpan</p><button type="button" onClick={openAddAddress} className="mt-4 rounded-xl px-6 py-2.5 text-sm font-semibold text-white/70" style={{ border: "1px solid rgba(139,92,246,0.3)" }}>+ Tambah Alamat</button></div> : <div className="flex flex-col gap-3">
+                  {addresses.map(addr => <div key={addr.id} className="rounded-lg px-4 py-3" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(139,92,246,0.12)" }}>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2"><span className="text-sm font-semibold text-white">{addr.recipient_name}</span>{addr.is_default && <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-white" style={{ background: "rgba(139,92,246,0.3)" }}>Utama</span>}{addr.label && <span className="text-[11px] text-white/40">{addr.label}</span>}</div>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <button type="button" onClick={() => openEditAddress(addr)} className="text-xs font-semibold text-[#c084fc] hover:opacity-80">Edit</button>
+                        <button type="button" onClick={() => { setDeleteError(""); setDeletingAddressId(addr.id); }} className="text-xs font-semibold text-red-400/90 hover:opacity-80">Hapus</button>
+                      </div>
+                    </div>
+                    <p className="mt-0.5 text-xs text-white/50">{addr.phone}</p>
+                    <p className="mt-0.5 text-xs leading-5 text-white/50">{addr.address_line1}{addr.address_line2 ? `, ${addr.address_line2}` : ""}, {addr.city}, {addr.province} {addr.postal_code}</p>
+                  </div>)}
+                  <button type="button" onClick={openAddAddress} className="self-start text-xs font-bold text-[#c084fc]">+ Tambah Alamat Baru</button>
                 </div>}
               </div>
             )}
@@ -627,7 +659,46 @@ export default function MemberPage() {
           </div>
         </div>
       )}
-      <AddressModal open={addressModalOpen} onClose={() => setAddressModalOpen(false)} onSaved={handleAddressSaved} />
+      <AddressModal open={addressModalOpen} onClose={closeAddressModal} onSaved={handleAddressSaved} editingAddress={editingAddress} />
+
+      {/* ── Hapus Alamat Confirmation ── */}
+      {deletingAddressId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={() => !deleteLoading && setDeletingAddressId(null)}>
+          <div
+            className="w-full max-w-sm rounded-2xl p-6"
+            style={{ background: "linear-gradient(135deg, #1e1b3a, #2d2556)", border: "1px solid rgba(139,92,246,0.2)", boxShadow: "0 8px 32px rgba(20,15,50,0.4)" }}
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 className="mb-2 text-base font-bold text-white">Hapus Alamat?</h3>
+            <p className="mb-5 text-sm text-white/60">Alamat ini akan dihapus permanen dan tidak dapat dikembalikan.</p>
+            {deleteError && (
+              <div className="mb-4 rounded-lg px-4 py-3 text-sm font-medium text-red-300" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)" }}>
+                {deleteError}
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setDeletingAddressId(null)}
+                disabled={deleteLoading}
+                className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white/70 transition hover:text-white disabled:opacity-50"
+                style={{ border: "1px solid rgba(139,92,246,0.3)" }}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteAddress}
+                disabled={deleteLoading}
+                className="flex-1 rounded-lg py-2.5 text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                style={{ background: "linear-gradient(135deg, #ef4444, #dc2626)" }}
+              >
+                {deleteLoading ? "Menghapus..." : "Hapus"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
