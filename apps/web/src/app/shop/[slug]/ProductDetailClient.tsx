@@ -26,6 +26,7 @@ type Props = {
     name: string;
     description: string | null;
     priceMinor: number;
+    comparePriceMinor: number | null;
     currency: string;
     stockQty: number;
     weightGrams: number | null;
@@ -33,10 +34,11 @@ type Props = {
   };
 };
 
+// Gallery is built exclusively from the product's real DB images — no
+// hardcoded slug-based supplementary images. A single-image product simply
+// shows one image.
 function getProductGalleryCards(product: Props["product"]): ProductMediaCard[] {
-  const slug = product.slug.toLowerCase();
-
-  if (product.images && product.images.length > 1) {
+  if (product.images && product.images.length > 0) {
     return product.images.map((img, idx) => ({
       url: img.url,
       alt: img.alt || `${product.name} - ${idx + 1}`,
@@ -44,59 +46,9 @@ function getProductGalleryCards(product: Props["product"]): ProductMediaCard[] {
     }));
   }
 
-  const mainImg = product.images[0]?.url;
-
-  if (slug.includes("serum") || slug.includes("glowage")) {
-    return [
-      { url: mainImg || "/GlowAge Multi Active Serum.png", alt: "GlowAge Multi-Active Serum", label: "Kemasan Utama" },
-      { url: "/product-serum-2.png", alt: "Brighten & Glow Formula", label: "Brighten & Glow" },
-      { url: "/product-serum-3.png", alt: "Kandungan Aktif Niacinamide", label: "Kandungan Aktif" },
-      { url: "/product-serum-4.png", alt: "Hasil Uji Klinis", label: "Hasil Klinis" },
-      { url: "/BA_serum.jpg", alt: "Before & After Pemakaian", label: "Sebelum & Sesudah" },
-      { url: "/halal_card.png", alt: "Sertifikasi BPOM & Halal", label: "Sertifikasi Resmi" },
-      { url: "/ginabo_prods.png", alt: "Rangkaian Produk Ginabo", label: "Rangkaian Perawatan" },
-    ];
-  }
-
-  if (slug.includes("cream") || slug.includes("bright-care")) {
-    return [
-      { url: mainImg || "/Bright & Care Moisture Cream.png", alt: "Bright & Care Moisture Cream", label: "Kemasan Utama" },
-      { url: "/product-cream-2.png", alt: "Skin Barrier Moisture Lock", label: "Barrier Lock" },
-      { url: "/product-cream-3.png", alt: "Deep Hydration Infusion", label: "Deep Hydration" },
-      { url: "/product-cream-4.png", alt: "Soothing & Calming Effect", label: "Menenangkan Kulit" },
-      { url: "/BA_cream.jpg", alt: "Before & After Pemakaian", label: "Sebelum & Sesudah" },
-      { url: "/halal_card.png", alt: "Sertifikasi BPOM & Halal", label: "Sertifikasi Resmi" },
-    ];
-  }
-
-  if (slug.includes("dna") || slug.includes("hydra") || slug.includes("gel")) {
-    return [
-      { url: mainImg || "/Hydra Moist Gel Ultimate.png", alt: "Hydra Moist Gel Ultimate", label: "Kemasan Utama" },
-      { url: "/product-dna-2.png", alt: "Salmon DNA 3-in-1", label: "Salmon DNA 3-in-1" },
-      { url: "/product-dna-3.png", alt: "Cooling & Fresh Gel", label: "Cooling & Fresh" },
-      { url: "/product-dna-4.png", alt: "Skin Recovery Support", label: "Skin Recovery" },
-      { url: "/BA_dna.jpg", alt: "Before & After Pemakaian", label: "Sebelum & Sesudah" },
-      { url: "/halal_card.png", alt: "Sertifikasi BPOM & Halal", label: "Sertifikasi Resmi" },
-    ];
-  }
-
-  if (slug.includes("bundle") || slug.includes("set") || slug.includes("complete")) {
-    const fallbackBundle = "/Hydra_Moist_Gel_Ultimate_GlowAge_Multi_Active_Serum_Bright_Care_Moisture_Cream.png";
-    return [
-      { url: mainImg || fallbackBundle, alt: product.name, label: "Paket Lengkap" },
-      { url: "/ginabo_bundling_3.png", alt: "Komposisi Produk Bundling", label: "Isi Rangkaian" },
-      { url: "/gnb21.png", alt: "21 Days Skin Transformation", label: "21 Days Journey" },
-      { url: "/halal_card.png", alt: "Sertifikasi BPOM & Halal", label: "Sertifikasi Resmi" },
-      { url: "/ginabo_prods.png", alt: "Rutinitas Skincare Lengkap", label: "Rutinitas AM/PM" },
-    ];
-  }
-
-  const fallbackUrl = mainImg || "/Hydra_Moist_Gel_Ultimate&Bright_Care_Moisture_Cream.png";
-  return [
-    { url: fallbackUrl, alt: product.name, label: "Kemasan Utama" },
-    { url: "/halal_card.png", alt: "Sertifikasi BPOM & Halal", label: "Sertifikasi Resmi" },
-    { url: "/ginabo_prods.png", alt: "Rangkaian Ginabo", label: "Rangkaian Produk" },
-  ];
+  // No real image on record — an honest brand-logo placeholder, not a
+  // fabricated product photo.
+  return [{ url: "/LOGO_GINABO.png", alt: product.name, label: "Foto belum tersedia" }];
 }
 
 const CERTIFICATIONS = [
@@ -211,11 +163,12 @@ export function ProductDetailClient({ product }: Props) {
   const gallery = useMemo(() => getProductGalleryCards(product), [product]);
   const currentCard = gallery[activeImg] || gallery[0];
 
-  const originalPriceMinor = useMemo(() => {
-    return Math.round(product.priceMinor * 1.4);
-  }, [product.priceMinor]);
-
-  const discountPercent = 30;
+  // Only real DB compare_price data can produce a strike-through/discount
+  // badge — never a fabricated inflated "original" price.
+  const hasRealDiscount = product.comparePriceMinor != null && product.comparePriceMinor > product.priceMinor;
+  const discountPercent = hasRealDiscount
+    ? Math.round((1 - product.priceMinor / product.comparePriceMinor!) * 100)
+    : 0;
 
   const subtitle = useMemo(() => {
     const slug = product.slug.toLowerCase();
@@ -512,12 +465,16 @@ export function ProductDetailClient({ product }: Props) {
               <span className="text-[24px] lg:text-[34px] font-extrabold text-[#E01E2B] tracking-tight leading-none">
                 {formatPrice(product.priceMinor)}
               </span>
-              <span className="text-[14px] lg:text-[18px] text-[#9CA3AF] line-through font-normal">
-                {formatPrice(originalPriceMinor)}
-              </span>
-              <span className="rounded-full bg-[#FBD9E9] text-[#DB2777] px-2 lg:px-2.5 py-0.5 text-[11px] lg:text-[14px] font-semibold">
-                -{discountPercent}%
-              </span>
+              {hasRealDiscount && (
+                <>
+                  <span className="text-[14px] lg:text-[18px] text-[#9CA3AF] line-through font-normal">
+                    {formatPrice(product.comparePriceMinor!)}
+                  </span>
+                  <span className="rounded-full bg-[#FBD9E9] text-[#DB2777] px-2 lg:px-2.5 py-0.5 text-[11px] lg:text-[14px] font-semibold">
+                    -{discountPercent}%
+                  </span>
+                </>
+              )}
             </div>
 
             {/* Label Quantity: 12px di mobile, 14px di desktop */}
@@ -747,16 +704,9 @@ export function ProductDetailClient({ product }: Props) {
             {/* Horizontal Product Cards Grid */}
             <div className="relative">
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
-                {related.map((item, idx) => {
-                  const tag = idx === 0 ? "21% Off" : idx === 1 ? "31% Off" : idx === 2 ? "18% Off" : "31% Off";
-                  const productWithTag = {
-                    ...item,
-                    tag,
-                  };
-                  return (
-                    <ProductCard key={item.slug} product={productWithTag} />
-                  );
-                })}
+                {related.map((item) => (
+                  <ProductCard key={item.slug} product={item} />
+                ))}
               </div>
 
               {/* Right Chevron arrow */}

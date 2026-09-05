@@ -6,6 +6,14 @@ export function mapCatalogProduct(row: Record<string, unknown>): CatalogProduct 
     throw new Error("base_price must be a non-negative integer");
   }
 
+  const comparePrice = row.compare_price;
+  const comparePriceMinor =
+    typeof comparePrice === "number" && Number.isSafeInteger(comparePrice) && comparePrice > price
+      ? comparePrice
+      : null;
+
+  const category = row.category as { name?: unknown; slug?: unknown } | null | undefined;
+
   const rawImages = (row.product_images ?? []) as Array<{
     url?: unknown;
     alt_text?: unknown;
@@ -26,12 +34,15 @@ export function mapCatalogProduct(row: Record<string, unknown>): CatalogProduct 
     name: String(row.name ?? ""),
     description: typeof row.description === "string" ? row.description : "",
     priceMinor: price,
+    comparePriceMinor,
     currency: "IDR",
     stockQty: typeof row.stock_quantity === "number" ? row.stock_quantity : 0,
     weightGrams: typeof row.weight_grams === "number" ? row.weight_grams : null,
     isActive: row.is_active !== false,
     averageRating: typeof row.average_rating === "number" ? row.average_rating : null,
     reviewCount: typeof row.review_count === "number" ? row.review_count : 0,
+    categorySlug: typeof category?.slug === "string" ? category.slug : null,
+    categoryName: typeof category?.name === "string" ? category.name : null,
     images,
   };
 }

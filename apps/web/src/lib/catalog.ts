@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabasePublic as supabase } from "@/lib/supabasePublic";
 import { mapCatalogProduct } from "@/lib/catalogMapping";
 
 export type CatalogProduct = {
@@ -7,12 +7,15 @@ export type CatalogProduct = {
   name: string;
   description: string;
   priceMinor: number;
+  comparePriceMinor: number | null;
   currency: "IDR" | "USD";
   stockQty: number;
   weightGrams: number | null;
   isActive: boolean;
   averageRating: number | null;
   reviewCount: number;
+  categorySlug: string | null;
+  categoryName: string | null;
   images: Array<{ url: string; alt: string | null; sortOrder: number }>;
 };
 
@@ -25,11 +28,14 @@ const demoProducts: CatalogProduct[] = [
     description: "Serum pencerah, pelembap & anti-aging harian.",
     priceMinor: 90000,
     currency: "IDR",
+    comparePriceMinor: null,
     stockQty: 50,
     weightGrams: 20,
     isActive: true,
     averageRating: null,
     reviewCount: 0,
+    categorySlug: "bundling",
+    categoryName: "Paket Bundling",
     images: [{ url: "/GlowAge Multi Active Serum.png", alt: "GlowAge Multi-Active Serum", sortOrder: 0 }],
   },
   {
@@ -39,11 +45,14 @@ const demoProducts: CatalogProduct[] = [
     description: "Cream harian untuk kelembapan dan skin barrier.",
     priceMinor: 75000,
     currency: "IDR",
+    comparePriceMinor: null,
     stockQty: 60,
     weightGrams: 10,
     isActive: true,
     averageRating: null,
     reviewCount: 0,
+    categorySlug: "bundling",
+    categoryName: "Paket Bundling",
     images: [{ url: "/Bright & Care Moisture Cream.png", alt: "Bright & Care Moisture Cream", sortOrder: 0 }],
   },
   {
@@ -53,11 +62,14 @@ const demoProducts: CatalogProduct[] = [
     description: "Gel 3-in-1: moisturizer, makeup prep & sleeping mask.",
     priceMinor: 120000,
     currency: "IDR",
+    comparePriceMinor: null,
     stockQty: 40,
     weightGrams: 30,
     isActive: true,
     averageRating: null,
     reviewCount: 0,
+    categorySlug: "bundling",
+    categoryName: "Paket Bundling",
     images: [{ url: "/Hydra Moist Gel Ultimate.png", alt: "Hydra Moist Gel Ultimate", sortOrder: 0 }],
   },
 
@@ -69,11 +81,14 @@ const demoProducts: CatalogProduct[] = [
     description: "Gel + Cream + Serum dalam satu paket lengkap.",
     priceMinor: 287999,
     currency: "IDR",
+    comparePriceMinor: null,
     stockQty: 25,
     weightGrams: 60,
     isActive: true,
     averageRating: null,
     reviewCount: 0,
+    categorySlug: "bundling",
+    categoryName: "Paket Bundling",
     images: [{ url: "/Hydra_Moist_Gel_Ultimate_GlowAge_Multi_Active_Serum_Bright_Care_Moisture_Cream.png", alt: "Ginabo Complete Skin Nutrition Set", sortOrder: 0 }],
   },
   {
@@ -83,11 +98,14 @@ const demoProducts: CatalogProduct[] = [
     description: "Kombinasi serum dan cream untuk regenerasi kulit.",
     priceMinor: 207999,
     currency: "IDR",
+    comparePriceMinor: null,
     stockQty: 35,
     weightGrams: 50,
     isActive: true,
     averageRating: null,
     reviewCount: 0,
+    categorySlug: "bundling",
+    categoryName: "Paket Bundling",
     images: [{ url: "/Hydra_Moist_Gel_Ultimate_GlowAge_Multi_Active_Serum.png", alt: "Repair & Glow Set", sortOrder: 0 }],
   },
   {
@@ -97,11 +115,14 @@ const demoProducts: CatalogProduct[] = [
     description: "Perawatan barrier intensif harian.",
     priceMinor: 197999,
     currency: "IDR",
+    comparePriceMinor: null,
     stockQty: 30,
     weightGrams: 40,
     isActive: true,
     averageRating: null,
     reviewCount: 0,
+    categorySlug: "bundling",
+    categoryName: "Paket Bundling",
     images: [{ url: "/Hydra_Moist_Gel_Ultimate&Bright_Care_Moisture_Cream.png", alt: "Daily Skin Barrier Set", sortOrder: 0 }],
   },
   {
@@ -111,11 +132,14 @@ const demoProducts: CatalogProduct[] = [
     description: "Perawatan fokus mencerahkan kulit kusam.",
     priceMinor: 169999,
     currency: "IDR",
+    comparePriceMinor: null,
     stockQty: 20,
     weightGrams: 30,
     isActive: true,
     averageRating: null,
     reviewCount: 0,
+    categorySlug: "bundling",
+    categoryName: "Paket Bundling",
     images: [{ url: "/GlowAge_Multi_Active_Serum&Bright_Care_Moisture_Cream.png", alt: "Bright Renewal Set", sortOrder: 0 }],
   },
 ];
@@ -123,7 +147,7 @@ const demoProducts: CatalogProduct[] = [
 export async function listActiveProducts(): Promise<CatalogProduct[]> {
   const { data, error } = await supabase
     .from("products")
-    .select(`*, product_images(url, alt_text, sort_order)`)
+    .select(`*, product_images(url, alt_text, sort_order), category:categories(name, slug)`)
     .eq("is_active", true)
     .order("created_at", { ascending: false });
 
@@ -147,7 +171,7 @@ export async function listActiveProducts(): Promise<CatalogProduct[]> {
 export async function getProductBySlug(slug: string): Promise<CatalogProduct | null> {
   const { data, error } = await supabase
     .from("products")
-    .select(`*, product_images(url, alt_text, sort_order)`)
+    .select(`*, product_images(url, alt_text, sort_order), category:categories(name, slug)`)
     .eq("slug", slug)
     .eq("is_active", true)
     .single();

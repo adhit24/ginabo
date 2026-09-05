@@ -1,17 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useShopCatalog } from "@/lib/useShopCatalog";
 import { ProductCard } from "@/components/ProductCard";
-
-const CATEGORIES = [
-  { key: "all",      label: "Semua Produk" },
-  { key: "skincare", label: "Skincare" },
-  { key: "bodycare", label: "Bodycare" },
-  { key: "bundling", label: "Paket Bundling" },
-];
 
 const SORT_OPTIONS = [
   { key: "newest",   label: "Terbaru" },
@@ -28,6 +21,28 @@ export default function ShopPage() {
   const [sort, setSort]               = useState("newest");
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+
+  // Category tabs are derived from the real product-type categories present
+  // in the catalog (from the DB `categories` table via each product's
+  // category_id), not a hardcoded taxonomy — a category with zero products
+  // simply doesn't appear, instead of showing a permanently-empty tab.
+  // "Bundling" stays a distinct, always-shown tab since bundles have no
+  // `products` row / category_id by design.
+  const CATEGORIES = useMemo(() => {
+    const nonBundle = allProducts.filter(p => p.category !== "bundling");
+    const seen = new Map<string, string>();
+    for (const p of nonBundle) {
+      if (!seen.has(p.category)) seen.set(p.category, p.categoryLabel ?? p.category);
+    }
+    const dynamic = Array.from(seen, ([key, label]) => ({ key, label }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+    const hasBundling = allProducts.some(p => p.category === "bundling");
+    return [
+      { key: "all", label: "Semua Produk" },
+      ...dynamic,
+      ...(hasBundling ? [{ key: "bundling", label: "Paket Bundling" }] : []),
+    ];
+  }, [allProducts]);
 
   const filtered = allProducts
     .filter(p => category === "all" || p.category === category)

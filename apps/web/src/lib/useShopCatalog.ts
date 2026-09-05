@@ -9,11 +9,13 @@ export type ShopProduct = {
   slug: string;
   name: string;
   category: string;
+  categoryLabel?: string;
   tag: string;
   rating: string;
   reviews: string;
   price: string;
   priceMinor: number;
+  comparePriceMinor?: number | null;
   img: string;
   originalPrice?: string;
   stockQty?: number;
@@ -59,12 +61,17 @@ export function useShopCatalog(): ShopProduct[] {
       .then((products) => {
         if (cancelled) return;
         const liveProducts: ShopProduct[] = products.map((p) => ({
-          id: p.id, slug: p.slug, name: p.name, category: "skincare",
+          id: p.id, slug: p.slug, name: p.name,
+          // Real product-type category from the DB, not a fake universal tag.
+          category: p.categorySlug ?? "lainnya",
+          categoryLabel: p.categoryName ?? "Lainnya",
           tag: p.averageRating != null ? "Best Seller" : "",
           rating: p.averageRating != null ? p.averageRating.toFixed(1) : "5.0",
           reviews: String(p.reviewCount),
           price: `Rp ${p.priceMinor.toLocaleString("id-ID")}`,
           priceMinor: p.priceMinor,
+          comparePriceMinor: p.comparePriceMinor,
+          originalPrice: p.comparePriceMinor != null ? `Rp ${p.comparePriceMinor.toLocaleString("id-ID")}` : undefined,
           img: p.images[0]?.url ?? "",
           stockQty: p.stockQty,
         }));

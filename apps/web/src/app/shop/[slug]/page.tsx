@@ -27,6 +27,7 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
         name:        product.name,
         description: product.description ?? null,
         priceMinor:  product.priceMinor,
+        comparePriceMinor: product.comparePriceMinor,
         currency:    product.currency,
         stockQty:    product.stockQty,
         weightGrams: product.weightGrams,
