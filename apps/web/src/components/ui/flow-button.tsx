@@ -37,7 +37,7 @@ function FlowButtonContent({ text, size }: { text: string; size: Size }) {
       <span
         className={
           isCompact
-            ? "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-[#78257C] rounded-[50%] opacity-0 group-hover:w-[140px] group-hover:h-[140px] group-hover:opacity-100 transition-all duration-[800ms] ease-[cubic-bezier(0.19,1,0.22,1)]"
+            ? "absolute inset-0 bg-[#78257C] scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-[800ms] ease-[cubic-bezier(0.19,1,0.22,1)]"
             : "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-[#78257C] rounded-[50%] opacity-0 group-hover:w-[220px] group-hover:h-[220px] group-hover:opacity-100 transition-all duration-[800ms] ease-[cubic-bezier(0.19,1,0.22,1)]"
         }
       />

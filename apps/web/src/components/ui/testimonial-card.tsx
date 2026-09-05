@@ -118,7 +118,7 @@ export const ClientsSection = ({
 }: ClientsSectionProps) => {
   return (
     <section className={cn("w-full bg-white text-slate-800 py-20 md:py-28", className)}>
-      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start px-4">
+      <div className="mx-auto max-w-6xl px-5 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
         
         {/* Left Column: Sticky Content */}
         <div className="flex flex-col gap-6 lg:sticky lg:top-24">

@@ -442,7 +442,7 @@ export default function ResellerProgramPage() {
             .benefit-card-3 { --shift-x: -22.5px; }
           }
         `}} />
-        <div className="mx-auto max-w-5xl px-5">
+        <div className="mx-auto max-w-6xl px-5">
           <SectionHeading id="benefits-heading" label="Benefit Partner" title="Lebih dari sekadar menjual skincare" />
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-0 justify-items-center">

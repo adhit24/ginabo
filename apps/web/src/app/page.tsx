@@ -571,7 +571,7 @@ export default function HomePage() {
               <a
                 key={item.title}
                 href={item.href}
-                className="flex items-start gap-4 px-8 py-7 transition hover:bg-[#fdf5ff] group"
+                className="flex items-start gap-4 px-4 md:px-8 py-7 transition hover:bg-[#fdf5ff] group"
               >
                 <div className="flex-shrink-0">{item.icon}</div>
                 <div>
