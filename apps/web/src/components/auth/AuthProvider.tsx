@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
-import { buildProfileUpsert } from "@/lib/auth/profileContract";
+import { buildProfileUpsert, normalizeIndonesianPhone } from "@/lib/auth/profileContract";
 
 export type MemberTier = "Regular" | "Silver" | "Gold" | "Platinum";
 
@@ -76,6 +76,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .single();
     const profileRecord = (profile as Record<string, unknown> | null) ?? {};
     const gender = (genderProfile as { gender?: User["gender"] } | null)?.gender ?? null;
+
+    // The signup trigger (handle_new_user) only copies full_name/avatar_url
+    // from auth.users metadata, not phone_number — so when email confirmation
+    // is required, the phone entered at signup never makes it into the
+    // profile row (the immediate post-signup .update() only runs when a
+    // session exists right away). Self-heal it here, on whichever session
+    // resolution first has an authenticated client: if the profile is still
+    // missing a phone but the original signup metadata has one, backfill it.
+    const metadataPhone = supabaseUser.user_metadata?.phone_number;
+    if (!profileRecord.phone_number && typeof metadataPhone === "string" && metadataPhone.trim()) {
+      try {
+        const normalizedPhone = normalizeIndonesianPhone(metadataPhone);
+        const { error: backfillError } = await supabase
+          .from("profiles")
+          .update({ phone_number: normalizedPhone } as never)
+          .eq("id", supabaseUser.id);
+        if (!backfillError) profileRecord.phone_number = normalizedPhone;
+      } catch {
+        // Invalid legacy metadata phone — leave the profile as-is rather
+        // than blocking session resolution over a cosmetic backfill.
+      }
+    }
+
     setUser(toAppUser(supabaseUser, { ...profileRecord, gender }));
   }
 
