@@ -168,6 +168,26 @@ export async function listActiveProducts(): Promise<CatalogProduct[]> {
   return dbProducts;
 }
 
+// Live re-lookup for cart items by DB id, deliberately not filtered on
+// is_active — the cart needs to know when a referenced product has gone
+// inactive/vanished so it can mark the item unavailable instead of trusting
+// its own stale localStorage snapshot.
+export async function getProductsByIds(ids: string[]): Promise<CatalogProduct[]> {
+  if (ids.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("products")
+    .select(`*, product_images(url, alt_text, sort_order), category:categories(name, slug)`)
+    .in("id", ids);
+
+  if (error) {
+    console.error("Failed to fetch cart products from db", error);
+    return [];
+  }
+
+  return ((data ?? []) as Record<string, unknown>[]).map((item) => mapCatalogProduct(item));
+}
+
 export async function getProductBySlug(slug: string): Promise<CatalogProduct | null> {
   const { data, error } = await supabase
     .from("products")

@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCart } from "@/components/cart/CartProvider";
+import { useCart, isItemPurchasable } from "@/components/cart/CartProvider";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { FlowButton } from "@/components/ui/flow-button";
 
 export default function CartPage() {
-  const { state, updateQuantity, removeItem, toggleSelected, setAllSelected, selectedItems, selectedTotals } = useCart();
+  const { state, updateQuantity, removeItem, toggleSelected, setAllSelected, selectedItems, selectedTotals, liveById } = useCart();
   const { formatPrice } = useCurrency();
 
   const allSelected = state.items.length > 0 && selectedItems.length === state.items.length;
@@ -65,11 +65,18 @@ export default function CartPage() {
 
               {state.items.map((item) => {
                 const checked = selectedItems.some((i) => i.productId === item.productId);
+                const live = liveById[item.productId];
+                const purchasable = isItemPurchasable(live);
+                const displayPrice = live ? live.priceMinor : item.priceMinor;
+                const hasRealDiscount = live?.comparePriceMinor != null && live.comparePriceMinor > live.priceMinor;
+                const unavailableReason = live === null ? "Produk tidak tersedia" : live && live.stockQty === 0 ? "Stok habis" : null;
+                const maxQty = live?.stockQty ?? Infinity;
                 return (
-                  <div key={item.productId} className="flex gap-3 rounded-[6px] border border-[#EDEDED] bg-white p-4 items-center">
+                  <div key={item.productId} className={`flex gap-3 rounded-[6px] border border-[#EDEDED] bg-white p-4 items-center ${purchasable ? "" : "opacity-60"}`}>
                     <input
                       type="checkbox"
                       checked={checked}
+                      disabled={!purchasable}
                       onChange={() => toggleSelected(item.productId)}
                       className="h-4 w-4 shrink-0 accent-[#8E51B8]"
                     />
@@ -86,7 +93,16 @@ export default function CartPage() {
                           <Link href={`/shop/${item.slug}`} className="text-[14px] font-bold text-[#231F20] hover:text-[#8E51B8] transition line-clamp-1">
                             {item.name}
                           </Link>
-                          <div className="mt-0.5 text-[13.5px] font-bold text-[#E91E63]">{formatPrice(item.priceMinor)}</div>
+                          {unavailableReason ? (
+                            <div className="mt-0.5 text-[12.5px] font-semibold text-red-500">{unavailableReason}</div>
+                          ) : (
+                            <div className="mt-0.5 flex items-center gap-2">
+                              <span className="text-[13.5px] font-bold text-[#E91E63]">{formatPrice(displayPrice)}</span>
+                              {hasRealDiscount && (
+                                <span className="text-[11px] text-gray-400 line-through">{formatPrice(live!.comparePriceMinor!)}</span>
+                              )}
+                            </div>
+                          )}
                         </div>
                         <button
                           type="button"
@@ -104,7 +120,8 @@ export default function CartPage() {
                           <button
                             type="button"
                             onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                            className="flex h-7 w-7 items-center justify-center text-[15px] text-[#707070] hover:bg-[#F5F5F5] transition"
+                            disabled={!purchasable}
+                            className="flex h-7 w-7 items-center justify-center text-[15px] text-[#707070] hover:bg-[#F5F5F5] transition disabled:opacity-30"
                           >
                             −
                           </button>
@@ -112,13 +129,14 @@ export default function CartPage() {
                           <button
                             type="button"
                             onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                            className="flex h-7 w-7 items-center justify-center text-[15px] text-[#707070] hover:bg-[#F5F5F5] transition"
+                            disabled={!purchasable || item.quantity >= maxQty}
+                            className="flex h-7 w-7 items-center justify-center text-[15px] text-[#707070] hover:bg-[#F5F5F5] transition disabled:opacity-30"
                           >
                             +
                           </button>
                         </div>
                         <div className="text-[14px] font-bold text-[#231F20]">
-                          {formatPrice(item.quantity * item.priceMinor)}
+                          {purchasable ? formatPrice(item.quantity * displayPrice) : "-"}
                         </div>
                       </div>
                     </div>

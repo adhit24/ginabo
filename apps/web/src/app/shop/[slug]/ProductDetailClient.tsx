@@ -494,8 +494,9 @@ export function ProductDetailClient({ product }: Props) {
                     {qty}
                   </span>
                   <button
-                    onClick={() => setQty((q) => q + 1)}
-                    className="flex h-8 w-9 lg:h-9 lg:w-10 items-center justify-center text-[18px] text-[#505050] hover:bg-[#F5F5F5] transition font-medium"
+                    onClick={() => setQty((q) => Math.min(product.stockQty, q + 1))}
+                    disabled={qty >= product.stockQty}
+                    className="flex h-8 w-9 lg:h-9 lg:w-10 items-center justify-center text-[18px] text-[#505050] hover:bg-[#F5F5F5] transition disabled:opacity-30 disabled:cursor-not-allowed font-medium"
                     aria-label="Tambah"
                   >
                     +

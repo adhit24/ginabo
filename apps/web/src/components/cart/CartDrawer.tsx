@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "./CartProvider";
+import { useCart, isItemPurchasable } from "./CartProvider";
 import { useCurrency } from "@/components/currency/CurrencyProvider";
 import { FlowButton } from "@/components/ui/flow-button";
 import { FREE_SHIPPING_THRESHOLD_MINOR } from "@/lib/constants";
 
 export function CartDrawer() {
-  const { state, totals, isOpen, closeCart, updateQuantity, removeItem } = useCart();
+  const { state, totals, isOpen, closeCart, updateQuantity, removeItem, liveById } = useCart();
   const { formatPrice } = useCurrency();
 
   const shippingRemaining = Math.max(0, FREE_SHIPPING_THRESHOLD_MINOR - totals.subtotalMinor);
@@ -75,9 +75,14 @@ export function CartDrawer() {
           ) : (
             <div className="divide-y divide-brand-100">
               {state.items.map(item => {
-                const originalMinor = Math.round(item.priceMinor * 1.24);
+                const live = liveById[item.productId];
+                const purchasable = isItemPurchasable(live);
+                const displayPrice = live ? live.priceMinor : item.priceMinor;
+                const hasRealDiscount = live?.comparePriceMinor != null && live.comparePriceMinor > live.priceMinor;
+                const unavailableReason = live === null ? "Produk tidak tersedia" : live && live.stockQty === 0 ? "Stok habis" : null;
+                const maxQty = live?.stockQty ?? Infinity;
                 return (
-                  <div key={item.productId} className="flex gap-3 py-4">
+                  <div key={item.productId} className={`flex gap-3 py-4 ${purchasable ? "" : "opacity-60"}`}>
                     {/* Thumbnail */}
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-brand-100 bg-brand-50">
                       {item.imageUrl ? (
@@ -96,10 +101,16 @@ export function CartDrawer() {
                     {/* Info */}
                     <div className="flex flex-1 flex-col justify-between gap-1">
                       <p className="line-clamp-2 text-sm font-semibold leading-snug text-brand-900">{item.name}</p>
-                      <div>
-                        <span className="text-sm font-bold text-brand-700">{formatPrice(item.priceMinor)}</span>
-                        <span className="ml-2 text-[11px] text-gray-400 line-through">{formatPrice(originalMinor)}</span>
-                      </div>
+                      {unavailableReason ? (
+                        <span className="text-[11px] font-semibold text-red-500">{unavailableReason}</span>
+                      ) : (
+                        <div>
+                          <span className="text-sm font-bold text-brand-700">{formatPrice(displayPrice)}</span>
+                          {hasRealDiscount && (
+                            <span className="ml-2 text-[11px] text-gray-400 line-through">{formatPrice(live!.comparePriceMinor!)}</span>
+                          )}
+                        </div>
+                      )}
 
                       {/* Qty + delete */}
                       <div className="flex items-center justify-between">
@@ -116,14 +127,16 @@ export function CartDrawer() {
                         <div className="flex items-center gap-0 overflow-hidden rounded-lg border border-brand-200">
                           <button
                             onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                            className="flex h-8 w-8 items-center justify-center text-brand-700 transition hover:bg-brand-50"
+                            disabled={!purchasable}
+                            className="flex h-8 w-8 items-center justify-center text-brand-700 transition hover:bg-brand-50 disabled:opacity-30"
                           >
                             <span className="text-sm leading-none">−</span>
                           </button>
                           <span className="w-8 text-center text-sm font-semibold text-brand-900">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                            className="flex h-8 w-8 items-center justify-center text-brand-700 transition hover:bg-brand-50"
+                            disabled={!purchasable || item.quantity >= maxQty}
+                            className="flex h-8 w-8 items-center justify-center text-brand-700 transition hover:bg-brand-50 disabled:opacity-30"
                           >
                             <span className="text-sm leading-none">+</span>
                           </button>

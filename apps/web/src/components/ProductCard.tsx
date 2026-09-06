@@ -10,7 +10,7 @@ import { AddedToCartModal, type AddedCartItem } from "@/components/cart/AddedToC
 import { FlowButton } from "@/components/ui/flow-button";
 
 export type ProductCardData = {
-  id?: string;
+  id: string;
   slug: string;
   name: string;
   price: string;
@@ -34,7 +34,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   const [addedItem, setAddedItem] = useState<AddedCartItem | null>(null);
 
   const quickViewProduct: QuickViewProduct = {
-    productId: product.id ?? product.slug,
+    productId: product.id,
     slug: product.slug,
     name: product.name,
     priceMinor: product.priceMinor ?? 0,

@@ -4,7 +4,26 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 
 import type { CartItem, CartState } from "@/components/cart/cartTypes";
 import { trackCustomerEvent } from "@/lib/analytics/events";
+import { getProductsByIds, type CatalogProduct } from "@/lib/catalog";
 import { CartDrawer } from "./CartDrawer";
+
+// Cart items are only references (product id + quantity); price, name, stock
+// and availability are never trusted from the localStorage snapshot once live
+// data has loaded. `null` means "looked up, no longer exists" (deleted or the
+// id never resolved); a missing key means "not looked up yet".
+export type LiveProductMap = Record<string, CatalogProduct | null>;
+
+export function isItemPurchasable(live: CatalogProduct | null | undefined): boolean {
+  if (live === undefined) return true; // not yet resolved — don't block optimistically
+  if (live === null) return false; // deleted
+  return live.isActive && live.stockQty > 0;
+}
+
+export function effectivePrice(item: CartItem, liveById: LiveProductMap): number | null {
+  const live = liveById[item.productId];
+  if (!isItemPurchasable(live)) return null;
+  return live ? live.priceMinor : item.priceMinor;
+}
 
 type CartContextValue = {
   state: CartState;
@@ -27,6 +46,8 @@ type CartContextValue = {
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
+  // Live product-catalog authority for cart items — see LiveProductMap above.
+  liveById: LiveProductMap;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -60,6 +81,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<CartState>({ items: [], selectedIds: [] });
   const [hydrated, setHydrated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [liveById, setLiveById] = useState<LiveProductMap>({});
 
   useEffect(() => {
     setState(readCartFromStorage());
@@ -70,6 +92,50 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!hydrated) return;
     writeCartToStorage(state);
   }, [hydrated, state]);
+
+  // Re-derive price/stock/active-state from the DB for every product
+  // currently referenced by the cart — the localStorage snapshot (price,
+  // name, image) is never treated as authoritative once this resolves.
+  const itemIdsKey = state.items.map((i) => i.productId).join(",");
+  useEffect(() => {
+    if (!hydrated) return;
+    const ids = itemIdsKey ? itemIdsKey.split(",") : [];
+    if (ids.length === 0) return;
+    let cancelled = false;
+    getProductsByIds(ids).then((products) => {
+      if (cancelled) return;
+      const found = new Map(products.map((p) => [p.id, p] as const));
+      setLiveById((prev) => {
+        const next = { ...prev };
+        for (const id of ids) next[id] = found.get(id) ?? null;
+        return next;
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, itemIdsKey]);
+
+  // Once live stock is known, cap any persisted quantity that exceeds it —
+  // sensible cart-level validation, not stock reservation. Out-of-stock
+  // items (stockQty === 0) are left as-is and excluded from totals instead,
+  // so the user can see and remove them rather than having them silently
+  // shrink to a misleading "0".
+  useEffect(() => {
+    if (!hydrated) return;
+    setState((prev) => {
+      let changed = false;
+      const items = prev.items.map((item) => {
+        const live = liveById[item.productId];
+        if (live && live.isActive && live.stockQty > 0 && item.quantity > live.stockQty) {
+          changed = true;
+          return { ...item, quantity: live.stockQty };
+        }
+        return item;
+      });
+      return changed ? { ...prev, items } : prev;
+    });
+  }, [liveById, hydrated]);
 
   const addItem = useCallback((item: Omit<CartItem, "quantity">, quantity = 1) => {
     const q = Math.max(1, Math.floor(quantity));
@@ -129,11 +195,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setState((prev) => ({ ...prev, selectedIds: selected ? prev.items.map((i) => i.productId) : [] }));
   }, []);
 
+  // Subtotal is always derived from live catalog price × validated quantity;
+  // items that are deleted, inactive, or out of stock contribute 0 to the
+  // monetary total (but stay visible/removable) instead of using their
+  // frozen localStorage price snapshot.
   const totals = useMemo(() => {
     const itemCount = state.items.reduce((acc, i) => acc + i.quantity, 0);
-    const subtotalMinor = state.items.reduce((acc, i) => acc + i.quantity * i.priceMinor, 0);
+    const subtotalMinor = state.items.reduce((acc, i) => {
+      const price = effectivePrice(i, liveById);
+      return price == null ? acc : acc + i.quantity * price;
+    }, 0);
     return { itemCount, subtotalMinor };
-  }, [state.items]);
+  }, [state.items, liveById]);
 
   const selectedItems = useMemo(
     () => state.items.filter((i) => state.selectedIds.includes(i.productId)),
@@ -142,9 +215,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const selectedTotals = useMemo(() => {
     const itemCount = selectedItems.reduce((acc, i) => acc + i.quantity, 0);
-    const subtotalMinor = selectedItems.reduce((acc, i) => acc + i.quantity * i.priceMinor, 0);
+    const subtotalMinor = selectedItems.reduce((acc, i) => {
+      const price = effectivePrice(i, liveById);
+      return price == null ? acc : acc + i.quantity * price;
+    }, 0);
     return { itemCount, subtotalMinor };
-  }, [selectedItems]);
+  }, [selectedItems, liveById]);
 
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
@@ -165,6 +241,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       isOpen,
       openCart,
       closeCart,
+      liveById,
     }),
     [
       state,
@@ -181,6 +258,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       isOpen,
       openCart,
       closeCart,
+      liveById,
     ]
   );
 
