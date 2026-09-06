@@ -21,8 +21,10 @@ const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   paid: 'Dibayar',
   processing: 'Diproses',
   shipped: 'Dikirim',
-  delivered: 'Selesai',
+  delivered: 'Diterima',
+  completed: 'Selesai',
   cancelled: 'Dibatalkan',
+  refunded: 'Dikembalikan',
 }
 
 const ORDER_STATUS_CLASS: Record<OrderStatus, string> = {
@@ -30,8 +32,10 @@ const ORDER_STATUS_CLASS: Record<OrderStatus, string> = {
   paid: 'bg-blue-100 text-blue-800',
   processing: 'bg-indigo-100 text-indigo-800',
   shipped: 'bg-purple-100 text-purple-800',
-  delivered: 'bg-green-100 text-green-800',
+  delivered: 'bg-emerald-100 text-emerald-800',
+  completed: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800',
+  refunded: 'bg-gray-100 text-gray-800',
 }
 
 const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {

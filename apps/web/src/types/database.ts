@@ -9,7 +9,9 @@ export type OrderStatus =
   | 'processing'
   | 'shipped'
   | 'delivered'
+  | 'completed'
   | 'cancelled'
+  | 'refunded'
 
 export type PaymentStatus =
   | 'pending'
