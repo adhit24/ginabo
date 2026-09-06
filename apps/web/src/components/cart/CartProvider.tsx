@@ -1,11 +1,20 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import type { CartItem, CartState } from "@/components/cart/cartTypes";
 import { trackCustomerEvent } from "@/lib/analytics/events";
 import { getProductsByIds, type CatalogProduct } from "@/lib/catalog";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { CartDrawer } from "./CartDrawer";
+
+// A DB product id is always a UUID; a bundle's fixed catalog id ("b1"..)
+// never matches this. Only UUID-shaped ids are sent to the live-lookup query
+// — bundles have no `products` row to look up, and this also stops a
+// malformed/tampered productId from crashing the batched query for every
+// other item in the cart (Postgres rejects a non-UUID literal against a
+// `uuid` column for the whole `IN (...)` list, not just the bad value).
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Cart items are only references (product id + quantity); price, name, stock
 // and availability are never trusted from the localStorage snapshot once live
@@ -52,18 +61,57 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const STORAGE_KEY = "ginabo_cart_v1";
+// Guest cart keeps the original key (no migration needed for existing
+// devices). Each authenticated user gets their own isolated key so logging
+// into a second account on the same browser never inherits the first
+// account's cart — see CartProvider's auth-transition effect below.
+const GUEST_STORAGE_KEY = "ginabo_cart_v1";
+const userStorageKey = (userId: string) => `ginabo_cart_user_${userId}_v1`;
 
-function readCartFromStorage(): CartState {
+function sanitizeQuantity(raw: unknown): number {
+  const n = typeof raw === "number" ? raw : typeof raw === "string" ? Number(raw) : NaN;
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.floor(n));
+}
+
+// Defends cart hydration against hand-edited/corrupted localStorage: missing
+// or non-string productId, non-integer/negative/string/null quantity, and
+// duplicate lines for the same product (coalesced by summing quantity, the
+// same invariant addItem already maintains for normal use).
+function readCartFromStorage(key: string): CartState {
   try {
-    const raw = globalThis.localStorage?.getItem(STORAGE_KEY);
+    const raw = globalThis.localStorage?.getItem(key);
     if (!raw) return { items: [], selectedIds: [] };
     const parsed = JSON.parse(raw) as Partial<CartState>;
-    const items = (parsed?.items ?? []).filter((i) => i?.productId && i.quantity > 0);
-    if (!items.length) return { items: [], selectedIds: [] };
+    const rawItems = Array.isArray(parsed?.items) ? parsed.items : [];
+
+    const coalesced = new Map<string, CartItem>();
+    for (const i of rawItems as Array<Record<string, unknown>>) {
+      if (!i || typeof i.productId !== "string" || i.productId.length === 0) continue;
+      const quantity = sanitizeQuantity(i.quantity);
+      if (quantity <= 0) continue;
+      const existing = coalesced.get(i.productId);
+      if (existing) {
+        existing.quantity += quantity;
+        continue;
+      }
+      coalesced.set(i.productId, {
+        productId: i.productId,
+        slug: typeof i.slug === "string" ? i.slug : "",
+        name: typeof i.name === "string" ? i.name : "",
+        priceMinor: typeof i.priceMinor === "number" && Number.isFinite(i.priceMinor) ? i.priceMinor : 0,
+        currency: i.currency === "USD" ? "USD" : "IDR",
+        imageUrl: typeof i.imageUrl === "string" ? i.imageUrl : null,
+        weightGrams: typeof i.weightGrams === "number" ? i.weightGrams : null,
+        quantity,
+      });
+    }
+
+    const items = Array.from(coalesced.values());
+    if (items.length === 0) return { items: [], selectedIds: [] };
     const knownIds = new Set(items.map((i) => i.productId));
     const selectedIds = Array.isArray(parsed?.selectedIds)
-      ? parsed.selectedIds.filter((id) => knownIds.has(id))
+      ? (parsed.selectedIds as unknown[]).filter((id): id is string => typeof id === "string" && knownIds.has(id))
       : items.map((i) => i.productId);
     return { items, selectedIds };
   } catch {
@@ -71,26 +119,104 @@ function readCartFromStorage(): CartState {
   }
 }
 
-function writeCartToStorage(state: CartState) {
+function writeCartToStorage(key: string, state: CartState) {
   try {
-    globalThis.localStorage?.setItem(STORAGE_KEY, JSON.stringify(state));
+    globalThis.localStorage?.setItem(key, JSON.stringify(state));
   } catch {}
 }
 
+// Guest items + the target account's existing items, deduped by productId
+// (quantities summed). Quantity overflow past live stock is left to the
+// existing post-hydration stock-clamp effect, so merge doesn't need its own
+// stock logic.
+function mergeCarts(base: CartState, incoming: CartState): CartState {
+  const items = base.items.map((i) => ({ ...i }));
+  const indexByProductId = new Map(items.map((i, idx) => [i.productId, idx] as const));
+  for (const inc of incoming.items) {
+    const idx = indexByProductId.get(inc.productId);
+    if (idx !== undefined) {
+      items[idx] = { ...items[idx], quantity: items[idx].quantity + inc.quantity };
+    } else {
+      items.push({ ...inc });
+      indexByProductId.set(inc.productId, items.length - 1);
+    }
+  }
+  const selectedIds = Array.from(new Set([...base.selectedIds, ...incoming.selectedIds]));
+  return { items, selectedIds };
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { user, isLoading: authLoading } = useAuth();
   const [state, setState] = useState<CartState>({ items: [], selectedIds: [] });
   const [hydrated, setHydrated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [liveById, setLiveById] = useState<LiveProductMap>({});
 
+  // Which storage key `state` currently represents, and whose cart it was
+  // last loaded for — both refs, not state, so the effects below can read
+  // "current" values without re-running on every render/keystroke.
+  const activeKeyRef = useRef<string>(GUEST_STORAGE_KEY);
+  const loadedForUserIdRef = useRef<string | null | undefined>(undefined); // undefined = never hydrated yet
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
+  // Initial hydration waits for auth to resolve first — reading the guest
+  // key before a returning user's session is confirmed would flash the
+  // wrong cart and, worse, could persist a bogus write to the wrong bucket.
   useEffect(() => {
-    setState(readCartFromStorage());
+    if (authLoading || hydrated) return;
+    const userId = user?.id ?? null;
+    const key = userId ? userStorageKey(userId) : GUEST_STORAGE_KEY;
+    let cart = readCartFromStorage(key);
+
+    // First hydration as a logged-in user: fold in whatever a guest built
+    // on this device before ever logging in, then empty the guest bucket so
+    // it isn't merged again on a later logout/login cycle.
+    if (userId) {
+      const guestCart = readCartFromStorage(GUEST_STORAGE_KEY);
+      if (guestCart.items.length > 0) {
+        cart = mergeCarts(cart, guestCart);
+        writeCartToStorage(GUEST_STORAGE_KEY, { items: [], selectedIds: [] });
+      }
+    }
+
+    activeKeyRef.current = key;
+    loadedForUserIdRef.current = userId;
+    setState(cart);
     setHydrated(true);
-  }, []);
+  }, [authLoading, hydrated, user]);
+
+  // Live auth transitions after initial hydration: login, logout, or
+  // (without an intervening logout) switching straight to a different
+  // account. Each transition loads the target account's own key; only the
+  // guest→login edge merges — logout never lets the next account inherit
+  // the previous one's cart, and logout itself doesn't carry the just-
+  // logged-out user's items into the guest bucket.
+  useEffect(() => {
+    if (!hydrated || authLoading) return;
+    const userId = user?.id ?? null;
+    if (loadedForUserIdRef.current === userId) return; // no transition
+
+    const wasGuest = loadedForUserIdRef.current === null;
+    const key = userId ? userStorageKey(userId) : GUEST_STORAGE_KEY;
+    let cart = readCartFromStorage(key);
+
+    if (userId && wasGuest) {
+      const guestCart = stateRef.current;
+      if (guestCart.items.length > 0) {
+        cart = mergeCarts(cart, guestCart);
+      }
+      writeCartToStorage(GUEST_STORAGE_KEY, { items: [], selectedIds: [] });
+    }
+
+    activeKeyRef.current = key;
+    loadedForUserIdRef.current = userId;
+    setState(cart);
+  }, [user, authLoading, hydrated]);
 
   useEffect(() => {
     if (!hydrated) return;
-    writeCartToStorage(state);
+    writeCartToStorage(activeKeyRef.current, state);
   }, [hydrated, state]);
 
   // Re-derive price/stock/active-state from the DB for every product
@@ -99,7 +225,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const itemIdsKey = state.items.map((i) => i.productId).join(",");
   useEffect(() => {
     if (!hydrated) return;
-    const ids = itemIdsKey ? itemIdsKey.split(",") : [];
+    const ids = (itemIdsKey ? itemIdsKey.split(",") : []).filter((id) => UUID_RE.test(id));
     if (ids.length === 0) return;
     let cancelled = false;
     getProductsByIds(ids).then((products) => {
