@@ -1,5 +1,6 @@
--- Task 6: checkout/payment compatibility hardening.
--- Add provider-neutral DOKU fields without deleting historical Midtrans data.
+-- Task 6: checkout/order/payment integrity hardening.
+-- Backward-compatible: keeps historical Midtrans columns/data intact while
+-- adding the provider-neutral fields required by the DOKU checkout flow.
 
 ALTER TABLE public.payments
   ADD COLUMN IF NOT EXISTS provider TEXT,
@@ -9,29 +10,43 @@ ALTER TABLE public.payments
   ADD COLUMN IF NOT EXISTS currency TEXT,
   ADD COLUMN IF NOT EXISTS raw_response JSONB;
 
--- Preserve and correctly classify historical Midtrans rows before defaults are
--- applied to new DOKU records.
-UPDATE public.payments
-SET provider = 'midtrans'
-WHERE provider IS NULL
-  AND (midtrans_order_id IS NOT NULL OR midtrans_transaction_id IS NOT NULL);
+-- Backfill legacy Midtrans rows only on databases where the old columns still
+-- exist. This keeps migration 014 safe both before and after the older
+-- destructive migration 013 has been applied in another environment.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'payments'
+      AND column_name = 'midtrans_order_id'
+  ) THEN
+    EXECUTE $sql$
+      UPDATE public.payments
+      SET provider = 'midtrans'
+      WHERE provider IS NULL
+        AND (midtrans_order_id IS NOT NULL OR midtrans_transaction_id IS NOT NULL)
+    $sql$;
 
-UPDATE public.payments
-SET
-  invoice_number = COALESCE(invoice_number, midtrans_order_id),
-  gross_amount = COALESCE(gross_amount, midtrans_gross_amount),
-  currency = COALESCE(currency, midtrans_currency, 'IDR'),
-  checkout_url = COALESCE(checkout_url, snap_redirect_url, payment_url)
-WHERE midtrans_order_id IS NOT NULL OR midtrans_transaction_id IS NOT NULL;
+    EXECUTE $sql$
+      UPDATE public.payments
+      SET
+        invoice_number = COALESCE(invoice_number, midtrans_order_id),
+        gross_amount = COALESCE(gross_amount, midtrans_gross_amount),
+        currency = COALESCE(currency, midtrans_currency, 'IDR'),
+        checkout_url = COALESCE(checkout_url, snap_redirect_url, payment_url)
+      WHERE midtrans_order_id IS NOT NULL OR midtrans_transaction_id IS NOT NULL
+    $sql$;
+  END IF;
+END;
+$$;
 
 ALTER TABLE public.payments
   ALTER COLUMN provider SET DEFAULT 'doku',
   ALTER COLUMN currency SET DEFAULT 'IDR';
 
--- One provider payment record per order prevents concurrent checkout requests
--- from recording duplicate payment rows for the same provider/order. A normal
--- (non-partial) unique index is intentional: PostgREST can target it directly
--- with `on_conflict=provider,order_id` for idempotent upserts.
+-- One provider payment row per order. A non-partial unique index is deliberate:
+-- PostgREST/Supabase can target it directly with onConflict=provider,order_id.
 CREATE UNIQUE INDEX IF NOT EXISTS idx_payments_provider_order_unique
   ON public.payments(provider, order_id);
 
@@ -54,11 +69,98 @@ COMMENT ON COLUMN public.payments.checkout_url IS
 COMMENT ON COLUMN public.payments.raw_response IS
   'Raw provider initiation response retained for audit/reconciliation.';
 
+-- orders + order_items must commit or roll back together. The route has already
+-- re-priced and validated the canonical catalog rows; this RPC only owns the
+-- persistence boundary so an item insert failure can never leave a header-only
+-- order behind.
+CREATE OR REPLACE FUNCTION public.create_checkout_order_atomic(
+  p_order JSONB,
+  p_items JSONB
+)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public
+AS $$
+DECLARE
+  v_order_id UUID;
+BEGIN
+  IF jsonb_typeof(p_items) <> 'array' OR jsonb_array_length(p_items) = 0 THEN
+    RAISE EXCEPTION 'checkout order requires at least one item'
+      USING ERRCODE = '22023';
+  END IF;
+
+  INSERT INTO public.orders (
+    order_number,
+    profile_id,
+    status,
+    subtotal,
+    shipping_cost,
+    discount_amount,
+    tax_amount,
+    total_amount,
+    payment_fee,
+    shipping_weight_grams,
+    checkout_idempotency_key,
+    coupon_id,
+    coupon_code,
+    shipping_address,
+    shipping_courier,
+    shipping_service,
+    notes
+  ) VALUES (
+    p_order->>'order_number',
+    (p_order->>'profile_id')::UUID,
+    COALESCE(NULLIF(p_order->>'status', ''), 'pending'),
+    (p_order->>'subtotal')::BIGINT,
+    (p_order->>'shipping_cost')::BIGINT,
+    (p_order->>'discount_amount')::BIGINT,
+    (p_order->>'tax_amount')::BIGINT,
+    (p_order->>'total_amount')::BIGINT,
+    (p_order->>'payment_fee')::BIGINT,
+    NULLIF(p_order->>'shipping_weight_grams', '')::INTEGER,
+    NULLIF(p_order->>'checkout_idempotency_key', ''),
+    NULLIF(p_order->>'coupon_id', '')::UUID,
+    NULLIF(p_order->>'coupon_code', ''),
+    p_order->'shipping_address',
+    NULLIF(p_order->>'shipping_courier', ''),
+    NULLIF(p_order->>'shipping_service', ''),
+    NULLIF(p_order->>'notes', '')
+  )
+  RETURNING id INTO v_order_id;
+
+  INSERT INTO public.order_items (
+    order_id,
+    product_id,
+    variant_id,
+    product_name,
+    variant_name,
+    quantity,
+    unit_price,
+    total_price
+  )
+  SELECT
+    v_order_id,
+    (item->>'product_id')::UUID,
+    NULLIF(item->>'variant_id', '')::UUID,
+    item->>'product_name',
+    NULLIF(item->>'variant_name', ''),
+    (item->>'quantity')::INTEGER,
+    (item->>'unit_price')::BIGINT,
+    (item->>'total_price')::BIGINT
+  FROM jsonb_array_elements(p_items) AS item;
+
+  RETURN v_order_id;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.create_checkout_order_atomic(JSONB, JSONB) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.create_checkout_order_atomic(JSONB, JSONB) FROM anon;
+REVOKE ALL ON FUNCTION public.create_checkout_order_atomic(JSONB, JSONB) FROM authenticated;
+GRANT EXECUTE ON FUNCTION public.create_checkout_order_atomic(JSONB, JSONB) TO service_role;
+
 -- Coupon limits must be claimed atomically. Route-level "count then insert"
--- checks are race-prone: two concurrent checkouts can both observe one slot
--- remaining and both consume it. This function locks the coupon row, re-checks
--- global/per-user limits inside one DB transaction, records the order usage,
--- and self-heals used_count from the canonical usage rows.
+-- checks are race-prone: two concurrent checkouts can both see one slot left.
 CREATE OR REPLACE FUNCTION public.claim_checkout_coupon(
   p_coupon_id UUID,
   p_profile_id UUID,
@@ -84,8 +186,7 @@ BEGIN
     RETURN FALSE;
   END IF;
 
-  -- A retry for the same order is already claimed and must not increment the
-  -- counters twice.
+  -- Idempotent retry for an order that already claimed this coupon.
   IF EXISTS (
     SELECT 1
     FROM public.coupon_usages
@@ -132,8 +233,6 @@ BEGIN
 END;
 $$;
 
--- The checkout route invokes this with the service-role server client. Keep
--- the RPC out of the public/anon/authenticated API surface.
 REVOKE ALL ON FUNCTION public.claim_checkout_coupon(UUID, UUID, UUID) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.claim_checkout_coupon(UUID, UUID, UUID) FROM anon;
 REVOKE ALL ON FUNCTION public.claim_checkout_coupon(UUID, UUID, UUID) FROM authenticated;
