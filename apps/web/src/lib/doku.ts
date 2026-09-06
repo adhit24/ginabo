@@ -129,6 +129,17 @@ export function calculateDokuSignature(opts: {
   return `HMACSHA256=${hmac}`
 }
 
+function buildDokuRequestId(idempotencyKey?: string): string {
+  if (!idempotencyKey) {
+    return `REQ-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+  }
+
+  // DOKU uses Request-Id as its idempotency key. Hash the app-level key so a
+  // client-controlled string never becomes a raw payment-provider header and
+  // the value always stays comfortably below DOKU's 128-character limit.
+  return `GINABO-${createHash('sha256').update(idempotencyKey).digest('hex')}`
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
@@ -140,6 +151,7 @@ export async function createDokuCheckoutSession(opts: {
   customer: DokuCustomerDetails
   items: DokuLineItem[]
   callbackUrl?: string
+  idempotencyKey?: string
 }): Promise<{ checkoutUrl: string; invoiceNumber: string; rawResponse: Record<string, unknown> }> {
   if (!dokuClientId || !dokuSecretKey) {
     throw new Error('DOKU credentials (DOKU_CLIENT_ID, DOKU_SECRET_KEY) are not configured')
@@ -169,7 +181,7 @@ export async function createDokuCheckoutSession(opts: {
   }
 
   const jsonBody = JSON.stringify(payload)
-  const requestId = `REQ-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+  const requestId = buildDokuRequestId(opts.idempotencyKey)
   const requestTimestamp = getDokuTimestamp()
   const digest = computeBodyDigest(jsonBody)
 
@@ -194,16 +206,25 @@ export async function createDokuCheckoutSession(opts: {
     body: jsonBody,
   })
 
-  if (!response.ok) {
+  // DOKU documents HTTP 409 as the idempotent replay response when the same
+  // Request-Id + request body is retried. The response body is the original
+  // result, so parse it exactly like the initial 200 response instead of
+  // turning a safe retry into an application-level failure.
+  if (!response.ok && response.status !== 409) {
     const errorBody = await response.text()
     throw new Error(`DOKU Checkout API error ${response.status}: ${errorBody}`)
   }
 
-  const data = (await response.json()) as DokuCheckoutResponse
+  let data: DokuCheckoutResponse
+  try {
+    data = (await response.json()) as DokuCheckoutResponse
+  } catch {
+    throw new Error(`DOKU Checkout returned an invalid JSON response (${response.status})`)
+  }
 
   const checkoutUrl = data.response?.payment?.url
   if (!checkoutUrl) {
-    throw new Error('DOKU Checkout response missing payment url')
+    throw new Error(`DOKU Checkout response missing payment url (${response.status})`)
   }
 
   return {
