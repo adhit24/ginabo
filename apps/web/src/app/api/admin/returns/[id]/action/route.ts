@@ -214,21 +214,34 @@ export async function POST(req: NextRequest, { params }: Ctx) {
       if (!p.return_item_id || !p.inspection_result) {
         return jsonError('return_item_id dan inspection_result wajib diisi', 422)
       }
+      const doRestock = p.restock ?? false
       await auth.adminDb
         .from('return_items')
         .update({
           inspection_result: p.inspection_result,
           inspection_note: p.inspection_note ?? null,
-          restock: p.restock ?? false,
+          restock: doRestock,
         })
         .eq('id', p.return_item_id)
         .eq('return_id', r.id)
-      return jsonOk({ ok: true })
+
+      let restocked = false
+      if (doRestock) {
+        const { data: rpcRes, error: rpcErr } = await auth.adminDb.rpc('restock_returned_item', {
+          p_return_item_id: p.return_item_id,
+        })
+        if (!rpcErr) {
+          restocked = Boolean(rpcRes)
+        }
+      }
+
+      return jsonOk({ ok: true, restocked })
     }
 
     case 'refund': {
       const method = p.refund_method ?? 'original_payment'
-      const amount = p.refund_amount ?? r.refund_amount
+      // Enforce server canonical calculated refund amount
+      const amount = r.refund_amount
       if (amount <= 0) return jsonError('Jumlah refund harus lebih dari 0', 422)
 
       // find original payment

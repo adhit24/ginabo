@@ -130,18 +130,55 @@ export async function POST(req: NextRequest) {
     return jsonError('Pesanan tidak memenuhi syarat retur', 409, eligibility.reasons)
   }
 
-  // Validate requested items against the order + clamp quantity
+  // Fetch existing active returns for this order to calculate previously returned quantities
+  const { data: existingReturns } = await auth.adminDb
+    .from('returns')
+    .select('id, items:return_items(order_item_id, quantity)')
+    .eq('order_id', o.id)
+    .not('status', 'in', '("rejected","cancelled")')
+
+  const previouslyReturnedMap = new Map<string, number>()
+  if (Array.isArray(existingReturns)) {
+    for (const ret of existingReturns) {
+      const items = (ret as unknown as { items: { order_item_id: string; quantity: number }[] }).items
+      if (Array.isArray(items)) {
+        for (const item of items) {
+          const prev = previouslyReturnedMap.get(item.order_item_id) ?? 0
+          previouslyReturnedMap.set(item.order_item_id, prev + item.quantity)
+        }
+      }
+    }
+  }
+
+  // Validate requested items against the order + clamp/verify cumulative remaining quantity
   const orderItemMap = new Map(o.items.map((it) => [it.id, it]))
   for (const reqItem of input.items) {
-    if (!orderItemMap.has(reqItem.order_item_id)) {
+    const src = orderItemMap.get(reqItem.order_item_id)
+    if (!src) {
       return jsonError('Salah satu item bukan bagian dari pesanan ini', 422, {
         order_item_id: reqItem.order_item_id,
       })
     }
+    const prevReturned = previouslyReturnedMap.get(reqItem.order_item_id) ?? 0
+    const remainingQty = src.quantity - prevReturned
+    if (remainingQty <= 0) {
+      return jsonError(`Item ${src.product_name} sudah tidak dapat direturn karena kuantitas telah habis direturn`, 422, {
+        order_item_id: reqItem.order_item_id,
+      })
+    }
+    if (reqItem.quantity > remainingQty) {
+      return jsonError(`Kuantitas retur melebihi sisa kuantitas pesanan yang dapat direturn (${remainingQty})`, 422, {
+        order_item_id: reqItem.order_item_id,
+        remaining_quantity: remainingQty,
+      })
+    }
   }
+
   const resolvedItems = input.items.map((reqItem) => {
     const src = orderItemMap.get(reqItem.order_item_id)!
-    const qty = Math.min(reqItem.quantity, src.quantity)
+    const prevReturned = previouslyReturnedMap.get(reqItem.order_item_id) ?? 0
+    const remainingQty = Math.max(0, src.quantity - prevReturned)
+    const qty = Math.min(reqItem.quantity, remainingQty)
     return {
       order_item_id: src.id,
       product_id: src.product_id,
