@@ -1,6 +1,7 @@
 // POST /api/payment/webhook — DOKU notification handler
-// DOKU calls this endpoint after transaction status change.
-// IMPORTANT: Always returns HTTP 200 to acknowledge webhook.
+// Receives transaction status notifications from DOKU Checkout gateway.
+// Performs strict signature verification, provider-neutral invoice lookup,
+// and delegates atomic order settlement to PostgreSQL RPCs.
 
 import { NextRequest, NextResponse } from 'next/server'
 import {
@@ -9,8 +10,7 @@ import {
   type DokuNotificationPayload,
 } from '@/lib/doku'
 import { createAdminClient } from '@/lib/supabase/server'
-import type { OrderRow } from '@/types/database'
-import { amountsMatch, parsePaymentAmount, resolvePaymentTransition, shouldFulfill, shouldUpdateOrderStatus } from '@/lib/payments/paymentState'
+import { parsePaymentAmount } from '@/lib/payments/paymentState'
 
 // ─── Route Handler ────────────────────────────────────────────────────────────
 
@@ -21,131 +21,113 @@ export async function POST(req: NextRequest) {
     body = JSON.parse(rawText) as Record<string, unknown>
   } catch {
     console.error('[webhook] Failed to parse notification body')
-    return ok()
+    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 })
   }
 
   const clientIdHeader = req.headers.get('client-id')
   const signatureHeader = req.headers.get('signature')
+  const requestIdHeader = req.headers.get('request-id')
+  const requestTimestampHeader = req.headers.get('request-timestamp')
 
+  // 1. Strict Fail-Closed DOKU Webhook Signature Verification
+  const isValidSignature = verifyDokuWebhookSignature({
+    clientIdHeader,
+    requestIdHeader,
+    requestTimestampHeader,
+    signatureHeader,
+    requestTargetPath: '/api/payment/webhook',
+    rawBody: rawText,
+  })
+
+  if (!isValidSignature) {
+    console.error('[webhook] DOKU Signature verification failed — rejecting request')
+    return NextResponse.json({ error: 'Invalid request signature or missing headers' }, { status: 400 })
+  }
+
+  // 2. Parse DOKU Notification Payload Fields
   const dokuPayload = body as unknown as DokuNotificationPayload
-  const orderNumber = dokuPayload.order?.invoice_number ?? (body.order_id as string) ?? ''
+  const orderNumber = (dokuPayload.order?.invoice_number ?? body.order_id ?? '').toString().trim()
   const grossAmountInput = dokuPayload.order?.amount ?? (body.gross_amount as number) ?? 0
-  const transactionStatus = dokuPayload.transaction?.status ?? (body.transaction_status as string) ?? 'PENDING'
-  const transactionId = (body.transaction as any)?.id ?? (body.service as any)?.id ?? (body.transaction_id as string) ?? ''
-  const paymentType = dokuPayload.channel?.id ?? dokuPayload.service?.id ?? (body.payment_type as string) ?? null
+  const transactionStatus = (dokuPayload.transaction?.status ?? body.transaction_status ?? 'PENDING').toString().trim()
+  const transactionId = (
+    (body.transaction as any)?.id ??
+    (body.service as any)?.id ??
+    body.transaction_id ??
+    ''
+  ).toString().trim()
+  const paymentType = (
+    dokuPayload.channel?.id ??
+    dokuPayload.service?.id ??
+    (body.payment_type as string) ??
+    null
+  )
 
-  // Signature verification for DOKU
-  if (process.env.DOKU_SECRET_KEY && (clientIdHeader || signatureHeader)) {
-    const isValid = verifyDokuWebhookSignature({
-      clientIdHeader,
-      requestIdHeader: req.headers.get('request-id'),
-      requestTimestampHeader: req.headers.get('request-timestamp'),
-      signatureHeader,
-      requestTargetPath: '/api/payment/webhook',
-      rawBody: rawText,
-    })
-
-    if (!isValid) {
-      console.error('[webhook] DOKU Signature verification failed — invalid request signature')
-      return ok()
-    }
+  if (!orderNumber) {
+    console.error('[webhook] Missing order invoice number')
+    return NextResponse.json({ error: 'Missing order invoice number' }, { status: 400 })
   }
-
-  const isPaymentSuccess = isDokuPaymentSuccessful(transactionStatus)
-  const admin = await createAdminClient()
-  const adminAny = admin as any
-
-  // Fetch order
-  const { data: rawOrder, error: orderFetchError } = await admin
-    .from('orders')
-    .select('id, status, profile_id, total_amount')
-    .eq('order_number', orderNumber as never)
-    .single()
-
-  if (orderFetchError || !rawOrder) {
-    console.error('[webhook] Order not found for order_number:', orderNumber)
-    return ok()
-  }
-
-  const order = rawOrder as Pick<OrderRow, 'id' | 'status' | 'profile_id' | 'total_amount'>
 
   let grossAmount: number
   try {
     grossAmount = parsePaymentAmount(grossAmountInput)
   } catch (error) {
     console.error('[webhook] Invalid gross amount:', error)
-    return ok()
+    return NextResponse.json({ error: 'Invalid gross amount' }, { status: 400 })
   }
 
-  if (!amountsMatch(order.total_amount, grossAmount)) {
-    console.error('[webhook] Gross amount mismatch for order:', orderNumber)
-    await adminAny.from('payments').update({ status: 'failed', raw_notification: body }).eq('invoice_number', orderNumber)
-    return ok()
-  }
+  const admin = await createAdminClient()
+  const adminAny = admin as any
 
-  // Update payment row using generic provider-neutral columns
-  const transition = resolvePaymentTransition(transactionStatus)
+  // 3. Process Settlement or Failure via Atomic Database RPCs
+  const isSuccess = isDokuPaymentSuccessful(transactionStatus)
 
-  await adminAny
-    .from('payments')
-    .update({
-      provider: 'doku',
-      provider_transaction_id: transactionId || null,
-      payment_type: paymentType,
-      status: transition.paymentStatus,
-      gross_amount: grossAmount,
-      raw_notification: body,
+  if (isSuccess) {
+    const { data, error } = await adminAny.rpc('settle_doku_payment', {
+      p_invoice_number: orderNumber,
+      p_provider_transaction_id: transactionId || null,
+      p_payment_type: paymentType ? String(paymentType) : null,
+      p_gross_amount: grossAmount,
+      p_raw_notification: body,
     })
-    .eq('invoice_number', orderNumber)
 
-  // Resolve new order status
-  const newOrderStatus = transition.orderStatus
-
-  if (!newOrderStatus || !shouldUpdateOrderStatus(order.status, newOrderStatus)) return ok()
-
-  // Fulfillment must succeed before the order is marked paid
-  if (isPaymentSuccess && shouldFulfill(order.status, newOrderStatus)) {
-    try {
-      await handlePaymentSucceeded(order.id, order.profile_id, orderNumber, admin)
-    } catch (error) {
-      console.error('[webhook] Fulfillment failed:', error instanceof Error ? error.message : error)
-      return ok()
+    if (error) {
+      console.error('[webhook] Settlement RPC failed:', error.message)
+      return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
     }
+
+    const res = Array.isArray(data) ? data[0] : data
+    if (!res || !res.success) {
+      console.error('[webhook] Settlement failed:', res?.message ?? 'Unknown error')
+      return NextResponse.json({ ok: false, error: res?.message ?? 'Settlement rejected' }, { status: 400 })
+    }
+
+    // Trigger in-app notification if first time settled
+    if (!res.already_settled && res.profile_id) {
+      await createOrderNotification(res.profile_id, orderNumber, admin).catch((err) => {
+        console.error('[webhook] Failed to create in-app notification:', err)
+      })
+    }
+
+    return NextResponse.json({ ok: true, message: res.message }, { status: 200 })
   }
 
-  // Update order status
-  const { error: orderUpdateError } = await admin
-    .from('orders')
-    .update({ status: newOrderStatus } as never)
-    .eq('id', order.id as never)
+  // Handle FAILED / EXPIRED / CANCELLED notifications
+  const { data: failData, error: failError } = await adminAny.rpc('handle_failed_doku_payment', {
+    p_invoice_number: orderNumber,
+    p_target_status: transactionStatus,
+    p_raw_notification: body,
+  })
 
-  if (orderUpdateError) {
-    console.error('[webhook] Failed to update order status:', orderUpdateError.message)
-    return ok()
+  if (failError) {
+    console.error('[webhook] Failure handling RPC failed:', failError.message)
+    return NextResponse.json({ ok: false, error: failError.message }, { status: 500 })
   }
 
-  return ok()
+  const res = Array.isArray(failData) ? failData[0] : failData
+  return NextResponse.json({ ok: true, message: res?.message ?? 'Failure recorded' }, { status: 200 })
 }
 
-// ─── Post-payment side-effects ────────────────────────────────────────────────
-
-async function handlePaymentSucceeded(
-  orderId: string,
-  userId: string,
-  orderNumber: string,
-  admin: Awaited<ReturnType<typeof createAdminClient>>,
-) {
-  await decrementStock(orderId, admin)
-  await createOrderNotification(userId, orderNumber, admin)
-}
-
-async function decrementStock(
-  orderId: string,
-  admin: Awaited<ReturnType<typeof createAdminClient>>,
-) {
-  const { error } = await (admin as any).rpc('fulfill_paid_order', { p_order_id: orderId })
-  if (error) throw new Error(`fulfillment gagal: ${error.message}`)
-}
+// ─── Helpers ───────────────────────────────────────────────────────────────────
 
 async function createOrderNotification(
   userId: string,
@@ -162,10 +144,4 @@ async function createOrderNotification(
     sent_at: null,
     read_at: null,
   } as never)
-}
-
-// ─── Helper ───────────────────────────────────────────────────────────────────
-
-function ok() {
-  return NextResponse.json({ ok: true }, { status: 200 })
 }

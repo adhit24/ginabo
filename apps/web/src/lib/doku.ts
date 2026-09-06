@@ -129,17 +129,6 @@ export function calculateDokuSignature(opts: {
   return `HMACSHA256=${hmac}`
 }
 
-function buildDokuRequestId(idempotencyKey?: string): string {
-  if (!idempotencyKey) {
-    return `REQ-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-  }
-
-  // DOKU uses Request-Id as its idempotency key. Hash the app-level key so a
-  // client-controlled string never becomes a raw payment-provider header and
-  // the value always stays comfortably below DOKU's 128-character limit.
-  return `GINABO-${createHash('sha256').update(idempotencyKey).digest('hex')}`
-}
-
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
@@ -181,7 +170,7 @@ export async function createDokuCheckoutSession(opts: {
   }
 
   const jsonBody = JSON.stringify(payload)
-  const requestId = buildDokuRequestId(opts.idempotencyKey)
+  const requestId = `REQ-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
   const requestTimestamp = getDokuTimestamp()
   const digest = computeBodyDigest(jsonBody)
 
@@ -206,25 +195,16 @@ export async function createDokuCheckoutSession(opts: {
     body: jsonBody,
   })
 
-  // DOKU documents HTTP 409 as the idempotent replay response when the same
-  // Request-Id + request body is retried. The response body is the original
-  // result, so parse it exactly like the initial 200 response instead of
-  // turning a safe retry into an application-level failure.
-  if (!response.ok && response.status !== 409) {
+  if (!response.ok) {
     const errorBody = await response.text()
     throw new Error(`DOKU Checkout API error ${response.status}: ${errorBody}`)
   }
 
-  let data: DokuCheckoutResponse
-  try {
-    data = (await response.json()) as DokuCheckoutResponse
-  } catch {
-    throw new Error(`DOKU Checkout returned an invalid JSON response (${response.status})`)
-  }
+  const data = (await response.json()) as DokuCheckoutResponse
 
   const checkoutUrl = data.response?.payment?.url
   if (!checkoutUrl) {
-    throw new Error(`DOKU Checkout response missing payment url (${response.status})`)
+    throw new Error('DOKU Checkout response missing payment url')
   }
 
   return {
@@ -244,9 +224,14 @@ export function verifyDokuWebhookSignature(opts: {
   signatureHeader: string | null
   requestTargetPath: string
   rawBody: string
+  secretKey?: string
 }): boolean {
-  if (!dokuSecretKey) {
-    throw new Error('DOKU_SECRET_KEY is not configured')
+  const secretKey = opts.secretKey ?? process.env.DOKU_SECRET_KEY ?? ''
+  const configuredClientId = process.env.DOKU_CLIENT_ID ?? ''
+
+  if (!secretKey) {
+    console.error('[doku] Webhook signature verification failed: DOKU_SECRET_KEY is not configured')
+    return false
   }
 
   const {
@@ -259,22 +244,30 @@ export function verifyDokuWebhookSignature(opts: {
   } = opts
 
   if (!clientIdHeader || !requestIdHeader || !requestTimestampHeader || !signatureHeader) {
+    console.error('[doku] Webhook signature verification failed: Missing required header(s)')
+    return false
+  }
+
+  if (configuredClientId && clientIdHeader !== configuredClientId) {
+    console.error('[doku] Webhook signature verification failed: Client-Id mismatch')
     return false
   }
 
   const digest = computeBodyDigest(rawBody)
   const expectedSignature = calculateDokuSignature({
     clientId: clientIdHeader,
-    secretKey: dokuSecretKey,
+    secretKey,
     requestId: requestIdHeader,
     requestTimestamp: requestTimestampHeader,
     requestTarget: requestTargetPath,
     digest,
   })
 
-  // Compare signature strings safely
-  const sigBufferA = Buffer.from(expectedSignature)
-  const sigBufferB = Buffer.from(signatureHeader)
+  const cleanReceived = signatureHeader.trim()
+  const cleanExpected = expectedSignature.trim()
+
+  const sigBufferA = Buffer.from(cleanExpected)
+  const sigBufferB = Buffer.from(cleanReceived)
 
   if (sigBufferA.length !== sigBufferB.length) {
     return false

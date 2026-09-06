@@ -388,7 +388,7 @@ export async function POST(req: NextRequest) {
     const { data: rawExisting, error: existingError } = await adminAny
       .from('orders')
       .select('id, order_number, status, subtotal, shipping_cost, discount_amount, total_amount, payment_fee, shipping_weight_grams, coupon_id, coupon_code, shipping_address, shipping_courier, shipping_service')
-      .eq('profile_id', user.id)
+      .eq('profile_id', user!.id)
       .eq('checkout_idempotency_key', idempotencyKey)
       .maybeSingle()
 
