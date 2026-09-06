@@ -237,3 +237,18 @@ REVOKE ALL ON FUNCTION public.claim_checkout_coupon(UUID, UUID, UUID) FROM PUBLI
 REVOKE ALL ON FUNCTION public.claim_checkout_coupon(UUID, UUID, UUID) FROM anon;
 REVOKE ALL ON FUNCTION public.claim_checkout_coupon(UUID, UUID, UUID) FROM authenticated;
 GRANT EXECUTE ON FUNCTION public.claim_checkout_coupon(UUID, UUID, UUID) TO service_role;
+
+-- Payment fulfillment mutates inventory and is SECURITY DEFINER by design so
+-- the trusted server-side webhook can perform stock updates atomically. It must
+-- never be exposed as a public RPC: otherwise an anonymous/signed-in client can
+-- decrement inventory for an unpaid order simply by knowing its UUID.
+DO $$
+BEGIN
+  IF to_regprocedure('public.fulfill_paid_order(uuid)') IS NOT NULL THEN
+    REVOKE ALL ON FUNCTION public.fulfill_paid_order(UUID) FROM PUBLIC;
+    REVOKE ALL ON FUNCTION public.fulfill_paid_order(UUID) FROM anon;
+    REVOKE ALL ON FUNCTION public.fulfill_paid_order(UUID) FROM authenticated;
+    GRANT EXECUTE ON FUNCTION public.fulfill_paid_order(UUID) TO service_role;
+  END IF;
+END;
+$$;
