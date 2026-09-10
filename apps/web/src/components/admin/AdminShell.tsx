@@ -46,6 +46,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "Marketing & Bisnis",
     items: [
+      { href: "/admin/coupons", label: "Kupon & Promosi", icon: "🏷️" },
       { href: "/admin/marketing", label: "Marketing Intelligence", icon: "📣" },
       { href: "/admin/skincare", label: "Skincare Intelligence", icon: "✨" },
     ],

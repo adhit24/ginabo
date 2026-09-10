@@ -8,6 +8,8 @@ import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/se
 import { createDokuCheckoutSession, isDokuProduction, type DokuLineItem } from '@/lib/doku'
 import { calculateShippingCost, COURIERS, getCities, isRajaOngkirConfigured, type CourierCode } from '@/lib/rajaongkir'
 import { calculateServerCheckoutTotal, normalizeCheckoutRequestItems, priceCheckoutItems, type ServerProduct, type ServerVariant } from '@/lib/checkout/checkoutService'
+import { validateCouponCode } from '@/lib/promotions/promotionService'
+import type { DiscountSnapshot, PromotionCartItem } from '@/lib/promotions/types'
 import type { OrderRow } from '@/types/database'
 
 // ─── Request schema ───────────────────────────────────────────────────────────
@@ -272,99 +274,39 @@ export async function POST(req: NextRequest) {
   const shippingCost = shippingOption.cost
   const paymentFee = PAYMENT_FEES[payment_method]
 
-  // 7. Coupon validation uses the real DB schema names. The previous route cast
-  // rows to a stale CouponRow shape (type/value/min_purchase/max_discount), so
-  // real coupons would silently calculate no discount.
+  // 7. Server-authoritative promotion and coupon engine validation (Task 13)
   let discountAmount = 0
   let couponId: string | null = null
   let normalizedCouponCode: string | null = null
-
-  const subtotalForCoupon = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+  let discountSnapshot: DiscountSnapshot | null = null
 
   if (coupon_code?.trim()) {
     normalizedCouponCode = coupon_code.trim().toUpperCase()
-    const { data: rawCoupon, error: couponError } = await adminAny
-      .from('coupons')
-      .select('id, code, discount_type, discount_value, min_order_amount, max_discount_amount, usage_limit, usage_per_user, used_count, applies_to, product_ids, category_ids, is_active, starts_at, expires_at')
-      .eq('code', normalizedCouponCode)
-      .maybeSingle()
-
-    if (couponError) {
-      console.error('[checkout] coupon lookup failed', couponError)
-      return jsonError('Gagal memvalidasi kupon', 503)
-    }
-
-    const coupon = rawCoupon as DbCoupon | null
-    if (!coupon || !coupon.is_active) return jsonError('Kupon tidak valid atau tidak aktif', 400)
-
-    const now = Date.now()
-    const startsAt = new Date(coupon.starts_at).getTime()
-    const expiresAt = coupon.expires_at ? new Date(coupon.expires_at).getTime() : null
-    if (!Number.isFinite(startsAt) || startsAt > now || (expiresAt !== null && expiresAt <= now)) {
-      return jsonError('Kupon belum berlaku atau sudah kedaluwarsa', 400)
-    }
-    if (subtotalForCoupon < coupon.min_order_amount) {
-      return jsonError('Minimum transaksi kupon belum terpenuhi', 400)
-    }
-
-    // Pre-check limits for a useful response. claim_checkout_coupon() below is
-    // still authoritative and row-locks the coupon to close concurrency races.
-    const [{ count: globalUsage, error: globalUsageError }, { count: userUsage, error: userUsageError }] = await Promise.all([
-      adminAny.from('coupon_usages').select('id', { count: 'exact', head: true }).eq('coupon_id', coupon.id),
-      adminAny.from('coupon_usages').select('id', { count: 'exact', head: true }).eq('coupon_id', coupon.id).eq('profile_id', user.id),
-    ])
-    if (globalUsageError || userUsageError) {
-      console.error('[checkout] coupon usage lookup failed', globalUsageError ?? userUsageError)
-      return jsonError('Gagal memvalidasi batas penggunaan kupon', 503)
-    }
-    if (coupon.usage_limit !== null && (globalUsage ?? 0) >= coupon.usage_limit) {
-      return jsonError('Kuota kupon sudah habis', 409)
-    }
-    if ((userUsage ?? 0) >= coupon.usage_per_user) {
-      return jsonError('Batas penggunaan kupon untuk akun ini sudah tercapai', 409)
-    }
-
     const productsById = new Map(
       ((productRows ?? []) as ProductForCheckout[]).map((product) => [product.id, product]),
     )
-    let eligibleSubtotal = subtotalForCoupon
 
-    if (coupon.applies_to === 'specific_products') {
-      const eligibleIds = new Set(coupon.product_ids ?? [])
-      eligibleSubtotal = items.reduce(
-        (sum, item) => eligibleIds.has(item.productId) ? sum + item.unitPrice * item.quantity : sum,
-        0,
-      )
-    } else if (coupon.applies_to === 'specific_categories') {
-      const eligibleCategoryIds = new Set(coupon.category_ids ?? [])
-      eligibleSubtotal = items.reduce((sum, item) => {
-        const categoryId = productsById.get(item.productId)?.category_id
-        return categoryId && eligibleCategoryIds.has(categoryId)
-          ? sum + item.unitPrice * item.quantity
-          : sum
-      }, 0)
+    const promotionItems: PromotionCartItem[] = items.map((i) => ({
+      productId: i.productId,
+      categoryId: productsById.get(i.productId)?.category_id ?? null,
+      unitPrice: i.unitPrice,
+      quantity: i.quantity,
+    }))
+
+    const promoResult = await validateCouponCode(adminAny, {
+      code: normalizedCouponCode,
+      userId: user.id,
+      items: promotionItems,
+      shippingCost,
+    })
+
+    if (!promoResult.valid) {
+      return jsonError(promoResult.message, 400, promoResult.errorCode)
     }
 
-    if (eligibleSubtotal <= 0) return jsonError('Kupon tidak berlaku untuk produk yang dipilih', 400)
-
-    if (coupon.discount_type === 'percentage') {
-      discountAmount = Math.round((eligibleSubtotal * coupon.discount_value) / 100)
-    } else if (coupon.discount_type === 'fixed_idr') {
-      discountAmount = Math.min(coupon.discount_value, eligibleSubtotal)
-    } else if (coupon.discount_type === 'free_shipping') {
-      discountAmount = shippingCost
-    }
-
-    if (coupon.max_discount_amount !== null) {
-      discountAmount = Math.min(discountAmount, coupon.max_discount_amount)
-    }
-
-    if (!Number.isSafeInteger(discountAmount) || discountAmount < 0) {
-      console.error('[checkout] coupon produced invalid discount', { couponId: coupon.id, discountAmount })
-      return jsonError('Konfigurasi kupon tidak valid', 500)
-    }
-
-    couponId = coupon.id
+    discountAmount = promoResult.discountAmount
+    couponId = promoResult.couponId ?? null
+    discountSnapshot = promoResult.discountSnapshot ?? null
   }
 
   let totals
@@ -505,6 +447,7 @@ export async function POST(req: NextRequest) {
         checkout_idempotency_key: idempotencyKey,
         coupon_id: couponId,
         coupon_code: normalizedCouponCode,
+        discount_snapshot: discountSnapshot,
         shipping_address: address,
         shipping_courier,
         shipping_service,
