@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { AddressModal } from "@/components/member/AddressModal";
 import type { AddressRow } from "@/types/database";
+import type { CustomerLoyaltySummary } from "@/lib/loyalty/types";
 import { authFetch, createClient } from "@/lib/supabase/client";
 
 const tiers = ["Regular", "Silver", "Gold", "Platinum"];
@@ -134,6 +135,24 @@ export default function MemberPage() {
   const [avatarError, setAvatarError] = useState("");
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
+  const [loyaltySummary, setLoyaltySummary] = useState<CustomerLoyaltySummary | null>(null);
+  const [loyaltyLoading, setLoyaltyLoading] = useState(false);
+
+  async function loadLoyalty() {
+    setLoyaltyLoading(true);
+    try {
+      const res = await authFetch("/api/loyalty/me");
+      const json = (await res.json()) as { ok: boolean; data?: CustomerLoyaltySummary };
+      if (json.ok && json.data) {
+        setLoyaltySummary(json.data);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setLoyaltyLoading(false);
+    }
+  }
+
   async function loadAddresses() {
     setAddressesLoading(true);
     try {
@@ -232,6 +251,7 @@ export default function MemberPage() {
     if (user) {
       setForm(f => ({ ...f, name: user.name, email: user.email, phone: user.phone ?? "", dob: user.dateOfBirth ?? "", gender: user.gender === "male" ? "Laki-laki" : user.gender === "female" ? "Perempuan" : "" }));
       void loadAddresses();
+      void loadLoyalty();
     }
   }, [user, isLoading, router]);
 
@@ -531,21 +551,94 @@ export default function MemberPage() {
             {/* ── Riwayat Poin ── */}
             {activeTab === "points" && (
               <div>
-                <h2 className="mb-1 text-base font-bold text-white">Riwayat Poin</h2>
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                  <h2 className="text-base font-bold text-white">Loyalty & Riwayat Poin</h2>
+                  {loyaltySummary && (
+                    <span className="rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-200 border border-brand-500/30">
+                      Tier: {loyaltySummary.currentTier}
+                    </span>
+                  )}
+                </div>
                 <div className="mb-6 h-px" style={{ background: "rgba(139,92,246,0.15)" }} />
-                <div className="mb-4 flex items-center justify-between rounded-xl px-5 py-4" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
-                  <span className="text-sm text-white/60">Total Poin Kamu</span>
-                  <span className="text-2xl font-extrabold text-[#c084fc]">{user.points.toLocaleString("id-ID")}</span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between rounded-lg px-4 py-3" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(139,92,246,0.12)" }}>
-                    <div>
-                      <div className="text-sm font-semibold text-white">Pendaftaran Member</div>
-                      <div className="text-xs text-white/40">{user.joinedAt}</div>
+
+                {/* Points Balance Card */}
+                <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl p-6" style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.25)" }}>
+                  <div>
+                    <span className="text-xs font-semibold text-white/60 uppercase tracking-wider">Total GINABO Points</span>
+                    <div className="mt-1 text-3xl font-black text-[#c084fc]">
+                      {(loyaltySummary?.pointsBalance ?? user.points).toLocaleString("id-ID")}
                     </div>
-                    <span className="text-sm font-bold text-green-400">+100 poin</span>
+                    <div className="mt-1 text-xs text-white/50">1 poin = Rp 1.000 belanja pesanan selesai</div>
                   </div>
+                  {loyaltySummary?.nextTier && (
+                    <div className="text-right">
+                      <div className="text-xs text-white/60">Target Tier Berikutnya</div>
+                      <div className="text-sm font-bold text-white">{loyaltySummary.nextTier}</div>
+                      <div className="text-xs text-[#c084fc] mt-0.5">{loyaltySummary.tierProgressPercent}% tercapai</div>
+                    </div>
+                  )}
                 </div>
+
+                {/* Next Tier Progress Bar */}
+                {loyaltySummary?.nextTier && (
+                  <div className="mb-6 rounded-xl p-4 bg-white/5 border border-white/10">
+                    <div className="flex justify-between text-xs text-white/70 mb-2 font-medium">
+                      <span>{loyaltySummary.currentTier}</span>
+                      <span>{loyaltySummary.nextTier}</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${loyaltySummary.tierProgressPercent}%`,
+                          background: "linear-gradient(90deg, #8b5cf6, #e879f9)",
+                        }}
+                      />
+                    </div>
+                    <p className="mt-3 text-xs text-white/60">{loyaltySummary.tierMessage}</p>
+                  </div>
+                )}
+
+                {/* Transaction History */}
+                <h3 className="text-sm font-bold text-white mb-3">Catatan Riwayat Poin</h3>
+                {loyaltyLoading ? (
+                  <p className="text-sm text-white/40">Memuat riwayat poin...</p>
+                ) : loyaltySummary && loyaltySummary.recentTransactions.length > 0 ? (
+                  <div className="flex flex-col gap-2.5">
+                    {loyaltySummary.recentTransactions.map((tx) => (
+                      <div
+                        key={tx.id}
+                        className="flex items-center justify-between rounded-xl px-4 py-3"
+                        style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(139,92,246,0.12)" }}
+                      >
+                        <div>
+                          <div className="text-sm font-semibold text-white">{tx.description}</div>
+                          <div className="text-xs text-white/40">{new Date(tx.createdAt).toLocaleDateString("id-ID")}</div>
+                        </div>
+                        <span
+                          className={`text-sm font-bold ${
+                            tx.pointsDelta > 0 ? "text-emerald-400" : "text-rose-400"
+                          }`}
+                        >
+                          {tx.pointsDelta > 0 ? `+${tx.pointsDelta}` : tx.pointsDelta} poin
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <div
+                      className="flex items-center justify-between rounded-xl px-4 py-3"
+                      style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(139,92,246,0.12)" }}
+                    >
+                      <div>
+                        <div className="text-sm font-semibold text-white">Pendaftaran Member & Welcome Bonus</div>
+                        <div className="text-xs text-white/40">{user.joinedAt}</div>
+                      </div>
+                      <span className="text-sm font-bold text-emerald-400">+100 poin</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

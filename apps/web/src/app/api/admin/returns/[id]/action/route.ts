@@ -16,6 +16,7 @@ import {
   processRefund,
   getActivePolicy,
 } from '@/lib/returns'
+import { reverseRefundLoyaltyPoints } from '@/lib/loyalty/loyaltyService'
 import type { ReturnStatus } from '@/types/returns'
 
 const schema = z.object({
@@ -270,6 +271,19 @@ export async function POST(req: NextRequest, { params }: Ctx) {
       if (err) return err
       // Mark order refunded
       await auth.adminDb.from('orders').update({ status: 'refunded' }).eq('id', r.order_id)
+
+      // Reversal of loyalty points
+      try {
+        await reverseRefundLoyaltyPoints(auth.adminDb, {
+          refundId: result.refundId ?? r.id,
+          orderId: r.order_id,
+          profileId: r.profile_id,
+          refundAmount: amount,
+        })
+      } catch (refundErr) {
+        console.error('[admin-return-refund] Loyalty points reversal failed:', refundErr)
+      }
+
       return jsonOk(result)
     }
 
