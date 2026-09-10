@@ -56,6 +56,13 @@ export interface Customer360Profile {
   loyaltyPoints?: number
   membershipTier?: string
 
+  // Marketing & Acquisition Attribution
+  acquisitionChannel?: string | null
+  acquisitionSource?: string | null
+  acquisitionCampaign?: string | null
+  firstPurchaseAt?: string | null
+  latestPurchaseChannel?: string | null
+
   // Commerce
   validOrderCount: number
   paidOrderCount: number

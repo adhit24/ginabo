@@ -6,7 +6,7 @@ import { validateCustomerEvent } from "@/lib/analytics/events";
 export async function POST(req: NextRequest) {
   let event;
   try {
-    event = validateCustomerEvent(await req.json());
+    event = validateCustomerEvent(await req.json(), { isClient: true });
   } catch (error) {
     return jsonError(error instanceof Error ? error.message : "Event tidak valid", 400);
   }

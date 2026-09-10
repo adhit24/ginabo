@@ -101,11 +101,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: res?.message ?? 'Settlement rejected' }, { status: 400 })
     }
 
-    // Trigger in-app notification if first time settled
-    if (!res.already_settled && res.profile_id) {
-      await createOrderNotification(res.profile_id, orderNumber, admin).catch((err) => {
-        console.error('[webhook] Failed to create in-app notification:', err)
-      })
+    // Trigger in-app notification & log server payment_success if first time settled
+    if (!res.already_settled) {
+      if (res.profile_id) {
+        await createOrderNotification(res.profile_id, orderNumber, admin).catch((err) => {
+          console.error('[webhook] Failed to create in-app notification:', err)
+        })
+      }
+
+      // Record authoritative server-side payment_success event
+      try {
+        await adminAny.from('customer_events').insert({
+          event_name: 'payment_success',
+          profile_id: res.profile_id || null,
+          order_id: res.order_id || null,
+          metadata: {
+            order_number: orderNumber,
+            amount: grossAmount,
+            channel: 'doku',
+          },
+          consent: true,
+        })
+      } catch (evErr) {
+        console.warn('[webhook] customer_events payment_success insert failed:', evErr)
+      }
     }
 
     return NextResponse.json({ ok: true, message: res.message }, { status: 200 })
