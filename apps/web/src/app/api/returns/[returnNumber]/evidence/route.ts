@@ -49,7 +49,10 @@ export async function POST(req: NextRequest, { params }: Ctx) {
     return jsonError('Bukti tidak dapat ditambahkan pada status retur saat ini', 409)
   }
 
-  // Enforce the uploader owns the folder (defence-in-depth on top of storage RLS).
+  // Enforce path safety against directory traversal and uploader folder ownership (defense-in-depth on top of storage RLS).
+  if (parsed.data.storage_path.includes('..') || parsed.data.storage_path.includes('\\')) {
+    return jsonError('Path penyimpanan tidak valid (direktori tidak diizinkan)', 400)
+  }
   if (!parsed.data.storage_path.startsWith(`${userId}/`)) {
     return jsonError('Path penyimpanan tidak valid', 403)
   }
