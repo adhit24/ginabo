@@ -5,6 +5,7 @@ import { jsonError, jsonOk } from "@/lib/http";
 import { createAdminClient } from "@/lib/supabase/server";
 import { getAdminSessionCookieName, verifyAdminSessionToken } from "@/lib/auth";
 import { isValidOrderTransition } from "@/lib/orders/orderLifecycle";
+import { creditOrderLoyaltyPoints } from "@/lib/loyalty/loyaltyService";
 import type { OrderStatus } from "@/types/database";
 
 export async function PATCH(
@@ -94,11 +95,22 @@ export async function PATCH(
       return jsonError("Gagal memperbarui status pesanan", 500, updateError?.message);
     }
 
+    // 7. Credit loyalty points idempotently if order is completed
+    let loyaltyCreditResult = null;
+    if (nextStatus === "completed") {
+      try {
+        loyaltyCreditResult = await creditOrderLoyaltyPoints(admin, params.id);
+      } catch (err) {
+        console.error("[admin-order-patch] Loyalty credit failed:", err);
+      }
+    }
+
     return jsonOk({
       id: params.id,
       previousStatus: currentStatus,
       newStatus: nextStatus,
       order: updatedOrder,
+      loyalty: loyaltyCreditResult,
     });
   } catch (e) {
     return jsonError("Server error", 500, e instanceof Error ? e.message : String(e));

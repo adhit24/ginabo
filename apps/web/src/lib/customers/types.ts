@@ -53,6 +53,8 @@ export interface Customer360Profile {
   normalizedPhone: string | null
   whatsappNumber: string | null
   registrationDate: string
+  loyaltyPoints?: number
+  membershipTier?: string
 
   // Commerce
   validOrderCount: number

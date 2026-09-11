@@ -24,6 +24,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/admin/intelligence", label: "Customer Intelligence", icon: "🧠" },
       { href: "/admin/customers", label: "Daftar Pelanggan", icon: "👥" },
+      { href: "/admin/loyalty", label: "Loyalty & Rewards", icon: "⭐" },
     ],
   },
   {

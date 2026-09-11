@@ -18,6 +18,7 @@ import {
   normalizeEmail,
 } from './phoneNormalizer'
 import { sanitizeCustomerPayload } from '@/lib/auth/adminAuth'
+import { calculateMembershipTier } from '@/lib/loyalty/tierEngine'
 
 const VALID_ORDER_STATUSES = ['paid', 'processing', 'shipped', 'delivered', 'completed']
 const VALID_REFUND_STATUSES = ['pending', 'processing', 'completed']
@@ -279,7 +280,7 @@ export async function getCustomer360Detail(
   // 1. Fetch profile
   const { data: profile, error: profileErr } = await db
     .from('profiles')
-    .select('id, email, full_name, phone_number, whatsapp_number, created_at')
+    .select('id, email, full_name, phone_number, whatsapp_number, created_at, loyalty_points')
     .eq('id', customerId)
     .maybeSingle()
 
@@ -414,6 +415,8 @@ export async function getCustomer360Detail(
     normalizedPhone: normalizeIndonesianPhone(profile.phone_number),
     whatsappNumber: normalizeIndonesianPhone(profile.whatsapp_number ?? profile.phone_number),
     registrationDate: profile.created_at,
+    loyaltyPoints: (profile as any).loyalty_points ?? 0,
+    membershipTier: calculateMembershipTier(computed.netRevenueMinor),
 
     validOrderCount: validOrders.length,
     paidOrderCount: paidOrders.length,

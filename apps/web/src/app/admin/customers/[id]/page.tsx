@@ -22,6 +22,50 @@ const SEGMENT_BADGES: Record<CustomerSegment, { label: string; bg: string; text:
 export default function AdminCustomerDetailPage({ params }: { params: { id: string } }) {
   const [data, setData] = useState<Customer360Profile | null>(null);
   const [state, setState] = useState<State>({ status: "loading" });
+  const [customerPoints, setCustomerPoints] = useState<number | null>(null);
+  const [adjustModalOpen, setAdjustModalOpen] = useState(false);
+  const [adjustDelta, setAdjustDelta] = useState<number>(50);
+  const [adjustReason, setAdjustReason] = useState("");
+  const [adjustLoading, setAdjustLoading] = useState(false);
+  const [adjustMsg, setAdjustMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  async function handleAdjustPoints(e: React.FormEvent) {
+    e.preventDefault();
+    if (!adjustReason.trim()) {
+      setAdjustMsg({ type: "error", text: "Alasan penyesuaian poin wajib diisi untuk audit." });
+      return;
+    }
+    if (adjustDelta === 0) {
+      setAdjustMsg({ type: "error", text: "Jumlah penyesuaian poin tidak boleh 0." });
+      return;
+    }
+    setAdjustLoading(true);
+    setAdjustMsg(null);
+    try {
+      const res = await fetch("/api/admin/loyalty/adjust", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          profileId: params.id,
+          pointsDelta: Number(adjustDelta),
+          reason: adjustReason.trim(),
+        }),
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error?.message ?? "Gagal menyesuaikan poin");
+      setCustomerPoints(json.data.newBalance);
+      setAdjustMsg({ type: "success", text: `Poin berhasil diperbarui! Saldo baru: ${json.data.newBalance} poin.` });
+      setTimeout(() => {
+        setAdjustModalOpen(false);
+        setAdjustMsg(null);
+        setAdjustReason("");
+      }, 1800);
+    } catch (err) {
+      setAdjustMsg({ type: "error", text: err instanceof Error ? err.message : String(err) });
+    } finally {
+      setAdjustLoading(false);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -35,6 +79,9 @@ export default function AdminCustomerDetailPage({ params }: { params: { id: stri
         }
         if (!cancelled) {
           setData(json.data);
+          if (json.data.loyaltyPoints !== undefined) {
+            setCustomerPoints(json.data.loyaltyPoints);
+          }
           setState({ status: "idle" });
         }
       } catch (e) {
@@ -129,7 +176,125 @@ export default function AdminCustomerDetailPage({ params }: { params: { id: stri
             {data.recommendedAction}
           </p>
         </div>
+
+        {/* Membership & Loyalty Points Summary */}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-brand-100 bg-brand-50/40 p-5">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-600 text-white font-bold text-lg shadow-sm">
+              ★
+            </div>
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-brand-800">
+                Status Membership & Loyalty Points
+              </div>
+              <div className="mt-1 flex items-center gap-3">
+                <span className="inline-flex items-center rounded-full bg-brand-100 px-3 py-0.5 text-xs font-bold text-brand-900 uppercase">
+                  Tier: {data.membershipTier ?? "Regular"}
+                </span>
+                <span className="text-sm font-bold text-gray-900">
+                  Saldo: <span className="text-brand-700 font-extrabold text-base">{customerPoints ?? data.loyaltyPoints ?? 0}</span> Poin
+                </span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                setAdjustDelta(50);
+                setAdjustReason("");
+                setAdjustMsg(null);
+                setAdjustModalOpen(true);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-brand-200 bg-white px-3.5 py-2 text-xs font-semibold text-brand-800 shadow-sm hover:bg-brand-50 transition"
+            >
+              +/- Sesuaikan Poin (Admin Audit)
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Manual Point Adjustment Modal */}
+      {adjustModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900">Penyesuaian Poin Manual</h3>
+              <button
+                type="button"
+                onClick={() => setAdjustModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 text-lg"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              Setiap penyesuaian akan dicatat di buku besar poin (ledger) dengan identitas admin dan alasan audit.
+            </p>
+
+            <form onSubmit={handleAdjustPoints} className="mt-4 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-700">
+                  Perubahan Poin (Delta)
+                </label>
+                <p className="text-[11px] text-gray-500">Gunakan angka positif untuk menambah, negatif untuk mengurangi.</p>
+                <input
+                  type="number"
+                  value={adjustDelta}
+                  onChange={(e) => setAdjustDelta(parseInt(e.target.value, 10) || 0)}
+                  className="mt-1 block w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  placeholder="Contoh: 100 atau -50"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700">
+                  Alasan Penyesuaian (Wajib Audit)
+                </label>
+                <textarea
+                  value={adjustReason}
+                  onChange={(e) => setAdjustReason(e.target.value)}
+                  rows={3}
+                  className="mt-1 block w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  placeholder="Contoh: Kompensasi keterlambatan kurir order #ORD-1234"
+                  required
+                />
+              </div>
+
+              {adjustMsg && (
+                <div
+                  className={`rounded-xl p-3 text-xs font-medium ${
+                    adjustMsg.type === "success"
+                      ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                      : "bg-rose-50 text-rose-800 border border-rose-200"
+                  }`}
+                >
+                  {adjustMsg.text}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setAdjustModalOpen(false)}
+                  disabled={adjustLoading}
+                  className="rounded-xl border border-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={adjustLoading || adjustDelta === 0}
+                  className="rounded-xl bg-brand-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-50 transition"
+                >
+                  {adjustLoading ? "Menyimpan..." : "Simpan Penyesuaian"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Commerce & RFM Metric Grid */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
