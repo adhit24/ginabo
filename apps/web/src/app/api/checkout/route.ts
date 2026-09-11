@@ -10,6 +10,8 @@ import { calculateShippingCost, COURIERS, getCities, isRajaOngkirConfigured, typ
 import { calculateServerCheckoutTotal, normalizeCheckoutRequestItems, priceCheckoutItems, type ServerProduct, type ServerVariant } from '@/lib/checkout/checkoutService'
 import { validateCouponCode } from '@/lib/promotions/promotionService'
 import type { DiscountSnapshot, PromotionCartItem } from '@/lib/promotions/types'
+import { cleanUtmParam, classifyMarketingChannel } from '@/lib/attribution/classifier'
+import type { AttributionPayload, MarketingChannelName } from '@/lib/attribution/types'
 import type { OrderRow } from '@/types/database'
 
 // ─── Request schema ───────────────────────────────────────────────────────────
@@ -28,6 +30,15 @@ interface CheckoutBody {
   shipping_service?: string | null
   payment_method?: string | null
   checkout_idempotency_key?: string | null
+  attribution?: AttributionPayload | null
+  session_id?: string | null
+  utm_source?: string | null
+  utm_medium?: string | null
+  utm_campaign?: string | null
+  utm_content?: string | null
+  utm_term?: string | null
+  referrer?: string | null
+  landing_page?: string | null
 }
 
 type DbCoupon = {
@@ -433,6 +444,35 @@ export async function POST(req: NextRequest) {
 
     for (let attempt = 0; attempt < 3 && !createdOrder; attempt += 1) {
       const orderNumber = generateOrderNumber()
+      
+      const rawAttr = body.attribution || {}
+      const utm_source = cleanUtmParam(rawAttr.utm_source || body.utm_source)
+      const utm_medium = cleanUtmParam(rawAttr.utm_medium || body.utm_medium)
+      const utm_campaign = cleanUtmParam(rawAttr.utm_campaign || body.utm_campaign)
+      const utm_content = cleanUtmParam(rawAttr.utm_content || body.utm_content)
+      const utm_term = cleanUtmParam(rawAttr.utm_term || body.utm_term)
+      const referrer = cleanUtmParam(rawAttr.referrer || body.referrer, 300)
+      const landing_page = cleanUtmParam(rawAttr.landing_page || body.landing_page, 200)
+
+      const channel = rawAttr.attribution_channel || classifyMarketingChannel(utm_source, utm_medium, referrer, utm_campaign)
+      const attributionSnapshot = rawAttr.attribution_snapshot || {
+        firstTouch: null,
+        lastTouch: {
+          source: utm_source,
+          medium: utm_medium,
+          campaign: utm_campaign,
+          content: utm_content,
+          term: utm_term,
+          referrer,
+          landingPage: landing_page,
+          channel,
+          capturedAt: new Date().toISOString(),
+        },
+        channel,
+        model: 'last_non_direct' as const,
+        capturedAt: new Date().toISOString(),
+      }
+
       const orderPayload = {
         order_number: orderNumber,
         profile_id: user.id,
@@ -452,6 +492,16 @@ export async function POST(req: NextRequest) {
         shipping_courier,
         shipping_service,
         notes: null,
+        utm_source,
+        utm_medium,
+        utm_campaign,
+        utm_content,
+        utm_term,
+        referrer,
+        landing_page,
+        attribution_channel: channel,
+        attribution_model: 'last_non_direct',
+        attribution_snapshot: attributionSnapshot,
       }
       const orderItemsPayload = items.map((item) => ({
         product_id: item.productId,
@@ -485,6 +535,26 @@ export async function POST(req: NextRequest) {
           shipping_courier,
           shipping_service,
         }
+
+        // Authoritative server-side event tracking for order_created
+        try {
+          await adminAny.from('customer_events').insert({
+            event_name: 'order_created',
+            profile_id: user.id,
+            order_id: createdOrder.id,
+            anonymous_session_id: cleanUtmParam(body.session_id || (rawAttr as any)?.sessionId, 128),
+            metadata: {
+              order_number: createdOrder.order_number,
+              total_amount: createdOrder.total_amount,
+              channel,
+              campaign: utm_campaign,
+            },
+            consent: true,
+          })
+        } catch (evErr) {
+          console.warn('[checkout] customer_events order_created insert failed:', evErr)
+        }
+
         orderIsNew = true
         break
       }

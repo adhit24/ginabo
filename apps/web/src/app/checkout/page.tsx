@@ -16,6 +16,7 @@ import { authFetch } from "@/lib/supabase/client";
 import type { ShippingOption } from "@/lib/rajaongkir";
 import type { AddressRow } from "@/types/database";
 import { trackCustomerEvent } from "@/lib/analytics/events";
+import { getAttributionForCheckout } from "@/lib/attribution/attributionTracker";
 
 const DEMO_PAYMENT_MODE = process.env.NEXT_PUBLIC_GINABO_DEMO_PAYMENT_MODE === "true";
 
@@ -165,6 +166,7 @@ export default function CheckoutPage() {
         router.push(`/checkout/payment?order=${orderNumber}`);
         return;
       }
+      const attributionPayload = getAttributionForCheckout();
       const res = await authFetch("/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -180,6 +182,7 @@ export default function CheckoutPage() {
           payment_method: paymentMethod?.provider ?? null,
           checkout_idempotency_key: checkoutIdempotencyKey,
           coupon_code: appliedCoupon?.code ?? null,
+          attribution: attributionPayload,
         })
       });
       const json = (await res.json()) as {

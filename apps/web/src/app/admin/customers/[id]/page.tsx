@@ -212,6 +212,39 @@ export default function AdminCustomerDetailPage({ params }: { params: { id: stri
             </button>
           </div>
         </div>
+
+        {/* Acquisition & Attribution Intelligence */}
+        <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50/40 p-4">
+          <div className="text-xs font-bold uppercase tracking-wider text-blue-900">
+            Sumber Akuisisi & Atribusi Pemasaran
+          </div>
+          <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="rounded-xl bg-white p-3 border border-blue-100/80">
+              <span className="text-gray-500 block">Channel Akuisisi</span>
+              <span className="font-bold text-gray-900 text-sm mt-0.5 block">
+                {data.acquisitionChannel ?? "Direct"}
+              </span>
+            </div>
+            <div className="rounded-xl bg-white p-3 border border-blue-100/80">
+              <span className="text-gray-500 block">Source / UTM</span>
+              <span className="font-bold text-gray-900 text-sm mt-0.5 block truncate" title={data.acquisitionSource ?? "direct"}>
+                {data.acquisitionSource ?? "direct"}
+              </span>
+            </div>
+            <div className="rounded-xl bg-white p-3 border border-blue-100/80">
+              <span className="text-gray-500 block">Campaign Pertama</span>
+              <span className="font-bold text-gray-900 text-sm mt-0.5 block truncate" title={data.acquisitionCampaign ?? "—"}>
+                {data.acquisitionCampaign ?? "—"}
+              </span>
+            </div>
+            <div className="rounded-xl bg-white p-3 border border-blue-100/80">
+              <span className="text-gray-500 block">Channel Terakhir</span>
+              <span className="font-bold text-gray-900 text-sm mt-0.5 block">
+                {data.latestPurchaseChannel ?? data.acquisitionChannel ?? "Direct"}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Manual Point Adjustment Modal */}

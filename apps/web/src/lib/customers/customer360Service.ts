@@ -19,6 +19,7 @@ import {
 } from './phoneNormalizer'
 import { sanitizeCustomerPayload } from '@/lib/auth/adminAuth'
 import { calculateMembershipTier } from '@/lib/loyalty/tierEngine'
+import { getCustomerAcquisitionAttribution } from '@/lib/attribution/attributionService'
 
 const VALID_ORDER_STATUSES = ['paid', 'processing', 'shipped', 'delivered', 'completed']
 const VALID_REFUND_STATUSES = ['pending', 'processing', 'completed']
@@ -407,6 +408,8 @@ export async function getCustomer360Detail(
     ),
   }))
 
+  const acquisition = await getCustomerAcquisitionAttribution(db, customerId)
+
   const result: Customer360Profile = {
     id: profile.id,
     name: profile.full_name ?? profile.email ?? '—',
@@ -417,6 +420,13 @@ export async function getCustomer360Detail(
     registrationDate: profile.created_at,
     loyaltyPoints: (profile as any).loyalty_points ?? 0,
     membershipTier: calculateMembershipTier(computed.netRevenueMinor),
+
+    // Marketing & Acquisition Attribution
+    acquisitionChannel: acquisition.acquisitionChannel,
+    acquisitionSource: acquisition.acquisitionSource,
+    acquisitionCampaign: acquisition.acquisitionCampaign,
+    firstPurchaseAt: acquisition.firstPurchaseAt,
+    latestPurchaseChannel: acquisition.latestPurchaseChannel,
 
     validOrderCount: validOrders.length,
     paidOrderCount: paidOrders.length,
