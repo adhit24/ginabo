@@ -6,18 +6,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import type { Database } from '@/types/database'
-
-function getRequiredEnv(name: string): string {
-  const value = process.env[name]
-  if (name === 'NEXT_PUBLIC_SUPABASE_URL' && (!value || value.includes('<'))) {
-    return 'https://lvmyjtzfohlorocrjvcx.supabase.co'
-  }
-  if ((name === 'NEXT_PUBLIC_SUPABASE_ANON_KEY' || name === 'SUPABASE_SERVICE_ROLE_KEY') && (!value || value.includes('<'))) {
-    return 'placeholder-key'
-  }
-  if (!value) throw new Error(`Missing required environment variable: ${name}`)
-  return value
-}
+import { assertSupabaseEnv } from './env'
 
 /**
  * Creates a Supabase client for Server Components and Route Handlers.
@@ -30,8 +19,8 @@ function getRequiredEnv(name: string): string {
 export async function createServerSupabaseClient() {
   const cookieStore = await cookies()
 
-  const url = getRequiredEnv('NEXT_PUBLIC_SUPABASE_URL')
-  const anonKey = getRequiredEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY')
+  const url = assertSupabaseEnv(process.env.NEXT_PUBLIC_SUPABASE_URL, 'NEXT_PUBLIC_SUPABASE_URL')
+  const anonKey = assertSupabaseEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, 'NEXT_PUBLIC_SUPABASE_ANON_KEY')
 
   return createServerClient<Database>(url, anonKey, {
     cookies: {
@@ -56,8 +45,8 @@ export async function createServerSupabaseClient() {
  * NEVER expose this client to the browser or pass it to client components.
  */
 export function createAdminClient() {
-  const url = getRequiredEnv('NEXT_PUBLIC_SUPABASE_URL')
-  const serviceKey = getRequiredEnv('SUPABASE_SERVICE_ROLE_KEY')
+  const url = assertSupabaseEnv(process.env.NEXT_PUBLIC_SUPABASE_URL, 'NEXT_PUBLIC_SUPABASE_URL')
+  const serviceKey = assertSupabaseEnv(process.env.SUPABASE_SERVICE_ROLE_KEY, 'SUPABASE_SERVICE_ROLE_KEY')
 
   return createClient<Database>(url, serviceKey, {
     auth: {

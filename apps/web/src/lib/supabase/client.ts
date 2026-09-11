@@ -4,6 +4,7 @@
 
 import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
+import { assertSupabaseEnv } from './env'
 
 let _browserClient: ReturnType<typeof createBrowserClient<Database>> | null = null
 
@@ -14,11 +15,8 @@ let _browserClient: ReturnType<typeof createBrowserClient<Database>> | null = nu
 export function createClient() {
   if (_browserClient) return _browserClient
 
-  const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const rawAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  const url = rawUrl && !rawUrl.includes('<') ? rawUrl : 'https://lvmyjtzfohlorocrjvcx.supabase.co'
-  const anonKey = rawAnonKey && !rawAnonKey.includes('<') ? rawAnonKey : 'placeholder-key'
+  const url = assertSupabaseEnv(process.env.NEXT_PUBLIC_SUPABASE_URL, 'NEXT_PUBLIC_SUPABASE_URL')
+  const anonKey = assertSupabaseEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, 'NEXT_PUBLIC_SUPABASE_ANON_KEY')
 
   _browserClient = createBrowserClient<Database>(url, anonKey)
 
