@@ -73,7 +73,65 @@ export default function CheckoutPage() {
     setShippingOption(null);
   }, []);
 
-  const grandTotal = totals.subtotalMinor + (shippingOption?.cost ?? 0) + (paymentMethod?.fee ?? 0);
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discountAmount: number;
+    ruleSummary?: string;
+  } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
+
+  const grandTotal = Math.max(
+    0,
+    totals.subtotalMinor +
+      (shippingOption?.cost ?? 0) +
+      (paymentMethod?.fee ?? 0) -
+      (appliedCoupon?.discountAmount ?? 0),
+  );
+
+  async function handleApplyCoupon() {
+    if (!couponInput.trim()) return;
+    setCouponLoading(true);
+    setCouponError(null);
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: couponInput.trim(),
+          items: cartItems.map((i) => ({
+            productId: i.productId,
+            unitPrice: i.priceMinor,
+            quantity: i.quantity,
+          })),
+          shippingCost: shippingOption?.cost ?? 0,
+        }),
+      });
+      const json = await res.json();
+      if (!json.ok) {
+        setCouponError(json.error?.message ?? "Kupon tidak valid");
+        setAppliedCoupon(null);
+      } else {
+        setAppliedCoupon({
+          code: json.data.code,
+          discountAmount: json.data.discountAmount,
+          ruleSummary: json.data.ruleSummary,
+        });
+        setCouponError(null);
+      }
+    } catch (e) {
+      setCouponError("Gagal memvalidasi kupon. Coba beberapa saat lagi.");
+    } finally {
+      setCouponLoading(false);
+    }
+  }
+
+  function handleRemoveCoupon() {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponError(null);
+  }
 
   async function submit() {
     if (cartItems.length === 0) return;
@@ -121,6 +179,7 @@ export default function CheckoutPage() {
           shipping_service: shippingOption?.service ?? null,
           payment_method: paymentMethod?.provider ?? null,
           checkout_idempotency_key: checkoutIdempotencyKey,
+          coupon_code: appliedCoupon?.code ?? null,
         })
       });
       const json = (await res.json()) as {
@@ -331,6 +390,49 @@ export default function CheckoutPage() {
                   </button>
                 </div>
 
+                {/* Coupon Code Section */}
+                <div className="mt-4 border-t border-[#F0F0F0] pt-4">
+                  <p className="text-[11.5px] font-bold uppercase tracking-wide text-[#A0A0A0] mb-2">Voucher / Kupon Diskon</p>
+                  {appliedCoupon ? (
+                    <div className="flex items-center justify-between rounded-lg bg-emerald-50 border border-emerald-200 p-2.5">
+                      <div>
+                        <span className="font-bold text-xs text-emerald-800 font-mono">{appliedCoupon.code}</span>
+                        <p className="text-[11px] text-emerald-700">Hemat {formatPrice(appliedCoupon.discountAmount)}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveCoupon}
+                        className="text-xs font-semibold text-rose-600 hover:text-rose-700"
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={couponInput}
+                          onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                          placeholder="Masukkan kode kupon"
+                          className="w-full rounded-lg border border-[#E0E0E0] px-3 py-1.5 text-xs text-[#231F20] uppercase placeholder:normal-case outline-none focus:border-[#8E51B8]"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleApplyCoupon}
+                          disabled={couponLoading || !couponInput.trim()}
+                          className="rounded-lg bg-[#8E51B8] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#78257C] disabled:opacity-50 transition"
+                        >
+                          {couponLoading ? "Cek..." : "Gunakan"}
+                        </button>
+                      </div>
+                      {couponError && (
+                        <p className="mt-1.5 text-[11.5px] text-rose-600">{couponError}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 <div className="mt-4 flex flex-col gap-2 text-[12.5px]">
                   <div className="flex items-center justify-between text-[#707070]">
                     <span>Subtotal ({totals.itemCount} item)</span>
@@ -344,6 +446,12 @@ export default function CheckoutPage() {
                     <span>Biaya Pembayaran</span>
                     <span className="font-semibold text-[#231F20]">{paymentMethod ? formatPrice(paymentMethod.fee) : "—"}</span>
                   </div>
+                  {appliedCoupon && (
+                    <div className="flex items-center justify-between text-emerald-700 font-semibold">
+                      <span>Diskon Kupon</span>
+                      <span>-{formatPrice(appliedCoupon.discountAmount)}</span>
+                    </div>
+                  )}
                   <div className="mt-2 flex items-center justify-between border-t border-[#EDEDED] pt-3 text-[14px] font-bold text-[#231F20]">
                     <span>Total</span>
                     <span className="text-[17px] font-extrabold text-[#E91E63]">{formatPrice(grandTotal)}</span>
