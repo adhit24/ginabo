@@ -1,18 +1,23 @@
 [CmdletBinding()]
 param(
-    [string]$ProjectRef = "lvmyjtzfohlorocrjvcx",
+    [string]$ProjectRef = "qnvrfoidfipjmrmdrvsz",
     [switch]$ConfirmStaging
 )
 
 $ErrorActionPreference = "Stop"
-$expectedProjectRef = "lvmyjtzfohlorocrjvcx"
+$stagingProjectRef = "qnvrfoidfipjmrmdrvsz"
+$productionProjectRef = "lvmyjtzfohlorocrjvcx"
+
+if ($ProjectRef -eq $productionProjectRef) {
+    throw "SAFETY CRITICAL STOP: ProjectRef $productionProjectRef adalah PRODUCTION Ginabo! Script ini TIDAK BOLEH dijalankan ke database production."
+}
 
 if (-not $ConfirmStaging) {
     throw "Safety stop: jalankan dengan -ConfirmStaging setelah memastikan ini project Supabase STAGING Ginabo."
 }
 
-if ($ProjectRef -ne $expectedProjectRef) {
-    throw "ProjectRef ditolak. Script ini hanya boleh untuk Ginabo staging: $expectedProjectRef"
+if ($ProjectRef -ne $stagingProjectRef) {
+    throw "ProjectRef ditolak. Script ini hanya boleh untuk Ginabo staging: $stagingProjectRef"
 }
 
  $supabase = Get-Command supabase -ErrorAction SilentlyContinue
