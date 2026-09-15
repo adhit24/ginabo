@@ -72,3 +72,27 @@ BEGIN
       WITH CHECK (true);
   END IF;
 END $$;
+
+-- 6. Guard profile loyalty_points against direct client tampering
+CREATE OR REPLACE FUNCTION public.protect_profile_system_fields()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF (auth.jwt()->>'role' = 'authenticated' AND NOT public.is_admin()) THEN
+    IF NEW.loyalty_points IS DISTINCT FROM OLD.loyalty_points THEN
+      RAISE EXCEPTION 'Unauthorized to mutate loyalty_points' USING ERRCODE = '42501';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_protect_profile_system_fields ON public.profiles;
+CREATE TRIGGER trg_protect_profile_system_fields
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION public.protect_profile_system_fields();
+
