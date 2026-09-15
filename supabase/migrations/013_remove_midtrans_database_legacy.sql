@@ -35,7 +35,8 @@ SET provider_refund_id = midtrans_refund_id
 WHERE provider_refund_id IS NULL AND midtrans_refund_id IS NOT NULL;
 
 -- 5. Re-create view v_order_summary without midtrans_transaction_status & safe against order duplication
-CREATE OR REPLACE VIEW public.v_order_summary AS
+DROP VIEW IF EXISTS public.v_order_summary;
+CREATE VIEW public.v_order_summary AS
 SELECT DISTINCT ON (o.id)
     o.id AS order_id,
     o.order_number,

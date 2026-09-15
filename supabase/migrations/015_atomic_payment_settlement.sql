@@ -21,6 +21,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+#variable_conflict use_column
 DECLARE
   v_payment RECORD;
   v_order RECORD;
@@ -78,7 +79,7 @@ BEGIN
 
   -- Decrement inventory if not already decremented
   IF v_order.inventory_decremented_at IS NULL THEN
-    FOR v_item IN SELECT product_id, variant_id, quantity FROM public.order_items WHERE order_id = v_order.id LOOP
+    FOR v_item IN SELECT product_id, variant_id, quantity FROM public.order_items oi WHERE oi.order_id = v_order.id LOOP
       IF v_item.variant_id IS NOT NULL THEN
         UPDATE public.product_variants
         SET stock_quantity = stock_quantity - v_item.quantity, updated_at = now()
@@ -146,6 +147,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+#variable_conflict use_column
 DECLARE
   v_payment RECORD;
   v_order RECORD;
@@ -208,7 +210,7 @@ BEGIN
     WHERE id = v_order.id;
 
     -- Release coupon reservation if any exists for this order
-    DELETE FROM public.coupon_usages WHERE order_id = v_order.id;
+    DELETE FROM public.coupon_usages WHERE coupon_usages.order_id = v_order.id;
   END IF;
 
   RETURN QUERY SELECT TRUE, 'Payment marked failed/expired and order cancelled', v_order.id, v_order.profile_id;
