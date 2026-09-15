@@ -67,6 +67,9 @@ node_modules/
 supabase/.temp/
 apps/web/dev-server*.log
 
+# QA/E2E scratch state (local only, never committed)
+scratch/
+
 # OS
 .DS_Store
 Thumbs.db

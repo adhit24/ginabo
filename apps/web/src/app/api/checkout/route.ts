@@ -665,6 +665,21 @@ export async function POST(req: NextRequest) {
     if (failedPaymentError) {
       console.error('[checkout] failed-payment audit persistence failed', failedPaymentError)
     }
+
+    // Session creation failed before the customer ever saw a checkout URL —
+    // cancel the pending order and release any coupon reservation through the
+    // same canonical RPC the DOKU webhook uses for FAILED/EXPIRED notifications,
+    // so the customer can safely retry checkout instead of being stuck against
+    // a claimed usage_per_user slot on an order that can never be paid.
+    const { error: releaseError } = await adminAny.rpc('handle_failed_doku_payment', {
+      p_invoice_number: order.order_number,
+      p_target_status: 'FAILED',
+      p_raw_notification: { reason: 'doku_session_creation_failed' },
+    })
+    if (releaseError) {
+      console.error('[checkout] coupon/order release after DOKU failure failed', releaseError)
+    }
+
     return jsonError('Gagal menghubungi payment gateway (DOKU Checkout)', 502)
   }
 
