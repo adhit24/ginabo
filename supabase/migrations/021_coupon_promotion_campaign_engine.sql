@@ -133,6 +133,7 @@ CREATE OR REPLACE FUNCTION public.handle_coupon_usage_deletion()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 BEGIN
     UPDATE public.coupons

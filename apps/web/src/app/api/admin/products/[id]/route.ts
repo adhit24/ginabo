@@ -1,12 +1,16 @@
-export const runtime = 'edge';
-
+import { NextRequest } from "next/server";
 import { jsonError, jsonOk } from "@/lib/http";
-import { supabase } from "@/lib/supabase";
+import { requireAdminAuth } from "@/lib/auth/adminAuth";
 import { adminProductSchema } from "@/lib/validation";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { data: product, error } = await supabase
+    const auth = await requireAdminAuth(req);
+    if (!auth.authorized || !auth.adminDb) {
+      return auth.errorResponse ?? jsonError("Akses ditolak. Diperlukan autentikasi admin.", 403);
+    }
+
+    const { data: product, error } = await auth.adminDb
       .from("products")
       .select("id, slug, name, description, short_description, ingredients, weight_grams, base_price, stock_quantity, is_active, average_rating, review_count, product_images(url, sort_order)")
       .eq("id", params.id)
@@ -39,8 +43,13 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const auth = await requireAdminAuth(req);
+    if (!auth.authorized || !auth.adminDb) {
+      return auth.errorResponse ?? jsonError("Akses ditolak. Diperlukan autentikasi admin.", 403);
+    }
+
     const body = await req.json();
     const parsed = adminProductSchema.partial().safeParse(body);
     if (!parsed.success) return jsonError("Invalid input", 400, parsed.error.flatten());
@@ -60,7 +69,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     if (parsed.data.stockQty !== undefined) updatePayload.stock_quantity = parsed.data.stockQty;
     if (parsed.data.isActive !== undefined) updatePayload.is_active = parsed.data.isActive;
 
-    const { data: updated, error: updateError } = await supabase
+    const { data: updated, error: updateError } = await auth.adminDb
       .from("products")
       .update(updatePayload)
       .eq("id", params.id)
@@ -71,9 +80,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     if (!updated) return jsonError("Not found", 404);
 
     if (imageUrlRaw !== undefined) {
-      await supabase.from("product_images").delete().eq("product_id", updated.id);
+      await auth.adminDb.from("product_images").delete().eq("product_id", updated.id);
       if (imageUrl) {
-        await supabase.from("product_images").insert({ product_id: updated.id, url: imageUrl, sort_order: 0 });
+        await auth.adminDb.from("product_images").insert({ product_id: updated.id, url: imageUrl, sort_order: 0 });
       }
     }
 
@@ -83,9 +92,14 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   }
 }
 
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { error } = await supabase.from("products").delete().eq("id", params.id);
+    const auth = await requireAdminAuth(req);
+    if (!auth.authorized || !auth.adminDb) {
+      return auth.errorResponse ?? jsonError("Akses ditolak. Diperlukan autentikasi admin.", 403);
+    }
+
+    const { error } = await auth.adminDb.from("products").delete().eq("id", params.id);
     if (error) return jsonError("Server error", 500, error.message);
     return jsonOk({ deleted: true });
   } catch (e) {

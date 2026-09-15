@@ -78,12 +78,21 @@ CREATE OR REPLACE FUNCTION public.protect_profile_system_fields()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, pg_temp
 AS $$
 BEGIN
   IF (auth.jwt()->>'role' = 'authenticated' AND NOT public.is_admin()) THEN
+    IF NEW.role IS DISTINCT FROM OLD.role THEN
+      RAISE EXCEPTION 'Unauthorized to mutate profile role' USING ERRCODE = '42501';
+    END IF;
     IF NEW.loyalty_points IS DISTINCT FROM OLD.loyalty_points THEN
       RAISE EXCEPTION 'Unauthorized to mutate loyalty_points' USING ERRCODE = '42501';
+    END IF;
+    IF NEW.reseller_tier_id IS DISTINCT FROM OLD.reseller_tier_id THEN
+      RAISE EXCEPTION 'Unauthorized to mutate reseller_tier_id' USING ERRCODE = '42501';
+    END IF;
+    IF NEW.is_active IS DISTINCT FROM OLD.is_active THEN
+      RAISE EXCEPTION 'Unauthorized to mutate is_active' USING ERRCODE = '42501';
     END IF;
   END IF;
   RETURN NEW;

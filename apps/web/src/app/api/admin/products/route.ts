@@ -1,12 +1,16 @@
-export const runtime = 'edge';
-
+import { NextRequest } from "next/server";
 import { jsonError, jsonOk } from "@/lib/http";
-import { supabase } from "@/lib/supabase";
+import { requireAdminAuth } from "@/lib/auth/adminAuth";
 import { adminProductSchema } from "@/lib/validation";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const { data: products, error } = await supabase
+    const auth = await requireAdminAuth(req);
+    if (!auth.authorized || !auth.adminDb) {
+      return auth.errorResponse ?? jsonError("Akses ditolak. Diperlukan autentikasi admin.", 403);
+    }
+
+    const { data: products, error } = await auth.adminDb
       .from("products")
       .select("id, slug, name, description, short_description, ingredients, weight_grams, base_price, stock_quantity, is_active, average_rating, review_count, created_at, product_images(url, sort_order)")
       .order("sort_order", { ascending: true });
@@ -42,8 +46,13 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    const auth = await requireAdminAuth(req);
+    if (!auth.authorized || !auth.adminDb) {
+      return auth.errorResponse ?? jsonError("Akses ditolak. Diperlukan autentikasi admin.", 403);
+    }
+
     const body = await req.json();
     const parsed = adminProductSchema.safeParse(body);
     if (!parsed.success) return jsonError("Invalid input", 400, parsed.error.flatten());
@@ -53,7 +62,7 @@ export async function POST(req: Request) {
         ? parsed.data.imageUrl.trim()
         : null;
 
-    const { data: created, error: insertError } = await supabase
+    const { data: created, error: insertError } = await auth.adminDb
       .from("products")
       .insert({
         slug: parsed.data.slug,
@@ -72,7 +81,7 @@ export async function POST(req: Request) {
     if (insertError) return jsonError("Server error", 500, insertError.message);
 
     if (imageUrl) {
-      const { error: imgError } = await supabase
+      const { error: imgError } = await auth.adminDb
         .from("product_images")
         .insert({ product_id: created.id, url: imageUrl, sort_order: 0 });
 
