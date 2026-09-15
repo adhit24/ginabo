@@ -381,15 +381,25 @@ export interface ReviewRow {
 export interface CouponRow {
   id: string
   code: string
-  type: CouponType
-  value: number
-  min_purchase: number | null
-  max_discount: number | null
+  discount_type?: 'percentage' | 'fixed_idr' | 'free_shipping' | 'fixed_amount'
+  discount_value?: number
+  type?: CouponType
+  value?: number
+  min_order_amount?: number
+  min_purchase?: number | null
+  max_discount_amount?: number | null
+  max_discount?: number | null
   usage_limit: number | null
-  usage_count: number
+  usage_per_user?: number
+  used_count?: number
+  usage_count?: number
+  applies_to?: 'all' | 'specific_products' | 'specific_categories'
+  product_ids?: string[] | null
+  category_ids?: string[] | null
   is_active: boolean
   starts_at: string | null
   expires_at: string | null
+  created_by?: string | null
   campaign_id?: string | null
   customer_eligibility?: 'all' | 'first_purchase' | 'repeat_customer' | 'specific_segments' | 'specific_tiers' | 'specific_profiles'
   eligible_segments?: string[]
@@ -798,6 +808,21 @@ export interface Database {
         }
         Returns: string
       }
+      adjust_inventory_manual: {
+        Args: {
+          p_product_id: string
+          p_variant_id: string | null
+          p_new_quantity: number
+          p_reason: string
+          p_admin_id: string | null
+        }
+        Returns: {
+          success: boolean
+          message: string
+          quantity_before: number
+          quantity_after: number
+        }[]
+      }
       adjust_inventory_stock: {
         Args: {
           p_product_id: string
@@ -814,15 +839,38 @@ export interface Database {
         }[]
       }
       reconcile_inventory_anomalies: {
-        Args: { p_auto_correct?: boolean }
+        Args: Record<string, never>
         Returns: {
-          product_id: string
-          variant_id: string | null
-          ledger_net_delta: number
-          current_stock: number
-          anomaly_delta: number
-          auto_corrected: boolean
+          anomaly_type: string
+          entity_type: string
+          entity_id: string
+          details: string
         }[]
+      }
+      claim_checkout_coupon: {
+        Args: {
+          p_coupon_id: string
+          p_profile_id: string
+          p_order_id: string
+        }
+        Returns: boolean
+      }
+      handle_failed_doku_payment: {
+        Args: {
+          p_invoice_number: string
+          p_target_status: string
+          p_raw_notification: Record<string, unknown>
+        }
+        Returns: {
+          success: boolean
+          message: string
+          order_id: string | null
+          profile_id: string | null
+        }[]
+      }
+      is_admin: {
+        Args: Record<string, never>
+        Returns: boolean
       }
     }
     Enums: {

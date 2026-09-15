@@ -91,6 +91,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+#variable_conflict use_column
 DECLARE
   v_payment RECORD;
   v_order RECORD;
@@ -150,7 +151,7 @@ BEGIN
 
   -- Decrement inventory if not already decremented
   IF v_order.inventory_decremented_at IS NULL THEN
-    FOR v_item IN SELECT product_id, variant_id, quantity FROM public.order_items WHERE order_id = v_order.id LOOP
+    FOR v_item IN SELECT product_id, variant_id, quantity FROM public.order_items oi WHERE oi.order_id = v_order.id LOOP
       IF v_item.variant_id IS NOT NULL THEN
         SELECT stock_quantity INTO v_qty_before
         FROM public.product_variants
