@@ -159,12 +159,31 @@ export interface OrderRow {
   shipping_weight_grams: number | null
   checkout_idempotency_key: string | null
   coupon_id: string | null
+  coupon_code?: string | null
+  discount_snapshot?: Record<string, unknown> | null
   shipping_address_id: string | null
   shipping_provider: string | null
   tracking_number: string | null
   notes: string | null
   reseller_id: string | null
   reseller_commission: number | null
+  processing_at?: string | null
+  shipped_at?: string | null
+  delivered_at?: string | null
+  completed_at?: string | null
+  cancelled_at?: string | null
+  inventory_decremented_at?: string | null
+  inventory_restored_at?: string | null
+  utm_source?: string | null
+  utm_medium?: string | null
+  utm_campaign?: string | null
+  utm_content?: string | null
+  utm_term?: string | null
+  referrer?: string | null
+  landing_page?: string | null
+  attribution_channel?: string | null
+  attribution_model?: string | null
+  attribution_snapshot?: Record<string, unknown> | null
   created_at: string
   updated_at: string
 }
@@ -371,6 +390,11 @@ export interface CouponRow {
   is_active: boolean
   starts_at: string | null
   expires_at: string | null
+  campaign_id?: string | null
+  customer_eligibility?: 'all' | 'first_purchase' | 'repeat_customer' | 'specific_segments' | 'specific_tiers' | 'specific_profiles'
+  eligible_segments?: string[]
+  eligible_tiers?: string[]
+  eligible_profile_ids?: string[]
   created_at: string
   updated_at: string
 }
@@ -382,6 +406,119 @@ export interface CouponUsageRow {
   order_id: string
   discount_applied: number
   used_at: string
+}
+
+export interface CampaignRow {
+  id: string
+  name: string
+  slug: string
+  objective: 'acquisition' | 'conversion' | 'retention' | 'winback' | 'loyalty' | 'seasonal'
+  description: string | null
+  starts_at: string | null
+  ends_at: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface InventoryMovementRow {
+  id: string
+  product_id: string
+  variant_id: string | null
+  movement_type: 'sale' | 'cancellation_restoration' | 'return_restock' | 'manual_adjustment' | 'receiving'
+  quantity_delta: number
+  quantity_before: number
+  quantity_after: number
+  reference_type: 'order' | 'return_item' | 'manual' | 'replenishment' | null
+  reference_id: string | null
+  reason: string | null
+  created_by: string | null
+  created_at: string
+}
+
+export interface LoyaltyTransactionRow {
+  id: string
+  profile_id: string
+  transaction_type: 'earn_purchase' | 'redeem' | 'adjustment' | 'reversal' | 'welcome_bonus' | 'expiry'
+  points_delta: number
+  balance_after: number
+  source_type: 'order' | 'refund' | 'admin' | 'registration' | 'manual'
+  source_id: string
+  description: string
+  created_at: string
+}
+
+export interface ReturnRow {
+  id: string
+  return_number: string
+  order_id: string
+  profile_id: string
+  status: string
+  reason_category: string
+  total_refund_amount: number
+  created_at: string
+  updated_at: string
+}
+
+export interface ReturnItemRow {
+  id: string
+  return_id: string
+  order_item_id: string
+  product_id: string
+  variant_id: string | null
+  product_name: string
+  variant_name: string | null
+  quantity: number
+  unit_price: number
+  restock: boolean
+  restocked_at: string | null
+  created_at: string
+}
+
+export interface CustomerEventRow {
+  event_id: string
+  profile_id: string | null
+  anonymous_session_id: string | null
+  event_name:
+    | 'session_started'
+    | 'product_viewed'
+    | 'search_submitted'
+    | 'add_to_cart'
+    | 'remove_from_cart'
+    | 'checkout_started'
+    | 'order_created'
+    | 'payment_success'
+    | 'payment_failed'
+    | 'coupon_applied'
+  product_id: string | null
+  order_id: string | null
+  metadata: Record<string, unknown>
+  consent: boolean
+  occurred_at: string
+}
+
+export interface Customer360MetricsRow {
+  profile_id: string
+  email: string
+  full_name: string | null
+  phone_number: string | null
+  whatsapp_number: string | null
+  registration_date: string
+  valid_order_count: number
+  paid_order_count: number
+  completed_order_count: number
+  gross_revenue: number
+  total_refunded_amount: number
+  net_revenue: number
+  average_order_value: number
+  total_units_purchased: number
+  first_order_at: string | null
+  last_order_at: string | null
+  return_count: number
+  cancelled_order_count: number
+  return_rate_percent: number
+  is_repeat_customer: boolean
+  first_purchase_month: string | null
 }
 
 // ─── Insert / Update helpers ──────────────────────────────────────────────────
@@ -454,6 +591,24 @@ export type CouponUpdate = Partial<CouponInsert>
 
 export type CouponUsageInsert = Omit<CouponUsageRow, 'id'>
 export type CouponUsageUpdate = Partial<CouponUsageInsert>
+
+export type CampaignInsert = Omit<CampaignRow, 'id' | 'created_at' | 'updated_at'>
+export type CampaignUpdate = Partial<CampaignInsert>
+
+export type InventoryMovementInsert = Omit<InventoryMovementRow, 'id' | 'created_at'>
+export type InventoryMovementUpdate = Partial<InventoryMovementInsert>
+
+export type LoyaltyTransactionInsert = Omit<LoyaltyTransactionRow, 'id' | 'created_at'>
+export type LoyaltyTransactionUpdate = Partial<LoyaltyTransactionInsert>
+
+export type ReturnInsert = Omit<ReturnRow, 'id' | 'created_at' | 'updated_at'>
+export type ReturnUpdate = Partial<ReturnInsert>
+
+export type ReturnItemInsert = Omit<ReturnItemRow, 'id' | 'created_at'>
+export type ReturnItemUpdate = Partial<ReturnItemInsert>
+
+export type CustomerEventInsert = Omit<CustomerEventRow, 'event_id' | 'occurred_at'>
+export type CustomerEventUpdate = Partial<CustomerEventInsert>
 
 // ─── Supabase Database type (compatible with createClient<Database>) ──────────
 
@@ -575,9 +730,101 @@ export interface Database {
         Insert: CouponUsageInsert
         Update: CouponUsageUpdate
       }
+      campaigns: {
+        Row: CampaignRow
+        Insert: CampaignInsert
+        Update: CampaignUpdate
+      }
+      inventory_movements: {
+        Row: InventoryMovementRow
+        Insert: InventoryMovementInsert
+        Update: InventoryMovementUpdate
+      }
+      loyalty_transactions: {
+        Row: LoyaltyTransactionRow
+        Insert: LoyaltyTransactionInsert
+        Update: LoyaltyTransactionUpdate
+      }
+      returns: {
+        Row: ReturnRow
+        Insert: ReturnInsert
+        Update: ReturnUpdate
+      }
+      return_items: {
+        Row: ReturnItemRow
+        Insert: ReturnItemInsert
+        Update: ReturnItemUpdate
+      }
+      customer_events: {
+        Row: CustomerEventRow
+        Insert: CustomerEventInsert
+        Update: CustomerEventUpdate
+      }
     }
-    Views: Record<string, never>
-    Functions: Record<string, never>
+    Views: {
+      customer_360_metrics: {
+        Row: Customer360MetricsRow
+      }
+    }
+    Functions: {
+      restore_cancelled_order_stock: {
+        Args: { p_order_id: string }
+        Returns: boolean
+      }
+      restock_returned_item: {
+        Args: { p_return_item_id: string }
+        Returns: boolean
+      }
+      settle_doku_payment: {
+        Args: {
+          p_invoice_number: string
+          p_provider_transaction_id: string
+          p_payment_type: string
+          p_gross_amount: number
+          p_raw_notification: Record<string, unknown>
+        }
+        Returns: {
+          success: boolean
+          message: string
+          order_id: string
+          profile_id: string
+          already_settled: boolean
+        }[]
+      }
+      create_checkout_order_atomic: {
+        Args: {
+          p_order: Record<string, unknown>
+          p_items: Record<string, unknown>[]
+        }
+        Returns: string
+      }
+      adjust_inventory_stock: {
+        Args: {
+          p_product_id: string
+          p_variant_id: string | null
+          p_quantity_delta: number
+          p_reason: string
+          p_admin_profile_id: string
+        }
+        Returns: {
+          success: boolean
+          message: string
+          quantity_before: number
+          quantity_after: number
+        }[]
+      }
+      reconcile_inventory_anomalies: {
+        Args: { p_auto_correct?: boolean }
+        Returns: {
+          product_id: string
+          variant_id: string | null
+          ledger_net_delta: number
+          current_stock: number
+          anomaly_delta: number
+          auto_corrected: boolean
+        }[]
+      }
+    }
     Enums: {
       order_status: OrderStatus
       payment_status: PaymentStatus
@@ -587,3 +834,4 @@ export interface Database {
     }
   }
 }
+
