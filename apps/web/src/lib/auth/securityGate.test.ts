@@ -55,4 +55,49 @@ describe("Milestone 6: Security Final Gate Unit Tests", () => {
     expect(verified?.role).toBe("ADMIN");
     expect(verified?.email).toBe("admin@ginabo.id");
   });
+
+  // Regression: Milestone 7 Batch 2B found that verifyAdminSessionToken let
+  // jose's jwtVerify() throw straight through on any malformed, tampered, or
+  // expired token. Callers that don't wrap the call in their own try/catch
+  // (e.g. /api/admin/me, the admin order PATCH routes, and middleware.ts's
+  // admin-area gate) turned that into an uncaught exception — a bare 500
+  // with a stack trace — instead of the intended clean 401/redirect. These
+  // assert directly on the unwrapped return value (no `.catch()` helper) so
+  // a regression here fails loudly instead of being silently absorbed by the
+  // test itself.
+  it("verifyAdminSessionToken resolves to null (never throws) for a malformed token", async () => {
+    process.env.AUTH_SECRET = "super_secret_test_auth_key_1234567890";
+
+    await expect(verifyAdminSessionToken("not-a-jwt-at-all")).resolves.toBeNull();
+    await expect(verifyAdminSessionToken("")).resolves.toBeNull();
+    await expect(verifyAdminSessionToken("a.b.c")).resolves.toBeNull();
+  });
+
+  it("verifyAdminSessionToken resolves to null (never throws) for an expired token", async () => {
+    process.env.AUTH_SECRET = "super_secret_test_auth_key_1234567890";
+    const { SignJWT } = await import("jose");
+    const secret = new TextEncoder().encode(process.env.AUTH_SECRET);
+    const expiredToken = await new SignJWT({ role: "ADMIN", email: "admin@ginabo.id" })
+      .setProtectedHeader({ alg: "HS256" })
+      .setSubject("admin-1")
+      .setIssuedAt(Math.floor(Date.now() / 1000) - 3600)
+      .setExpirationTime(Math.floor(Date.now() / 1000) - 1800)
+      .sign(secret);
+
+    await expect(verifyAdminSessionToken(expiredToken)).resolves.toBeNull();
+  });
+
+  it("verifyAdminSessionToken resolves to null (never throws) for a signature signed with the wrong secret", async () => {
+    process.env.AUTH_SECRET = "super_secret_test_auth_key_1234567890";
+    const { SignJWT } = await import("jose");
+    const wrongSecret = new TextEncoder().encode("a-completely-different-secret");
+    const tokenFromWrongSecret = await new SignJWT({ role: "ADMIN", email: "admin@ginabo.id" })
+      .setProtectedHeader({ alg: "HS256" })
+      .setSubject("admin-1")
+      .setIssuedAt(Math.floor(Date.now() / 1000))
+      .setExpirationTime("7d")
+      .sign(wrongSecret);
+
+    await expect(verifyAdminSessionToken(tokenFromWrongSecret)).resolves.toBeNull();
+  });
 });

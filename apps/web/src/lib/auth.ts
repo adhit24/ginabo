@@ -31,7 +31,18 @@ export async function createAdminSessionToken(payload: AdminSessionPayload) {
 
 export async function verifyAdminSessionToken(token: string) {
   const secret = getAuthSecret();
-  const { payload } = await jwtVerify(token, secret);
+  // jwtVerify throws on any malformed, expired, or bad-signature token.
+  // Every caller treats a null return as "not authenticated" (redirect to
+  // login / 401), so an uncaught throw here escapes as an unhandled
+  // exception instead — surfacing as a bare 500 with a stack trace for
+  // callers (like /api/admin/me and the admin PATCH routes) that don't wrap
+  // this call in their own try/catch.
+  let payload: Record<string, unknown>;
+  try {
+    ({ payload } = await jwtVerify(token, secret));
+  } catch {
+    return null;
+  }
   const sub = payload.sub;
   const role = payload.role;
   const email = payload.email;
