@@ -22,7 +22,7 @@ type OrderProjection = Pick<
   | 'discount_amount'
   | 'tax_amount'
   | 'total_amount'
-  | 'shipping_provider'
+  | 'shipping_courier'
   | 'tracking_number'
   | 'notes'
   | 'created_at'
@@ -102,7 +102,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
     discount_amount,
     tax_amount,
     total_amount,
-    shipping_provider,
+    shipping_courier,
     tracking_number,
     notes,
     created_at,
@@ -165,7 +165,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
     discount_amount: order.discount_amount,
     tax_amount: order.tax_amount,
     total_amount: order.total_amount,
-    shipping_provider: order.shipping_provider,
+    shipping_courier: order.shipping_courier,
     tracking_number: order.tracking_number,
     notes: order.notes,
     created_at: order.created_at,

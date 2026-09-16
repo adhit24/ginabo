@@ -155,6 +155,7 @@ export interface OrderRow {
   total_amount: number
   payment_fee: number
   shipping_address: Record<string, unknown>
+  shipping_courier: string | null
   shipping_service: string | null
   shipping_weight_grams: number | null
   checkout_idempotency_key: string | null
@@ -162,7 +163,6 @@ export interface OrderRow {
   coupon_code?: string | null
   discount_snapshot?: Record<string, unknown> | null
   shipping_address_id: string | null
-  shipping_provider: string | null
   tracking_number: string | null
   notes: string | null
   reseller_id: string | null

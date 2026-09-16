@@ -122,7 +122,6 @@ export default async function OrderDetailPage({ params }: PageProps) {
     discount_amount: number
     tax_amount: number
     total_amount: number
-    shipping_provider: string | null
     shipping_courier: string | null
     tracking_number: string | null
     created_at: string
@@ -144,7 +143,6 @@ export default async function OrderDetailPage({ params }: PageProps) {
       discount_amount,
       tax_amount,
       total_amount,
-      shipping_provider,
       shipping_courier,
       tracking_number,
       created_at,
@@ -339,7 +337,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
               <div className="mb-1 font-semibold text-purple-900">Info Pengiriman</div>
               <div className="mb-3 text-purple-700">
                 <span className="font-medium">
-                  {order.shipping_courier?.toUpperCase() ?? order.shipping_provider ?? '—'}
+                  {order.shipping_courier?.toUpperCase() ?? '—'}
                 </span>
                 {' · '}
                 <span className="font-mono">{order.tracking_number}</span>

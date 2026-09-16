@@ -70,7 +70,6 @@ export async function PATCH(
   const updates: Record<string, unknown> = {
     tracking_number: cleanTracking,
     shipping_courier: cleanCourier,
-    shipping_provider: cleanCourier.toLowerCase(),
     shipping_service: cleanService,
     status: "shipped",
     shipped_at: (rawOrder as any).shipped_at || nowIso,
@@ -81,7 +80,7 @@ export async function PATCH(
     .from("orders")
     .update(updates as never)
     .eq("id", params.id as never)
-    .select("id, order_number, tracking_number, shipping_courier, shipping_provider, shipping_service, status, shipped_at")
+    .select("id, order_number, tracking_number, shipping_courier, shipping_service, status, shipped_at")
     .single();
 
   if (error) {
