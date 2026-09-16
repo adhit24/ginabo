@@ -233,7 +233,7 @@ export async function getExecutiveDashboardSummary(
   let ordersQuery = supabase
     .from('orders')
     .select(
-      'id, order_number, profile_id, total_amount, discount_amount, attribution_channel, utm_campaign, created_at, status, payment_status'
+      'id, order_number, profile_id, total_amount, discount_amount, attribution_channel, utm_campaign, created_at, status'
     )
 
   if (prevStart) ordersQuery = ordersQuery.gte('created_at', prevStart)
@@ -260,12 +260,12 @@ export async function getExecutiveDashboardSummary(
     }
   }
 
-  // Filter valid paid orders
+  // Filter valid paid orders — orders has no payment_status column (that
+  // lives on payments.status); status alone already tells us whether
+  // payment cleared, matching the VALID_ORDER_STATUSES standard used by
+  // customer360Service.ts, loyaltyService.ts, and attributionService.ts.
   function isValidPaid(o: any): boolean {
-    const isPaid = o.payment_status === 'paid' || o.payment_status === 'settled'
-    const isCompleted = ['processing', 'shipped', 'delivered', 'completed'].includes(o.status)
-    const isCancelled = ['cancelled', 'pending'].includes(o.status) && !isPaid
-    return (isPaid || isCompleted) && !isCancelled
+    return ['paid', 'processing', 'shipped', 'delivered', 'completed'].includes(o.status)
   }
 
   const validCurOrders = curOrders.filter(isValidPaid)
@@ -328,7 +328,7 @@ export async function getExecutiveDashboardSummary(
   if (allBuyerIds.length > 0) {
     const { data: customerOrderHistory } = await supabase
       .from('orders')
-      .select('profile_id, created_at, status, payment_status')
+      .select('profile_id, created_at, status')
       .in('profile_id', allBuyerIds)
       .order('created_at', { ascending: true })
 
