@@ -94,14 +94,17 @@ export default async function OrderDetailPage({ params }: PageProps) {
     settlement_time: string | null
   }
 
+  // orders.shipping_address is a JSONB snapshot taken at checkout time
+  // (supabase/migrations/001_initial_schema.sql), not a foreign key — there
+  // is no "addresses" relationship on orders to embed.
   type AddressRecord = {
-    recipient_name: string
-    phone: string
-    address_line1: string
-    address_line2: string | null
-    city: string
-    province: string
-    postal_code: string
+    recipient_name?: string
+    phone?: string
+    address_line1?: string
+    address_line2?: string | null
+    city?: string
+    province?: string
+    postal_code?: string
   }
 
   type OrderItem = {
@@ -146,15 +149,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
       shipping_courier,
       tracking_number,
       created_at,
-      shipping_address:addresses(
-        recipient_name,
-        phone,
-        address_line1,
-        address_line2,
-        city,
-        province,
-        postal_code
-      ),
+      shipping_address,
       items:order_items(
         id,
         product_name,

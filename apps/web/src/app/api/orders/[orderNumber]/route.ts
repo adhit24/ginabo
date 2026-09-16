@@ -4,7 +4,7 @@
 import { type NextRequest } from 'next/server'
 import { jsonError, jsonOk } from '@/lib/http'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server'
-import type { OrderRow, OrderItemRow, PaymentRow, AddressRow } from '@/types/database'
+import type { OrderRow, OrderItemRow, PaymentRow } from '@/types/database'
 
 interface RouteContext {
   params: { orderNumber: string }
@@ -28,16 +28,18 @@ type OrderProjection = Pick<
   | 'created_at'
   | 'updated_at'
 > & {
-  shipping_address: Pick<
-    AddressRow,
-    | 'recipient_name'
-    | 'phone'
-    | 'address_line1'
-    | 'address_line2'
-    | 'city'
-    | 'province'
-    | 'postal_code'
-  > | null
+  // orders.shipping_address is a JSONB snapshot taken at checkout time
+  // (supabase/migrations/001_initial_schema.sql), not a foreign key —
+  // there is no "addresses" relationship on orders to embed.
+  shipping_address: {
+    recipient_name?: string
+    phone?: string
+    address_line1?: string
+    address_line2?: string | null
+    city?: string
+    province?: string
+    postal_code?: string
+  } | null
   items: Pick<
     OrderItemRow,
     | 'id'
@@ -107,15 +109,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
     notes,
     created_at,
     updated_at,
-    shipping_address:addresses(
-      recipient_name,
-      phone,
-      address_line1,
-      address_line2,
-      city,
-      province,
-      postal_code
-    ),
+    shipping_address,
     items:order_items(
       id,
       product_id,

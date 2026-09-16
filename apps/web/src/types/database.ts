@@ -162,7 +162,6 @@ export interface OrderRow {
   coupon_id: string | null
   coupon_code?: string | null
   discount_snapshot?: Record<string, unknown> | null
-  shipping_address_id: string | null
   tracking_number: string | null
   notes: string | null
   reseller_id: string | null
