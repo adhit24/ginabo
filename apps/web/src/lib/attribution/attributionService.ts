@@ -100,7 +100,7 @@ export async function getMarketingAttributionOverview(
   let ordersQuery = supabase
     .from('orders')
     .select(
-      'id, order_number, profile_id, total_amount, discount_amount, attribution_channel, utm_source, utm_medium, utm_campaign, created_at, status, payment_status'
+      'id, order_number, profile_id, total_amount, discount_amount, attribution_channel, utm_source, utm_medium, utm_campaign, created_at, status'
     )
 
   if (startDate) ordersQuery = ordersQuery.gte('created_at', startDate)
@@ -111,17 +111,18 @@ export async function getMarketingAttributionOverview(
     console.error('[AttributionService] Error querying orders:', ordersError)
   }
 
-  // Filter for valid paid commerce (Task 11 / Customer 360 standard)
-  const validOrders = (rawOrders || []).filter((o: any) => {
-    const isPaid = o.payment_status === 'paid' || o.payment_status === 'settled'
-    const isCompletedLifecycle = ['processing', 'shipped', 'delivered'].includes(o.status)
-    const isCancelled = ['cancelled', 'pending'].includes(o.status) && !isPaid
-    return (isPaid || isCompletedLifecycle) && !isCancelled
-  })
+  // Filter for valid paid commerce — same VALID_ORDER_STATUSES standard used
+  // by Customer 360 (customer360Service.ts) and loyalty crediting
+  // (loyaltyService.ts). orders has no payment_status column (that lives on
+  // payments.status); status itself already tells us whether payment
+  // cleared, since checkout only ever moves an order to 'paid' via
+  // settle_doku_payment.
+  const VALID_ORDER_STATUSES = ['paid', 'processing', 'shipped', 'delivered', 'completed']
+  const validOrders = (rawOrders || []).filter((o: any) => VALID_ORDER_STATUSES.includes(o.status))
 
   // 2. Fetch refund totals for net revenue
   let refundsQuery = supabase
-    .from('order_refunds')
+    .from('refunds')
     .select('amount, status, created_at')
     .eq('status', 'completed')
 
@@ -139,15 +140,11 @@ export async function getMarketingAttributionOverview(
   if (profileIds.length > 0) {
     const { data: allCustomerOrders } = await supabase
       .from('orders')
-      .select('profile_id, created_at, status, payment_status')
+      .select('profile_id, created_at, status')
       .in('profile_id', profileIds)
       .order('created_at', { ascending: true })
 
-    const validHistory = (allCustomerOrders || []).filter((o: any) => {
-      const isPaid = o.payment_status === 'paid' || o.payment_status === 'settled'
-      const isCompleted = ['processing', 'shipped', 'delivered'].includes(o.status)
-      return isPaid || isCompleted
-    })
+    const validHistory = (allCustomerOrders || []).filter((o: any) => VALID_ORDER_STATUSES.includes(o.status))
 
     for (const ord of validHistory) {
       if (ord.profile_id && !firstOrderMap[ord.profile_id]) {
@@ -363,8 +360,8 @@ export async function reconcileAttributionData(
   // Check 1: Paid orders missing attribution snapshot or channel
   const { data: allPaidOrders, error: ordersErr } = await supabase
     .from('orders')
-    .select('id, order_number, attribution_channel, attribution_snapshot, created_at, payment_status, status')
-    .in('payment_status', ['paid', 'settled'])
+    .select('id, order_number, attribution_channel, attribution_snapshot, created_at, status')
+    .in('status', ['paid', 'processing', 'shipped', 'delivered', 'completed'])
 
   if (ordersErr) {
     console.error('[Reconciliation] Error fetching orders:', ordersErr)
@@ -440,7 +437,7 @@ export async function getCustomerAcquisitionAttribution(
 ) {
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('id, order_number, attribution_channel, utm_source, utm_campaign, created_at, status, payment_status')
+    .select('id, order_number, attribution_channel, utm_source, utm_campaign, created_at, status')
     .eq('profile_id', profileId)
     .order('created_at', { ascending: true })
 
@@ -454,11 +451,9 @@ export async function getCustomerAcquisitionAttribution(
     }
   }
 
-  const validOrders = orders.filter((o: any) => {
-    const isPaid = o.payment_status === 'paid' || o.payment_status === 'settled'
-    const isCompleted = ['processing', 'shipped', 'delivered'].includes(o.status)
-    return isPaid || isCompleted
-  })
+  const validOrders = orders.filter((o: any) =>
+    ['paid', 'processing', 'shipped', 'delivered', 'completed'].includes(o.status)
+  )
 
   if (validOrders.length === 0) {
     return {

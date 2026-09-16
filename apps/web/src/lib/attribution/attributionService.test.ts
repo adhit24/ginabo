@@ -106,7 +106,7 @@ describe('attributionService', () => {
             }
             return chain
           }
-          if (table === 'order_refunds') {
+          if (table === 'refunds') {
             const chain: any = {
               select: vi.fn().mockReturnThis(),
               eq: vi.fn().mockReturnThis(),

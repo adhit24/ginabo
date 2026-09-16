@@ -131,7 +131,7 @@ describe('executiveService', () => {
               then: (res: any) => res({ data: mockOrders, error: null }),
             }
           }
-          if (table === 'order_refunds') {
+          if (table === 'refunds') {
             return {
               select: vi.fn().mockReturnThis(),
               eq: vi.fn().mockReturnThis(),

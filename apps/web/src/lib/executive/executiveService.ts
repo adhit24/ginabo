@@ -294,7 +294,7 @@ export async function getExecutiveDashboardSummary(
 
   // 2. Fetch completed refunds
   let refundsQuery = supabase
-    .from('order_refunds')
+    .from('refunds')
     .select('amount, status, created_at')
     .eq('status', 'completed')
 
