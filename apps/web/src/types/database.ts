@@ -351,13 +351,10 @@ export interface NotificationRow {
 
 export interface AdminUserRow {
   id: string
-  user_id: string
-  email: string
-  full_name: string | null
-  role: 'super_admin' | 'admin' | 'staff' | 'cs'
-  permissions: string[] | null
+  profile_id: string
+  permissions: Record<string, boolean>
   is_active: boolean
-  last_login_at: string | null
+  created_by: string | null
   created_at: string
   updated_at: string
 }

@@ -84,7 +84,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
   const { data: adminRecord } = await adminDb
     .from('admin_users')
     .select('id')
-    .eq('user_id', user.id as never)
+    .eq('profile_id', user.id as never)
     .eq('is_active', true as never)
     .maybeSingle()
 
