@@ -135,6 +135,7 @@ describe('executiveService', () => {
             return {
               select: vi.fn().mockReturnThis(),
               eq: vi.fn().mockReturnThis(),
+              in: vi.fn().mockReturnThis(),
               gte: vi.fn().mockReturnThis(),
               lte: vi.fn().mockResolvedValue({ data: mockRefunds, error: null }),
             }

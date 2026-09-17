@@ -241,9 +241,56 @@ export async function POST(req: NextRequest, { params }: Ctx) {
 
     case 'refund': {
       const method = p.refund_method ?? 'original_payment'
-      // Enforce server canonical calculated refund amount
-      const amount = r.refund_amount
-      if (amount <= 0) return jsonError('Jumlah refund harus lebih dari 0', 422)
+
+      // Guard against duplicate refund or invalid transition
+      if (r.status === 'refund_approved' || r.status === 'completed') {
+        return jsonError('Refund sudah pernah diproses untuk retur ini', 409)
+      }
+      if (!canTransition(r.status, 'refund_approved')) {
+        return jsonError(`Transisi status tidak valid: ${r.status} → refund_approved`, 409)
+      }
+
+      const { data: existingRefund } = await auth.adminDb
+        .from('refunds')
+        .select('id')
+        .eq('return_id', r.id)
+        .in('status', ['pending', 'processing', 'completed'])
+        .maybeSingle()
+      if (existingRefund) {
+        return jsonError('Refund sudah pernah dicatat untuk retur ini', 409)
+      }
+
+      // Check order paid total and past refunds
+      const { data: orderRow } = await auth.adminDb
+        .from('orders')
+        .select('id, total_amount, status')
+        .eq('id', r.order_id)
+        .single()
+      if (!orderRow) return jsonError('Pesanan tidak ditemukan', 404)
+
+      const { data: pastRefunds } = await auth.adminDb
+        .from('refunds')
+        .select('amount')
+        .eq('order_id', r.order_id)
+        .in('status', ['pending', 'processing', 'completed'])
+      const totalPastRefunded = (pastRefunds ?? []).reduce(
+        (acc: number, rf: { amount: number }) => acc + Number(rf.amount || 0),
+        0,
+      )
+      const remainingPaid = Math.max(0, Number(orderRow.total_amount || 0) - totalPastRefunded)
+      if (remainingPaid <= 0) {
+        return jsonError('Pesanan ini sudah mencapai batas maksimal refund (sudah full refund)', 422)
+      }
+
+      const requestedAmount = p.refund_amount ?? r.refund_amount
+      if (requestedAmount <= 0) return jsonError('Jumlah refund harus lebih dari 0', 422)
+      if (requestedAmount > remainingPaid) {
+        return jsonError(
+          `Jumlah refund (${requestedAmount}) melebihi sisa pembayaran pesanan (${remainingPaid})`,
+          422,
+        )
+      }
+      const amount = requestedAmount
 
       // find original payment
       const { data: pay } = await auth.adminDb

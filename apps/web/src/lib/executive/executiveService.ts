@@ -265,7 +265,7 @@ export async function getExecutiveDashboardSummary(
   // payment cleared, matching the VALID_ORDER_STATUSES standard used by
   // customer360Service.ts, loyaltyService.ts, and attributionService.ts.
   function isValidPaid(o: any): boolean {
-    return ['paid', 'processing', 'shipped', 'delivered', 'completed'].includes(o.status)
+    return ['paid', 'processing', 'shipped', 'delivered', 'completed', 'refunded'].includes(o.status)
   }
 
   const validCurOrders = curOrders.filter(isValidPaid)
@@ -296,7 +296,7 @@ export async function getExecutiveDashboardSummary(
   let refundsQuery = supabase
     .from('refunds')
     .select('amount, status, created_at')
-    .eq('status', 'completed')
+    .in('status', ['completed', 'pending', 'processing'])
 
   if (prevStart) refundsQuery = refundsQuery.gte('created_at', prevStart)
   if (curEnd) refundsQuery = refundsQuery.lte('created_at', curEnd)

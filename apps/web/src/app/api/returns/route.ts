@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
   const { data: order } = await auth.userDb
     .from('orders')
     .select(
-      `id, order_number, status, delivered_at, created_at,
+      `id, order_number, status, total_amount, delivered_at, created_at,
        items:order_items(id, product_id, variant_id, product_name, variant_name, sku, image_url, quantity, unit_price)`,
     )
     .eq('order_number', input.order_number)
@@ -104,6 +104,7 @@ export async function POST(req: NextRequest) {
   const o = order as never as {
     id: string
     order_number: string
+    total_amount: number | null
     items: {
       id: string
       product_id: string | null
@@ -118,6 +119,22 @@ export async function POST(req: NextRequest) {
   }
 
   const policy = await getActivePolicy(auth.adminDb)
+
+  // Check existing refunds to calculate remaining refundable paid amount
+  const { data: pastRefunds } = await auth.adminDb
+    .from('refunds')
+    .select('amount')
+    .eq('order_id', o.id)
+    .in('status', ['pending', 'processing', 'completed'])
+  const totalPastRefunded = (pastRefunds ?? []).reduce(
+    (acc: number, rf: { amount: number }) => acc + Number(rf.amount || 0),
+    0,
+  )
+  const orderTotalPaid = Number(o.total_amount ?? 0)
+  const remainingPaid = Math.max(0, orderTotalPaid - totalPastRefunded)
+  if (remainingPaid <= 0) {
+    return jsonError('Pesanan ini sudah tidak dapat direturn karena dana telah sepenuhnya direfund', 422)
+  }
 
   // Eligibility (re-check server-side)
   const { count: openCount } = await auth.adminDb
@@ -174,7 +191,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const resolvedItems = input.items.map((reqItem) => {
+  const rawResolvedItems = input.items.map((reqItem) => {
     const src = orderItemMap.get(reqItem.order_item_id)!
     const prevReturned = previouslyReturnedMap.get(reqItem.order_item_id) ?? 0
     const remainingQty = Math.max(0, src.quantity - prevReturned)
@@ -194,7 +211,17 @@ export async function POST(req: NextRequest) {
     }
   })
 
-  const amount = computeRefundAmount(resolvedItems)
+  const rawAmount = computeRefundAmount(rawResolvedItems)
+  const amount = Math.min(rawAmount, remainingPaid)
+
+  // Scale line item refund amount proportionally if capped by remaining paid amount
+  const resolvedItems = rawResolvedItems.map((it) => {
+    if (rawAmount > remainingPaid && rawAmount > 0) {
+      const scaledLine = Math.round((it.line_refund_amount / rawAmount) * amount)
+      return { ...it, line_refund_amount: scaledLine }
+    }
+    return it
+  })
 
   // Risk scoring (SECURITY DEFINER RPC)
   let riskScore = 0

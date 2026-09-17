@@ -21,7 +21,7 @@ import { sanitizeCustomerPayload } from '@/lib/auth/adminAuth'
 import { calculateMembershipTier } from '@/lib/loyalty/tierEngine'
 import { getCustomerAcquisitionAttribution } from '@/lib/attribution/attributionService'
 
-const VALID_ORDER_STATUSES = ['paid', 'processing', 'shipped', 'delivered', 'completed']
+const VALID_ORDER_STATUSES = ['paid', 'processing', 'shipped', 'delivered', 'completed', 'refunded']
 const VALID_REFUND_STATUSES = ['pending', 'processing', 'completed']
 
 /**
@@ -332,7 +332,7 @@ export async function getCustomer360Detail(
   const allOrders = orders ?? []
   const validOrders = allOrders.filter((o) => VALID_ORDER_STATUSES.includes(o.status))
   const paidOrders = allOrders.filter((o) => o.status === 'paid')
-  const completedOrders = allOrders.filter((o) => o.status === 'completed')
+  const completedOrders = allOrders.filter((o) => o.status === 'completed' || o.status === 'refunded')
   const cancelledOrders = allOrders.filter((o) => o.status === 'cancelled')
 
   const sortedValidOrderDates = validOrders
