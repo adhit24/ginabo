@@ -17,6 +17,9 @@ const SECURITY_HEADERS = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  env: {
+    DOKU_IS_PRODUCTION: 'true',
+  },
   experimental: {},
 
   typescript: {

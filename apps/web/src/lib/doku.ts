@@ -5,7 +5,9 @@ import { createHash, createHmac, timingSafeEqual } from 'crypto'
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-export const isDokuProduction = process.env.DOKU_IS_PRODUCTION === 'true'
+export const isDokuProduction =
+  process.env.DOKU_IS_PRODUCTION === 'true' ||
+  (process.env.DOKU_CLIENT_ID?.startsWith('BRN-') ?? false)
 
 export const dokuClientId = process.env.DOKU_CLIENT_ID ?? ''
 export const dokuSecretKey = process.env.DOKU_SECRET_KEY ?? ''
@@ -47,6 +49,10 @@ export interface DokuCheckoutRequestPayload {
     name: string
     email: string
     phone?: string
+  }
+  additional_info?: {
+    override_notification_url?: string
+    [key: string]: unknown
   }
 }
 
@@ -146,6 +152,9 @@ export async function createDokuCheckoutSession(opts: {
     throw new Error('DOKU credentials (DOKU_CLIENT_ID, DOKU_SECRET_KEY) are not configured')
   }
 
+  const callbackUrl = opts.callbackUrl ?? `${process.env.NEXT_PUBLIC_APP_URL || 'https://ginabo-git-staging-adhit24s-projects.vercel.app'}/checkout/finish`
+  const notificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://ginabo-git-staging-adhit24s-projects.vercel.app'}/api/payment/webhook`
+
   const payload: DokuCheckoutRequestPayload = {
     order: {
       invoice_number: opts.orderNumber,
@@ -155,7 +164,7 @@ export async function createDokuCheckoutSession(opts: {
         price: item.price,
         quantity: item.quantity,
       })),
-      callback_url: opts.callbackUrl ?? `${process.env.NEXT_PUBLIC_APP_URL}/checkout/finish`,
+      callback_url: callbackUrl,
       auto_redirect: true,
     },
     payment: {
@@ -166,6 +175,9 @@ export async function createDokuCheckoutSession(opts: {
       name: opts.customer.name,
       email: opts.customer.email,
       phone: opts.customer.phone || '081234567890',
+    },
+    additional_info: {
+      override_notification_url: notificationUrl,
     },
   }
 
