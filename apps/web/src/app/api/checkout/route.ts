@@ -659,7 +659,7 @@ export async function POST(req: NextRequest) {
         status: 'failed',
         checkout_url: null,
         raw_response: null,
-        raw_notification: null,
+        raw_notification: { reason: 'doku_session_creation_failed', error: error instanceof Error ? error.message : String(error) },
       }, { onConflict: 'provider,order_id' })
 
     if (failedPaymentError) {

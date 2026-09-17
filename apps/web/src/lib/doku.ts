@@ -108,6 +108,13 @@ export function computeBodyDigest(bodyString: string): string {
 }
 
 /**
+ * Strips special characters rejected by DOKU's name validator (e.g. brackets, colons, punctuation).
+ */
+export function sanitizeDokuName(name: string): string {
+  return name.replace(/[^a-zA-Z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100) || 'Pelanggan'
+}
+
+/**
  * Computes DOKU Signature header for HTTP requests or Webhooks.
  * Formula:
  * HMACSHA256 = Base64(HMAC-SHA256(SecretKey, Client-Id + \n + Request-Id + \n + Request-Timestamp + \n + Request-Target + \n + Digest))
@@ -160,7 +167,7 @@ export async function createDokuCheckoutSession(opts: {
       invoice_number: opts.orderNumber,
       amount: opts.totalAmount,
       line_items: opts.items.map((item) => ({
-        name: item.name.slice(0, 100),
+        name: sanitizeDokuName(item.name),
         price: item.price,
         quantity: item.quantity,
       })),
@@ -172,7 +179,7 @@ export async function createDokuCheckoutSession(opts: {
     },
     customer: {
       id: opts.customer.id || opts.orderNumber,
-      name: opts.customer.name,
+      name: sanitizeDokuName(opts.customer.name),
       email: opts.customer.email,
       phone: opts.customer.phone || '081234567890',
     },
