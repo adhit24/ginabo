@@ -229,6 +229,56 @@ export default async function OrderDetailPage({ params }: PageProps) {
             </span>
           </div>
 
+          {/* Contextual Status Alert Banner */}
+          {order.status === 'pending' && (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+              <p className="font-semibold">Menunggu Pembayaran</p>
+              <p className="mt-1 text-xs text-amber-700">
+                Pesanan Anda belum dibayar atau pembayaran sedang menunggu konfirmasi. Silakan selesaikan pembayaran menggunakan instruksi atau tombol &quot;Bayar Sekarang&quot; di bawah.
+              </p>
+            </div>
+          )}
+          {order.status === 'cancelled' && (
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+              <p className="font-semibold">Pesanan Dibatalkan</p>
+              <p className="mt-1 text-xs text-red-700">
+                Pembayaran belum berhasil diselesaikan atau pesanan telah dibatalkan. Anda dapat melakukan pemesanan ulang melalui katalog toko kami.
+              </p>
+            </div>
+          )}
+          {order.status === 'refunded' && (
+            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-900">
+              <p className="font-semibold">Pesanan Dikembalikan (Refund)</p>
+              <p className="mt-1 text-xs text-gray-600">
+                Pengembalian dana untuk pesanan ini telah diproses sesuai kebijakan retur dan pengembalian dana Ginabo.
+              </p>
+            </div>
+          )}
+          {(order.status === 'paid' || order.status === 'processing') && (
+            <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+              <p className="font-semibold">Pembayaran Terkonfirmasi</p>
+              <p className="mt-1 text-xs text-blue-700">
+                Terima kasih! Pembayaran Anda telah kami terima secara terverifikasi dan pesanan sedang dipersiapkan oleh tim pemenuhan kami.
+              </p>
+            </div>
+          )}
+          {order.status === 'shipped' && (
+            <div className="rounded-2xl border border-purple-200 bg-purple-50 p-4 text-sm text-purple-900">
+              <p className="font-semibold">Pesanan Sedang Dikirim</p>
+              <p className="mt-1 text-xs text-purple-700">
+                Paket Anda telah diserahkan ke pihak ekspedisi. Anda dapat memantau nomor resi di bawah ini.
+              </p>
+            </div>
+          )}
+          {(order.status === 'delivered' || order.status === 'completed') && (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+              <p className="font-semibold">Pesanan Selesai</p>
+              <p className="mt-1 text-xs text-emerald-700">
+                Pesanan telah berhasil diterima. Jika terdapat kendala fisik atau ketidaksesuaian barang, Anda dapat mengajukan permohonan retur di bawah.
+              </p>
+            </div>
+          )}
+
           {/* Items */}
           <div className="grid gap-3">
             <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -358,6 +408,11 @@ export default async function OrderDetailPage({ params }: PageProps) {
               paymentUrl={latestPayment.checkout_url || latestPayment.payment_url}
               orderNumber={order.order_number}
             />
+          )}
+          {isPendingPayment && !latestPayment?.checkout_url && !latestPayment?.payment_url && (
+            <p className="w-full text-xs text-amber-700">
+              Sesi pembayaran belum tersedia atau telah berakhir. Jika Anda belum menyelesaikan pembayaran, silakan hubungi customer service atau buat pesanan baru.
+            </p>
           )}
           <Link
             href="/shop"
